@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/imgs">
+        <file>icons/noun_copy_2080193.png</file>
+        <file>icons/noun_Cut File_3118760.png</file>
+        <file>icons/noun_Download_2383249.png</file>
+        <file>icons/noun_file find_556585.png</file>
+        <file>icons/noun_new file_2650249.png</file>
+        <file>icons/noun_open_1509551.png</file>
+        <file>icons/noun_paste_2302624.png</file>
+        <file>icons/noun_Redo_124669.png</file>
+        <file>icons/noun_replace_1913722.png</file>
+        <file>icons/noun_Save_1435429.png</file>
+        <file>icons/noun_Undo_1246691.png</file>
+        <file>icons/noun_lock user_2052931.png</file>
+    </qresource>
+    <qresource prefix="/appIcon">
+        <file>CoText.ico</file>
+        <file>CoText.icns</file>
+    </qresource>
+</RCC>
