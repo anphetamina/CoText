@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1.0)
 
-project(CoText)
+project(CoText-client)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -17,21 +17,8 @@ find_package(Qt5 COMPONENTS Gui REQUIRED)
 find_package(Qt5 COMPONENTS Network REQUIRED)
 find_package(Qt5 COMPONENTS Sql REQUIRED)
 
-file(GLOB CLIENT
-        "client/*.h"
-        "client/*.cpp"
-        )
-file(GLOB SERVER
-        "server/*.h"
-        "server/*.cpp"
-        )
-file(GLOB GUI
-        "gui/*.h"
-        "gui/*.cpp"
-        "gui/*.ui"
-        "gui/Resources.qrc"
-        )
+file(GLOB CLIENT "*.h" "*.cpp" "*.ui" "Resources.qrc")
 
-add_executable(CoText main.cpp ${CLIENT} ${SERVER} ${GUI})
+add_executable(CoText-client main.cpp ${CLIENT})
 
-target_link_libraries(CoText Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Network Qt5::Sql)
+target_link_libraries(CoText-client Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Network Qt5::Sql)
