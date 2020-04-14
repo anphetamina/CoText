@@ -1,0 +1,37 @@
+cmake_minimum_required(VERSION 3.15)
+project(TogheditServer)
+
+set(CMAKE_CXX_STANDARD 17)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+#set(INSTALL_EXAMPLEDIR "examples/websockets/sslechoserver")
+
+find_package(Qt5 COMPONENTS WebSockets)
+
+add_executable(TogheditServer main.cpp sslechoserver.cpp sslechoserver.h PacketDef.h Packet.cpp Packet.h Parser.cpp Parser.h)
+
+target_link_libraries(TogheditServer PUBLIC
+        Qt5::WebSockets
+        )
+
+# Resources:
+set(securesocketclient_resource_files
+        "localhost.cert"
+        "localhost.key"
+        )
+
+qt5_add_resources(TogheditServer "securesocketclient"
+        PREFIX
+        "securesocketclient.qrc"
+        FILES
+        ${securesocketclient_resource_files}
+        )
+
+#install(TARGETS sslechoserver
+#        RUNTIME DESTINATION "${INSTALL_EXAMPLEDIR}"
+#        BUNDLE DESTINATION "${INSTALL_EXAMPLEDIR}"
+#        LIBRARY DESTINATION "${INSTALL_EXAMPLEDIR}"
+#        )
