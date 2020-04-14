@@ -21,8 +21,9 @@ find_package(Qt5 COMPONENTS PrintSupport REQUIRED)
 find_package(Qt5WebSockets REQUIRED)
 
 file(GLOB CLIENT "*.h" "*.cpp" "*.ui" "Resources.qrc")
+file(GLOB GUI "gui/.h" "gui/.cpp" "gui/*.ui" "gui/Resources.qrc")
 
-add_executable(CoText-client main.cpp ${CLIENT})
+add_executable(CoText-client main.cpp ${CLIENT} ${GUI})
 
 target_link_libraries(CoText-client Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Network Qt5::Sql Qt5::Svg Qt5::PrintSupport)
 
