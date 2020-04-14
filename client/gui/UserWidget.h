@@ -21,36 +21,11 @@ class UserWidget : public QDialog {
 public:
     explicit UserWidget(QWidget *parent = nullptr);
     ~UserWidget();
-    QString getName();
-    QString getSurname();
-    QString getEmail();
-    QString getNick();
-    QIcon getProfilePic();
 
-    void setName(QString _name);
-    void setSurname(QString _surname);
-    void setProfilePic(QIcon _profilePic);
-    void setNick(QString _nickname);
-    void setEmail(QString _email);
-    void addFriend(User * _usrFriend);
-    void setTimeBeforeInactive(int _timer);
-    void setUserState(int _state);
-
-    QList<User*> getFriends();
-
-    int getUserState();
-    int getActualSecondsBeforeInactive();
 
 private:
     Ui::UserWidget *ui;
-    QList<User*> friendList;
-    QString name;
-    QString surname;
-    QString nickname;
-    QString email;
-    QIcon profilePic;
-    int userState;
-    int secondsBeforeInactive;
+
 };
 
 #endif // USERWIDGET_H
