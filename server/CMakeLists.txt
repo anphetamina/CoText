@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(TogheditServer)
+project(CoText-server)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -11,9 +11,9 @@ set(CMAKE_AUTOUIC ON)
 
 find_package(Qt5 COMPONENTS WebSockets)
 
-add_executable(TogheditServer main.cpp sslechoserver.cpp sslechoserver.h PacketDef.h Packet.cpp Packet.h Parser.cpp Parser.h)
+add_executable(CoText-server main.cpp sslechoserver.cpp sslechoserver.h PacketDef.h Packet.cpp Packet.h Parser.cpp Parser.h)
 
-target_link_libraries(TogheditServer PUBLIC
+target_link_libraries(CoText-server PUBLIC
         Qt5::WebSockets
         )
 
@@ -23,7 +23,7 @@ set(securesocketclient_resource_files
         "localhost.key"
         )
 
-qt5_add_resources(TogheditServer "securesocketclient"
+qt5_add_resources(CoText-server "securesocketclient"
         PREFIX
         "securesocketclient.qrc"
         FILES

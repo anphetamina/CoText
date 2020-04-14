@@ -18,9 +18,12 @@ find_package(Qt5 COMPONENTS Network REQUIRED)
 find_package(Qt5 COMPONENTS Sql REQUIRED)
 find_package(Qt5 COMPONENTS Svg REQUIRED)
 find_package(Qt5 COMPONENTS PrintSupport REQUIRED)
+find_package(Qt5WebSockets REQUIRED)
 
 file(GLOB CLIENT "*.h" "*.cpp" "*.ui" "Resources.qrc")
 
 add_executable(CoText-client main.cpp ${CLIENT})
 
 target_link_libraries(CoText-client Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Network Qt5::Sql Qt5::Svg Qt5::PrintSupport)
+
+target_link_libraries(CoText-client Qt5::WebSockets)
