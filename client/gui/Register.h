@@ -2,6 +2,13 @@
 #define REGISTER_H
 
 #include <QDialog>
+#include <QDrag>
+#include <QDragEnterEvent>
+#include <QDragLeaveEvent>
+#include <QDropEvent>
+#include <QMimeData>
+#include <QIcon>
+#include "mainwindow.h"
 
 namespace Ui {
 class Register;
@@ -17,6 +24,11 @@ public:
 
 private slots:
     void on_pushButton_Register_clicked();
+    void dragEnterEvent(QDragEnterEvent *event) override;
+    void dropEvent(QDropEvent *event) override;
+    //void dragLeaveEvent(QDragLeaveEvent *event) override;
+
+
 
 private:
     QString name;
@@ -25,6 +37,7 @@ private:
     QString pass1;
     QString pass2;
     QString email;
+    QIcon profilePicture;
     Ui::Register *ui;
     void clearInput();
 };

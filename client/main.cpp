@@ -1,5 +1,5 @@
-#include "MainWindow.h"
-#include "Login.h"
+#include "./gui/MainWindow.h"
+#include "./gui/Login.h"
 
 #include <QApplication> //manages: widgets, events, mouse movements, overall looking feel
 
