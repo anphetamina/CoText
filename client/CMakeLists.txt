@@ -20,8 +20,8 @@ find_package(Qt5 COMPONENTS Svg REQUIRED)
 find_package(Qt5 COMPONENTS PrintSupport REQUIRED)
 find_package(Qt5WebSockets REQUIRED)
 
-file(GLOB CLIENT "*.h" "*.cpp" "*.ui" "Resources.qrc")
-file(GLOB GUI "gui/.h" "gui/.cpp" "gui/*.ui" "gui/Resources.qrc")
+file(GLOB CLIENT "*.h" "*.cpp")
+file(GLOB GUI "gui/*.h" "gui/*.cpp" "gui/*.ui" "gui/Resources.qrc")
 
 add_executable(CoText-client main.cpp ${CLIENT} ${GUI})
 

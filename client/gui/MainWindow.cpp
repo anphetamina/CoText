@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 #include "Login.h"
 #include "DBConf.h"
-#include "UserWidget.h"
+
 
 
 #include <QPixmap> //allows to create a qpixmap onj which takes 1 arg
@@ -15,10 +15,12 @@
 
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow){
+	
     QApplication::instance()->setAttribute(Qt::AA_DontShowIconsInMenus, true);
+    
     ui->setupUi(this);
     //this->user = nullptr;
-    user = nullptr;
+    
 
 
     //installing EventFilter for QToolButtons on the qToolBar
@@ -315,16 +317,4 @@ void MainWindow::on_actionLogin_triggered()
 void MainWindow::on_actionShare_Uri_triggered() {
     QMessageBox::StandardButton reply = QMessageBox::warning(this, "ciao", "uri");
 }
-/*
-static void MainWindow::setUser(User* _user) {
-    user = new User();
-    user->setName(_user->getName());
-    user->setSurname(_user->getSurname());
-    user->setNick(_user->getNick());
-    user->setEmail(_user->getNick());
-    user->setProfilePic(_user->getProfilePic());
-    user->setUserState(20); //ACTIVE USER
-
-}
-*/
 

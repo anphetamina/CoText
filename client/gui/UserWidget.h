@@ -1,6 +1,7 @@
 #ifndef USERWIDGET_H
 #define USERWIDGET_H
 
+
 #include <QDialog>
 #include <QIcon>
 #include "../User.h"

@@ -26,7 +26,7 @@
  */
 
 
-extern User *user;
+static User *user = nullptr;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -38,8 +38,9 @@ class MainWindow : public QMainWindow
 
 public:
 
-    MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    
     static void setUser(User* usr){
         user = new User();
         user->setName(usr->getName());
