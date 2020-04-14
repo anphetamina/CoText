@@ -1,8 +1,14 @@
 //
 // Created by Emanuele Munafò on 13/04/2020.
 //
+#ifdef _WIN32
+  /* See http://stackoverflow.com/questions/12765743/getaddrinfo-on-win32 */
+  #ifndef _WIN32_WINNT
+    #define _WIN32_WINNT 0x0501  /* Windows XP. */
+  #endif
+  #include <winsock2.h>
+#endif
 
-#include <winsock.h>
 #include "Packet.h"
 
 Packet::Packet()

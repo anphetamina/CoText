@@ -2,7 +2,14 @@
 // Created by Emanuele Munafò on 13/04/2020.
 //
 
-#include <winsock.h>
+#ifdef _WIN32
+/* See http://stackoverflow.com/questions/12765743/getaddrinfo-on-win32 */
+  #ifndef _WIN32_WINNT
+    #define _WIN32_WINNT 0x0501  /* Windows XP. */
+  #endif
+  #include <winsock2.h>
+#endif
+
 #include "Parser.h"
 
 bool Parser::parse(uint8_t* data, size_t len, size_t& bytesRead, Packet& packet)

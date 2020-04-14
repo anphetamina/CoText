@@ -13,8 +13,6 @@ endif()
 
 IF(WIN32)
     SET(OS_SPECIFIC_LIBS netapi32 wsock32)
-ELSE(WIN32)
-    SET(OS_SPECIFIC_LIBS )
 ENDIF(WIN32)
 
 find_package(Qt5 COMPONENTS Core REQUIRED)
