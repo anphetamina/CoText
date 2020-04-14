@@ -1,5 +1,6 @@
 #include "UserWidget.h"
 #include "ui_user.h"
+#include "../User.h"
 
 UserWidget::UserWidget(QWidget *parent) : QDialog(parent), ui(new Ui::UserWidget) {
     ui->setupUi(this);
@@ -7,37 +8,37 @@ UserWidget::UserWidget(QWidget *parent) : QDialog(parent), ui(new Ui::UserWidget
     this->setTimeBeforeInactive(300);
 }
 
-User::~User() { delete ui; }
+UserWidget::~UserWidget() { delete ui; }
 /* GETTERS */
-QString User::getName() { return this->name; }
+QString UserWidget::getName() { return this->name; }
 
-QString User::getSurname() { return this->surname; }
+QString UserWidget::getSurname() { return this->surname; }
 
-QString User::getEmail() { return this->email; }
+QString UserWidget::getEmail() { return this->email; }
 
-QString User::getNick() { return this->nickname; }
+QString UserWidget::getNick() { return this->nickname; }
 
-QIcon User::getProfilePic(){ return this->profilePic; }
+QIcon UserWidget::getProfilePic(){ return this->profilePic; }
 
-QList<User*> User::getFriends() { return this->friendList; }
+QList<User*> UserWidget::getFriends() { return this->friendList; }
 
-int User::getUserState() { return this->userState; }
+int UserWidget::getUserState() { return this->userState; }
 
-int User::getActualSecondsBeforeInactive() { return this->secondsBeforeInactive; }
+int UserWidget::getActualSecondsBeforeInactive() { return this->secondsBeforeInactive; }
 
 /* SETTERS */
-void User::setName(QString _name) { this->name = _name; }
+void UserWidget::setName(QString _name) { this->name = _name; }
 
-void User::setSurname(QString _surname) { this->surname = _surname; }
+void UserWidget::setSurname(QString _surname) { this->surname = _surname; }
 
-void User::setProfilePic(QIcon _profilePic) { this->profilePic = _profilePic; }
+void UserWidget::setProfilePic(QIcon _profilePic) { this->profilePic = _profilePic; }
 
-void User::setNick(QString _nick) { this->nickname = _nick; }
+void UserWidget::setNick(QString _nick) { this->nickname = _nick; }
 
-void User::setEmail(QString _email) { this->email = _email; }
+void UserWidget::setEmail(QString _email) { this->email = _email; }
 
-void User::addFriend(User* _usrFriend) { this->friendList.append(_usrFriend); }
+void UserWidget::addFriend(User* _usrFriend) { this->friendList.append(_usrFriend); }
 
-void User::setTimeBeforeInactive(int _timer){ this->secondsBeforeInactive = _timer; }
+void UserWidget::setTimeBeforeInactive(int _timer){ this->secondsBeforeInactive = _timer; }
 
-void User::setUserState(int _state) { this->userState = _state; }
+void UserWidget::setUserState(int _state) { this->userState = _state; }

@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QIcon>
+#include "../User.h"
 
 #define ACTIVE 20
 #define INACTIVE 21
@@ -19,7 +20,7 @@ class UserWidget : public QDialog {
 
 public:
     explicit UserWidget(QWidget *parent = nullptr);
-    ~User();
+    ~UserWidget();
     QString getName();
     QString getSurname();
     QString getEmail();
