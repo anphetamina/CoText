@@ -1,7 +1,7 @@
-#include "user.h"
+#include "UserWidget.h"
 #include "ui_user.h"
 
-User::User(QWidget *parent) : QDialog(parent), ui(new Ui::User) {
+UserWidget::UserWidget(QWidget *parent) : QDialog(parent), ui(new Ui::UserWidget) {
     ui->setupUi(this);
     this->setUserState(OFFLINE);
     this->setTimeBeforeInactive(300);

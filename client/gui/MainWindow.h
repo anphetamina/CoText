@@ -12,7 +12,7 @@
 #include <QWidget>
 #include <QEvent>
 
-#include "user.h"
+#include "UserWidget.h"
 
 //#include <QSqlDatabase>
 

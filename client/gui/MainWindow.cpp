@@ -1,8 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "login.h"
-#include "dbConf.h"
-#include "user.h"
+#include "Login.h"
+#include "DBConf.h"
+#include "UserWidget.h"
 
 
 #include <QPixmap> //allows to create a qpixmap onj which takes 1 arg

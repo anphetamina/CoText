@@ -1,5 +1,5 @@
-#ifndef USER_H
-#define USER_H
+#ifndef USERWIDGET_H
+#define USERWIDGET_H
 
 #include <QDialog>
 #include <QIcon>
@@ -11,14 +11,14 @@
 
 
 namespace Ui {
-class User;
+class UserWidget;
 }
 
-class User : public QDialog {
+class UserWidget : public QDialog {
     Q_OBJECT
 
 public:
-    explicit User(QWidget *parent = nullptr);
+    explicit UserWidget(QWidget *parent = nullptr);
     ~User();
     QString getName();
     QString getSurname();
@@ -41,7 +41,7 @@ public:
     int getActualSecondsBeforeInactive();
 
 private:
-    Ui::User *ui;
+    Ui::UserWidget *ui;
     QList<User*> friendList;
     QString name;
     QString surname;
@@ -52,4 +52,4 @@ private:
     int secondsBeforeInactive;
 };
 
-#endif // USER_H
+#endif // USERWIDGET_H

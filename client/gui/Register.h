@@ -8,7 +8,7 @@
 #include <QDropEvent>
 #include <QMimeData>
 #include <QIcon>
-#include "mainwindow.h"
+#include "MainWindow.h"
 
 namespace Ui {
 class Register;
