@@ -1,6 +1,7 @@
-#include "Login.h"
+#include "login.h"
 #include "ui_login.h"
-#include "Register.h"
+#include "register.h"
+#include "user.h"
 
 Login::Login(QWidget *parent) :
     QDialog(parent),
