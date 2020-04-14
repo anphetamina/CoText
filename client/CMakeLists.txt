@@ -11,6 +11,12 @@ if(CMAKE_VERSION VERSION_LESS "3.7.0")
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
 endif()
 
+IF(WIN32)
+    SET(OS_SPECIFIC_LIBS netapi32 wsock32)
+ELSE(WIN32)
+    SET(OS_SPECIFIC_LIBS )
+ENDIF(WIN32)
+
 find_package(Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt5 COMPONENTS Gui REQUIRED)
@@ -25,6 +31,4 @@ file(GLOB GUI "gui/*.h" "gui/*.cpp" "gui/*.ui" "gui/Resources.qrc")
 
 add_executable(CoText-client main.cpp ${CLIENT} ${GUI})
 
-target_link_libraries(CoText-client Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Network Qt5::Sql Qt5::Svg Qt5::PrintSupport)
-
-target_link_libraries(CoText-client Qt5::WebSockets)
+target_link_libraries(CoText-client Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Network Qt5::Sql Qt5::Svg Qt5::PrintSupport Qt5::WebSockets ${OS_SPECIFIC_LIBS})

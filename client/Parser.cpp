@@ -2,6 +2,7 @@
 // Created by Emanuele Munafò on 13/04/2020.
 //
 
+#include <winsock.h>
 #include "Parser.h"
 
 bool Parser::parse(uint8_t* data, size_t len, size_t& bytesRead, Packet& packet)
