@@ -11,7 +11,7 @@ set(CMAKE_AUTOUIC ON)
 
 find_package(Qt5 COMPONENTS WebSockets)
 
-add_executable(CoText-server main.cpp sslechoserver.cpp sslechoserver.h PacketDef.h Packet.cpp Packet.h Parser.cpp Parser.h)
+add_executable(CoText-server main.cpp sslechoserver.cpp sslechoserver.h PacketDef.h Packet.cpp Packet.h PingPacket.cpp PingPacket.h)
 
 target_link_libraries(CoText-server PUBLIC
         Qt5::WebSockets

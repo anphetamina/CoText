@@ -38,6 +38,8 @@ private:
 
 
     void tryLogin(Packet rcvd_packet);
+
+    void dispatch(PacketHandler rcvd_packet, QWebSocket* m_webSocket);
 };
 
 #endif //SSLECHOSERVER_H

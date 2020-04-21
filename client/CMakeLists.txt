@@ -27,6 +27,6 @@ find_package(Qt5WebSockets REQUIRED)
 file(GLOB CLIENT "*.h" "*.cpp")
 file(GLOB GUI "gui/*.h" "gui/*.cpp" "gui/*.ui" "gui/Resources.qrc")
 
-add_executable(CoText-client main.cpp ${CLIENT} ${GUI})
+add_executable(CoText-client main.cpp ${CLIENT} ${GUI} PingPacket.cpp PingPacket.h)
 
 target_link_libraries(CoText-client Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Network Qt5::Sql Qt5::Svg Qt5::PrintSupport Qt5::WebSockets ${OS_SPECIFIC_LIBS})

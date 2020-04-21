@@ -9,7 +9,7 @@
   #endif
   #include <winsock2.h>
 #endif
-
+/*
 #include "Parser.h"
 
 bool Parser::parse(uint8_t* data, size_t len, size_t& bytesRead, Packet& packet)
@@ -29,19 +29,20 @@ bool Parser::parse(uint8_t* data, size_t len, size_t& bytesRead, Packet& packet)
                     _field_step = 0;
                     continue;
                 }
-                packet.header = b;
+                //packet.header = b;
                 _field_step++;
                 break;
 
                 // Flags.
             case 1:
-                packet.flags = b;
+                packet.setFlags(b);
                 _field_step++;
                 break;
 
                 // Type (2 bytes!).
             case 2:
-                packet.type = uint16_t(b) << 8;
+                //packet.type = uint16_t(b) << 8;
+                packet.setType(b);
                 _field_step++;
                 break;
 
@@ -100,4 +101,4 @@ bool Parser::parse(uint8_t* data, size_t len, size_t& bytesRead, Packet& packet)
         }
     }
     return false;
-}
+}*/

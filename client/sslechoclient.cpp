@@ -6,6 +6,7 @@
 #include "Packet.h"
 #include "Parser.h"
 #include "PacketDef.h"
+#include "PingPacket.h"
 #include <QtCore/QDebug>
 #include <QtWebSockets/QWebSocket>
 #include <QCoreApplication>
@@ -34,8 +35,9 @@ void SslEchoClient::onConnected()
     // And set callback for binary msg
     connect(&m_webSocket, &QWebSocket::binaryMessageReceived,
             this, &SslEchoClient::onBinaryMessageReceived);
-    //this->sendPing();
-    this->sendLogin();
+    this->sendPing();
+    this->sendPing();
+    //this->sendLogin();
     //m_webSocket.sendTextMessage(QStringLiteral("Hello, world!"));
 }
 //! [onConnected]
@@ -69,74 +71,51 @@ void SslEchoClient::onSslErrors(const QList<QSslError> &errors)
 
 void SslEchoClient::sendPing() {
     // Create buffer
-    std::vector<uint8_t> buf;
+    PingPacket pp = PingPacket("test");
 
-    // Define fields, serialize and send packets.
-    // Ping packet.
-    Packet pkt1;
-    pkt1.header = 0xAF;
-    pkt1.flags = 0x00;
-    pkt1.type = PACK_TYPE_PING;
-    pkt1.size = 3;
-    pkt1.data = {0x11, 0x22, 0x33};
-    pkt1.signature = 0xFF;
-    pkt1.serialize(buf);
-    QByteArray* qbuf = new QByteArray(reinterpret_cast<const char*>(buf.data()), buf.size());
-
+    pp.send(m_webSocket);
     qDebug() << "Ping sent";
-    m_webSocket.sendBinaryMessage(*qbuf);
-    delete qbuf;
 
 }
-
-void SslEchoClient::sendLogin() {
-    // Create buffer
-    std::vector<uint8_t> buf;
-
-    // Define fields, serialize and send packets.
-    // Ping packet.
-    Packet pkt1;
-    pkt1.header = 0xAF;
-    pkt1.flags = 0x00;
-    pkt1.type = PACK_TYPE_LOGIN_REQ;
-    pkt1.size = 3;
-    pkt1.data = {0x11, 0x22, 0x33};
-    pkt1.signature = 0xFF;
-    pkt1.serialize(buf);
-    QByteArray* qbuf = new QByteArray(reinterpret_cast<const char*>(buf.data()), buf.size());
-
-    // Send login message
-    qDebug() << "Login sent";
-    m_webSocket.sendBinaryMessage(*qbuf);
-    delete qbuf;
-
-}
-
 
 void SslEchoClient::packetParse(QByteArray rcvd_packet) {
+    PacketBuffer* pBuffer = new PacketBuffer();
 
     // Parsing.
-    Parser parser;
-    Packet packet;
+    /*QDataStream streamRcv(&rcvd_packet, QIODevice::ReadOnly);
+    //SocketBuffer& socketBuffer = clients.value(socket)->getSocketBuffer();// TODO: extend for many
 
-    // Convert again qbytearray to vector of byte for now
-    const unsigned char* begin = reinterpret_cast<unsigned char*>(rcvd_packet.data());
-    const unsigned char* end = begin + rcvd_packet.length();
-    std::vector<uint8_t> buf( begin, end );
-    // End casting
+    if (pBuffer->getDataSize() == 0) {
+        rcvd_packet >> pBuffer;
+    }*/
+    pBuffer->append(rcvd_packet);
 
-    uint8_t *p = buf.data();
-    size_t plen = buf.size();
-    while (plen > 0) {
-        size_t bytesRead = 0;
-        if (parser.parse(p, plen, bytesRead, packet)) {
-            // At this point the `packet` is complete.
-            qDebug() << "[INFO] Parsed new packet: type=" << packet.type << " size=" << packet.size << "sig=" << packet.signature;
+    if (pBuffer->isComplete()) {
+
+        QDataStream dataStream(pBuffer->bufferPtr(), QIODevice::ReadWrite);
+        quint8 mType = (quint8)pBuffer->getType();
+
+        try {
+            PacketHandler packetH = PacketHandler();
+            packetH->read(dataStream);
+            pBuffer->clearBuffer();
+
+            if (mType == PACK_TYPE_PING)
+            {
+                qDebug() << "[INFO] Parsed new packet:";
+                //packetHandler.process(message, socket);
+            }
+            else qDebug()  << "[ERROR] Uknown type: " << mType;
         }
-        p += bytesRead;
-        plen -= bytesRead;
+        catch (std::exception me)//(MyException& me)
+        {
+            qDebug() << me.what();
+            pBuffer->clearBuffer();
+            //socketAbort(m_webSocket);				// Terminate connection with the client
+        }
     }
 
+    /*
     // packet object and his field are instantiated now
     switch(packet.type){
         case PACK_TYPE_PING:
@@ -144,7 +123,6 @@ void SslEchoClient::packetParse(QByteArray rcvd_packet) {
             break;
         case PACK_TYPE_LOGIN_RES:
             qDebug() << "Login response";
-
             break;
         default:
             qDebug() << "Uknown packet type: " << packet.type;
@@ -152,6 +130,7 @@ void SslEchoClient::packetParse(QByteArray rcvd_packet) {
     }
 
     return;
+     */
 }
 
 

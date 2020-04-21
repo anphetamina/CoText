@@ -7,6 +7,7 @@
 #include "QtWebSockets/QWebSocket"
 #include "Parser.h"
 #include "PacketDef.h"
+#include "PingPacket.h"
 #include <QtCore/QDebug>
 #include <QtCore/QFile>
 #include <QtNetwork/QSslCertificate>
@@ -87,8 +88,7 @@ void SslEchoServer::processBinaryMessage(QByteArray message)
     // Parse packet
     this->packetParse(message);
 
-    // Send back (echoing) the packets?
-    /*
+    /* //Send back (echoing) the packets for debug
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
     if (pClient)
     {
@@ -119,59 +119,60 @@ void SslEchoServer::onSslErrors(const QList<QSslError> &)
 
 void SslEchoServer::packetParse(QByteArray rcvd_packet) {
 
-    // Parsing.
-    Parser parser;
-    Packet packet;
+    // Create a new packet buffer (used to w8 and receive for the full packet)
+    PacketBuffer* pBuffer = new PacketBuffer();
+    //qDebug() << rcvd_packet;
+    //Create a data stream (used to deserialize the rcvd bytearray  to a structured packet)
+    QDataStream streamRcv(&rcvd_packet, QIODevice::ReadOnly);
 
-    // Convert again qbytearray to vector of byte for now
-    const unsigned char* begin = reinterpret_cast<unsigned char*>(rcvd_packet.data());
-    const unsigned char* end = begin + rcvd_packet.length();
-    std::vector<uint8_t> buf( begin, end );
-    // End casting
+    // If the packet buffer is empty parse (deserialize) the headers field (MAGIC_VAL|Flags|type|payloadLen)
+    if (pBuffer->getDataSize() == 0) {
+        streamRcv >> *pBuffer;
+    }
+    // Append the continuation of the packet TODO:check
+    QByteArray payload = rcvd_packet.mid(4+sizeof(quint32));//header+Payoadlen skip
+    pBuffer->append(payload);
 
-    uint8_t *p = buf.data();
-    size_t plen = buf.size();
-    while (plen > 0) {
-        size_t bytesRead = 0;
-        if (parser.parse(p, plen, bytesRead, packet)) {
-            // At this point the `packet` is complete.
-            qDebug() << "[INFO] Parsed new packet: type=" << packet.type << " size=" << packet.size;
+    if (pBuffer->isComplete()) {
+
+        QDataStream dataStream(pBuffer->bufferPtr(), QIODevice::ReadWrite);
+        quint8 mType = (quint8)pBuffer->getType();
+
+        try {
+            // Create an empty packet and read the fields by deserializing the data stream into a structured Packet
+            PacketHandler packetH = PacketBuilder::Container(mType);
+            packetH->read(dataStream);
+            // Clear the buffer when a full packet is received (we are ready for the next one!)
+            pBuffer->clearBuffer();
+
+            // If the type is correct TODO: add HeadID check
+            if ( mType == PACK_TYPE_PING & mType <= PACK_TYPE_PING )
+            {
+                qDebug() << "[INFO] Parsed new packet. Type: " << mType;
+                QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
+                dispatch(packetH, pClient);
+            }
+            else qDebug()  << "[ERROR] Unknown packet type!\nUknType: " << mType;
         }
-        p += bytesRead;
-        plen -= bytesRead;
+        catch (std::exception me)//(MyException& me)
+        {
+            qDebug() << me.what();
+            pBuffer->clearBuffer();
+            //socketAbort(m_webSocket);				// Terminate connection with the client
+        }
     }
-    // packet object and his field are instantiated now
-    switch(packet.type){
-
-        case PACK_TYPE_PING:
-            qDebug() << "Ping received";
-            break;
-        case PACK_TYPE_LOGIN_REQ:
-            qDebug() << "Login request";
-            // Create user class
-            // (implicitly or explicitly generate key= signature)
-            this->tryLogin(packet);
-            break;
-        default:
-            qDebug() << "Uknown packet type: " << packet.type;
-            break;
-    }
-
-    return;
 }
-
+/*
 void SslEchoServer::tryLogin(Packet rcvd_packet) {
-    /*
 
-     user = new User(); // remember to delete on disconnect
-     if(!user->verify_login){
-        send_login_error()
-        del user;
-        return false;
-     }
-     user->generateSignature();
+//     user = new User(); // remember to delete on disconnect
+//     if(!user->verify_login){
+//        send_login_error()
+//        del user;
+//        return false;
+//     }
+//     user->generateSignature();
 
-     */
 
     // Create user class
     // (implicitly or explicitly generate key= signature)
@@ -193,4 +194,16 @@ void SslEchoServer::tryLogin(Packet rcvd_packet) {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
     pClient->sendBinaryMessage(*qbuf);
     delete qbuf;
+}*/
+
+void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* m_webSocket){
+    switch (rcvd_packet->getType()){
+        case(PACK_TYPE_PING):
+            qDebug() << rcvd_packet.get();
+            PingPacket* ping = dynamic_cast<PingPacket*>(rcvd_packet.get());
+            //PacketHandler response = emit loginRequest(m_webSocket, ping->getDebugMsg());
+            //response->send(socket);
+            qDebug() << ping->getDebugMsg();
+            break;
+    }
 }
