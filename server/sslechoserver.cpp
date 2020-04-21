@@ -115,7 +115,7 @@ void SslEchoServer::socketDisconnected()
         if (client->isLogged()) {
             qDebug() << "User " << client->getEmail() << " disconnected";
         }
-
+        // Remove client element from map and close the socket
         clientMapping.remove(pClient);
         pClient->close();
         pClient->deleteLater();
@@ -210,12 +210,18 @@ void SslEchoServer::tryLogin(Packet rcvd_packet) {
 
 void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* m_webSocket){
     switch (rcvd_packet->getType()){
-        case(PACK_TYPE_PING):
+        // Remeber to add {} scope to avoid jump from switch compilation error
+        case(PACK_TYPE_PING): {
             qDebug() << rcvd_packet.get();
-            PingPacket* ping = dynamic_cast<PingPacket*>(rcvd_packet.get());
-            //PacketHandler response = emit loginRequest(m_webSocket, ping->getDebugMsg());
-            //response->send(websocket);
+            PingPacket *ping = dynamic_cast<PingPacket *>(rcvd_packet.get());
             qDebug() << ping->getDebugMsg();
             break;
+        }
+        case(PACK_TYPE_LOGIN_REQ): {
+            qDebug() << rcvd_packet.get();
+            //PingPacket* ping = dynamic_cast<PingPacket*>(rcvd_packet.get());
+            //qDebug() << ping->getDebugMsg();
+            break;
+        }
     }
 }

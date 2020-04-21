@@ -45,10 +45,11 @@ void Packet::send(QWebSocket& m_webSocket) {
 
     // Define additional fields, serialize and send packets.
     this->serialize(qbuf, stream);
+
+    // We set and write the size after the serialization because we dont know the qByteArray length in a previous moment
     this->setSize(qbuf.size());
     this->writeSize(stream);
     qDebug() << "Buf size:" << qbuf.size();
-    // Send setAsLogged message
     qDebug() << "A packet was just sent";
     m_webSocket.sendBinaryMessage(qbuf);
     // Try to force a flush of the websocket buffer
@@ -64,7 +65,7 @@ void Packet::read(QDataStream& stream){
 
     readPayload(stream);
     if (stream.status() != QDataStream::Ok || !stream.atEnd()) {
-        //throw StreamReadException("Unable to read from stream", type);
+        //throw StreamException("Unable to read from stream", type);
     }
 }
 
@@ -283,7 +284,6 @@ PacketHandler PacketBuilder::Container(quint8 type)
     switch (type)
     {
         case PACK_TYPE_PING:			return new PingPacket();
-
 
         default:
             throw std::exception();//TODO: create custom exception

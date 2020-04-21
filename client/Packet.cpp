@@ -62,7 +62,7 @@ void Packet::read(QDataStream& stream){
 
     readPayload(stream);
     if (stream.status() != QDataStream::Ok || !stream.atEnd()) {
-        //throw StreamReadException("Unable to read from stream", type);
+        //throw StreamException("Unable to read from stream", type);
     }
 }
 
