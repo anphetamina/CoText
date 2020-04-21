@@ -48,10 +48,10 @@ void Packet::send(QWebSocket& m_webSocket) {
     this->setSize(qbuf.size());
     this->writeSize(stream);
     qDebug() << "Buf size:" << qbuf.size();
-    // Send login message
+    // Send setAsLogged message
     qDebug() << "A packet was just sent";
     m_webSocket.sendBinaryMessage(qbuf);
-    // Try to force a flush of the socket buffer
+    // Try to force a flush of the websocket buffer
     m_webSocket.flush();//"\xAF\x00\x00\x01\x00\x00\x00\x04\x00\x00\x00\b\x00t\x00""e\x00s\x00t"
 
 }
@@ -120,18 +120,18 @@ void Packet::setSignature(quint8 signature) {
 
 
 PacketHandler::PacketHandler()
-        : m_ptr(nullptr), ref(nullptr)
+        : ptr(nullptr), ref(nullptr)
 {
 }
 
 PacketHandler::PacketHandler(std::nullptr_t)
-        : m_ptr(nullptr), ref(nullptr)
+        : ptr(nullptr), ref(nullptr)
 {
 }
 
 PacketHandler::PacketHandler(Packet* m)
 try
-        : m_ptr(m), ref(new int(1))
+        : ptr(m), ref(new int(1))
 {
 }
 catch (...)
@@ -141,70 +141,70 @@ catch (...)
 }
 
 PacketHandler::PacketHandler(const PacketHandler& other)
-        : m_ptr(other.m_ptr), ref(other.ref)
+        : ptr(other.ptr), ref(other.ref)
 {
-    if (m_ptr != nullptr)
+    if (ptr != nullptr)
         ++(*ref);
 }
 
 PacketHandler::PacketHandler(PacketHandler&& other) noexcept
-        : m_ptr(other.m_ptr), ref(other.ref)
+        : ptr(other.ptr), ref(other.ref)
 {
-    other.m_ptr = nullptr;
+    other.ptr = nullptr;
 }
 
 PacketHandler& PacketHandler::operator=(PacketHandler other)
 {
     // Copy & Swap assignment operator implementation
-    std::swap(this->m_ptr, other.m_ptr);
+    std::swap(this->ptr, other.ptr);
     std::swap(this->ref, other.ref);
     return *this;
 }
 
 Packet& PacketHandler::operator*() const
 {
-    return *m_ptr;
+    return *ptr;
 }
 
 Packet* PacketHandler::operator->() const
 {
-    return m_ptr;
+    return ptr;
 }
 
 PacketHandler::operator bool() const
 {
-    return m_ptr != nullptr;
+    return ptr != nullptr;
 }
 
 Packet* PacketHandler::get() const
 {
-    return m_ptr;
+    return ptr;
 }
 
 void PacketHandler::reset()
 {
-    if (m_ptr != nullptr)
+    if (ptr != nullptr)
     {
         --(*ref);
         if (*ref == 0)
         {
-            delete m_ptr;
+            delete ptr;
             delete ref;
         }
     }
 
-    m_ptr = nullptr;
+    ptr = nullptr;
     ref = nullptr;
 }
 
 PacketHandler::~PacketHandler()
 {
-    if (m_ptr != nullptr)
+    if (ptr != nullptr)
     {
         --(*ref);
         if (*ref == 0)
         {
-            delete m_ptr;
+            delete ptr;
             delete ref;
         }
     }

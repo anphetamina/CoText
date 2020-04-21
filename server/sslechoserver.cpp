@@ -52,7 +52,7 @@ SslEchoServer::SslEchoServer(quint16 port, QObject *parent) :
 SslEchoServer::~SslEchoServer()
 {
     m_pWebSocketServer->close();
-    qDeleteAll(m_clients.begin(), m_clients.end());
+    //qDeleteAll(m_clients.begin(), m_clients.end());
 }
 
 //! [onNewConnection]
@@ -62,12 +62,16 @@ void SslEchoServer::onNewConnection()
 
     qDebug() << "Client connected:" << pSocket->peerName() << pSocket->origin() << pSocket->peerAddress();
 
+    // Create a new client object
+    QSharedPointer<Client> client(new Client(pSocket));
+    clientMapping.insert(pSocket, client);
+
     connect(pSocket, &QWebSocket::textMessageReceived, this, &SslEchoServer::processTextMessage);
     connect(pSocket, &QWebSocket::binaryMessageReceived,
             this, &SslEchoServer::processBinaryMessage);
     connect(pSocket, &QWebSocket::disconnected, this, &SslEchoServer::socketDisconnected);
 
-    m_clients << pSocket;
+    //m_clients << pSocket;
 }
 //! [onNewConnection]
 
@@ -98,14 +102,22 @@ void SslEchoServer::processBinaryMessage(QByteArray message)
 }
 //! [processBinaryMessage]
 
+
 //! [socketDisconnected]
 void SslEchoServer::socketDisconnected()
 {
-    qDebug() << "Client disconnected";
+    qDebug() << "Client seems to be disconnected";
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-    if (pClient)
-    {
-        m_clients.removeAll(pClient);
+
+    if (pClient) {
+        QSharedPointer<Client> client = clientMapping[pClient];
+
+        if (client->isLogged()) {
+            qDebug() << "User " << client->getEmail() << " disconnected";
+        }
+
+        clientMapping.remove(pClient);
+        pClient->close();
         pClient->deleteLater();
     }
 }
@@ -202,7 +214,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* m_webSocket)
             qDebug() << rcvd_packet.get();
             PingPacket* ping = dynamic_cast<PingPacket*>(rcvd_packet.get());
             //PacketHandler response = emit loginRequest(m_webSocket, ping->getDebugMsg());
-            //response->send(socket);
+            //response->send(websocket);
             qDebug() << ping->getDebugMsg();
             break;
     }

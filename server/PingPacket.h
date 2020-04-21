@@ -14,7 +14,7 @@ protected:
 
     PingPacket();
 
-    // Costruct LoginRequest message with the username of the account that is trying to login
+    // Costruct LoginRequest message with the username of the account that is trying to setAsLogged
 
     void writePayload(QDataStream& stream) const override;
     void readPayload(QDataStream& stream) override;

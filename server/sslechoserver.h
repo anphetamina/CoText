@@ -10,6 +10,7 @@
 #include <QtCore/QByteArray>
 #include <QtNetwork/QSslError>
 #include "Packet.h"
+#include "Client.h"
 
 QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
@@ -22,7 +23,7 @@ public:
     ~SslEchoServer() override;
 
 private Q_SLOTS:
-            void onNewConnection();
+    void onNewConnection();
     void processTextMessage(QString message);
     void processBinaryMessage(QByteArray message);
     void socketDisconnected();
@@ -30,7 +31,10 @@ private Q_SLOTS:
 
 private:
     QWebSocketServer *m_pWebSocketServer;
-    QList<QWebSocket *> m_clients;
+    //QList<QWebSocket *> m_clients;
+
+    // Association of socket and client
+    QMap<QWebSocket*, QSharedPointer<Client>> clientMapping;
 
     void packetParse(QByteArray rcvd_packet);
 

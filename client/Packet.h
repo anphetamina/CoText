@@ -79,7 +79,7 @@ class PacketHandler
 {
 private:
 
-    Packet* m_ptr;
+    Packet* ptr;
     int* ref;
 
 public:
