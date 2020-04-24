@@ -3,7 +3,7 @@
 //
 
 #include "PingPacket.h"
-#include "PacketDef.h"
+#include "Packet.h"
 
 
 /*************** LOGIN REQUEST MESSAGE ***************/

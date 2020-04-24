@@ -14,7 +14,8 @@
 
 
 class User  {
-
+    friend QDataStream& operator>>(QDataStream& in, User& user);
+    friend QDataStream& operator<<(QDataStream& out, const User& user);
 public:
     User();
     ~User();
@@ -47,7 +48,7 @@ private:
     QIcon profilePic;
     int userState;
     int secondsBeforeInactive;
-    uint8_t _signature = 0x00;
+    uint8_t signature = 0x00;
 
     void setSignature(uint8_t signature);
 

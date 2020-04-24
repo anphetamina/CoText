@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 project(CoText-server)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
@@ -12,7 +12,7 @@ set(CMAKE_AUTOUIC ON)
 find_package(Qt5 COMPONENTS WebSockets)
 find_package(Qt5 COMPONENTS Gui REQUIRED)
 
-add_executable(CoText-server main.cpp sslechoserver.cpp sslechoserver.h PacketDef.h Packet.cpp Packet.h PingPacket.cpp PingPacket.h Client.cpp Client.h User.cpp User.h LoginPacket.cpp LoginPacket.h)
+add_executable(CoText-server main.cpp sslechoserver.cpp sslechoserver.h PacketDef.h Packet.cpp Packet.h PingPacket.cpp PingPacket.h LoginPacket.cpp LoginPacket.h AccountPacket.cpp AccountPacket.h Client.cpp Client.h User.cpp User.h)
 
 target_link_libraries(CoText-server PUBLIC
         Qt5::WebSockets

@@ -25,7 +25,7 @@ QList<User*> User::getFriends() { return this->friendList; }
 int User::getUserState() { return this->userState; }
 
 int User::getActualSecondsBeforeInactive() { return this->secondsBeforeInactive; }
-int User::getSignature() { return this->_signature; }
+int User::getSignature() { return this->signature; }
 
 
 /* SETTERS */
@@ -45,4 +45,34 @@ void User::setTimeBeforeInactive(int _timer){ this->secondsBeforeInactive = _tim
 
 void User::setUserState(int _state) { this->userState = _state; }
 
-void User::setSignature(uint8_t signature) { this->_signature = signature; }
+void User::setSignature(uint8_t signature) { this->signature = signature; }
+
+
+QDataStream& operator>>(QDataStream& in, User& user)
+{
+    in >> user.name >> user.surname >> user.email
+       >> user.nickname
+       >> user.profilePic
+       //>> user.friendList
+       >> user.userState
+       >> user.secondsBeforeInactive
+       >> user.userState
+       >> user.signature
+            ;
+
+    return in;
+}
+
+QDataStream& operator<<(QDataStream& out, const User& user)
+{
+    out << user.name << user.surname << user.email
+        << user.nickname
+        << user.profilePic
+        //<< user.friendList
+        << user.userState
+        << user.secondsBeforeInactive
+        << user.userState
+        << user.signature
+            ;
+    return out;
+}

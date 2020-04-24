@@ -2,7 +2,7 @@
 // Created by Emanuele Munafò on 13/04/2020.
 //
 #ifdef _WIN32
-  /* See http://stackoverflow.com/questions/12765743/getaddrinfo-on-win32 */
+/* See http://stackoverflow.com/questions/12765743/getaddrinfo-on-win32 */
   #ifndef _WIN32_WINNT
     #define _WIN32_WINNT 0x0501  /* Windows XP. */
   #endif
@@ -13,7 +13,10 @@
 #include "Packet.h"
 #include "PacketDef.h"
 #include "PingPacket.h"
+#include "LoginPacket.h"
+#include "AccountPacket.h"
 
+/** Packet **/
 Packet::Packet(uint16_t type) : header(0xAF), type(type), flags(0x00)
 {}
 
@@ -25,8 +28,10 @@ Packet::~Packet()
 void Packet::serialize(QByteArray buf, QDataStream& stream)
 {
     // Header|FLAGS|type|size|payload
+
     stream << header << flags << type << quint32(0);
     this->writePayload(stream);
+
     if (stream.status() == QDataStream::WriteFailed) {
         //throw StreamException("Unable to write on stream during a send op", type);
     }
@@ -43,13 +48,14 @@ void Packet::send(QWebSocket& m_webSocket) {
 
     // Define additional fields, serialize and send packets.
     this->serialize(qbuf, stream);
+
+    // We set and write the size after the serialization because we dont know the qByteArray length in a previous moment
     this->setSize(qbuf.size());
     this->writeSize(stream);
     qDebug() << "Buf size:" << qbuf.size();
-    // Send login message
     qDebug() << "A packet was just sent";
     m_webSocket.sendBinaryMessage(qbuf);
-    // Try to force a flush of the socket buffer
+    // Try to force a flush of the websocket buffer
     m_webSocket.flush();//"\xAF\x00\x00\x01\x00\x00\x00\x04\x00\x00\x00\b\x00t\x00""e\x00s\x00t"
 
 }
@@ -96,6 +102,7 @@ void Packet::writeSize(QDataStream& stream) {
     stream << (quint32)(size - 4 - sizeof(quint32));// Set full size
 }
 
+
 const QByteArray &Packet::getData() const {
     return data;
 }
@@ -113,9 +120,7 @@ void Packet::setSignature(quint8 signature) {
 }
 
 
-// PAcket handler
-
-
+/** PAcket handler**/
 PacketHandler::PacketHandler()
         : ptr(nullptr), ref(nullptr)
 {
@@ -126,14 +131,14 @@ PacketHandler::PacketHandler(std::nullptr_t)
 {
 }
 
-PacketHandler::PacketHandler(Packet* m)
+PacketHandler::PacketHandler(Packet* p)
 try
-        : ptr(m), ref(new int(1))
+        : ptr(p), ref(new int(1))
 {
 }
 catch (...)
 {
-    delete m;
+    delete p;
     throw;
 }
 
@@ -257,6 +262,7 @@ void PacketBuffer::clearBuffer()
 
 bool PacketBuffer::isComplete()
 {
+    qDebug() << mSize << getReceivedSize();
     return mSize == getReceivedSize();
 };
 
@@ -272,12 +278,21 @@ QDataStream& operator>>(QDataStream& in, PacketBuffer& PacketBuffer)
 }
 
 
+
 /*** Packet forger **/
+
 PacketHandler PacketBuilder::Container(quint8 type)
 {
     switch (type)
     {
-        case PACK_TYPE_PING:			return new PingPacket();
+        case PACK_TYPE_PING:			    return new PingPacket();
+        case PACK_TYPE_LOGIN_REQ:			return new class LoginReqPacket();
+        case PACK_TYPE_LOGIN_OK:			return new LoginOkPacket();
+        case PACK_TYPE_LOGOUT_REQ:			return new class LogoutReqPacket();
+
+        case PACK_TYPE_ACC_CREATE:			return new class AccountCreationPacket();
+        case PACK_TYPE_ACC_OK:			    return new AccountOkPacket();
+        case PACK_TYPE_ACC_UPDATE:			return new class AccountUpdatePacket();
 
 
         default:
@@ -291,9 +306,26 @@ PacketHandler PacketBuilder::Ping(QString msg)
 {
     return new PingPacket(msg);
 }
-/*
-PacketHandler PacketBuilder::LoginRequest(QString username)
+
+PacketHandler PacketBuilder::LoginReqPacket(QString username, QString hashedPassword)
 {
-    return new LoginRequestMessage(username);
+    return new class LoginReqPacket(username, hashedPassword);
 }
- */
+
+PacketHandler PacketBuilder::LoginOk(User user)
+{
+    return new class LoginOkPacket(user);
+}
+PacketHandler PacketBuilder::AccountCreationPacket(QString username,QString password, QString name, QString surname, QIcon profilePic)
+{
+    return new class AccountCreationPacket(username, password, name, surname, profilePic);
+}
+PacketHandler PacketBuilder::AccountOk(User user)
+{
+    return new class AccountOkPacket(user);
+}
+
+PacketHandler PacketBuilder::AccountUpdatePacket(QString username,QString password, QString name, QString surname, QIcon profilePic)
+{
+    return new class AccountUpdatePacket(username, password, name, surname, profilePic);
+}

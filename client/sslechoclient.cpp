@@ -7,6 +7,7 @@
 #include "Parser.h"
 #include "PacketDef.h"
 #include "PingPacket.h"
+#include "LoginPacket.h"
 #include <QtCore/QDebug>
 #include <QtWebSockets/QWebSocket>
 #include <QCoreApplication>
@@ -36,7 +37,7 @@ void SslEchoClient::onConnected()
     connect(&m_webSocket, &QWebSocket::binaryMessageReceived,
             this, &SslEchoClient::onBinaryMessageReceived);
     this->sendPing();
-    this->sendPing();
+    this->sendTest();
     //this->sendLogin();
     //m_webSocket.sendTextMessage(QStringLiteral("Hello, world!"));
 }
@@ -75,6 +76,15 @@ void SslEchoClient::sendPing() {
 
     pp.send(m_webSocket);
     qDebug() << "Ping sent";
+
+}
+
+void SslEchoClient::sendTest() {
+    // Create buffer
+    LoginReqPacket lrp = LoginReqPacket("test@domain.tld", "test2HashedPassword");
+
+    lrp.send(m_webSocket);
+    qDebug() << "Test sent";
 
 }
 

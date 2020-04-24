@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Packet.h"
+#include "PacketDef.h"
 
 class PingPacket : public Packet {
     friend PacketBuilder;//or use public costructor

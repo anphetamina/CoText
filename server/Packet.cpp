@@ -11,9 +11,12 @@
 
 
 #include "Packet.h"
-#include "PingPacket.h"
 #include "PacketDef.h"
+#include "PingPacket.h"
+#include "LoginPacket.h"
+#include "AccountPacket.h"
 
+/** Packet **/
 Packet::Packet(uint16_t type) : header(0xAF), type(type), flags(0x00)
 {}
 
@@ -117,9 +120,7 @@ void Packet::setSignature(quint8 signature) {
 }
 
 
-// PAcket handler
-
-
+/** PAcket handler**/
 PacketHandler::PacketHandler()
         : ptr(nullptr), ref(nullptr)
 {
@@ -130,14 +131,14 @@ PacketHandler::PacketHandler(std::nullptr_t)
 {
 }
 
-PacketHandler::PacketHandler(Packet* m)
+PacketHandler::PacketHandler(Packet* p)
 try
-        : ptr(m), ref(new int(1))
+        : ptr(p), ref(new int(1))
 {
 }
 catch (...)
 {
-    delete m;
+    delete p;
     throw;
 }
 
@@ -279,11 +280,20 @@ QDataStream& operator>>(QDataStream& in, PacketBuffer& PacketBuffer)
 
 
 /*** Packet forger **/
+
 PacketHandler PacketBuilder::Container(quint8 type)
 {
     switch (type)
     {
-        case PACK_TYPE_PING:			return new PingPacket();
+        case PACK_TYPE_PING:			    return new PingPacket();
+        case PACK_TYPE_LOGIN_REQ:			return new class LoginReqPacket();
+        case PACK_TYPE_LOGIN_OK:			return new LoginOkPacket();
+        case PACK_TYPE_LOGOUT_REQ:			return new class LogoutReqPacket();
+
+        case PACK_TYPE_ACC_CREATE:			return new class AccountCreationPacket();
+        case PACK_TYPE_ACC_OK:			    return new AccountOkPacket();
+        case PACK_TYPE_ACC_UPDATE:			return new class AccountUpdatePacket();
+
 
         default:
             throw std::exception();//TODO: create custom exception
@@ -296,9 +306,26 @@ PacketHandler PacketBuilder::Ping(QString msg)
 {
     return new PingPacket(msg);
 }
-/*
-PacketHandler PacketBuilder::LoginRequest(QString username)
+
+PacketHandler PacketBuilder::LoginReqPacket(QString username, QString hashedPassword)
 {
-    return new LoginRequestMessage(username);
+    return new class LoginReqPacket(username, hashedPassword);
 }
- */
+
+PacketHandler PacketBuilder::LoginOk(User user)
+{
+    return new class LoginOkPacket(user);
+}
+PacketHandler PacketBuilder::AccountCreationPacket(QString username,QString password, QString name, QString surname, QIcon profilePic)
+{
+    return new class AccountCreationPacket(username, password, name, surname, profilePic);
+}
+PacketHandler PacketBuilder::AccountOk(User user)
+{
+    return new class AccountOkPacket(user);
+}
+
+PacketHandler PacketBuilder::AccountUpdatePacket(QString username,QString password, QString name, QString surname, QIcon profilePic)
+{
+    return new class AccountUpdatePacket(username, password, name, surname, profilePic);
+}

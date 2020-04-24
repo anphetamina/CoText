@@ -9,6 +9,8 @@
 #include <QByteArray>
 #include <QWebSocket>
 #include <QDataStream>
+#include "User.h"
+
 
 class Packet
 {
@@ -65,7 +67,7 @@ public:
     // Serialize using QDataStream implementation
     void serialize(QByteArray buf, QDataStream& stream);
     quint32 getPayloadLen();
-    void writeSize(QDataStream& stream);
+
 protected:
 
     // Write the payload of a specific packet on the Qdatastream buffer
@@ -73,8 +75,10 @@ protected:
     // Read the payload from the Qdatastream buffer
     virtual void readPayload(QDataStream& stream) = 0;
 
+    void writeSize(QDataStream &stream);
 };
 
+/** Packet handler **/
 class PacketHandler
 {
 private:
@@ -86,7 +90,7 @@ public:
 
     PacketHandler();
     PacketHandler(std::nullptr_t);
-    PacketHandler(Packet* m);
+    PacketHandler(Packet* p);
 
     PacketHandler(const PacketHandler& other);
     PacketHandler(PacketHandler&& other) noexcept;
@@ -103,6 +107,7 @@ public:
 
     ~PacketHandler();
 };
+
 
 
 class PacketBuffer
@@ -135,38 +140,41 @@ public:
     quint32 getReceivedSize() const;
 };
 
+
 class PacketBuilder
 {
 public:
 
     static PacketHandler Container(quint8 type);
     static PacketHandler Ping(QString msg);
-    /*
-
-    static PacketHandler AccountCreation(QString username, QImage icon, QString password);
-    static PacketHandler AccountUpdate(QImage icon, QString password);
-    static PacketHandler AccountConfirmation(User user);
-    static PacketHandler AccountErr(QString error);
-
-    static PacketHandler LoginReq(QString username);
+    static PacketHandler LoginReqPacket(QString username, QString hashedPassword);
     static PacketHandler LoginOk(User user);
-    static PacketHandler LoginErr(QString error);
-    static PacketHandler Logout();
+    static PacketHandler LogoutReq();
+    static PacketHandler AccountCreationPacket(QString username,QString password, QString name, QString surname, QIcon profilePic);
+    static PacketHandler AccountOk(User user);
+    static PacketHandler AccountUpdatePacket(QString username,QString password, QString name, QString surname, QIcon profilePic);
 
-    static PacketHandler DocumentCreation(QString docName);
-    static PacketHandler DocumentRemoval(QString docURI);
-    static PacketHandler DocumentOpen(QString docURI);
-    static PacketHandler DocumentDismissal();
-    static PacketHandler DocumentClose();
-    static PacketHandler DocumentErr(QString error);
-
-    static PacketHandler CharsInsert(QVector<Symbol> symbols, bool isLast, TextBlockID bId, QTextBlockFormat blkFmt);
-    static PacketHandler CharsDelete(QVector<Position> positions);
-    static PacketHandler CursorSeek(qint32 userId, qint32 newPosition);
-
-    static PacketHandler PresenceRefresh(qint32 userId, QString nickname, QImage icon);
-    static PacketHandler PresenceRegister(qint32 userId, QString nickname, QImage icon);
-    static PacketHandler PresenceUnregister(qint32 userId);
-
-    static PacketHandler Error(QString error);*/
 };
+/*
+
+
+static PacketHandler AccountErr(QString error);
+
+static PacketHandler LoginErr(QString error);
+
+static PacketHandler DocumentCreation(QString docName);
+static PacketHandler DocumentRemoval(QString docURI);
+static PacketHandler DocumentOpen(QString docURI);
+static PacketHandler DocumentDismissal();
+static PacketHandler DocumentClose();
+static PacketHandler DocumentErr(QString error);
+
+static PacketHandler CharsInsert(QVector<Symbol> symbols, bool isLast, TextBlockID bId, QTextBlockFormat blkFmt);
+static PacketHandler CharsDelete(QVector<Position> positions);
+static PacketHandler CursorSeek(qint32 userId, qint32 newPosition);
+
+static PacketHandler PresenceRefresh(qint32 userId, QString nickname, QImage icon);
+static PacketHandler PresenceRegister(qint32 userId, QString nickname, QImage icon);
+static PacketHandler PresenceUnregister(qint32 userId);
+
+static PacketHandler Error(QString error);*/

@@ -35,6 +35,8 @@ private:
     void packetParse(QByteArray rcvd_packet);
 
     void sendLogin();
+
+    void sendTest();
 };
 
 #endif // SSLECHOCLIENT_H

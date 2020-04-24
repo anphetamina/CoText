@@ -8,6 +8,7 @@
 #include "Parser.h"
 #include "PacketDef.h"
 #include "PingPacket.h"
+#include "LoginPacket.h"
 #include <QtCore/QDebug>
 #include <QtCore/QFile>
 #include <QtNetwork/QSslCertificate>
@@ -158,7 +159,7 @@ void SslEchoServer::packetParse(QByteArray rcvd_packet) {
             pBuffer->clearBuffer();
 
             // If the type is correct TODO: add HeadID check
-            if ( mType == PACK_TYPE_PING & mType <= PACK_TYPE_PING )
+            if ( mType == PACK_TYPE_PING ||  mType <= PACK_TYPE_LAST_CODE )
             {
                 qDebug() << "[INFO] Parsed new packet. Type: " << mType;
                 QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
@@ -219,7 +220,14 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* m_webSocket)
         }
         case(PACK_TYPE_LOGIN_REQ): {
             qDebug() << rcvd_packet.get();
-            //PingPacket* ping = dynamic_cast<PingPacket*>(rcvd_packet.get());
+            LoginReqPacket* loginReq = dynamic_cast<LoginReqPacket*>(rcvd_packet.get());
+            qDebug() << loginReq->getUsername();
+            break;
+        }
+
+        case(PACK_TYPE_LOGOUT_REQ): {
+            qDebug() << rcvd_packet.get();
+            LogoutReqPacket* logoutReq = dynamic_cast<LogoutReqPacket*>(rcvd_packet.get());
             //qDebug() << ping->getDebugMsg();
             break;
         }
