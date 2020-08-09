@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <iostream>
-#include <sstream>
 #include "SharedEditor.h"
 #include "NetworkServer.h"
 #include "Shuffler.h"
@@ -75,8 +74,9 @@ int SharedEditor::generateIdBetween(int min, int max, bool strategy) {
 
 /**
  *
+ * @param line
  * @param index
- * @return the position of the next previous symbol from pos
+ * @return the previous fractional position from line and index
  */
 std::vector<Identifier> SharedEditor::findPosBefore(int line, int index) {
 
@@ -92,8 +92,9 @@ std::vector<Identifier> SharedEditor::findPosBefore(int line, int index) {
 
 /**
  *
+ * @param line
  * @param index
- * @return the position of the next following symbol from pos
+ * @return the next fractional position from line and index
  */
 std::vector<Identifier> SharedEditor::findPosAfter(int line, int index) {
 
@@ -188,10 +189,10 @@ std::vector<Identifier> SharedEditor::generatePosBetween(std::vector<Identifier>
 }
 
 /**
- *
- * @param pos
+ * insert symbol at line in index
+ * @param line
+ * @param index
  * @param symbol
- * insert symbol at the given pos
  */
 void SharedEditor::insertSymbol(int line, int index, Symbol symbol) {
 
@@ -284,9 +285,11 @@ void SharedEditor::localInsert(int line, int index, char value) {
 
 /**
  *
- * @param startPos
- * @param endPos
- * @return symbols erased from [startPos, endPos] in a single line
+ * @param startLine
+ * @param startIndex
+ * @param endLine
+ * @param endIndex
+ * @return erased symbols in [startIndex, endIndex]
  */
 std::vector<Symbol> SharedEditor::eraseSingleLine(int startLine, int startIndex, int endLine, int endIndex) {
     endIndex++;
@@ -300,9 +303,11 @@ std::vector<Symbol> SharedEditor::eraseSingleLine(int startLine, int startIndex,
 
 /**
  *
- * @param startPos
- * @param endPos
- * @return symbols erased from [startPos, endPos] between multiple lines
+ * @param startLine
+ * @param startIndex
+ * @param endLine
+ * @param endIndex
+ * @return erased symbols in [startIndex, endIndex] from [startLine, endLine]
  */
 std::vector<Symbol> SharedEditor::eraseMultipleLines(int startLine, int startIndex, int endLine, int endIndex) {
 
@@ -322,9 +327,11 @@ std::vector<Symbol> SharedEditor::eraseMultipleLines(int startLine, int startInd
 }
 
 /**
- *
- * @param index
- * remove symbols from [startPos, endPos]
+ * erase symbols in [startIndex, endIndex] from [startLine, endLine]
+ * @param startLine
+ * @param startIndex
+ * @param endLine
+ * @param endIndex
  */
 void SharedEditor::localErase(int startLine, int startIndex, int endLine, int endIndex) {
 
@@ -379,13 +386,13 @@ void SharedEditor::localErase(int startLine, int startIndex, int endLine, int en
 /**
  *
  * @param symbol
- * insert symbol right before the first one with the higher fractional position
+ * @return the pair (line,index) and insert symbol right before the first one with the higher fractional position
  */
-void SharedEditor::remoteInsert(Symbol symbol) {
+std::pair<int, int> SharedEditor::remoteInsert(Symbol symbol) {
 
     if (symbols.front().empty()) {
         insertSymbol(0, 0, symbol);
-        return;
+        return std::make_pair(0, 0);
     }
 
     std::vector<std::vector<Symbol>>::iterator line_it;
@@ -439,20 +446,21 @@ void SharedEditor::remoteInsert(Symbol symbol) {
             insertSymbol(line, index, symbol);
 
             idCounter--;
+
+            return std::make_pair(line, index);
         }
-
-
     }
 
+    return std::make_pair(-1, -1);
 
 }
 
 /**
  *
  * @param symbol
- * remove symbol
+ * @return the pair (line,index) of the removed symbol
  */
-void SharedEditor::remoteErase(Symbol symbol) {
+std::pair<int, int> SharedEditor::remoteErase(Symbol symbol) {
     if (!symbols.front().empty()) {
         bool mergeLines = false;
         std::vector<std::vector<Symbol>>::iterator line_it;
@@ -493,9 +501,9 @@ void SharedEditor::remoteErase(Symbol symbol) {
 
         if (index_it == line_it->end()) {
             if (symbol.getC() == '\n') {
-                std::cout << "remoteInsert symbol 'CRLF' ("+symbol.getId()+") not found" << std::endl;
+                std::cout << "remoteErase symbol 'CRLF' ("+symbol.getId()+") not found" << std::endl;
             } else {
-                std::cout << "remoteInsert symbol '"+ std::string(1, symbol.getC()) +"' ("+symbol.getId()+") not found" << std::endl;
+                std::cout << "remoteErase symbol '"+ std::string(1, symbol.getC()) +"' ("+symbol.getId()+") not found" << std::endl;
             }
         } else {
             int index = index_it - line_it->begin();
@@ -509,8 +517,12 @@ void SharedEditor::remoteErase(Symbol symbol) {
                 line_it->insert(line_it->end(), (line_it + 1)->begin(), (line_it + 1)->end());
                 symbols.erase(line_it + 1);
             }
+
+            return std::make_pair(line, index);
         }
     }
+
+    return std::make_pair(-1, -1);
 }
 
 /**
