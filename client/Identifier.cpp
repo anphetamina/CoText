@@ -34,3 +34,7 @@ bool Identifier::operator<(const Identifier &rhs) const {
         return digit < rhs.digit;
     }
 }
+
+QIdentifier Identifier::toSerializable() {
+    return QIdentifier(digit, siteId);
+}

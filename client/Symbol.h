@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include "Identifier.h"
+#include "QSymbol.h"
 
 class Symbol {
 private:
@@ -28,6 +29,8 @@ public:
 
     bool operator==(const Symbol &symbol) const;
     bool operator<(const Symbol &symbol) const;
+
+    QSymbol toSerializable();
 };
 
 
