@@ -1,4 +1,8 @@
+#include <QChar>
+#include <QString>
+#include <QVector>
 #include "Symbol.h"
+#include "QSymbol.h"
 
 Symbol::Symbol(char c, const std::string id, const std::vector<Identifier> position) : c(c), id(id), position(position) {}
 

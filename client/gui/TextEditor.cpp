@@ -347,8 +347,8 @@ int TextEditor::getRow(int position) {
  * @param symbol
  */
 void TextEditor::remoteInsert(Symbol symbol) {
-    QPair<int, int> pos = editor.remoteInsert(symbol);
-    if (pos != qMakePair(-1, -1)) {
+    std::pair<int, int> pos = editor.remoteInsert(symbol);
+    if (pos != std::make_pair(-1, -1)) {
         int position = getPosition(pos.first, pos.second);
         ui.textEdit->textCursor().setPosition(position);
         ui.textEdit->textCursor().insertText(QChar::fromLatin1(symbol.getC()));
@@ -360,8 +360,8 @@ void TextEditor::remoteInsert(Symbol symbol) {
  * @param symbol
  */
 void TextEditor::remoteErase(Symbol symbol) {
-    QPair<int, int> pos = editor.remoteErase(symbol);
-    if (pos != qMakePair(-1, -1)) {
+    std::pair<int, int> pos = editor.remoteErase(symbol);
+    if (pos != std::make_pair(-1, -1)) {
         int position = getPosition(pos.first, pos.second);
         ui.textEdit->textCursor().setPosition(position);
         ui.textEdit->textCursor().deleteChar();

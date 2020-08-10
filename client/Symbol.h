@@ -5,7 +5,9 @@
 #include <string>
 #include <vector>
 #include "Identifier.h"
-#include "QSymbol.h"
+
+
+class QSymbol;
 
 class Symbol {
 private:

@@ -3,6 +3,7 @@
 //
 
 #include "Identifier.h"
+#include "QIdentifier.h"
 
 Identifier::Identifier(int digit, int siteId) : digit(digit), siteId(siteId) {}
 

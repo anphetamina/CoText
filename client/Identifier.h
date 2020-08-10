@@ -6,7 +6,7 @@
 #define CRDTPP_MULTI_IDENTIFIER_H
 
 
-#include "QIdentifier.h"
+class QIdentifier;
 
 class Identifier {
 
