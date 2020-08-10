@@ -61,3 +61,5 @@ void LogoutReqPacket::writePayload(QDataStream& stream) const
 void LogoutReqPacket::readPayload(QDataStream& stream)
 {
 }
+
+//An idea could be to use just a single error packet with a counter without the specification about what the error was
