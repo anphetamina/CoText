@@ -26,8 +26,8 @@ SslEchoServer::SslEchoServer(quint16 port, QObject *parent) :
                                               QWebSocketServer::SecureMode,
                                               this);
     QSslConfiguration sslConfiguration;
-    QFile certFile(QStringLiteral("/Users/Emanuele/CLionProjects/TogheditServer/localhost.cert"));
-    QFile keyFile(QStringLiteral("/Users/Emanuele/CLionProjects/TogheditServer/localhost.key"));
+    QFile certFile(QStringLiteral("../localhost.cert"));
+    QFile keyFile(QStringLiteral("../localhost.key"));
     certFile.open(QIODevice::ReadOnly);
     keyFile.open(QIODevice::ReadOnly);
     QSslCertificate certificate(&certFile, QSsl::Pem);
@@ -46,6 +46,8 @@ SslEchoServer::SslEchoServer(quint16 port, QObject *parent) :
                 this, &SslEchoServer::onNewConnection);
         connect(m_pWebSocketServer, &QWebSocketServer::sslErrors,
                 this, &SslEchoServer::onSslErrors);
+    } else{
+        qDebug() << "Cant listen";
     }
 }
 //! [constructor]

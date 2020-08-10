@@ -6,7 +6,7 @@
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    SslEchoServer server(1234);
+    SslEchoServer server(12345);
     dbConfigure();
     getUserlist();
 
