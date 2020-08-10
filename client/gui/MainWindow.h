@@ -11,8 +11,10 @@
 #include <QMessageBox>
 #include <QWidget>
 #include <QEvent>
+#include <QtGui/QTextCharFormat>
 
 #include "UserWidget.h"
+#include "TextEditor.h"
 
 //#include <QSqlDatabase>
 
@@ -24,7 +26,6 @@
 
 
  */
-
 
 static User *user = nullptr;
 
@@ -51,6 +52,7 @@ public:
         user->setUserState(20); //ACTIVE USER
     }
 
+    Ui::MainWindow *getUi() const;
 
 
 private slots:
@@ -82,16 +84,12 @@ private slots:
 
 
 private:
+
     Ui::MainWindow *ui;
-
-
-
     QString currentFileName = "";
     void Save_as();
     void closeEvent(QCloseEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
-
-
 
 };
 #endif // MAINWINDOW_H

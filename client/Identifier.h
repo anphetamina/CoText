@@ -6,6 +6,8 @@
 #define CRDTPP_MULTI_IDENTIFIER_H
 
 
+class QIdentifier;
+
 class Identifier {
 
     int digit;
@@ -25,6 +27,8 @@ public:
     bool operator==(const Identifier &rhs) const;
 
     bool operator<(const Identifier &rhs) const;
+
+    QIdentifier toSerializable();
 };
 
 

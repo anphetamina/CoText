@@ -15,13 +15,18 @@
         <file>icons/noun_new document_2429385.svg</file>
         <file>icons/noun_user login_178831.svg</file>
         <file>icons/noun_url_887536.svg</file>
+        <file>icons/noun_url_887536_white.svg</file>
         <file>icons/noun_Settings_2324598.svg</file>
         <file>icons/noun_Exit_1558251_white.svg</file>
         <file>icons/noun_Folder_2047792_white.svg</file>
         <file>icons/noun_new document_2429385_white.svg</file>
         <file>icons/noun_Settings_2324598_white.svg</file>
         <file>icons/noun_user login_178831_white.svg</file>
-        <file>icons/noun_url_887536_white.svg</file>
+        <file>icons/font.png</file>
+        <file>icons/info.png</file>
+        <file>icons/bold.png</file>
+        <file>icons/underline.png</file>
+        <file>icons/italic.png</file>
     </qresource>
     <qresource prefix="/appIcon">
         <file>CoText.icns</file>

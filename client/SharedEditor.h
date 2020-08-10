@@ -57,8 +57,8 @@ public:
     std::vector<Symbol> eraseSingleLine(int startLine, int startIndex, int endLine, int endIndex);
     std::vector<Symbol> eraseMultipleLines(int startLine, int startIndex, int endLine, int endIndex);
     void process(const Message& m);
-    void remoteInsert(Symbol symbol);
-    void remoteErase(Symbol symbol);
+    std::pair<int, int> remoteInsert(Symbol symbol);
+    std::pair<int, int> remoteErase(Symbol symbol);
     std::string to_string();
 };
 

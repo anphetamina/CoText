@@ -1,4 +1,8 @@
+#include <QChar>
+#include <QString>
+#include <QVector>
 #include "Symbol.h"
+#include "QSymbol.h"
 
 Symbol::Symbol(char c, const std::string id, const std::vector<Identifier> position) : c(c), id(id), position(position) {}
 
@@ -45,4 +49,12 @@ bool Symbol::operator<(const Symbol &symbol) const {
         }
     }
     return this->position.size() < symbol.getPosition().size();
+}
+
+QSymbol Symbol::toSerializable() {
+    QVector<QIdentifier> position = {};
+    for (auto identifier : this->position) {
+        position.push_back(identifier.toSerializable());
+    }
+    return QSymbol(QChar(c), QString::fromStdString(id), position);
 }

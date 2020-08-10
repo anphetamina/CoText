@@ -3,6 +3,7 @@
 //
 
 #include "Identifier.h"
+#include "QIdentifier.h"
 
 Identifier::Identifier(int digit, int siteId) : digit(digit), siteId(siteId) {}
 
@@ -33,4 +34,8 @@ bool Identifier::operator<(const Identifier &rhs) const {
     } else {
         return digit < rhs.digit;
     }
+}
+
+QIdentifier Identifier::toSerializable() {
+    return QIdentifier(digit, siteId);
 }

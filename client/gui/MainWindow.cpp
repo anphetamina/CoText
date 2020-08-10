@@ -38,6 +38,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     //ui->iconLabel->setPixmap(icon);
    // ui->statusbar->addPermanentWidget();
 
+
+
+
 }
 
 
@@ -56,7 +59,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
 
 bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
-    qDebug()<<"Sono entrato nella evetFilter" << event->type() << watched;
+    // qDebug()<<"Sono entrato nella evetFilter" << event->type() << watched;
 
     //Login
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionLogin)) && event->type() == QEvent::Enter) {
@@ -316,5 +319,10 @@ void MainWindow::on_actionLogin_triggered()
 
 void MainWindow::on_actionShare_Uri_triggered() {
     QMessageBox::StandardButton reply = QMessageBox::warning(this, "ciao", "uri");
+}
+
+
+Ui::MainWindow *MainWindow::getUi() const {
+    return ui;
 }
 

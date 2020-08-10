@@ -6,6 +6,9 @@
 #include <vector>
 #include "Identifier.h"
 
+
+class QSymbol;
+
 class Symbol {
 private:
     char c;
@@ -28,6 +31,8 @@ public:
 
     bool operator==(const Symbol &symbol) const;
     bool operator<(const Symbol &symbol) const;
+
+    QSymbol toSerializable();
 };
 
 

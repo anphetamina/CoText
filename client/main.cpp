@@ -2,9 +2,11 @@
 #include "./gui/Login.h"
 
 #include <QApplication> //manages: widgets, events, mouse movements, overall looking feel
+#include <iostream>
 
 //#include <QtCore/QCoreApplication>
 #include "sslechoclient.h"
+#include "NetworkServer.h"
 
 int main(int argc, char *argv[])
 {
@@ -35,6 +37,11 @@ int main(int argc, char *argv[])
     ////TODO
 
     w->show();
+
+    NetworkServer network;
+    SharedEditor ed1(network);
+
+    TextEditor editor(*w, *w->getUi(), ed1);
 
     return a.exec();
 }
