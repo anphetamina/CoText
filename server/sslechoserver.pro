@@ -1,4 +1,5 @@
 QT = websockets
+QT += sql
 
 TARGET = sslechoserver
 CONFIG   += console

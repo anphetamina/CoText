@@ -1,4 +1,4 @@
-/*
+
 #ifndef DBCONF_H
 #define DBCONF_H
 
@@ -14,4 +14,5 @@ extern QString dbName;
 extern int port;
 
 bool dbConfigure();
-*/
+bool getUserlist();
+
