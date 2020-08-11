@@ -35,7 +35,7 @@ TextEditor::TextEditor(QWidget &parent, Ui::MainWindow &ui, SharedEditor &editor
             while (listening) {
                 std::unique_lock lock(messagesMutex);
                 is_empty.wait(lock, [&] { return !messages.empty(); });
-                const Message& message = messages.top();
+                Message message = messages.top();
                 messages.pop();
                 lock.unlock();
 
@@ -222,6 +222,8 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
         editor.localErase(startRow, startCol, endRow, endCol);
 
+        // todo send message asynchronously
+
         int newSize = editor.getSymbols().size();
 
         decrementIndex(startRow, charsRemoved);
@@ -252,6 +254,8 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
             } else {
                 editor.localInsert(row, col, addedChar.toLatin1());
             }
+
+            // todo send message asynchronously
 
             /**
              * if it reaches the end of the line go in the next one
