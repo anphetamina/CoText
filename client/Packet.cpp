@@ -295,6 +295,12 @@ PacketHandler PacketBuilder::Container(quint8 type)
         case PACK_TYPE_ACC_OK:			    return new AccountOkPacket();
         case PACK_TYPE_ACC_UPDATE:			return new class AccountUpdatePacket();
         case PACK_TYPE_MSG:			        return new class Message();
+        //case PACK_TYPE_CURSOR_POS:			return new class CursorPacket();
+        //case PACK_TYPE_DOC_CREATE:			return new class DocumentCreatePacket();
+        //case PACK_TYPE_DOC_OPEN:			    return new class DocumentOpenPacket();
+        //case PACK_TYPE_DOC_DEL:			    return new class DocumentDelPacket();
+        //case PACK_TYPE_DOC_OK:			    return new class DocumentOkPacket();
+        //case PACK_TYPE_DOC_ASKSURI:			return new class DocumentAskSharableURIPacket();
 
 
         default:
@@ -336,3 +342,39 @@ PacketHandler PacketBuilder::Message(int type, QSymbol qs, int siteId)
 {
     return new class Message(type, qs, siteId);
 }
+
+/*
+PacketHandler PacketBuilder::CursorPacket(qint32 userId, qint32 newPosition)
+{
+    return new class CursorPacket(userId, newPosition);
+}
+
+ */
+
+/*
+PacketHandler DocumentCreatePacket::DocumentCreatePacket(QString docName, qint32 userId)
+{
+    return new class DocumentCreatePacket(userId, newPosition);
+}
+
+ PacketHandler DocumentOpenPacket::DocumentOpenPacket(QString docName, qint32 userId)
+{
+    return new class DocumentOpenPacket(userId, newPosition);
+}
+
+ PacketHandler DocumentDelPacket::DocumentDelPacket(QString docName, qint32 userId)
+{
+    return new class DocumentDelPacket(userId, newPosition);
+}
+
+PacketHandler DocumentOkPacket::DocumentOkPacket(QString docName, qint32 userId)
+{
+    return new class DocumentOkPacket(userId, newPosition);
+}
+
+PacketHandler DocumentAskSharableURIPacket::DocumentAskSharableURIPacket(QString docName, qint32 userId, QString sharableURI)
+{
+    return new class DocumentAskSharableURIPacket(userId, newPosition, sharableURI);
+}
+
+ */
