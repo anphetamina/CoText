@@ -4,7 +4,7 @@
 
 #include "QSymbol.h"
 
-QSymbol::QSymbol(const QChar &c, const QString &id, const QVector<QIdentifier> &position) : c(c), id(id),
+QSymbol::QSymbol(const QChar &c, const QString &id, const QVector<Identifier> &position) : c(c), id(id),
                                                                                             position(position) {}
 
 const QChar &QSymbol::getC() const {
@@ -15,7 +15,7 @@ const QString &QSymbol::getId() const {
     return id;
 }
 
-const QVector<QIdentifier> &QSymbol::getPosition() const {
+const QVector<Identifier> &QSymbol::getPosition() const {
     return position;
 }
 
@@ -27,14 +27,10 @@ void QSymbol::setId(const QString &id) {
     QSymbol::id = id;
 }
 
-void QSymbol::setPosition(const QVector<QIdentifier> &position) {
+void QSymbol::setPosition(const QVector<Identifier> &position) {
     QSymbol::position = position;
 }
 
 Symbol QSymbol::toOriginal() {
-    std::vector<Identifier> position = {};
-    for (auto identifier : this->position) {
-        position.push_back(identifier.toOriginal());
-    }
-    return Symbol(c.toLatin1(), id.toStdString(), position);
+    return Symbol(c.toLatin1(), id.toStdString(), std::vector(position.begin(), position.end()));
 }

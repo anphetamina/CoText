@@ -10,10 +10,11 @@ class NetworkServer {
 private:
     std::vector<SharedEditor*> editors;
     std::deque<Message> messages;
+    int id;
 
 public:
     NetworkServer();
-    std::string connect(SharedEditor* sharedEditor);
+    int connect(SharedEditor* sharedEditor);
     void disconnect(SharedEditor* sharedEditor);
     void send(const Message& m);
     void dispatchMessages();

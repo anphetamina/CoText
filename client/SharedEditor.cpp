@@ -132,8 +132,8 @@ std::vector<Identifier> SharedEditor::generatePosBetween(std::vector<Identifier>
 
     int id1 = 0;
     int id2 = static_cast<int>(std::pow(2, level)*base);
-    std::string siteId1 = siteId;
-    std::string siteId2 = siteId;
+    int siteId1 = siteId;
+    int siteId2 = siteId;
     if (pos1.size() > level) {
         id1 = pos1.at(level).getDigit();
         siteId1 = pos1.at(level).getSiteId();
@@ -254,7 +254,7 @@ void SharedEditor::localInsert(int line, int index, char value) {
     }
 
 
-    std::string sym_id = siteId;
+    std::string sym_id = std::to_string(siteId);
     sym_id.append("-");
     sym_id.append(std::to_string(idCounter));
     std::vector<Identifier> sym_position;
@@ -603,7 +603,7 @@ NetworkServer& SharedEditor::getServer() const {
     return server;
 }
 
-std::string SharedEditor::getSiteId() const {
+int SharedEditor::getSiteId() const {
     return siteId;
 }
 
@@ -615,7 +615,7 @@ int SharedEditor::getCounter() const {
     return counter;
 }
 
-void SharedEditor::setSiteId(std::string siteId) {
+void SharedEditor::setSiteId(int siteId) {
     SharedEditor::siteId = siteId;
 }
 

@@ -9,30 +9,29 @@
 #include <QtCore/QChar>
 #include <QtCore/QString>
 #include <QtCore/QVector>
-#include "QIdentifier.h"
 #include "Symbol.h"
 
 class QSymbol {
 
     QChar c;
     QString id;
-    QVector<QIdentifier> position;
+    QVector<Identifier> position;
 
 public:
 
-    QSymbol(const QChar &c, const QString &id, const QVector<QIdentifier> &position);
+    QSymbol(const QChar &c, const QString &id, const QVector<Identifier> &position);
 
     void setC(const QChar &c);
 
     void setId(const QString &id);
 
-    void setPosition(const QVector<QIdentifier> &position);
+    void setPosition(const QVector<Identifier> &position);
 
     const QChar &getC() const;
 
     const QString &getId() const;
 
-    const QVector<QIdentifier> &getPosition() const;
+    const QVector<Identifier> &getPosition() const;
 
     Symbol toOriginal();
 

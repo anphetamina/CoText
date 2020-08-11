@@ -8,29 +8,25 @@
 #include <iostream>
 
 
-class QIdentifier;
-
 class Identifier {
 
     int digit;
-    std::string siteId;
+    int siteId;
 
 public:
-    Identifier(int digit, std::string siteId);
+    Identifier(int digit, int siteId);
 
     int getDigit() const;
 
     void setDigit(int digit);
 
-    std::string getSiteId() const;
+    int getSiteId() const;
 
-    void setSiteId(std::string siteId);
+    void setSiteId(int siteId);
 
     bool operator==(const Identifier &rhs) const;
 
     bool operator<(const Identifier &rhs) const;
-
-    QIdentifier toSerializable();
 };
 
 

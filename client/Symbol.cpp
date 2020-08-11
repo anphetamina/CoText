@@ -52,9 +52,5 @@ bool Symbol::operator<(const Symbol &symbol) const {
 }
 
 QSymbol Symbol::toSerializable() {
-    QVector<QIdentifier> position = {};
-    for (auto identifier : this->position) {
-        position.push_back(identifier.toSerializable());
-    }
-    return QSymbol(QChar(c), QString::fromStdString(id), position);
+    return QSymbol(QChar(c), QString::fromStdString(id), QVector<Identifier>(position.begin(), position.end()));
 }

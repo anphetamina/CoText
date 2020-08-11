@@ -14,9 +14,9 @@ private:
     NetworkServer& server;
 
     /**
-     * UUID
+     * assigned by the server
      */
-    std::string siteId;
+    int siteId;
 
     std::vector<std::vector<Symbol>> symbols;
 
@@ -46,9 +46,9 @@ public:
 
     void setServer(NetworkServer &server);
 
-    std::string getSiteId() const;
+    int getSiteId() const;
 
-    void setSiteId(std::string siteId);
+    void setSiteId(int siteId);
 
     std::vector<std::vector<Symbol>>& getSymbols();
 

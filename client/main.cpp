@@ -5,7 +5,6 @@
 #include <iostream>
 
 //#include <QtCore/QCoreApplication>
-#include <QUuid>
 #include "sslechoclient.h"
 #include "NetworkServer.h"
 
@@ -43,8 +42,6 @@ int main(int argc, char *argv[])
     SharedEditor sharedEditor(network);
 
     TextEditor editor(*w, *w->getUi(), sharedEditor);
-
-    qDebug() << QUuid::createUuid().toString(QUuid::WithoutBraces);
 
     return a.exec();
 }
