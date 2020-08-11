@@ -17,3 +17,5 @@ extern int port;
 bool dbConfigure();
 bool getUserlist();
 User checkLoginData(QString email, QString password);
+QIcon loadProfilePic(int id);
+QList<QString> getDocuments(int userId);
