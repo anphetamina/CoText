@@ -20,6 +20,7 @@ public:
     int getSiteId() const;
 
     int getCounter() const;
+    ~Message() {};
 protected:
     Message();
     void writePayload(QDataStream& stream) const override;

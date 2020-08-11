@@ -10,6 +10,7 @@
 #include <QWebSocket>
 #include <QDataStream>
 #include "User.h"
+#include "QSymbol.h"
 
 
 class Packet
@@ -153,6 +154,7 @@ public:
     static PacketHandler AccountCreationPacket(QString username,QString password, QString name, QString surname, QIcon profilePic);
     static PacketHandler AccountOk(User user);
     static PacketHandler AccountUpdatePacket(QString username,QString password, QString name, QString surname, QIcon profilePic);
+    static PacketHandler Message(int type, QSymbol qs, int siteId);
 
 };
 /*

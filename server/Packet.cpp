@@ -15,6 +15,7 @@
 #include "PingPacket.h"
 #include "LoginPacket.h"
 #include "AccountPacket.h"
+#include "Message.h"
 
 /** Packet **/
 Packet::Packet(uint16_t type) : header(0xAF), type(type), flags(0x00)
@@ -293,6 +294,7 @@ PacketHandler PacketBuilder::Container(quint8 type)
         case PACK_TYPE_ACC_CREATE:			return new class AccountCreationPacket();
         case PACK_TYPE_ACC_OK:			    return new AccountOkPacket();
         case PACK_TYPE_ACC_UPDATE:			return new class AccountUpdatePacket();
+        case PACK_TYPE_MSG:			        return new class Message();
 
 
         default:
@@ -329,3 +331,16 @@ PacketHandler PacketBuilder::AccountUpdatePacket(QString username,QString passwo
 {
     return new class AccountUpdatePacket(username, password, name, surname, profilePic);
 }
+
+PacketHandler PacketBuilder::Message(int type, QSymbol qs, int siteId)
+{
+    return new class Message(type, qs, siteId);
+}
+
+/*
+ * Add new PacketBuilder method to create the empty packet (-> add def to Packet.cpp and PAcket.h and add #include newpacket.h in both file)
+ * Create and define new code for packet in PacketDef.h
+ * Add case in switch in the  PacketHandler PacketBuilder::Container(quint8 type) method. (Packet.cpp)
+ * Implement operator<< and operator>> in the below class if not available so that writePayload and ReadPayload can serialize the payload of packet.
+ *
+ */

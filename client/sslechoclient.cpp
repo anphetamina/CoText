@@ -4,10 +4,10 @@
 
 #include "sslechoclient.h"
 #include "Packet.h"
-#include "Parser.h"
 #include "PacketDef.h"
 #include "PingPacket.h"
 #include "LoginPacket.h"
+#include "Message.h"
 #include <QtCore/QDebug>
 #include <QtWebSockets/QWebSocket>
 #include <QCoreApplication>
@@ -80,11 +80,19 @@ void SslEchoClient::sendPing() {
 }
 
 void SslEchoClient::sendTest() {
+    qDebug() << "[NETWORK] ** Network Test Start ** ";
+    qDebug() << "[NETWORK] ** Sending login req packet ** ";
     // Create buffer
     LoginReqPacket lrp = LoginReqPacket("test@domain.tld", "test2HashedPassword");
-
     lrp.send(m_webSocket);
-    qDebug() << "Test sent";
+    qDebug() << "[NETWORK] ** Sending Message packet ** ";
+    QVector<Identifier> sym_position;
+    QString test("test_qstring");
+    QChar qc = test.at(0);//t
+    QSymbol qs = QSymbol(qc, test, sym_position);
+    Message msg = Message(1, qs, 3);
+    msg.send(m_webSocket);
+    qDebug() << "[NETWORK] ** Network Test Packet were all sent ** ";
 
 }
 

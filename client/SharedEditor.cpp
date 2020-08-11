@@ -531,8 +531,9 @@ std::pair<int, int> SharedEditor::remoteErase(Symbol symbol) {
  * if m.type = 1 insert the symbol respecting the fractional position
  * if m.type = -1 remove the symbol given the fractional position
  */
-void SharedEditor::process(const Message &m) {
+void SharedEditor::process( Message &m) {
     Symbol symbol = m.getS();
+
     switch (m.getType()) {
         case INSERT:
             remoteInsert(symbol);
