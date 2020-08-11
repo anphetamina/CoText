@@ -11,19 +11,8 @@ class QSymbol;
 
 class Symbol {
 private:
-    /**
-     * char inserted in the document
-     */
     char c;
-
-    /**
-     * combination of id counter and site id
-     */
     std::string id;
-
-    /**
-     * fractional position
-     */
     std::vector<Identifier> position;
 public:
     Symbol();

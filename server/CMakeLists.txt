@@ -16,7 +16,9 @@ find_package(Qt5 COMPONENTS Gui REQUIRED)
 find_package(Qt5 COMPONENTS Sql REQUIRED)
 find_package(Qt5 COMPONENTS Network REQUIRED)
 
-add_executable(CoText-server main.cpp sslechoserver.cpp sslechoserver.h PacketDef.h Packet.cpp Packet.h PingPacket.cpp PingPacket.h LoginPacket.cpp LoginPacket.h AccountPacket.cpp AccountPacket.h Client.cpp Client.h User.cpp User.h DBConf.cpp DBConf.h)
+file(GLOB SERVER "*.h" "*.cpp")
+
+add_executable(CoText-server main.cpp  PacketDef.h Packet.cpp Packet.h ${SERVER} sslechoserver.cpp sslechoserver.h PingPacket.cpp PingPacket.h LoginPacket.cpp LoginPacket.h AccountPacket.cpp AccountPacket.h Client.cpp Client.h User.cpp User.h Identifier.cpp Identifier.h Symbol.cpp Symbol.h QSymbol.h QSymbol.cpp Message.cpp Message.h DBConf.cpp DBConf.h)
 
 target_link_libraries(CoText-server PUBLIC
         Qt5::Network

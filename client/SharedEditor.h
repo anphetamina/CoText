@@ -70,9 +70,13 @@ public:
     std::vector<Symbol> localErase(int startLine, int startIndex, int endLine, int endIndex);
     std::vector<Symbol> eraseSingleLine(int startLine, int startIndex, int endLine, int endIndex);
     std::vector<Symbol> eraseMultipleLines(int startLine, int startIndex, int endLine, int endIndex);
-    void process(const Message& m); // todo remove
+    void process(Message& m);
+    //std::pair<int, int> remoteInsert(Symbol symbol);
+    //std::pair<int, int> remoteErase(Symbol symbol);
+
     std::pair<int, int> remoteInsert(const Symbol &symbol);
     std::pair<int, int> remoteErase(const Symbol &symbol);
+
     std::string to_string();
 };
 

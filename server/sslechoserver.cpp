@@ -5,10 +5,10 @@
 #include "sslechoserver.h"
 #include "QtWebSockets/QWebSocketServer"
 #include "QtWebSockets/QWebSocket"
-#include "Parser.h"
 #include "PacketDef.h"
 #include "PingPacket.h"
 #include "LoginPacket.h"
+#include "Message.h"
 #include <QtCore/QDebug>
 #include <QtCore/QFile>
 #include <QtNetwork/QSslCertificate>
@@ -227,10 +227,20 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* m_webSocket)
             break;
         }
 
+
         case(PACK_TYPE_LOGOUT_REQ): {
             qDebug() << rcvd_packet.get();
             LogoutReqPacket* logoutReq = dynamic_cast<LogoutReqPacket*>(rcvd_packet.get());
             //qDebug() << ping->getDebugMsg();
+            break;
+        }
+
+        case(PACK_TYPE_MSG): {
+            qDebug() << rcvd_packet.get();
+            Message* msg = dynamic_cast<Message*>(rcvd_packet.get());
+            //qDebug() << msg->getData();
+            qDebug() << msg->getS().getC();
+            qDebug() << msg->getSiteId();
             break;
         }
     }

@@ -10,17 +10,17 @@ private:
     //Symbol s;
     QSymbol qs;
     int siteId;
-
 public:
     Message(int type, QSymbol qs, int siteId);
     Message(int type, Symbol s, int siteId);
 
     int getType() const;
 
-    Symbol getS() const;
+    Symbol getS() ;
     int getSiteId() const;
 
     int getCounter() const;
+    ~Message() {};
 protected:
     Message();
     void writePayload(QDataStream& stream) const override;

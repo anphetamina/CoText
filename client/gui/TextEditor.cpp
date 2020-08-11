@@ -400,7 +400,6 @@ void TextEditor::remoteInsert(const Symbol &symbol) {
         }
     }
 }
-
 /**
  * erase symbol received from the server
  * @param symbol
