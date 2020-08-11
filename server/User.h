@@ -18,10 +18,13 @@ class User  {
     friend QDataStream& operator<<(QDataStream& out, const User& user);
 public:
     User();
+    User(int id, QString email, QString name, QString surname);
     ~User();
     QString getName();
     QString getSurname();
     QString getEmail();
+    int getId();
+
     QString getNick();
     QIcon getProfilePic();
 
@@ -30,9 +33,11 @@ public:
     void setProfilePic(QIcon _profilePic);
     void setNick(QString _nickname);
     void setEmail(QString _email);
+    void setId(int _id);
     void addFriend(User * _usrFriend);
     void setTimeBeforeInactive(int _timer);
     void setUserState(int _state);
+    bool isLogged();
 
     QList<User*> getFriends();
 
@@ -47,6 +52,7 @@ private:
     QString email;
     QIcon profilePic;
     int userState;
+    int id;
     int secondsBeforeInactive;
     uint8_t signature = 0x00;
 
