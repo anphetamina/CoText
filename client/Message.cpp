@@ -11,7 +11,7 @@ int Message::getType() const {
     return type;
 }
 
-Symbol Message::getS()  {
+Symbol Message::getS() const {
     return qs.toOriginal();
 }
 

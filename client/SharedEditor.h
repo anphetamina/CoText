@@ -12,10 +12,24 @@ class NetworkServer;
 class SharedEditor {
 private:
     NetworkServer& server;
+
+    /**
+     * assigned by the server
+     */
     int siteId;
+
     std::vector<std::vector<Symbol>> symbols;
+
+    /**
+     * current number of symbols in the document
+     */
     int counter;
+
+    /**
+     * total number of symbols added in the document
+     */
     uint64_t idCounter;
+
     std::map<int, bool> strategies;
     int base;
     int boundary;
@@ -57,8 +71,12 @@ public:
     std::vector<Symbol> eraseSingleLine(int startLine, int startIndex, int endLine, int endIndex);
     std::vector<Symbol> eraseMultipleLines(int startLine, int startIndex, int endLine, int endIndex);
     void process(Message& m);
-    std::pair<int, int> remoteInsert(Symbol symbol);
-    std::pair<int, int> remoteErase(Symbol symbol);
+    //std::pair<int, int> remoteInsert(Symbol symbol);
+    //std::pair<int, int> remoteErase(Symbol symbol);
+
+    std::pair<int, int> remoteInsert(const Symbol &symbol);
+    std::pair<int, int> remoteErase(const Symbol &symbol);
+
     std::string to_string();
 };
 

@@ -25,11 +25,15 @@ public:
     QSymbol(const QChar &c, const QString &id, const QVector<Identifier> &position);
     QSymbol( QChar &c,  QString &id,  QVector<Identifier> &position);
 
+    //QSymbol(const QChar &c, const QString &id, const QVector<Identifier> &position);
+
     void setC(const QChar &c);
 
     void setId(const QString &id);
 
     void setPosition(QVector<Identifier> &position);
+
+    void setPosition(const QVector<Identifier> &position);
 
     QChar &getC();
 
@@ -37,7 +41,9 @@ public:
 
     QVector<Identifier> &getPosition() ;
 
-    Symbol toOriginal();
+    const QVector<Identifier> &getPosition() const;
+
+    Symbol toOriginal() const;
 
 
 };

@@ -8,6 +8,10 @@
 
 #include <QDebug>
 #include <iostream>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <stack>
 #include <QtWidgets/QTextEdit>
 #include "MainWindow.h"
 #include "../SharedEditor.h"
@@ -19,7 +23,9 @@ class TextEditor : public QObject {
     Q_OBJECT
 
 public:
-    explicit TextEditor(QWidget &parent, Ui::MainWindow &ui, SharedEditor &editor);
+    explicit TextEditor(QWidget &parent, Ui::MainWindow &ui, SharedEditor &editor, int numWorkers = 3, int numListeners = 1);
+
+    virtual ~TextEditor();
 
 private:
 
@@ -45,9 +51,23 @@ private:
      * remote
      */
 
-    void remoteInsert(Symbol symbol);
-    void remoteErase(Symbol symbol);
+    void remoteInsert(const Symbol& symbol);
+    void remoteErase(const Symbol &symbol);
     int getPosition(int row, int col);
+
+    /**
+     * concurrency
+     */
+
+    int numWorkers;
+    int numListeners;
+    std::vector<std::thread> workers;
+    std::vector<std::thread> listeners;
+    std::mutex editorMutex;
+    std::mutex messagesMutex;
+    std::condition_variable is_empty;
+    std::stack<Message> messages;
+    bool listening;
 
 private slots:
 

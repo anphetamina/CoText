@@ -1,9 +1,10 @@
 #include <algorithm>
+#include <QUuid>
 #include "NetworkServer.h"
 
 int NetworkServer::connect(SharedEditor* sharedEditor) {
     editors.push_back(sharedEditor);
-    return id++;
+    return ++id;
 }
 
 void NetworkServer::disconnect(SharedEditor *sharedEditor) {

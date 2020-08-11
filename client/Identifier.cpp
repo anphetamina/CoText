@@ -3,7 +3,6 @@
 //
 
 #include "Identifier.h"
-#include "QIdentifier.h"
 
 Identifier::Identifier() {}
 

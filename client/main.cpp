@@ -39,9 +39,9 @@ int main(int argc, char *argv[])
     w->show();
 
     NetworkServer network;
-    SharedEditor ed1(network);
+    SharedEditor sharedEditor(network);
 
-    TextEditor editor(*w, *w->getUi(), ed1);
+    TextEditor editor(*w, *w->getUi(), sharedEditor);
 
     return a.exec();
 }

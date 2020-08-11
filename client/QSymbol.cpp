@@ -32,15 +32,18 @@ void QSymbol::setId(const QString &id) {
 }
 
 void QSymbol::setPosition( QVector<Identifier> &position) {
+
     QSymbol::position = position;
 }
 
-Symbol QSymbol::toOriginal() {
+Symbol QSymbol::toOriginal() const {
     std::vector<Identifier> position = {};
     for (auto identifier : this->position) {
         position.push_back(identifier);//.toOriginal() // Using identifier for now
     }
     return Symbol(c.toLatin1(), id.toStdString(), position);
+
+    //return Symbol(c.toLatin1(), id.toStdString(), std::vector(position.begin(), position.end()));
 }
 
 QDataStream & operator << (QDataStream & s, const QSymbol &qs) {

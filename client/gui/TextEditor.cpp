@@ -7,8 +7,9 @@
 #include <QtWidgets/QFontDialog>
 #include "TextEditor.h"
 
-TextEditor::TextEditor(QWidget &parent, Ui::MainWindow &ui, SharedEditor &editor) : parent(parent), ui(ui), editor(editor), index({0}) {
+TextEditor::TextEditor(QWidget &parent, Ui::MainWindow &ui, SharedEditor &editor, int numWorkers, int numListeners) : parent(parent), ui(ui), editor(editor), index({0}), numWorkers(numWorkers), numListeners(numListeners), listening(true) {
 
+    ui.textEdit->document()->setDocumentMargin(50);
 
     /**
     * font styling connections
@@ -28,6 +29,40 @@ TextEditor::TextEditor(QWidget &parent, Ui::MainWindow &ui, SharedEditor &editor
      */
 
     connect(ui.textEdit->document(), &QTextDocument::contentsChange, this, &TextEditor::contentsChange);
+
+    for (int i = 0; i < numWorkers; i++) {
+        workers.emplace_back([&] {
+            while (listening) {
+                std::unique_lock lock(messagesMutex);
+                is_empty.wait(lock, [&] { return !messages.empty(); });
+                const Message& message = messages.top();
+                messages.pop();
+                lock.unlock();
+
+                if (message.getType() == 1) {
+                    remoteInsert(message.getS());
+                    std::cout << std::this_thread::get_id() << ": inserted char " << message.getS().getC() << std::endl;
+                } else if (message.getType() == -1) {
+                    remoteErase(message.getS());
+                    std::cout << std::this_thread::get_id() << ": removed char " << message.getS().getC() << std::endl;
+                } else {
+                    std::cout << std::this_thread::get_id() << ": received invalid message type" << std::endl;
+                }
+            }
+        });
+    }
+
+    for (int i = 0; i < numListeners; i++) {
+        listeners.emplace_back([&] {
+            while (listening) {
+                // todo
+//                std::unique_lock lock(messagesMutex);
+//                messages.push(Message(0, Symbol('c', "id", {Identifier(0, "siteId")}), "siteId"));
+//                is_empty.notify_one();
+            }
+
+        });
+    }
 }
 
 void TextEditor::selectFont() {
@@ -81,10 +116,11 @@ void TextEditor::colorChanged(const QColor &c) {
 
 void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) {
 
+    std::lock_guard lock(editorMutex);
 
     /**
      * QTextEdit bug
-     * pasting >= characters gives wrong number of added and removed chars
+     * pasting >= 1 characters gives wrong number of added and removed chars
      */
     if (charsAdded >= 1 && charsRemoved >= 1) {
         charsAdded--;
@@ -313,7 +349,7 @@ void TextEditor::decrementIndex(int pos, int n) {
 /**
  * @param row
  * @param position
- * @return the relative offset from a given row
+ * @return the relative offset from the starting index of row
  */
 int TextEditor::getCol(int row, int position) {
     return position - index[row];
@@ -346,25 +382,36 @@ int TextEditor::getRow(int position) {
  * insert symbol received from the server
  * @param symbol
  */
-void TextEditor::remoteInsert(Symbol symbol) {
+void TextEditor::remoteInsert(const Symbol &symbol) {
+    std::lock_guard lock(editorMutex);
     std::pair<int, int> pos = editor.remoteInsert(symbol);
-    if (pos != std::make_pair(-1, -1)) {
+    if (pos.first != -1 || pos.second != -1) {
         int position = getPosition(pos.first, pos.second);
         ui.textEdit->textCursor().setPosition(position);
         ui.textEdit->textCursor().insertText(QChar::fromLatin1(symbol.getC()));
+
+        incrementIndex(pos.first, 1);
+        if (symbol.getC() == '\n') {
+            insertRow(pos.first, 1);
+        }
     }
 }
-
 /**
  * erase symbol received from the server
  * @param symbol
  */
-void TextEditor::remoteErase(Symbol symbol) {
+void TextEditor::remoteErase(const Symbol &symbol) {
+    std::lock_guard lock(editorMutex);
     std::pair<int, int> pos = editor.remoteErase(symbol);
-    if (pos != std::make_pair(-1, -1)) {
+    if (pos.first != -1 || pos.second != -1) {
         int position = getPosition(pos.first, pos.second);
         ui.textEdit->textCursor().setPosition(position);
         ui.textEdit->textCursor().deleteChar();
+
+        decrementIndex(pos.first, 1);
+        if (symbol.getC() == '\n') {
+            deleteRow(pos.first, 1);
+        }
     }
 }
 
@@ -378,4 +425,17 @@ int TextEditor::getPosition(int row, int col) {
     int pos = index[row];
     pos += col;
     return pos;
+}
+
+TextEditor::~TextEditor() {
+    listening = false;
+
+    for (auto &w : workers) {
+        w.join();
+    }
+
+    for (auto &l : listeners) {
+        l.join();
+    }
+
 }
