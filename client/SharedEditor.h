@@ -65,9 +65,9 @@ public:
     bool retrieveStrategy(int level);
     std::vector<Identifier> findPosBefore(int line, int index);
     std::vector<Identifier> findPosAfter(int line, int index);
-    void localInsert(int line, int index, char value);
+    Symbol localInsert(int line, int index, char value);
     void insertSymbol(int line, int index, Symbol symbol);
-    void localErase(int startLine, int startIndex, int endLine, int endIndex);
+    std::vector<Symbol> localErase(int startLine, int startIndex, int endLine, int endIndex);
     std::vector<Symbol> eraseSingleLine(int startLine, int startIndex, int endLine, int endIndex);
     std::vector<Symbol> eraseMultipleLines(int startLine, int startIndex, int endLine, int endIndex);
     void process(Message& m);

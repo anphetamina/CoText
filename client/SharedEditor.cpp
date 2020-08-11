@@ -241,7 +241,7 @@ void SharedEditor::insertSymbol(int line, int index, Symbol symbol) {
  *
  * the insert in (0,5) is replaced with the insert in (1,0)
  */
-void SharedEditor::localInsert(int line, int index, char value) {
+Symbol SharedEditor::localInsert(int line, int index, char value) {
 
     if (line < 0) {
         throw std::out_of_range("line "+std::to_string(line)+" is negative");
@@ -296,12 +296,9 @@ void SharedEditor::localInsert(int line, int index, char value) {
     } catch (std::exception& e) {
         std::cerr << "line " << line << ", index " << index << ", value " << value << ", siteId " << siteId << std::endl;
         std::cerr << e.what() << std::endl;
-        return;
     }
 
-    // todo send message asynchronously
-    Message m(INSERT, sym, siteId);
-    server.send(m);
+    return sym;
 }
 
 /**
@@ -354,7 +351,7 @@ std::vector<Symbol> SharedEditor::eraseMultipleLines(int startLine, int startInd
  * @param endLine
  * @param endIndex
  */
-void SharedEditor::localErase(int startLine, int startIndex, int endLine, int endIndex) {
+std::vector<Symbol> SharedEditor::localErase(int startLine, int startIndex, int endLine, int endIndex) {
 
     if (startLine < 0) {
         throw std::out_of_range("startLine "+std::to_string(startLine)+" is negative");
@@ -373,7 +370,7 @@ void SharedEditor::localErase(int startLine, int startIndex, int endLine, int en
     std::vector<Symbol> erasedSymbols;
     bool mergeLines = false;
     if (symbols[0].empty() || symbols.size() <= startLine) {
-        return;
+        return {};
     } else if (startLine != endLine) {
         erasedSymbols = eraseMultipleLines(startLine, startIndex, endLine, endIndex);
         if (symbols[startLine + 1].empty()) {
@@ -396,11 +393,7 @@ void SharedEditor::localErase(int startLine, int startIndex, int endLine, int en
         symbols.erase(symbols.begin() + startLine+1);
     }
 
-    // todo send message asynchronously
-    for (Symbol sym : erasedSymbols) {
-        Message m(DELETE, sym, siteId);
-        server.send(m);
-    }
+    return erasedSymbols;
 
 }
 
