@@ -8,15 +8,15 @@ class Message {
 private:
     int type;
     Symbol s;
-    int siteId;
+    std::string siteId;
 public:
-    Message(int type, const Symbol s, int siteId);
+    Message(int type, const Symbol s, std::string siteId);
 
     int getType() const;
 
     const Symbol &getS() const;
 
-    int getSiteId() const;
+    std::string getSiteId() const;
 
     int getCounter() const;
 };

@@ -5,7 +5,7 @@
 #include "Identifier.h"
 #include "QIdentifier.h"
 
-Identifier::Identifier(int digit, int siteId) : digit(digit), siteId(siteId) {}
+Identifier::Identifier(int digit, std::string siteId) : digit(digit), siteId(siteId) {}
 
 int Identifier::getDigit() const {
     return digit;
@@ -15,11 +15,11 @@ void Identifier::setDigit(int digit) {
     Identifier::digit = digit;
 }
 
-int Identifier::getSiteId() const {
+std::string Identifier::getSiteId() const {
     return siteId;
 }
 
-void Identifier::setSiteId(int siteId) {
+void Identifier::setSiteId(std::string siteId) {
     Identifier::siteId = siteId;
 }
 
@@ -37,5 +37,5 @@ bool Identifier::operator<(const Identifier &rhs) const {
 }
 
 QIdentifier Identifier::toSerializable() {
-    return QIdentifier(digit, siteId);
+    return QIdentifier(digit, QString::fromStdString(siteId));
 }

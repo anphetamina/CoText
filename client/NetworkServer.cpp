@@ -1,9 +1,10 @@
 #include <algorithm>
+#include <QUuid>
 #include "NetworkServer.h"
 
-int NetworkServer::connect(SharedEditor* sharedEditor) {
+std::string NetworkServer::connect(SharedEditor* sharedEditor) {
     editors.push_back(sharedEditor);
-    return id++;
+    return QUuid::createUuid().toString(QUuid::WithoutBraces).toStdString();
 }
 
 void NetworkServer::disconnect(SharedEditor *sharedEditor) {
@@ -18,12 +19,12 @@ void NetworkServer::send(const Message &m) {
 void NetworkServer::dispatchMessages() {
     for (auto m = messages.begin(); m != messages.end(); m++) {
         for (auto e : editors) {
-            if (e->getSiteId() != m->getSiteId()) {
+            /*if (e->getSiteId() != m->getSiteId()) {
                 e->process(*m);
-            }
+            }*/
         }
     }
     messages.clear();
 }
 
-NetworkServer::NetworkServer() : id(0) {}
+NetworkServer::NetworkServer() {}

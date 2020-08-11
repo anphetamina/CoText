@@ -7,22 +7,23 @@
 
 
 #include <QtCore/QtGlobal>
+#include <QtCore/QString>
 #include "Identifier.h"
 
 class QIdentifier {
     qint32 digit;
-    qint32 siteId;
+    QString siteId;
 
 public:
-    QIdentifier(qint32 digit, qint32 siteId);
+    QIdentifier(qint32 digit, QString siteId);
 
     void setDigit(qint32 digit);
 
-    void setSiteId(qint32 siteId);
+    void setSiteId(QString siteId);
 
     qint32 getDigit() const;
 
-    qint32 getSiteId() const;
+    QString getSiteId() const;
 
     Identifier toOriginal();
 };

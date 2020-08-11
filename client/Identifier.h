@@ -5,24 +5,26 @@
 #ifndef CRDTPP_MULTI_IDENTIFIER_H
 #define CRDTPP_MULTI_IDENTIFIER_H
 
+#include <iostream>
+
 
 class QIdentifier;
 
 class Identifier {
 
     int digit;
-    int siteId;
+    std::string siteId;
 
 public:
-    Identifier(int digit, int siteId);
+    Identifier(int digit, std::string siteId);
 
     int getDigit() const;
 
     void setDigit(int digit);
 
-    int getSiteId() const;
+    std::string getSiteId() const;
 
-    void setSiteId(int siteId);
+    void setSiteId(std::string siteId);
 
     bool operator==(const Identifier &rhs) const;
 

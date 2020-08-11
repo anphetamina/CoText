@@ -4,13 +4,13 @@
 
 #include "QIdentifier.h"
 
-QIdentifier::QIdentifier(qint32 digit, qint32 siteId) : digit(digit), siteId(siteId) {}
+QIdentifier::QIdentifier(qint32 digit, QString siteId) : digit(digit), siteId(siteId) {}
 
 qint32 QIdentifier::getDigit() const {
     return digit;
 }
 
-qint32 QIdentifier::getSiteId() const {
+QString QIdentifier::getSiteId() const {
     return siteId;
 }
 
@@ -18,10 +18,10 @@ void QIdentifier::setDigit(qint32 digit) {
     QIdentifier::digit = digit;
 }
 
-void QIdentifier::setSiteId(qint32 siteId) {
+void QIdentifier::setSiteId(QString siteId) {
     QIdentifier::siteId = siteId;
 }
 
 Identifier QIdentifier::toOriginal() {
-    return Identifier(digit, siteId);
+    return Identifier(digit, siteId.toStdString());
 }

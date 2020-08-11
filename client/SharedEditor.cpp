@@ -6,6 +6,8 @@
 #include "SharedEditor.h"
 #include "NetworkServer.h"
 #include "Shuffler.h"
+#include "QSymbol.h"
+#include <QDebug>
 
 SharedEditor::SharedEditor(NetworkServer &server)
         : server(server), counter(0), base(32), boundary(10), idCounter(0) {
@@ -130,8 +132,8 @@ std::vector<Identifier> SharedEditor::generatePosBetween(std::vector<Identifier>
 
     int id1 = 0;
     int id2 = static_cast<int>(std::pow(2, level)*base);
-    int siteId1 = siteId;
-    int siteId2 = siteId;
+    std::string siteId1 = siteId;
+    std::string siteId2 = siteId;
     if (pos1.size() > level) {
         id1 = pos1.at(level).getDigit();
         siteId1 = pos1.at(level).getSiteId();
@@ -252,7 +254,7 @@ void SharedEditor::localInsert(int line, int index, char value) {
     }
 
 
-    std::string sym_id = std::to_string(siteId);
+    std::string sym_id = siteId;
     sym_id.append("-");
     sym_id.append(std::to_string(idCounter));
     std::vector<Identifier> sym_position;
@@ -273,12 +275,31 @@ void SharedEditor::localInsert(int line, int index, char value) {
         sym_position = generatePosBetween(pos1, pos2, sym_position, 0);
         sym.setPosition(sym_position);
         insertSymbol(line, index, sym);
+
+        /*std::cout << "original char: " << sym.getC() << std::endl;
+
+        QSymbol qSymbol = sym.toSerializable();
+        qDebug() << "char" << qSymbol.getC().toLatin1() << "id" << qSymbol.getId();
+        qDebug() << "position";
+        for (auto pos : qSymbol.getPosition()) {
+            qDebug() << "[" << pos.getDigit() << "," << pos.getSiteId() << "]";
+        }
+
+        Symbol oSymbol = qSymbol.toOriginal();
+        std::cout << "char " << oSymbol.getC() << " id " << oSymbol.getId() << std::endl;
+        std::cout << "position " << std::endl;
+        for (auto pos : oSymbol.getPosition()) {
+            std::cout << "[ " << pos.getDigit() << ", " << pos.getSiteId() << " ]";
+        }
+        std::cout << std::endl;*/
+
     } catch (std::exception& e) {
         std::cerr << "line " << line << ", index " << index << ", value " << value << ", siteId " << siteId << std::endl;
         std::cerr << e.what() << std::endl;
         return;
     }
 
+    // todo send message asynchronously
     Message m(INSERT, sym, siteId);
     server.send(m);
 }
@@ -375,6 +396,7 @@ void SharedEditor::localErase(int startLine, int startIndex, int endLine, int en
         symbols.erase(symbols.begin() + startLine+1);
     }
 
+    // todo send message asynchronously
     for (Symbol sym : erasedSymbols) {
         Message m(DELETE, sym, siteId);
         server.send(m);
@@ -388,7 +410,7 @@ void SharedEditor::localErase(int startLine, int startIndex, int endLine, int en
  * @param symbol
  * @return the pair (line,index) and insert symbol right before the first one with the higher fractional position
  */
-std::pair<int, int> SharedEditor::remoteInsert(Symbol symbol) {
+std::pair<int, int> SharedEditor::remoteInsert(const Symbol &symbol) {
 
     if (symbols.front().empty()) {
         insertSymbol(0, 0, symbol);
@@ -460,7 +482,7 @@ std::pair<int, int> SharedEditor::remoteInsert(Symbol symbol) {
  * @param symbol
  * @return the pair (line,index) of the removed symbol
  */
-std::pair<int, int> SharedEditor::remoteErase(Symbol symbol) {
+std::pair<int, int> SharedEditor::remoteErase(const Symbol &symbol) {
     if (!symbols.front().empty()) {
         bool mergeLines = false;
         std::vector<std::vector<Symbol>>::iterator line_it;
@@ -581,7 +603,7 @@ NetworkServer& SharedEditor::getServer() const {
     return server;
 }
 
-int SharedEditor::getSiteId() const {
+std::string SharedEditor::getSiteId() const {
     return siteId;
 }
 
@@ -593,7 +615,7 @@ int SharedEditor::getCounter() const {
     return counter;
 }
 
-void SharedEditor::setSiteId(int siteId) {
+void SharedEditor::setSiteId(std::string siteId) {
     SharedEditor::siteId = siteId;
 }
 
