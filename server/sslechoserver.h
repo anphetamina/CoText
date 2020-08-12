@@ -43,7 +43,7 @@ private:
 
     //void tryLogin(Packet rcvd_packet);
 
-    void dispatch(PacketHandler rcvd_packet, QWebSocket* m_webSocket);
+    void dispatch(PacketHandler rcvd_packet, QWebSocket* pClient);
 };
 
 #endif //SSLECHOSERVER_H

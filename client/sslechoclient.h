@@ -37,6 +37,8 @@ private:
     void sendLogin();
 
     void sendTest();
+
+    void authenticate(QString username, QString password);
 };
 
 #endif // SSLECHOCLIENT_H

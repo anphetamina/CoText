@@ -81,10 +81,7 @@ void SslEchoClient::sendPing() {
 
 void SslEchoClient::sendTest() {
     qDebug() << "[NETWORK] ** Network Test Start ** ";
-    qDebug() << "[NETWORK] ** Sending login req packet ** ";
-    // Create buffer
-    LoginReqPacket lrp = LoginReqPacket("test@domain.tld", "test2HashedPassword");
-    lrp.send(m_webSocket);
+    this->authenticate("test@test.test", "test");
     qDebug() << "[NETWORK] ** Sending Message packet ** ";
     QVector<Identifier> sym_position;
     QString test("test_qstring");
@@ -94,6 +91,13 @@ void SslEchoClient::sendTest() {
     msg.send(m_webSocket);
     qDebug() << "[NETWORK] ** Network Test Packet were all sent ** ";
 
+}
+
+void SslEchoClient::authenticate(QString username, QString password) {
+    qDebug() << "[NETWORK] ** Sending login req packet ** ";
+    QString hashedPassword = password;
+    LoginReqPacket lrp = LoginReqPacket(username, hashedPassword);
+    lrp.send(m_webSocket);
 }
 
 void SslEchoClient::packetParse(QByteArray rcvd_packet) {

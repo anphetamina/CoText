@@ -75,6 +75,34 @@ User checkLoginData(QString email, QString password){
     }
 }
 
+User* checkUserLoginData(QString email, QString password){
+    QSqlQuery query;
+    QString hashedpassword = password;
+    qDebug() << "[AUTH] Trying authentication for Mario Rossi (test@test.test)";
+    // Avoiding security concerns about sql for now
+    QString squery = "SELECT username, id, email, name, surname FROM User WHERE email='"+email+"' AND password='" + hashedpassword + "'";
+    //qDebug() << "[DB] Composed query to be executed: " << squery;
+    query.exec(squery);
+
+    if (query.next()) {
+        QString username = query.value(0).toString();
+        int id = query.value(1).toInt();
+        QString email = query.value(2).toString();
+        QString name = query.value(3).toString();
+        QString surname = query.value(4).toString();
+        User* loggedUser = new User(id, email, name, surname);
+        qDebug() << "[AUTH] New user authenticated with success." << endl << "\tRetrieved info = [Email: " << loggedUser->getEmail() << "; Name:" << loggedUser->getName() << "]";
+        return loggedUser;
+    }
+    else{
+        User* failedUser = new User();
+        failedUser->setEmail(email);
+        failedUser->setId(-1);
+        qDebug() << "[AUTH] A user failed the auth. Email tried: " << email;
+        return failedUser;
+    }
+}
+
 
 QIcon loadProfilePic(int id){
     QString pictureFileName = QString::number(id)+".png";
