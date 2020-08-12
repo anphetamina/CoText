@@ -9,6 +9,8 @@
 
 /** Document creation packet **/
 class DocumentCreatePacket : public Packet {
+    DocumentCreatePacket(QString docName, qint32 userId);
+
     friend PacketBuilder;
 private:
     qint32 userId;
@@ -22,12 +24,14 @@ protected:
 public:
     DocumentCreatePacket(qint32 userId, QString docName);
     ~DocumentCreatePacket() {};
-    QString getuserId() const;
-    QString getdocName const;
+    int getuserId() const;
+    QString getdocName() const;
 };
 
 /** Document open packet **/
 class DocumentOpenPacket : public Packet {
+    DocumentOpenPacket(QString docName, qint32 userId);
+
     friend PacketBuilder;
 private:
     qint32 userId;
@@ -41,12 +45,14 @@ protected:
 public:
     DocumentOpenPacket(qint32 userId, QString docName);
     ~DocumentOpenPacket() {};
-    QString getuserId() const;
-    QString getdocName const;
+    int getuserId() const;
+    QString getdocName() const;
 };
 
 /** Document delete packet **/
 class DocumentDelPacket : public Packet {
+    DocumentDelPacket(QString docName, qint32 userId);
+
     friend PacketBuilder;
 private:
     qint32 userId;
@@ -60,8 +66,8 @@ protected:
 public:
     DocumentDelPacket(qint32 userId, QString docName);
     ~DocumentDelPacket() {};
-    QString getuserId() const;
-    QString getdocName const;
+    int getuserId() const;
+    QString getdocName() const;
 };
 
 /** Document Ok packet: the desirable response for a DocumentOpen packet **/
@@ -69,8 +75,11 @@ public:
 class DocumentOkPacket : public Packet {
     friend PacketBuilder;
 private:
-    qint32 userId;
+    int docId;
     QString docName;
+
+    int siteId;
+    std::vector<std::vector<QSymbol>> qsymbols;
 protected:
     DocumentOkPacket();
 
@@ -78,14 +87,17 @@ protected:
     void readPayload(QDataStream& stream) override;
 
 public:
-    DocumentOkPacket(qint32 userId, QString docName);
+    DocumentOkPacket(int docId, QString docName, int siteId, std::vector<std::vector<QSymbol>> qsymbols);
     ~DocumentOkPacket() {};
-    QString getuserId() const;
-    QString getdocName const;
+    int getsiteId() const;
+    int getdocId() const;
+    QString getdocName() const;
 };
 
 /** DocumentAskSharableURIPacket: the  packet used to check permission and get the URI used to invite people**/
 class DocumentAskSharableURIPacket : public Packet {
+    DocumentAskSharableURIPacket(QString docName, qint32 userId, QString sharableURI);
+
     friend PacketBuilder;
 private:
     qint32 userId;
@@ -101,6 +113,7 @@ protected:
 public:
     DocumentAskSharableURIPacket(qint32 userId, QString docName, QString sharableURI);
     ~DocumentAskSharableURIPacket() {};
-    QString getuserId() const;
-    QString getdocName const;
+    int getuserId() const;
+    QString getdocName() const;
+
 };
