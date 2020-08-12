@@ -234,6 +234,8 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             User* loggedUser = checkUserLoginData(username, password);
             client->setAsLogged(loggedUser);
 
+            LoginOkPacket lop = LoginOkPacket(*loggedUser);
+            lop.send(*pClient);
             //qDebug() << loginReq->getUsername();
             break;
         }

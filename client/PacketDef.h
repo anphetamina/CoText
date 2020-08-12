@@ -32,3 +32,4 @@
 #define PACK_TYPE_DOC_ERR 0x0056
 
 
+#define PACK_TYPE_LAST_CODE 0x0099

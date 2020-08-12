@@ -124,7 +124,7 @@ void DocumentAskSharableURIPacket::writePayload(QDataStream& stream) const
 
 void DocumentAskSharableURIPacket::readPayload(QDataStream& stream)
 {
-    stream >> userId >> docName << sharableURI;
+    stream >> userId >> docName >> sharableURI;
 }
 
 

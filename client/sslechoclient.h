@@ -11,6 +11,7 @@
 #include <QtCore/QList>
 #include <QtCore/QString>
 #include <QtCore/QUrl>
+#include "Packet.h"
 
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
 
@@ -39,6 +40,8 @@ private:
     void sendTest();
 
     void authenticate(QString username, QString password);
+
+    void dispatch(PacketHandler rcvd_packet, QWebSocket *pClient);
 };
 
 #endif // SSLECHOCLIENT_H

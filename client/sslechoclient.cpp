@@ -47,7 +47,7 @@ void SslEchoClient::onConnected()
 void SslEchoClient::onTextMessageReceived(QString message)
 {
     qDebug() << "Message received:" << message;
-    qApp->quit();
+    //qApp->quit();
 }
 
 //! [onTextMessageReceived]
@@ -55,7 +55,7 @@ void SslEchoClient::onBinaryMessageReceived(QByteArray message)
 {
     //qDebug() << "Message received:" << message;
     this->packetParse(message);
-    qApp->quit();
+    //qApp->quit();
 }
 
 void SslEchoClient::onSslErrors(const QList<QSslError> &errors)
@@ -101,33 +101,40 @@ void SslEchoClient::authenticate(QString username, QString password) {
 }
 
 void SslEchoClient::packetParse(QByteArray rcvd_packet) {
+
+    // Create a new packet buffer (used to w8 and receive for the full packet)
     PacketBuffer* pBuffer = new PacketBuffer();
+    //qDebug() << rcvd_packet;
+    //Create a data stream (used to deserialize the rcvd bytearray  to a structured packet)
+    QDataStream streamRcv(&rcvd_packet, QIODevice::ReadOnly);
 
-    // Parsing.
-    /*QDataStream streamRcv(&rcvd_packet, QIODevice::ReadOnly);
-    //SocketBuffer& socketBuffer = clients.value(socket)->getSocketBuffer();// TODO: extend for many
-
+    // If the packet buffer is empty parse (deserialize) the headers field (MAGIC_VAL|Flags|type|payloadLen)
     if (pBuffer->getDataSize() == 0) {
-        rcvd_packet >> pBuffer;
-    }*/
-    pBuffer->append(rcvd_packet);
+        streamRcv >> *pBuffer;
+    }
+    // Append the continuation of the packet TODO:check
+    QByteArray payload = rcvd_packet.mid(4+sizeof(quint32));//header+Payoadlen skip
+    pBuffer->append(payload);
 
     if (pBuffer->isComplete()) {
 
         QDataStream dataStream(pBuffer->bufferPtr(), QIODevice::ReadWrite);
-        quint8 mType = (quint8)pBuffer->getType();
+        quint8 mType = (quint8) pBuffer->getType();
 
         try {
-            PacketHandler packetH = PacketHandler();
+            // Create an empty packet and read the fields by deserializing the data stream into a structured Packet
+            PacketHandler packetH = PacketBuilder::Container(mType);
             packetH->read(dataStream);
+            // Clear the buffer when a full packet is received (we are ready for the next one!)
             pBuffer->clearBuffer();
 
-            if (mType == PACK_TYPE_PING)
-            {
-                qDebug() << "[INFO] Parsed new packet:";
-                //packetHandler.process(message, socket);
-            }
-            else qDebug()  << "[ERROR] Uknown type: " << mType;
+            // If the type is correct TODO: add HeadID check
+            if (mType == PACK_TYPE_PING || mType <= PACK_TYPE_LAST_CODE) {
+                qDebug() << "[INFO] Parsed new packet. Type: " << mType;
+                QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
+                dispatch(packetH, pClient);
+            } else
+                qDebug() << "[ERROR] Unknown packet type!\nUknType: " << mType;
         }
         catch (std::exception me)//(MyException& me)
         {
@@ -136,24 +143,28 @@ void SslEchoClient::packetParse(QByteArray rcvd_packet) {
             //socketAbort(m_webSocket);				// Terminate connection with the client
         }
     }
-
-    /*
-    // packet object and his field are instantiated now
-    switch(packet.type){
-        case PACK_TYPE_PING:
-            qDebug() << "Pong received";
-            break;
-        case PACK_TYPE_LOGIN_RES:
-            qDebug() << "Login response";
-            break;
-        default:
-            qDebug() << "Uknown packet type: " << packet.type;
-            break;
-    }
-
-    return;
-     */
 }
+
+void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
+    //qDebug() << rcvd_packet.get();  // print packet as hex
+    qDebug() << "New packet type= " << rcvd_packet->getType();
+    switch (rcvd_packet->getType()) {
+        // Remeber to add {} scope to avoid jump from switch compilation error
+        case (PACK_TYPE_PING): {
+            PingPacket *ping = dynamic_cast<PingPacket *>(rcvd_packet.get());
+            qDebug() << "[PING] Debug text: " << ping->getDebugMsg();
+            break;
+        }
+
+        case(PACK_TYPE_LOGIN_OK): {
+            LoginOkPacket* loginOk = dynamic_cast<LoginOkPacket*>(rcvd_packet.get());
+            User loggedUser = loginOk->getUser();
+            qDebug() << "[AUTH] Logged in as: "<< loggedUser.getEmail();
+            break;
+        }
+    }
+}
+
 
 
 //    // Save the secret key that will be used
