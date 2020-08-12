@@ -159,7 +159,12 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
         case(PACK_TYPE_LOGIN_OK): {
             LoginOkPacket* loginOk = dynamic_cast<LoginOkPacket*>(rcvd_packet.get());
             User loggedUser = loginOk->getUser();
-            qDebug() << "[AUTH] Logged in as: "<< loggedUser.getEmail();
+            if ( loggedUser.isLogged() ){
+                qDebug() << "[AUTH] Logged in as: " << loggedUser.getEmail();
+            }
+            else {
+                qDebug() << "[AUTH] FAILED. See the server for the log.";
+            }
             break;
         }
     }

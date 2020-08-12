@@ -57,7 +57,7 @@ void User::setSignature(uint8_t signature) { this->signature = signature; }
 
 QDataStream& operator>>(QDataStream& in, User& user)
 {
-    in >> user.name >> user.surname >> user.email
+    in >> user.id >> user.name >> user.surname >> user.email
        >> user.nickname
        >> user.profilePic
        //>> user.friendList
@@ -72,7 +72,7 @@ QDataStream& operator>>(QDataStream& in, User& user)
 
 QDataStream& operator<<(QDataStream& out, const User& user)
 {
-    out << user.name << user.surname << user.email
+    out << user.id << user.name << user.surname << user.email
         << user.nickname
         << user.profilePic
         //<< user.friendList
