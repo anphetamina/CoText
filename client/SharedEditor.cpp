@@ -1,18 +1,13 @@
-#define INSERT 1
-#define DELETE -1
-
 #include <algorithm>
 #include <iostream>
 #include "SharedEditor.h"
-#include "NetworkServer.h"
 #include "Shuffler.h"
 #include "QSymbol.h"
 #include <QDebug>
 
-SharedEditor::SharedEditor(NetworkServer &server)
-        : server(server), counter(0), base(32), boundary(10), idCounter(0) {
+SharedEditor::SharedEditor(int siteId)
+        : siteId(siteId), counter(0), base(32), boundary(10), idCounter(0) {
     symbols.emplace_back();
-    siteId = server.connect(this);
 }
 
 bool SharedEditor::retrieveStrategy(int level) {
@@ -540,29 +535,6 @@ std::pair<int, int> SharedEditor::remoteErase(const Symbol &symbol) {
     return std::make_pair(-1, -1);
 }
 
-/**
- *
- * @param m
- * if m.type = 1 insert the symbol respecting the fractional position
- * if m.type = -1 remove the symbol given the fractional position
- */
-void SharedEditor::process( Message &m) {
-    Symbol symbol = m.getS();
-
-    switch (m.getType()) {
-        case INSERT:
-            remoteInsert(symbol);
-            break;
-
-        case DELETE:
-            remoteErase(symbol);
-            break;
-
-        default:
-            throw std::runtime_error("process: forbidden action");
-    }
-}
-
 std::string SharedEditor::to_string() {
     std::string output{};
     for (const auto& line : symbols) {
@@ -571,10 +543,6 @@ std::string SharedEditor::to_string() {
         }
     }
     return output;
-}
-
-void SharedEditor::setServer(NetworkServer &server) {
-    this->server = server;
 }
 
 int SharedEditor::getBase() const {
@@ -591,10 +559,6 @@ uint64_t SharedEditor::getIdCounter() const {
 
 void SharedEditor::setIdCounter(uint64_t idCounter) {
     this->idCounter = idCounter;
-}
-
-NetworkServer& SharedEditor::getServer() const {
-    return server;
 }
 
 int SharedEditor::getSiteId() const {

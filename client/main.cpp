@@ -6,7 +6,6 @@
 
 //#include <QtCore/QCoreApplication>
 #include "sslechoclient.h"
-#include "NetworkServer.h"
 
 int main(int argc, char *argv[])
 {
@@ -16,13 +15,6 @@ int main(int argc, char *argv[])
 	styleFile.open(QFile::ReadOnly);
 	QString stylesheetString = QLatin1String(styleFile.readAll());
 	a.setStyleSheet(stylesheetString);
-
-
-    // ** Network testing code
-    //QCoreApplication a(argc, argv);
-    SslEchoClient client(QUrl(QStringLiteral("wss://localhost:12345")));
-    Q_UNUSED(client);
-    // ** End of network testing code
 
     // Set GUI options
     MainWindow *w = new MainWindow();
@@ -38,10 +30,7 @@ int main(int argc, char *argv[])
 
     w->show();
 
-    NetworkServer network;
-    SharedEditor sharedEditor(network);
-
-    TextEditor editor(*w, *w->getUi(), sharedEditor);
+    TextEditor editor(*w, *w->getUi());
 
     return a.exec();
 }

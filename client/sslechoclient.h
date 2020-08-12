@@ -12,6 +12,7 @@
 #include <QtCore/QString>
 #include <QtCore/QUrl>
 #include "Packet.h"
+#include "Message.h"
 
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
 
@@ -20,6 +21,15 @@ class SslEchoClient : public QObject
 Q_OBJECT
 public:
     explicit SslEchoClient(const QUrl &url, QObject *parent = nullptr);
+
+signals:
+
+    void insertSymbol(Symbol symbol);
+    void removeSymbol(Symbol symbol);
+
+public slots:
+
+    void sendMessage(Symbol symbol, int type, int siteId);
 
 private Q_SLOTS:
     void onConnected();

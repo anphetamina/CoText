@@ -3,12 +3,9 @@
 //
 
 #include "sslechoclient.h"
-#include "Packet.h"
 #include "PacketDef.h"
 #include "PingPacket.h"
 #include "LoginPacket.h"
-#include "Message.h"
-#include <QtCore/QDebug>
 #include <QtWebSockets/QWebSocket>
 #include <QCoreApplication>
 
@@ -87,7 +84,7 @@ void SslEchoClient::sendTest() {
     QString test("test_qstring");
     QChar qc = test.at(0);//t
     QSymbol qs = QSymbol(qc, test, sym_position);
-    Message msg = Message(1, qs, 3);
+    Message msg = Message(MSG_INSERT_SYM, qs, 3);
     msg.send(m_webSocket);
     qDebug() << "[NETWORK] ** Network Test Packet were all sent ** ";
 
@@ -167,7 +164,29 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             }
             break;
         }
+
+        case (PACK_TYPE_MSG): {
+            Message *msg = dynamic_cast<Message *>(rcvd_packet.get());
+            switch (msg->getType()) {
+                case(MSG_INSERT_SYM): {
+                    emit insertSymbol(msg->getS());
+                    break;
+                }
+
+                case(MSG_DELETE_SYM): {
+                    emit removeSymbol(msg->getS());
+                    break;
+                }
+            }
+            break;
+        }
     }
+}
+
+void SslEchoClient::sendMessage(Symbol symbol, int type, int siteId) {
+    Message msg = Message(type, symbol.toSerializable(), siteId);
+    msg.send(m_webSocket);
+    qDebug() << "sent" << ((symbol.getC() == '\n') ? "LF" : QString(symbol.getC())) << "(" << type << ")";
 }
 
 

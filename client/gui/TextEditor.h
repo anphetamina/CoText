@@ -15,6 +15,7 @@
 #include <QtWidgets/QTextEdit>
 #include "MainWindow.h"
 #include "../SharedEditor.h"
+#include "../sslechoclient.h"
 
 namespace Ui { class MainWindow; }
 
@@ -23,7 +24,7 @@ class TextEditor : public QObject {
     Q_OBJECT
 
 public:
-    explicit TextEditor(QWidget &parent, Ui::MainWindow &ui, SharedEditor &editor, int numWorkers = 3, int numListeners = 1);
+    explicit TextEditor(QWidget &parent, Ui::MainWindow &ui);
 
     virtual ~TextEditor();
 
@@ -31,7 +32,9 @@ private:
 
     QWidget &parent;
     Ui::MainWindow &ui;
-    SharedEditor &editor;
+    SharedEditor editor;
+    SslEchoClient sslEchoClient;
+    QThread *listener;
     std::vector<int> index;
 
     void fontChanged(const QFont &f);
@@ -47,29 +50,20 @@ private:
     int getRow(int position);
     int getCol(int row, int position);
 
+
     /**
      * remote
      */
 
-    void remoteInsert(const Symbol& symbol);
-    void remoteErase(const Symbol &symbol);
     int getPosition(int row, int col);
 
-    /**
-     * concurrency
-     */
 
-    int numWorkers;
-    int numListeners;
-    std::vector<std::thread> workers;
-    std::vector<std::thread> listeners;
-    std::mutex editorMutex;
-    std::mutex messagesMutex;
-    std::condition_variable is_empty;
-    std::stack<Message> messages;
-    bool listening;
+
 
 private slots:
+
+    void remoteInsert(Symbol symbol);
+    void remoteErase(Symbol symbol);
 
     /**
      * font style management
@@ -89,6 +83,11 @@ private slots:
 
     void contentsChange(int position, int charsRemoved, int charsAdded);
     void cursorPositionChanged();
+
+signals:
+
+    void sendSymbol(Symbol symbol, int type, int siteId);
+
 
 };
 
