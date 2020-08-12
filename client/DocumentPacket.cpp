@@ -80,7 +80,8 @@ void DocumentDelPacket::readPayload(QDataStream& stream)
 /** Document Ok packet **/
 // Inherit from a DocumentBaseActionClass?
 DocumentOkPacket::DocumentOkPacket(): Packet(PACK_TYPE_DOC_OK){}
-DocumentOkPacket::DocumentOkPacket(int docId, QString docName, int siteId, std::vector<std::vector<QSymbol>> qsymbols ): Packet(PACK_TYPE_DOC_OK), docId(docId), siteId(siteId), docName(docName), qsymbols(qsymbols){};
+DocumentOkPacket::DocumentOkPacket(int docId, QString docName, int siteId, QVector<QVector<QSymbol>> qsymbols ): Packet(PACK_TYPE_DOC_OK), docId(docId), siteId(siteId), docName(docName), qsymbols(qsymbols){};
+DocumentOkPacket::DocumentOkPacket(int docId, QString docName, int siteId, std::vector<std::vector<Symbol>> symbols ): Packet(PACK_TYPE_DOC_OK), docId(docId), siteId(siteId), docName(docName), qsymbols(toQVector(symbols)){};
 
 int DocumentOkPacket::getsiteId() const {
     return siteId;
@@ -94,14 +95,22 @@ QString DocumentOkPacket::getdocName() const {
     return docName;
 }
 
+QVector<QVector<QSymbol>> DocumentOkPacket::getqsymbols() const {
+    return qsymbols;
+}
+
+std::vector<std::vector<Symbol>>  DocumentOkPacket::getsymbols() const {
+    return toVector(qsymbols);
+}
+
 void DocumentOkPacket::writePayload(QDataStream& stream) const
 {
-    stream << docId << docName << siteId;// <<  qsymbols;
+    stream << docId << docName << siteId << qsymbols;// <<  qsymbols;
 }
 
 void DocumentOkPacket::readPayload(QDataStream& stream)
 {
-    stream >> docId >> docName >> siteId;// >>  qsymbols;
+    stream >> docId >> docName >> siteId >> qsymbols;// >>  qsymbols;
 }
 
 /** DocumentAskSharableURIPacket packet **/
@@ -127,12 +136,31 @@ void DocumentAskSharableURIPacket::readPayload(QDataStream& stream)
     stream >> userId >> docName >> sharableURI;
 }
 
+// Convert a bidimensional std::vector of symbols to a bidimensional qvector of qsymbols
+QVector<QVector<QSymbol>> toQVector(std::vector<std::vector<Symbol>> symbols){
+    QVector<QVector<QSymbol>> qsymbols = {};
+    for (auto symbolArr : symbols) {
+        QVector<QSymbol> qsymbolArr = {};
+        for (auto symbol : symbolArr) {  // Iterate over the Symbols
+            QSymbol qsym = symbol.toSerializable();
+            qsymbolArr.push_back(qsym);
+        }
+        qsymbols.push_back(qsymbolArr);
+    }
+    return qsymbols;
+}
+//QVector::fromStdVector ( const std::vector<T> & vector )
 
-/*
-static PacketHandler DocumentCreation(QString docName);
-static PacketHandler DocumentRemoval(QString docURI);
-static PacketHandler DocumentOpen(QString docURI);
-static PacketHandler DocumentClose();
-static PacketHandler DocumentErr(QString error);
-
-*/
+// Convert a bidimensional qvector of qsymbolsto a  bidimensional std::vector of symbols to
+std::vector<std::vector<Symbol>> toVector(QVector<QVector<QSymbol>> qsymbols){
+    std::vector<std::vector<Symbol>> symbols = {};
+    for (auto symbolQArr : qsymbols) {
+        std::vector<Symbol> symbolArr = {};
+        for (auto qsymbol : symbolQArr) {  // Iterate over the Symbols
+            Symbol sym = qsymbol.toOriginal();
+            symbolArr.push_back(sym);
+        }
+        symbols.push_back(symbolArr);
+    }
+    return symbols;
+}

@@ -261,11 +261,21 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             //qDebug() << msg->getData();
             qDebug() << "[MSG] New symbol received." << endl << "Char: " << msg->getS().getC() << " SiteId: " <<  msg->getSiteId();
             // Broadcast to all the connected client of a document
-
+            //TODO: dont use clientMapping.keys() but the vector with all the clients with that document opened
+            for (auto onlineClient : clientMapping.keys()) {
+                if(onlineClient != pClient) {
+                    msg->send(*(pClient));
+                    qDebug() << "sent";
+                }
+            }
             break;
         }
         /*
         case(PACK_TYPE_DOC_OPEN): {
+            if (!client->isLogged()) {
+                break;
+            }
+            DocumentOkPacket* msg = dynamic_cast<DocumentOkPacket*>(rcvd_packet.get());
             // Check if user already had an open document
             // Check permission of the user for that doc
             // Set the document in the packet as the current opened doc
