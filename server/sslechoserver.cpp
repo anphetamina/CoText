@@ -74,6 +74,7 @@ void SslEchoServer::onNewConnection()
     connect(pSocket, &QWebSocket::binaryMessageReceived,
             this, &SslEchoServer::processBinaryMessage);
     connect(pSocket, &QWebSocket::disconnected, this, &SslEchoServer::socketDisconnected);
+    //TODO: Check if user already exist in the map values, (i.e. connected from 1 device first and then an other)
 
     //m_clients << pSocket;
 }
@@ -119,7 +120,6 @@ void SslEchoServer::socketDisconnected()
         if (client->isLogged()) {
             qDebug() << "User " << client->getEmail() << " disconnected";
         }
-        User * tu = client->getUser();
         client->logout();
 
         // Remove client element from map and close the socket
@@ -258,7 +258,19 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             Message* msg = dynamic_cast<Message*>(rcvd_packet.get());
             //qDebug() << msg->getData();
             qDebug() << "[MSG] New symbol received." << endl << "Char: " << msg->getS().getC() << " SiteId: " <<  msg->getSiteId();
+            // Broadcast to all the connected client of a document
+
             break;
         }
+        /*
+        case(PACK_TYPE_DOC_OPEN): {
+            // Check if user already had an open document
+            // Check permission of the user for that doc
+            // Set the document in the packet as the current opened doc
+            //documentMapping.insert(docId, client)
+            // Send the content of the document
+            break;
+        }
+        */
     }
 }

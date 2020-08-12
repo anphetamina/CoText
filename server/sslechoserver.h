@@ -36,6 +36,9 @@ private:
     // Association of socket and client
     QMap<QWebSocket*, QSharedPointer<Client>> clientMapping;
 
+    //Association of opened doc and user
+    QMap<int, QSharedPointer<Client>> documentMapping;
+
     void packetParse(QByteArray rcvd_packet);
 
     //void tryLogin(QByteArray rcvd_packet);

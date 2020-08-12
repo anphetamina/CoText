@@ -129,3 +129,21 @@ QList<QString> getDocuments(int userId){
      }
      return docList;
 }
+
+bool checkDocPermission(int docId, int userId){
+    QSqlQuery query;
+    QString quserId = QString::number(userId);
+    QString qdocId = QString::number(docId);
+
+    query.exec("SELECT documentid, documentname, documentpath FROM User WHERE userid="+quserId+" AND documentid="+qdocId);
+    if (query.next()) {
+        int id = query.value(0).toInt();
+        QString docName = query.value(1).toString();
+        QString docPath = query.value(2).toString();
+        //qDebug() << username << id;
+        return true;
+    }
+    else{
+        return false;
+    }
+}
