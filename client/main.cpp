@@ -16,6 +16,13 @@ int main(int argc, char *argv[])
 	QString stylesheetString = QLatin1String(styleFile.readAll());
 	a.setStyleSheet(stylesheetString);
 
+
+    // ** Network testing code
+    //QCoreApplication a(argc, argv);
+    SslEchoClient client(QUrl(QStringLiteral("wss://localhost:12345")));
+    Q_UNUSED(client);
+    // ** End of network testing code
+
     // Set GUI options
     MainWindow *w = new MainWindow();
 	QCoreApplication::setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles, true);

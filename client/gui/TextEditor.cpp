@@ -9,7 +9,7 @@
 #include "TextEditor.h"
 #include "../PacketDef.h"
 
-TextEditor::TextEditor(QWidget &parent, Ui::MainWindow &ui) : parent(parent), ui(ui), index({0}), editor(SharedEditor()), sslEchoClient(SslEchoClient(QUrl(QStringLiteral("wss://localhost:12345")))) {
+TextEditor::TextEditor(QWidget &parent, Ui::MainWindow &ui) : parent(parent), ui(ui), index({0}), editor(SharedEditor()), sslEchoClient(SslEchoClient(QUrl(QStringLiteral("wss://localhost:1")))) {
 
     // todo set better margins
     ui.textEdit->document()->setDocumentMargin(50);
