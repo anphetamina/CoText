@@ -10,6 +10,7 @@ int main(int argc, char *argv[])
     dbConfigure();
     getUserlist();
     checkLoginData("test@test.test", "test");
+    //qDebug() <<  checkDocPermission(1,1);
     Q_UNUSED(server);
 
     return a.exec();

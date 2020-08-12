@@ -119,7 +119,7 @@ QList<QString> getDocuments(int userId){
     QList<QString> docList = QList<QString>();
     QSqlQuery query;
     QString quserId = QString::number(userId);
-    query.exec("SELECT documentid, documentname, documentpath FROM User WHERE userid="+quserId);
+    query.exec("SELECT documentid, documentname, documentpath FROM Permission WHERE userid="+quserId);
      while (query.next()) {
          int id = query.value(0).toInt();
          QString docName = query.value(1).toString();
@@ -135,7 +135,7 @@ bool checkDocPermission(int docId, int userId){
     QString quserId = QString::number(userId);
     QString qdocId = QString::number(docId);
 
-    query.exec("SELECT documentid, documentname, documentpath FROM User WHERE userid="+quserId+" AND documentid="+qdocId);
+    query.exec("SELECT documentid, documentname, documentpath FROM Permission WHERE userid="+quserId+" AND documentid="+qdocId);
     if (query.next()) {
         int id = query.value(0).toInt();
         QString docName = query.value(1).toString();
@@ -147,3 +147,21 @@ bool checkDocPermission(int docId, int userId){
         return false;
     }
 }
+
+/*
+void saveToDisk(QString doc){
+    QFile file("docX.dat");
+    file.open(QIODevice::WriteOnly);
+    QDataStream out(&file);   // we will serialize the data into the file
+    out << doc;
+    file.close();
+
+}
+
+QString loadFromDisk(){
+    QFile file("docX.dat");
+    QString doc;
+    file.open(QIODevice::ReadOnly);
+    out >> doc;
+}
+ */
