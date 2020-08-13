@@ -425,9 +425,9 @@ std::pair<int, int> SharedEditor::remoteInsert(const Symbol &symbol) {
 
     if (*line_it->begin() == symbol) {
         if (symbol.getC() == '\n') {
-            std::cout << "remoteInsert symbol 'CRLF' ("+symbol.getId()+") already exists" << std::endl;
+            qDebug() << "remoteInsert symbol 'CRLF' (" << symbol.getC() << ") already exists" << endl;
         } else {
-            std::cout << "remoteInsert symbol '"+ std::string(1, symbol.getC()) +"' ("+symbol.getId()+") already exists" << std::endl;
+            qDebug() << "remoteInsert symbol '" << symbol.getC()  << "' (" << QString::fromStdString(symbol.getId()) << ") already exists" << endl;
         }
 
     } else {
@@ -443,9 +443,10 @@ std::pair<int, int> SharedEditor::remoteInsert(const Symbol &symbol) {
 
         if (*index_it == symbol) {
             if (symbol.getC() == '\n') {
-                std::cout << "remoteInsert symbol 'CRLF' ("+symbol.getId()+") already exists" << std::endl;
+
+                qDebug() << "remoteInsert symbol 'CRLF'" <<  symbol.getC() <<  "(" << QString::fromStdString(symbol.getId()) << ") already exists" << endl;
             } else {
-                std::cout << "remoteInsert symbol '"+ std::string(1, symbol.getC()) +"' ("+symbol.getId()+") already exists" << std::endl;
+                qDebug() << "remoteInsert symbol '" << symbol.getC()  << "' (" << QString::fromStdString(symbol.getId()) << ") already exists" << endl;
             }
         } else {
             if (index_it->getC() == '\n') {
@@ -511,9 +512,9 @@ std::pair<int, int> SharedEditor::remoteErase(const Symbol &symbol) {
 
         if (index_it == line_it->end()) {
             if (symbol.getC() == '\n') {
-                std::cout << "remoteErase symbol 'CRLF' ("+symbol.getId()+") not found" << std::endl;
+                qDebug() << "remoteErase symbol 'CRLF' (" << QString::fromStdString(symbol.getId()) << ") not found" << endl;
             } else {
-                std::cout << "remoteErase symbol '"+ std::string(1, symbol.getC()) +"' ("+symbol.getId()+") not found" << std::endl;
+                qDebug() << "remoteErase symbol '" <<  symbol.getC()  << "' ("+QString::fromStdString(symbol.getId()) << ") not found" << endl;
             }
         } else {
             int index = index_it - line_it->begin();
