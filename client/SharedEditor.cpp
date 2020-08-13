@@ -5,6 +5,7 @@
 #include "QSymbol.h"
 #include <QDebug>
 
+
 SharedEditor::SharedEditor(int siteId)
         : siteId(siteId), counter(0), base(32), boundary(10), idCounter(0) {
     symbols.emplace_back();
@@ -292,7 +293,6 @@ Symbol SharedEditor::localInsert(int line, int index, char value) {
         std::cerr << "line " << line << ", index " << index << ", value " << value << ", siteId " << siteId << std::endl;
         std::cerr << e.what() << std::endl;
     }
-
     return sym;
 }
 
