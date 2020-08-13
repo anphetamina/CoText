@@ -11,7 +11,7 @@
 #include "../PacketDef.h"
 #include "../sslechoclient.h" // Removed import from .h and added forward decl
 
-TextEditor::TextEditor(QWidget &parent, Ui::MainWindow &ui, SslEchoClient* client) : parent(parent), ui(ui), index({0}), editor(SharedEditor()), sslEchoClient(client) {
+TextEditor::TextEditor(QWidget &parent, Ui::MainWindow &ui, SslEchoClient* client) : parent(parent), ui(ui), index({0}), editor(SharedEditor(2)), sslEchoClient(client) {
 
     // todo set better margins
     ui.textEdit->document()->setDocumentMargin(50);
@@ -211,7 +211,8 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
         std::vector<Symbol> erasedSymbols = editor.localErase(startRow, startCol, endRow, endCol);
 
         for (Symbol symbol : erasedSymbols) {
-            emit sendSymbol(symbol, MSG_DELETE_SYM, editor.getSiteId());
+            if(symbol.getSiteId() == editor.getSiteId())
+                emit sendSymbol(symbol, MSG_DELETE_SYM, editor.getSiteId());
         }
 
         int newSize = editor.getSymbols().size();
@@ -240,11 +241,15 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
             if (addedChar == QChar::LineFeed || addedChar == QChar::ParagraphSeparator) {
                 Symbol symbol = editor.localInsert(row, col, '\n');
-                emit sendSymbol(symbol, MSG_INSERT_SYM, editor.getSiteId());
+                qDebug() << editor.getSiteId() << symbol.getSiteId();
+                if(symbol.getSiteId() == editor.getSiteId())
+                    emit sendSymbol(symbol, MSG_INSERT_SYM, editor.getSiteId());
                 newRows++;
             } else {
                 Symbol symbol = editor.localInsert(row, col, addedChar.toLatin1());
-                emit sendSymbol(symbol, MSG_INSERT_SYM, editor.getSiteId());
+                qDebug() << editor.getSiteId() << symbol.getSiteId();
+                if(symbol.getSiteId() == editor.getSiteId())
+                    emit sendSymbol(symbol, MSG_INSERT_SYM, editor.getSiteId());
 
             }
 
@@ -377,6 +382,7 @@ int TextEditor::getRow(int position) {
 /**
  * insert symbol received from the server
  * @param symbol
+ * Note: here we loose info about original symb
  */
 void TextEditor::remoteInsert(Symbol symbol) {
     std::pair<int, int> pos = editor.remoteInsert(symbol);

@@ -47,6 +47,7 @@ public:
     QSymbol toSerializable();
 
 
+    int getSiteId() const;
 };
 
 

@@ -17,6 +17,12 @@ void Symbol::setC(char c) {
 const std::string &Symbol::getId() const {
     return id;
 }
+int Symbol::getSiteId() const {
+    std::string delimiter = "-";
+    std::string siteId = id.substr(0, id.find(delimiter)); // id is composed by siteId-counter
+    int isiteId = std::stoi( siteId );
+    return isiteId;
+}
 
 void Symbol::setId(const std::string &id) {
     Symbol::id = id;

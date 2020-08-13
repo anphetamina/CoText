@@ -200,7 +200,6 @@ void SslEchoClient::connectToEditor(TextEditor* te) {
     connect(this, &SslEchoClient::removeSymbol, te, &TextEditor::remoteErase);
     connect(te, &TextEditor::sendSymbol, this, &SslEchoClient::sendMessage);
 
-
 }
 
 //    // Save the secret key that will be used
