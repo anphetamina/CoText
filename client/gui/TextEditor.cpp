@@ -381,8 +381,12 @@ void TextEditor::remoteInsert(Symbol symbol) {
     std::pair<int, int> pos = editor.remoteInsert(symbol);
     if (pos.first != -1 || pos.second != -1) {
         int position = getPosition(pos.first, pos.second);
-        ui.textEdit->textCursor().setPosition(position);
+        QTextCursor oldCursor = ui.textEdit->textCursor();
+        QTextCursor cursor = ui.textEdit->textCursor();
+        cursor.setPosition(position);
+        ui.textEdit->setTextCursor(cursor);
         ui.textEdit->textCursor().insertText(QChar::fromLatin1(symbol.getC()));
+        ui.textEdit->setTextCursor(oldCursor);
 
         incrementIndex(pos.first, 1);
         if (symbol.getC() == '\n') {
@@ -399,8 +403,12 @@ void TextEditor::remoteErase(Symbol symbol) {
     std::pair<int, int> pos = editor.remoteErase(symbol);
     if (pos.first != -1 || pos.second != -1) {
         int position = getPosition(pos.first, pos.second);
-        ui.textEdit->textCursor().setPosition(position);
+        QTextCursor oldCursor = ui.textEdit->textCursor();
+        QTextCursor cursor = ui.textEdit->textCursor();
+        cursor.setPosition(position);
+        ui.textEdit->setTextCursor(cursor);
         ui.textEdit->textCursor().deleteChar();
+        ui.textEdit->setTextCursor(oldCursor);
 
         decrementIndex(pos.first, 1);
         if (symbol.getC() == '\n') {
