@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.15)
 project(CoText-server)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_BUILD_TYPE RELEASE)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -10,6 +9,8 @@ set(CMAKE_AUTOUIC ON)
 #set(INSTALL_EXAMPLEDIR "examples/websockets/sslechoserver")
 set(DYLD_LIBRARY_PATH  "/usr/local/mysql/lib/")
 set(QT_DEBUG_PLUGINS 1)
+
+#set(CMAKE_BUILD_TYPE RELEASE)
 
 if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
     add_definitions(-DQT_NO_DEBUG_OUTPUT)
