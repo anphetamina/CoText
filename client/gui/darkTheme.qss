@@ -17,7 +17,7 @@ QGroupBox#groupBoxRegister {
 }
 
 QLineEdit {
-	background-color: rgb(51, 51, 51);
+	background-color: rgb(107, 107, 107);
 	border-radius: 2px;
 }
 
@@ -27,7 +27,7 @@ QLineEdit {
 
 QTextEdit#textEdit {
 	border-radius: 3px;
-	background-color: white;
+	background-color: rgb(107, 107, 107);
 }
 QWidget#centralWidget{
 	background-color: rgb(37, 37, 38);
