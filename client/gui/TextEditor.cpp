@@ -265,17 +265,15 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
     /**
      * print the current document in the console
      */
-
-    std::cout << std::endl << "---" << std::endl;
+    qDebug() << endl << "---" << endl;
     const auto& symbols = editor.getSymbols();
     for (int i = 0; i < symbols.size(); i++) {
-        std::cout << "[" << index[i] << "] ";
+        qDebug() << "[" << index[i] << "] ";
         for (int j = 0; j < symbols[i].size(); j++) {
-            std::cout << symbols[i][j].getC();
+            qDebug() << symbols[i][j].getC();
         }
     }
-
-    std::cout << std::endl << "---" << std::endl;
+    qDebug() << endl << "---" << endl;
 }
 
 /**
