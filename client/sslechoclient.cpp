@@ -6,6 +6,7 @@
 #include "PacketDef.h"
 #include "PingPacket.h"
 #include "LoginPacket.h"
+#include "gui/TextEditor.h"
 #include <QtWebSockets/QWebSocket>
 #include <QCoreApplication>
 
@@ -18,6 +19,7 @@ SslEchoClient::SslEchoClient(const QUrl &url, QObject *parent) :
     connect(&m_webSocket, &QWebSocket::connected, this, &SslEchoClient::onConnected);
     connect(&m_webSocket, QOverload<const QList<QSslError>&>::of(&QWebSocket::sslErrors),
             this, &SslEchoClient::onSslErrors);
+
     m_webSocket.open(QUrl(url));
 }
 //! [constructor]
@@ -33,6 +35,7 @@ void SslEchoClient::onConnected()
     // And set callback for binary msg
     connect(&m_webSocket, &QWebSocket::binaryMessageReceived,
             this, &SslEchoClient::onBinaryMessageReceived);
+
     this->sendPing();
     this->sendTest();
     //this->sendLogin();
@@ -85,7 +88,7 @@ void SslEchoClient::sendTest() {
     QChar qc = test.at(0);//t
     QSymbol qs = QSymbol(qc, test, sym_position);
     Message msg = Message(MSG_INSERT_SYM, qs, 3);
-    msg.send(m_webSocket);
+    //msg.send(m_webSocket);
     qDebug() << "[NETWORK] ** Network Test Packet were all sent ** ";
 
 }
@@ -162,6 +165,8 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             else {
                 qDebug() << "[AUTH] FAILED. See the server for the log.";
             }
+            pServer = qobject_cast<QWebSocket *>(sender());
+
             break;
         }
 
@@ -185,10 +190,17 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
 
 void SslEchoClient::sendMessage(Symbol symbol, int type, int siteId) {
     Message msg = Message(type, symbol.toSerializable(), siteId);
-    msg.send(m_webSocket);
+    msg.send(*pServer);
     qDebug() << "sent" << ((symbol.getC() == '\n') ? "LF" : QString(symbol.getC())) << "(" << type << ")";
 }
 
+void SslEchoClient::connectToEditor(TextEditor* te) {
+//kink to
+    connect(this, &SslEchoClient::insertSymbol, te, &TextEditor::remoteInsert);
+    connect(this, &SslEchoClient::removeSymbol, te, &TextEditor::remoteErase);
+    connect(te, &TextEditor::sendSymbol, this, &SslEchoClient::sendMessage);
 
+
+}
 
 //    // Save the secret key that will be used

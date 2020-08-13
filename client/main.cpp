@@ -19,8 +19,8 @@ int main(int argc, char *argv[])
 
     // ** Network testing code
     //QCoreApplication a(argc, argv);
-    SslEchoClient client(QUrl(QStringLiteral("wss://localhost:12345")));
-    Q_UNUSED(client);
+    SslEchoClient* client = new SslEchoClient(QUrl(QStringLiteral("wss://localhost:12345")));
+    Q_UNUSED(*client);
     // ** End of network testing code
 
     // Set GUI options
@@ -37,7 +37,8 @@ int main(int argc, char *argv[])
 
     w->show();
 
-    TextEditor editor(*w, *w->getUi());
-
+    TextEditor editor(*w, *w->getUi(), client);
+    //delete client;
     return a.exec();
+
 }

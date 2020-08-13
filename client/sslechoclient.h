@@ -2,8 +2,7 @@
 // Created by Emanuele Munafò on 04/04/2020.
 //
 
-#ifndef SSLECHOCLIENT_H
-#define SSLECHOCLIENT_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtWebSockets/QWebSocket>
@@ -13,6 +12,7 @@
 #include <QtCore/QUrl>
 #include "Packet.h"
 #include "Message.h"
+#include "gui/TextEditor.h"
 
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
 
@@ -43,6 +43,8 @@ private:
 
     void sendPing();
 
+    QWebSocket *pServer;
+
     void packetParse(QByteArray rcvd_packet);
 
     void sendLogin();
@@ -52,6 +54,9 @@ private:
     void authenticate(QString username, QString password);
 
     void dispatch(PacketHandler rcvd_packet, QWebSocket *pClient);
+
+public:
+    void connectToEditor(TextEditor* te);
+
 };
 
-#endif // SSLECHOCLIENT_H

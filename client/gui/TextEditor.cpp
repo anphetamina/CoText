@@ -6,10 +6,12 @@
 #include <QtWidgets/QColorDialog>
 #include <QtWidgets/QFontDialog>
 #include <QThread>
+
 #include "TextEditor.h"
 #include "../PacketDef.h"
+#include "../sslechoclient.h" // Removed import from .h and added forward decl
 
-TextEditor::TextEditor(QWidget &parent, Ui::MainWindow &ui) : parent(parent), ui(ui), index({0}), editor(SharedEditor()), sslEchoClient(SslEchoClient(QUrl(QStringLiteral("wss://localhost:1")))) {
+TextEditor::TextEditor(QWidget &parent, Ui::MainWindow &ui, SslEchoClient* client) : parent(parent), ui(ui), index({0}), editor(SharedEditor()), sslEchoClient(client) {
 
     // todo set better margins
     ui.textEdit->document()->setDocumentMargin(50);
@@ -39,15 +41,17 @@ TextEditor::TextEditor(QWidget &parent, Ui::MainWindow &ui) : parent(parent), ui
 
     qRegisterMetaType<Symbol>("Symbol");
 
-    listener = new QThread(&parent);
-    sslEchoClient.moveToThread(listener);
+    //listener = new QThread(&parent);
+    //(*sslEchoClient).moveToThread(listener);
 
-    connect(&sslEchoClient, &SslEchoClient::insertSymbol, this, &TextEditor::remoteInsert);
-    connect(&sslEchoClient, &SslEchoClient::removeSymbol, this, &TextEditor::remoteErase);
 
-    connect(this, &TextEditor::sendSymbol, &sslEchoClient, &SslEchoClient::sendMessage);
+    //connect(sslEchoClient, &SslEchoClient::insertSymbol, this, &TextEditor::remoteInsert);
+    //connect(sslEchoClient, &SslEchoClient::removeSymbol, this, &TextEditor::remoteErase);
 
-    listener->start();
+    //&QThread::started
+    //connect(this, &TextEditor::sendSymbol, sslEchoClient, &SslEchoClient::sendMessage);
+    //listener->start();
+    sslEchoClient->connectToEditor(this);
 
 }
 
@@ -243,7 +247,6 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
                 emit sendSymbol(symbol, MSG_INSERT_SYM, editor.getSiteId());
 
             }
-
 
 
             /**

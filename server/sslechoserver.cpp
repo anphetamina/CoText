@@ -64,7 +64,7 @@ void SslEchoServer::onNewConnection()
 {
     QWebSocket *pSocket = m_pWebSocketServer->nextPendingConnection();
 
-    qDebug() << "Client connected:" << pSocket->peerName() << pSocket->origin() << pSocket->peerAddress();
+    qDebug() << "Client connected:" << pSocket->peerName() << pSocket->origin() << pSocket->peerAddress() << "@" << pSocket->peerPort();
 
     // Create a new client object
     QSharedPointer<Client> client(new Client(pSocket));
@@ -262,10 +262,10 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             qDebug() << "[MSG] New symbol received." << endl << "Char: " << msg->getS().getC() << " SiteId: " <<  msg->getSiteId();
             // Broadcast to all the connected client of a document
             //TODO: dont use clientMapping.keys() but the vector with all the clients with that document opened
-            for (auto onlineClient : clientMapping.keys()) {
+            for (QWebSocket* onlineClient : clientMapping.keys()) {
                 if(onlineClient != pClient) {
-                    msg->send(*(pClient));
-                    qDebug() << "sent";
+                    msg->send(*(onlineClient));
+                    qDebug() << "from: " << pClient->peerPort() << "sent to " << onlineClient->peerPort() ;
                 }
             }
             break;
@@ -284,5 +284,14 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             break;
         }
         */
-    }
+
+
+        }
+        /* Debug send always ping for each packet received */
+        /*
+        for (QWebSocket* onlineClient : clientMapping.keys()) {
+            PingPacket pp = PingPacket("test");
+            pp.send(*onlineClient);
+        }
+         */
 }

@@ -15,16 +15,23 @@
 #include <QtWidgets/QTextEdit>
 #include "MainWindow.h"
 #include "../SharedEditor.h"
-#include "../sslechoclient.h"
+//#include "../sslechoclient.h"
 
 namespace Ui { class MainWindow; }
+
+
+// Forward declaration (im using just pointer and in this way avoid the circular dep. issue)
+class SslEchoClient;
 
 class TextEditor : public QObject {
 
     Q_OBJECT
 
+
+
 public:
     explicit TextEditor(QWidget &parent, Ui::MainWindow &ui);
+    TextEditor(QWidget &parent, Ui::MainWindow &ui, SslEchoClient *client);
 
     virtual ~TextEditor();
 
@@ -33,7 +40,7 @@ private:
     QWidget &parent;
     Ui::MainWindow &ui;
     SharedEditor editor;
-    SslEchoClient sslEchoClient;
+    SslEchoClient* sslEchoClient;
     QThread *listener;
     std::vector<int> index;
 
@@ -59,11 +66,15 @@ private:
 
 
 
-
-private slots:
+public slots:
 
     void remoteInsert(Symbol symbol);
     void remoteErase(Symbol symbol);
+
+private slots:
+
+    //void remoteInsert(Symbol symbol);
+    //void remoteErase(Symbol symbol);
 
     /**
      * font style management
