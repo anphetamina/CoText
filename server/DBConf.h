@@ -6,6 +6,7 @@
 
 #include <QSqlDatabase>
 #include <QtCore>
+#include "User.h"
 
 extern QString HostName;
 extern QString UserName;
@@ -15,4 +16,8 @@ extern int port;
 
 bool dbConfigure();
 bool getUserlist();
-
+User checkLoginData(QString email, QString password);
+User* checkUserLoginData(QString email, QString password);
+QIcon loadProfilePic(int id);
+QList<QString> getDocuments(int userId);
+bool checkDocPermission(int docId, int userId);

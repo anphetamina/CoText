@@ -9,6 +9,7 @@
 #include "PingPacket.h"
 #include "LoginPacket.h"
 #include "Message.h"
+#include "DBConf.h"
 #include <QtCore/QDebug>
 #include <QtCore/QFile>
 #include <QtNetwork/QSslCertificate>
@@ -63,7 +64,7 @@ void SslEchoServer::onNewConnection()
 {
     QWebSocket *pSocket = m_pWebSocketServer->nextPendingConnection();
 
-    qDebug() << "Client connected:" << pSocket->peerName() << pSocket->origin() << pSocket->peerAddress();
+    qDebug() << "Client connected:" << pSocket->peerName() << pSocket->origin() << pSocket->peerAddress() << "@" << pSocket->peerPort();
 
     // Create a new client object
     QSharedPointer<Client> client(new Client(pSocket));
@@ -73,6 +74,7 @@ void SslEchoServer::onNewConnection()
     connect(pSocket, &QWebSocket::binaryMessageReceived,
             this, &SslEchoServer::processBinaryMessage);
     connect(pSocket, &QWebSocket::disconnected, this, &SslEchoServer::socketDisconnected);
+    //TODO: Check if user already exist in the map values, (i.e. connected from 1 device first and then an other)
 
     //m_clients << pSocket;
 }
@@ -118,6 +120,8 @@ void SslEchoServer::socketDisconnected()
         if (client->isLogged()) {
             qDebug() << "User " << client->getEmail() << " disconnected";
         }
+        client->logout();
+
         // Remove client element from map and close the socket
         clientMapping.remove(pClient);
         pClient->close();
@@ -211,37 +215,83 @@ void SslEchoServer::tryLogin(Packet rcvd_packet) {
     delete qbuf;
 }*/
 
-void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* m_webSocket){
+void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
+    QSharedPointer<Client> client = clientMapping[pClient];
+    //qDebug() << rcvd_packet.get();  // print packet as hex
+
     switch (rcvd_packet->getType()){
         // Remeber to add {} scope to avoid jump from switch compilation error
         case(PACK_TYPE_PING): {
-            qDebug() << rcvd_packet.get();
             PingPacket *ping = dynamic_cast<PingPacket *>(rcvd_packet.get());
-            qDebug() << ping->getDebugMsg();
+            qDebug() << "[PING] Debug text: " << ping->getDebugMsg();
             break;
         }
         case(PACK_TYPE_LOGIN_REQ): {
-            qDebug() << rcvd_packet.get();
             LoginReqPacket* loginReq = dynamic_cast<LoginReqPacket*>(rcvd_packet.get());
-            qDebug() << loginReq->getUsername();
+            QString username = loginReq->getUsername();
+            QString password = loginReq->gethashedPassword();
+
+            User* loggedUser = checkUserLoginData(username, password);
+            client->setAsLogged(loggedUser);
+
+            LoginOkPacket lop = LoginOkPacket(*loggedUser);
+            lop.send(*pClient);
+            //qDebug() << loginReq->getUsername();
             break;
         }
 
 
         case(PACK_TYPE_LOGOUT_REQ): {
-            qDebug() << rcvd_packet.get();
             LogoutReqPacket* logoutReq = dynamic_cast<LogoutReqPacket*>(rcvd_packet.get());
-            //qDebug() << ping->getDebugMsg();
+
+            if (client->isLogged()) {
+                qDebug() << "User " << client->getEmail() << " disconnected";
+            }
+            client->logout();  // --> set peer as logged out and free the memory used for User structure
+            clientMapping.remove(pClient);  // Remove entry from connected peer->user mapping
+            // Close websocket for that peer
+            pClient->close();
+            pClient->deleteLater();
+
             break;
         }
 
         case(PACK_TYPE_MSG): {
-            qDebug() << rcvd_packet.get();
             Message* msg = dynamic_cast<Message*>(rcvd_packet.get());
             //qDebug() << msg->getData();
-            qDebug() << msg->getS().getC();
-            qDebug() << msg->getSiteId();
+            qDebug() << "[MSG] New symbol received." << endl << "Char: " << msg->getS().getC() << " SiteId: " <<  msg->getSiteId();
+            // Broadcast to all the connected client of a document
+            //TODO: dont use clientMapping.keys() but the vector with all the clients with that document opened
+            for (QWebSocket* onlineClient : clientMapping.keys()) {
+                if(onlineClient != pClient) {
+                    msg->send(*(onlineClient));
+                    qDebug() << "from: " << pClient->peerPort() << "sent to " << onlineClient->peerPort() ;
+                }
+            }
             break;
         }
-    }
+        /*
+        case(PACK_TYPE_DOC_OPEN): {
+            if (!client->isLogged()) {
+                break;
+            }
+            DocumentOkPacket* msg = dynamic_cast<DocumentOkPacket*>(rcvd_packet.get());
+            // Check if user already had an open document
+            // Check permission of the user for that doc
+            // Set the document in the packet as the current opened doc
+            //documentMapping.insert(docId, client)
+            // Send the content of the document
+            break;
+        }
+        */
+
+
+        }
+        /* Debug send always ping for each packet received */
+        /*
+        for (QWebSocket* onlineClient : clientMapping.keys()) {
+            PingPacket pp = PingPacket("test");
+            pp.send(*onlineClient);
+        }
+         */
 }

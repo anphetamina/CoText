@@ -9,6 +9,12 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
+#set(CMAKE_BUILD_TYPE RELEASE)
+if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
+    add_definitions(-DQT_NO_DEBUG_OUTPUT)
+endif (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
+
+
 if(CMAKE_VERSION VERSION_LESS "3.7.0")
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
 endif()
@@ -16,6 +22,7 @@ endif()
 IF(WIN32)
     SET(OS_SPECIFIC_LIBS netapi32 wsock32)
 ENDIF(WIN32)
+
 
 find_package(Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
@@ -29,6 +36,6 @@ find_package(Qt5WebSockets REQUIRED)
 file(GLOB CLIENT "*.h" "*.cpp")
 file(GLOB GUI "gui/*.h" "gui/*.cpp" "gui/*.ui" "gui/Resources.qrc")
 
-add_executable(CoText-client main.cpp ${CLIENT} ${GUI} PingPacket.cpp PingPacket.h LoginPacket.cpp LoginPacket.h AccountPacket.cpp AccountPacket.h)
+add_executable(CoText-client main.cpp ${CLIENT} ${GUI} PingPacket.cpp PingPacket.h LoginPacket.cpp LoginPacket.h AccountPacket.cpp AccountPacket.h  DocumentPacket.cpp DocumentPacket.h)
 
 target_link_libraries(CoText-client Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Network Qt5::Sql Qt5::Svg Qt5::PrintSupport Qt5::WebSockets ${OS_SPECIFIC_LIBS})

@@ -15,23 +15,27 @@
 #include <QtWidgets/QTextEdit>
 #include "MainWindow.h"
 #include "../SharedEditor.h"
+//#include "../sslechoclient.h"
 
 namespace Ui { class MainWindow; }
+
+
+// Forward declaration (im using just pointer and in this way avoid the circular dep. issue)
+class SslEchoClient;
 
 class TextEditor : public QObject {
 
     Q_OBJECT
 
 public:
-    explicit TextEditor(QWidget &parent, Ui::MainWindow &ui, SharedEditor &editor, int numWorkers = 3, int numListeners = 1);
-
-    virtual ~TextEditor();
+    explicit TextEditor(QWidget &parent, Ui::MainWindow &ui, SslEchoClient *client);
 
 private:
 
     QWidget &parent;
     Ui::MainWindow &ui;
-    SharedEditor &editor;
+    SharedEditor editor;
+    SslEchoClient* sslEchoClient;
     std::vector<int> index;
 
     void fontChanged(const QFont &f);
@@ -47,27 +51,20 @@ private:
     int getRow(int position);
     int getCol(int row, int position);
 
+
     /**
      * remote
      */
 
-    void remoteInsert(const Symbol& symbol);
-    void remoteErase(const Symbol &symbol);
+    std::atomic<bool> isFromRemote;
     int getPosition(int row, int col);
 
-    /**
-     * concurrency
-     */
 
-    int numWorkers;
-    int numListeners;
-    std::vector<std::thread> workers;
-    std::vector<std::thread> listeners;
-    std::mutex editorMutex;
-    std::mutex messagesMutex;
-    std::condition_variable is_empty;
-    std::stack<Message> messages;
-    bool listening;
+
+public slots:
+
+    void remoteInsert(Symbol symbol);
+    void remoteErase(Symbol symbol);
 
 private slots:
 
@@ -89,6 +86,12 @@ private slots:
 
     void contentsChange(int position, int charsRemoved, int charsAdded);
     void cursorPositionChanged();
+
+signals:
+
+    void symbolsInserted(std::vector<Symbol> symbols, int siteId);
+    void symbolsErased(std::vector<Symbol> symbols, int siteId);
+
 
 };
 

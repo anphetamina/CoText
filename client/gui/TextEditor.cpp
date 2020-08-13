@@ -5,11 +5,18 @@
 #include <ui_mainwindow.h>
 #include <QtWidgets/QColorDialog>
 #include <QtWidgets/QFontDialog>
+#include <QThread>
+#include "../Shuffler.h"
 #include "TextEditor.h"
+#include "../PacketDef.h"
+#include "../sslechoclient.h" // Removed import from .h and added forward decl
 
-TextEditor::TextEditor(QWidget &parent, Ui::MainWindow &ui, SharedEditor &editor, int numWorkers, int numListeners) : parent(parent), ui(ui), editor(editor), index({0}), numWorkers(numWorkers), numListeners(numListeners), listening(true) {
 
+TextEditor::TextEditor(QWidget &parent, Ui::MainWindow &ui, SslEchoClient* client) : parent(parent), ui(ui), index({0}), editor(SharedEditor(Shuffler::getInstance()->getRandomInt())), sslEchoClient(client), isFromRemote(false) {
+
+    // todo set better margins
     ui.textEdit->document()->setDocumentMargin(50);
+    qDebug() << "Current sID: "<< editor.getSiteId();
 
     /**
     * font styling connections
@@ -30,39 +37,14 @@ TextEditor::TextEditor(QWidget &parent, Ui::MainWindow &ui, SharedEditor &editor
 
     connect(ui.textEdit->document(), &QTextDocument::contentsChange, this, &TextEditor::contentsChange);
 
-    for (int i = 0; i < numWorkers; i++) {
-        workers.emplace_back([&] {
-            while (listening) {
-                std::unique_lock lock(messagesMutex);
-                is_empty.wait(lock, [&] { return !messages.empty(); });
-                Message message = messages.top();
-                messages.pop();
-                lock.unlock();
+    /**
+     * remote connections
+     */
 
-                if (message.getType() == 1) {
-                    remoteInsert(message.getS());
-                    std::cout << std::this_thread::get_id() << ": inserted char " << message.getS().getC() << std::endl;
-                } else if (message.getType() == -1) {
-                    remoteErase(message.getS());
-                    std::cout << std::this_thread::get_id() << ": removed char " << message.getS().getC() << std::endl;
-                } else {
-                    std::cout << std::this_thread::get_id() << ": received invalid message type" << std::endl;
-                }
-            }
-        });
-    }
+    qRegisterMetaType<Symbol>("Symbol");
 
-    for (int i = 0; i < numListeners; i++) {
-        listeners.emplace_back([&] {
-            while (listening) {
-                // todo
-//                std::unique_lock lock(messagesMutex);
-//                messages.push(Message(0, Symbol('c', "id", {Identifier(0, "siteId")}), "siteId"));
-//                is_empty.notify_one();
-            }
+    sslEchoClient->connectToEditor(this);
 
-        });
-    }
 }
 
 void TextEditor::selectFont() {
@@ -116,7 +98,10 @@ void TextEditor::colorChanged(const QColor &c) {
 
 void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) {
 
-    std::lock_guard lock(editorMutex);
+    if (isFromRemote) {
+        isFromRemote = false;
+        return;
+    }
 
     /**
      * QTextEdit bug
@@ -220,16 +205,14 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
         int oldSize = editor.getSymbols().size();
 
-        editor.localErase(startRow, startCol, endRow, endCol);
-
-        // todo send message asynchronously
+        std::vector<Symbol> erasedSymbols = editor.localErase(startRow, startCol, endRow, endCol);
 
         int newSize = editor.getSymbols().size();
 
         decrementIndex(startRow, charsRemoved);
         deleteRow(startRow, oldSize - newSize);
 
-
+        emit symbolsErased(erasedSymbols, editor.getSiteId());
     }
 
     if (charsAdded > 0) {
@@ -245,17 +228,22 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
         int pos = row;
         int newRows = 0;
 
+        std::vector<Symbol> insertedSymbols;
+
         while (charsAdded > 0) {
             QChar addedChar = ui.textEdit->document()->characterAt(position++);
 
             if (addedChar == QChar::LineFeed || addedChar == QChar::ParagraphSeparator) {
-                editor.localInsert(row, col, '\n');
+                Symbol symbol = editor.localInsert(row, col, '\n');
+                insertedSymbols.push_back(symbol);
+//                emit sendSymbol(symbol, MSG_INSERT_SYM, editor.getSiteId());
                 newRows++;
             } else {
-                editor.localInsert(row, col, addedChar.toLatin1());
+                Symbol symbol = editor.localInsert(row, col, addedChar.toLatin1());
+                insertedSymbols.push_back(symbol);
+//                emit sendSymbol(symbol, MSG_INSERT_SYM, editor.getSiteId());
             }
 
-            // todo send message asynchronously
 
             /**
              * if it reaches the end of the line go in the next one
@@ -271,21 +259,24 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
         incrementIndex(pos, n);
         insertRow(pos, newRows);
+
+        emit symbolsInserted(insertedSymbols, editor.getSiteId());
     }
 
 
     /**
      * print the current document in the console
      */
+
+    /*QDebug dbg(QtDebugMsg);
+    qDebug() << "---";
     const auto& symbols = editor.getSymbols();
     for (int i = 0; i < symbols.size(); i++) {
-        std::cout << "[" << index[i] << "] ";
+        dbg << "[" << index[i] << "]";
         for (int j = 0; j < symbols[i].size(); j++) {
-            std::cout << symbols[i][j].getC();
+            dbg << symbols[i][j].getC();
         }
-    }
-
-    std::cout << std::endl << "---" << std::endl;
+    }*/
 }
 
 /**
@@ -386,37 +377,47 @@ int TextEditor::getRow(int position) {
  * insert symbol received from the server
  * @param symbol
  */
-void TextEditor::remoteInsert(const Symbol &symbol) {
-    std::lock_guard lock(editorMutex);
+void TextEditor::remoteInsert(Symbol symbol) {
+    isFromRemote = true;
     std::pair<int, int> pos = editor.remoteInsert(symbol);
     if (pos.first != -1 || pos.second != -1) {
         int position = getPosition(pos.first, pos.second);
-        ui.textEdit->textCursor().setPosition(position);
+        QTextCursor oldCursor = ui.textEdit->textCursor();
+        QTextCursor cursor = ui.textEdit->textCursor();
+        cursor.setPosition(position);
+        ui.textEdit->setTextCursor(cursor);
         ui.textEdit->textCursor().insertText(QChar::fromLatin1(symbol.getC()));
+        ui.textEdit->setTextCursor(oldCursor);
 
         incrementIndex(pos.first, 1);
         if (symbol.getC() == '\n') {
             insertRow(pos.first, 1);
         }
     }
+
 }
 /**
  * erase symbol received from the server
  * @param symbol
  */
-void TextEditor::remoteErase(const Symbol &symbol) {
-    std::lock_guard lock(editorMutex);
+void TextEditor::remoteErase(Symbol symbol) {
+    isFromRemote = true;
     std::pair<int, int> pos = editor.remoteErase(symbol);
     if (pos.first != -1 || pos.second != -1) {
         int position = getPosition(pos.first, pos.second);
-        ui.textEdit->textCursor().setPosition(position);
+        QTextCursor oldCursor = ui.textEdit->textCursor();
+        QTextCursor cursor = ui.textEdit->textCursor();
+        cursor.setPosition(position);
+        ui.textEdit->setTextCursor(cursor);
         ui.textEdit->textCursor().deleteChar();
+        ui.textEdit->setTextCursor(oldCursor);
 
         decrementIndex(pos.first, 1);
         if (symbol.getC() == '\n') {
             deleteRow(pos.first, 1);
         }
     }
+
 }
 
 /**
@@ -429,17 +430,4 @@ int TextEditor::getPosition(int row, int col) {
     int pos = index[row];
     pos += col;
     return pos;
-}
-
-TextEditor::~TextEditor() {
-    listening = false;
-
-    for (auto &w : workers) {
-        w.join();
-    }
-
-    for (auto &l : listeners) {
-        l.join();
-    }
-
 }

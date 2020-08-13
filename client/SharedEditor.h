@@ -5,13 +5,9 @@
 #include <map>
 #include <random>
 #include "Symbol.h"
-#include "Message.h"
-
-class NetworkServer;
 
 class SharedEditor {
 private:
-    NetworkServer& server;
 
     /**
      * assigned by the server
@@ -34,17 +30,13 @@ private:
     int base;
     int boundary;
 public:
-    SharedEditor(NetworkServer &server);
+    SharedEditor(int siteId = 0);
 
     int getBoundary() const;
 
     void setBoundary(int boundary);
 
     void setCounter(int counter);
-
-    NetworkServer &getServer() const;
-
-    void setServer(NetworkServer &server);
 
     int getSiteId() const;
 
@@ -70,9 +62,6 @@ public:
     std::vector<Symbol> localErase(int startLine, int startIndex, int endLine, int endIndex);
     std::vector<Symbol> eraseSingleLine(int startLine, int startIndex, int endLine, int endIndex);
     std::vector<Symbol> eraseMultipleLines(int startLine, int startIndex, int endLine, int endIndex);
-    void process(Message& m);
-    //std::pair<int, int> remoteInsert(Symbol symbol);
-    //std::pair<int, int> remoteErase(Symbol symbol);
 
     std::pair<int, int> remoteInsert(const Symbol &symbol);
     std::pair<int, int> remoteErase(const Symbol &symbol);

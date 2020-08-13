@@ -3,12 +3,10 @@
 //
 
 #include "sslechoclient.h"
-#include "Packet.h"
 #include "PacketDef.h"
 #include "PingPacket.h"
 #include "LoginPacket.h"
-#include "Message.h"
-#include <QtCore/QDebug>
+#include "gui/TextEditor.h"
 #include <QtWebSockets/QWebSocket>
 #include <QCoreApplication>
 
@@ -21,6 +19,7 @@ SslEchoClient::SslEchoClient(const QUrl &url, QObject *parent) :
     connect(&m_webSocket, &QWebSocket::connected, this, &SslEchoClient::onConnected);
     connect(&m_webSocket, QOverload<const QList<QSslError>&>::of(&QWebSocket::sslErrors),
             this, &SslEchoClient::onSslErrors);
+
     m_webSocket.open(QUrl(url));
 }
 //! [constructor]
@@ -36,6 +35,7 @@ void SslEchoClient::onConnected()
     // And set callback for binary msg
     connect(&m_webSocket, &QWebSocket::binaryMessageReceived,
             this, &SslEchoClient::onBinaryMessageReceived);
+
     this->sendPing();
     this->sendTest();
     //this->sendLogin();
@@ -47,7 +47,7 @@ void SslEchoClient::onConnected()
 void SslEchoClient::onTextMessageReceived(QString message)
 {
     qDebug() << "Message received:" << message;
-    qApp->quit();
+    //qApp->quit();
 }
 
 //! [onTextMessageReceived]
@@ -55,7 +55,7 @@ void SslEchoClient::onBinaryMessageReceived(QByteArray message)
 {
     //qDebug() << "Message received:" << message;
     this->packetParse(message);
-    qApp->quit();
+    //qApp->quit();
 }
 
 void SslEchoClient::onSslErrors(const QList<QSslError> &errors)
@@ -81,49 +81,60 @@ void SslEchoClient::sendPing() {
 
 void SslEchoClient::sendTest() {
     qDebug() << "[NETWORK] ** Network Test Start ** ";
-    qDebug() << "[NETWORK] ** Sending login req packet ** ";
-    // Create buffer
-    LoginReqPacket lrp = LoginReqPacket("test@domain.tld", "test2HashedPassword");
-    lrp.send(m_webSocket);
+    this->authenticate("test@test.test", "test");
     qDebug() << "[NETWORK] ** Sending Message packet ** ";
     QVector<Identifier> sym_position;
     QString test("test_qstring");
     QChar qc = test.at(0);//t
     QSymbol qs = QSymbol(qc, test, sym_position);
-    Message msg = Message(1, qs, 3);
-    msg.send(m_webSocket);
+    Message msg = Message(MSG_INSERT_SYM, qs, 3);
+    //msg.send(m_webSocket);
     qDebug() << "[NETWORK] ** Network Test Packet were all sent ** ";
 
 }
 
+void SslEchoClient::authenticate(QString username, QString password) {
+    qDebug() << "[NETWORK] ** Sending login req packet ** ";
+    QString hashedPassword = password;
+    LoginReqPacket lrp = LoginReqPacket(username, hashedPassword);
+    lrp.send(m_webSocket);
+}
+
 void SslEchoClient::packetParse(QByteArray rcvd_packet) {
+
+    // Create a new packet buffer (used to w8 and receive for the full packet)
     PacketBuffer* pBuffer = new PacketBuffer();
+    //qDebug() << rcvd_packet;
+    //Create a data stream (used to deserialize the rcvd bytearray  to a structured packet)
+    QDataStream streamRcv(&rcvd_packet, QIODevice::ReadOnly);
 
-    // Parsing.
-    /*QDataStream streamRcv(&rcvd_packet, QIODevice::ReadOnly);
-    //SocketBuffer& socketBuffer = clients.value(socket)->getSocketBuffer();// TODO: extend for many
-
+    // If the packet buffer is empty parse (deserialize) the headers field (MAGIC_VAL|Flags|type|payloadLen)
     if (pBuffer->getDataSize() == 0) {
-        rcvd_packet >> pBuffer;
-    }*/
-    pBuffer->append(rcvd_packet);
+        streamRcv >> *pBuffer;
+    }
+    // Append the continuation of the packet TODO:check
+    QByteArray payload = rcvd_packet.mid(4+sizeof(quint32));//header+Payoadlen skip
+    pBuffer->append(payload);
 
     if (pBuffer->isComplete()) {
 
         QDataStream dataStream(pBuffer->bufferPtr(), QIODevice::ReadWrite);
-        quint8 mType = (quint8)pBuffer->getType();
+        quint8 mType = (quint8) pBuffer->getType();
 
         try {
-            PacketHandler packetH = PacketHandler();
+            // Create an empty packet and read the fields by deserializing the data stream into a structured Packet
+            PacketHandler packetH = PacketBuilder::Container(mType);
             packetH->read(dataStream);
+            // Clear the buffer when a full packet is received (we are ready for the next one!)
             pBuffer->clearBuffer();
 
-            if (mType == PACK_TYPE_PING)
-            {
-                qDebug() << "[INFO] Parsed new packet:";
-                //packetHandler.process(message, socket);
-            }
-            else qDebug()  << "[ERROR] Uknown type: " << mType;
+            // If the type is correct TODO: add HeadID check
+            if (mType == PACK_TYPE_PING || mType <= PACK_TYPE_LAST_CODE) {
+                qDebug() << "[INFO] Parsed new packet. Type: " << mType;
+                QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
+                dispatch(packetH, pClient);
+            } else
+                qDebug() << "[ERROR] Unknown packet type!\nUknType: " << mType;
         }
         catch (std::exception me)//(MyException& me)
         {
@@ -132,24 +143,74 @@ void SslEchoClient::packetParse(QByteArray rcvd_packet) {
             //socketAbort(m_webSocket);				// Terminate connection with the client
         }
     }
-
-    /*
-    // packet object and his field are instantiated now
-    switch(packet.type){
-        case PACK_TYPE_PING:
-            qDebug() << "Pong received";
-            break;
-        case PACK_TYPE_LOGIN_RES:
-            qDebug() << "Login response";
-            break;
-        default:
-            qDebug() << "Uknown packet type: " << packet.type;
-            break;
-    }
-
-    return;
-     */
 }
 
+void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
+    //qDebug() << rcvd_packet.get();  // print packet as hex
+    qDebug() << "New packet type= " << rcvd_packet->getType();
+    switch (rcvd_packet->getType()) {
+        // Remeber to add {} scope to avoid jump from switch compilation error
+        case (PACK_TYPE_PING): {
+            PingPacket *ping = dynamic_cast<PingPacket *>(rcvd_packet.get());
+            qDebug() << "[PING] Debug text: " << ping->getDebugMsg();
+            break;
+        }
+
+        case(PACK_TYPE_LOGIN_OK): {
+            LoginOkPacket* loginOk = dynamic_cast<LoginOkPacket*>(rcvd_packet.get());
+            User loggedUser = loginOk->getUser();
+            if ( loggedUser.isLogged() ){
+                qDebug() << "[AUTH] Logged in as: " << loggedUser.getEmail();
+            }
+            else {
+                qDebug() << "[AUTH] FAILED. See the server for the log.";
+            }
+            pServer = qobject_cast<QWebSocket *>(sender());
+
+            break;
+        }
+
+        case (PACK_TYPE_MSG): {
+            Message *msg = dynamic_cast<Message *>(rcvd_packet.get());
+            switch (msg->getType()) {
+                case(MSG_INSERT_SYM): {
+                    emit insertReceived(msg->getS());
+                    break;
+                }
+
+                case(MSG_ERASE_SYM): {
+                    emit eraseReceived(msg->getS());
+                    break;
+                }
+            }
+            break;
+        }
+    }
+}
+
+void SslEchoClient::sendInsert(std::vector<Symbol> symbols, int siteId) {
+    for (Symbol symbol : symbols) {
+        Message msg = Message(MSG_INSERT_SYM, symbol.toSerializable(), siteId);
+        msg.send(*pServer);
+//        qDebug() << "sent" << ((symbol.getC() == '\n') ? "LF" : QString(symbol.getC())) << "(" << type << ")";
+    }
+}
+
+void SslEchoClient::sendErase(std::vector<Symbol> symbols, int siteId) {
+    for (Symbol symbol : symbols) {
+        Message msg = Message(MSG_ERASE_SYM, symbol.toSerializable(), siteId);
+        msg.send(*pServer);
+//        qDebug() << "sent" << ((symbol.getC() == '\n') ? "LF" : QString(symbol.getC())) << "(" << type << ")";
+    }
+}
+
+void SslEchoClient::connectToEditor(TextEditor* te) {
+//kink to
+    connect(this, &SslEchoClient::insertReceived, te, &TextEditor::remoteInsert);
+    connect(this, &SslEchoClient::eraseReceived, te, &TextEditor::remoteErase);
+    connect(te, &TextEditor::symbolsInserted, this, &SslEchoClient::sendInsert);
+    connect(te, &TextEditor::symbolsErased, this, &SslEchoClient::sendErase);
+
+}
 
 //    // Save the secret key that will be used

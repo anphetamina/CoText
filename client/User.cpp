@@ -7,6 +7,7 @@
 User::User() {
 
 }
+User::User(int id, QString email, QString name, QString surname):id(id), email(email), name(name), surname(surname){};
 
 User::~User() { }
 /* GETTERS */
@@ -15,6 +16,8 @@ QString User::getName() { return this->name; }
 QString User::getSurname() { return this->surname; }
 
 QString User::getEmail() { return this->email; }
+
+int User::getId() { return this->id; }
 
 QString User::getNick() { return this->nickname; }
 
@@ -26,6 +29,7 @@ int User::getUserState() { return this->userState; }
 
 int User::getActualSecondsBeforeInactive() { return this->secondsBeforeInactive; }
 int User::getSignature() { return this->signature; }
+bool User::isLogged() { return this->id > 0?1:0 ; }
 
 
 /* SETTERS */
@@ -39,6 +43,8 @@ void User::setNick(QString _nick) { this->nickname = _nick; }
 
 void User::setEmail(QString _email) { this->email = _email; }
 
+void User::setId(int _id) { this->id = _id; }
+
 void User::addFriend(User* _usrFriend) { this->friendList.append(_usrFriend); }
 
 void User::setTimeBeforeInactive(int _timer){ this->secondsBeforeInactive = _timer; }
@@ -49,7 +55,7 @@ void User::setSignature(uint8_t signature) { this->signature = signature; }
 
 QDataStream& operator>>(QDataStream& in, User& user)
 {
-    in >> user.name >> user.surname >> user.email
+    in >> user.id >> user.name >> user.surname >> user.email
        >> user.nickname
        >> user.profilePic
        //>> user.friendList
@@ -64,7 +70,7 @@ QDataStream& operator>>(QDataStream& in, User& user)
 
 QDataStream& operator<<(QDataStream& out, const User& user)
 {
-    out << user.name << user.surname << user.email
+    out << user.id <<  user.name << user.surname << user.email
         << user.nickname
         << user.profilePic
         //<< user.friendList

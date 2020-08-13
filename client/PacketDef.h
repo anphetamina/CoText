@@ -32,3 +32,7 @@
 #define PACK_TYPE_DOC_ERR 0x0056
 
 
+#define PACK_TYPE_LAST_CODE 0x0099
+
+#define MSG_INSERT_SYM 1
+#define MSG_ERASE_SYM -1

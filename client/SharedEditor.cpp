@@ -1,18 +1,14 @@
-#define INSERT 1
-#define DELETE -1
-
 #include <algorithm>
 #include <iostream>
 #include "SharedEditor.h"
-#include "NetworkServer.h"
 #include "Shuffler.h"
 #include "QSymbol.h"
 #include <QDebug>
 
-SharedEditor::SharedEditor(NetworkServer &server)
-        : server(server), counter(0), base(32), boundary(10), idCounter(0) {
+
+SharedEditor::SharedEditor(int siteId)
+        : siteId(siteId), counter(0), base(32), boundary(10), idCounter(0) {
     symbols.emplace_back();
-    siteId = server.connect(this);
 }
 
 bool SharedEditor::retrieveStrategy(int level) {
@@ -297,7 +293,6 @@ Symbol SharedEditor::localInsert(int line, int index, char value) {
         std::cerr << "line " << line << ", index " << index << ", value " << value << ", siteId " << siteId << std::endl;
         std::cerr << e.what() << std::endl;
     }
-
     return sym;
 }
 
@@ -430,9 +425,9 @@ std::pair<int, int> SharedEditor::remoteInsert(const Symbol &symbol) {
 
     if (*line_it->begin() == symbol) {
         if (symbol.getC() == '\n') {
-            std::cout << "remoteInsert symbol 'CRLF' ("+symbol.getId()+") already exists" << std::endl;
+            qDebug() << "remoteInsert symbol 'CRLF' (" << symbol.getC() << ") already exists" << endl;
         } else {
-            std::cout << "remoteInsert symbol '"+ std::string(1, symbol.getC()) +"' ("+symbol.getId()+") already exists" << std::endl;
+            qDebug() << "remoteInsert symbol '" << symbol.getC()  << "' (" << QString::fromStdString(symbol.getId()) << ") already exists" << endl;
         }
 
     } else {
@@ -448,9 +443,10 @@ std::pair<int, int> SharedEditor::remoteInsert(const Symbol &symbol) {
 
         if (*index_it == symbol) {
             if (symbol.getC() == '\n') {
-                std::cout << "remoteInsert symbol 'CRLF' ("+symbol.getId()+") already exists" << std::endl;
+
+                qDebug() << "remoteInsert symbol 'CRLF'" <<  symbol.getC() <<  "(" << QString::fromStdString(symbol.getId()) << ") already exists" << endl;
             } else {
-                std::cout << "remoteInsert symbol '"+ std::string(1, symbol.getC()) +"' ("+symbol.getId()+") already exists" << std::endl;
+                qDebug() << "remoteInsert symbol '" << symbol.getC()  << "' (" << QString::fromStdString(symbol.getId()) << ") already exists" << endl;
             }
         } else {
             if (index_it->getC() == '\n') {
@@ -516,9 +512,9 @@ std::pair<int, int> SharedEditor::remoteErase(const Symbol &symbol) {
 
         if (index_it == line_it->end()) {
             if (symbol.getC() == '\n') {
-                std::cout << "remoteErase symbol 'CRLF' ("+symbol.getId()+") not found" << std::endl;
+                qDebug() << "remoteErase symbol 'CRLF' (" << QString::fromStdString(symbol.getId()) << ") not found" << endl;
             } else {
-                std::cout << "remoteErase symbol '"+ std::string(1, symbol.getC()) +"' ("+symbol.getId()+") not found" << std::endl;
+                qDebug() << "remoteErase symbol '" <<  symbol.getC()  << "' ("+QString::fromStdString(symbol.getId()) << ") not found" << endl;
             }
         } else {
             int index = index_it - line_it->begin();
@@ -540,29 +536,6 @@ std::pair<int, int> SharedEditor::remoteErase(const Symbol &symbol) {
     return std::make_pair(-1, -1);
 }
 
-/**
- *
- * @param m
- * if m.type = 1 insert the symbol respecting the fractional position
- * if m.type = -1 remove the symbol given the fractional position
- */
-void SharedEditor::process( Message &m) {
-    Symbol symbol = m.getS();
-
-    switch (m.getType()) {
-        case INSERT:
-            remoteInsert(symbol);
-            break;
-
-        case DELETE:
-            remoteErase(symbol);
-            break;
-
-        default:
-            throw std::runtime_error("process: forbidden action");
-    }
-}
-
 std::string SharedEditor::to_string() {
     std::string output{};
     for (const auto& line : symbols) {
@@ -571,10 +544,6 @@ std::string SharedEditor::to_string() {
         }
     }
     return output;
-}
-
-void SharedEditor::setServer(NetworkServer &server) {
-    this->server = server;
 }
 
 int SharedEditor::getBase() const {
@@ -591,10 +560,6 @@ uint64_t SharedEditor::getIdCounter() const {
 
 void SharedEditor::setIdCounter(uint64_t idCounter) {
     this->idCounter = idCounter;
-}
-
-NetworkServer& SharedEditor::getServer() const {
-    return server;
 }
 
 int SharedEditor::getSiteId() const {

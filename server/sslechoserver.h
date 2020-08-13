@@ -36,6 +36,9 @@ private:
     // Association of socket and client
     QMap<QWebSocket*, QSharedPointer<Client>> clientMapping;
 
+    //Association of opened doc and user
+    QMap<int, QSharedPointer<Client>> documentMapping;
+
     void packetParse(QByteArray rcvd_packet);
 
     //void tryLogin(QByteArray rcvd_packet);
@@ -43,7 +46,7 @@ private:
 
     //void tryLogin(Packet rcvd_packet);
 
-    void dispatch(PacketHandler rcvd_packet, QWebSocket* m_webSocket);
+    void dispatch(PacketHandler rcvd_packet, QWebSocket* pClient);
 };
 
 #endif //SSLECHOSERVER_H

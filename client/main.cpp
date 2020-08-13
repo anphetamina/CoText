@@ -2,11 +2,11 @@
 #include "./gui/Login.h"
 
 #include <QApplication> //manages: widgets, events, mouse movements, overall looking feel
+#include <QThread>
 #include <iostream>
 
 //#include <QtCore/QCoreApplication>
 #include "sslechoclient.h"
-#include "NetworkServer.h"
 
 int main(int argc, char *argv[])
 {
@@ -27,9 +27,15 @@ int main(int argc, char *argv[])
 
     // ** Network testing code
     //QCoreApplication a(argc, argv);
-    SslEchoClient client(QUrl(QStringLiteral("wss://localhost:12345")));
-    Q_UNUSED(client);
+    SslEchoClient* client = new SslEchoClient(QUrl(QStringLiteral("wss://localhost:12345")));
+    Q_UNUSED(*client);
     // ** End of network testing code
+
+    /*QThread *listener = new QThread();
+    client->moveToThread(listener);
+    listener->start();
+
+    qRegisterMetaType<QList<QSslError>>("QList<QSslError>");*/
 
     // Set GUI options
     MainWindow *w = new MainWindow();
@@ -45,10 +51,8 @@ int main(int argc, char *argv[])
 
     w->show();
 
-    NetworkServer network;
-    SharedEditor sharedEditor(network);
-
-    TextEditor editor(*w, *w->getUi(), sharedEditor);
-
+    TextEditor editor(*w, *w->getUi(), client);
+    //delete client;
     return a.exec();
+
 }
