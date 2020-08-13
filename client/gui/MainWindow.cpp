@@ -13,13 +13,24 @@
 #include <QtSvg>
 #include <QEvent>
 
-
+bool isLogged = true;
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow){
 	
     QApplication::instance()->setAttribute(Qt::AA_DontShowIconsInMenus, true);
     
     ui->setupUi(this);
     //this->user = nullptr;
+    if(!isLogged) {
+    	ui->textEdit->setDisabled(true);
+    	//ui->page->hide();
+    	//ui->page_2->show();
+    	
+    	
+    } else {
+    	ui->textEdit->setDisabled(false);
+    	//ui->page_2->hide();
+    	//ui->page->show();
+    }
     
 
 
@@ -316,9 +327,20 @@ void MainWindow::on_actionLogin_triggered()
 }
 
 
-
 void MainWindow::on_actionShare_Uri_triggered() {
+	
     QMessageBox::StandardButton reply = QMessageBox::warning(this, "ciao", "uri");
+    
+}
+
+void MainWindow::on_actionSettings_triggered() {
+	
+	UserWidget uw;
+	
+	uw.setModal(true);
+	
+	uw.exec();
+	
 }
 
 

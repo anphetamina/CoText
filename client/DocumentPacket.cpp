@@ -3,36 +3,13 @@
 //
 
 #include "PacketDef.h"
+#include "DocumentPacket.h"
 
 /** Document Creation packet **/
 DocumentCreatePacket::DocumentCreatePacket(): Packet(PACK_TYPE_DOC_CREATE){}
-DocumentCreatePacket::DocumentCreatePacket(QString docName, qint32 userId ): Packet(PACK_TYPE_DOC_CREATE), userId(userId), docName(docName){};
+DocumentCreatePacket::DocumentCreatePacket(qint32 userId, QString docName): Packet(PACK_TYPE_DOC_CREATE), userId(userId), docName(docName){};
 
-QString DocumentCreatePacket::getuserId() const {
-    return userId;
-}
-
-QString DocumentCreatePacket::getdocName() const {
-    return docName;
-}
-
-void DocumentCreatePacket::writePayload(QDataStream& stream) const
-{
-    stream << userId << docName;
-}
-
-void DocumentCreatePacket::readPayload(QDataStream& stream)
-{
-    stream >> userId >> docName;
-}
-
-
-
-/** Document Creation packet **/
-DocumentCreatePacket::DocumentCreatePacket(): Packet(PACK_TYPE_DOC_CREATE){}
-DocumentCreatePacket::DocumentCreatePacket(QString docName, qint32 userId ): Packet(PACK_TYPE_DOC_CREATE), userId(userId), docName(docName){};
-
-QString DocumentCreatePacket::getuserId() const {
+qint32 DocumentCreatePacket::getuserId() const {
     return userId;
 }
 
@@ -53,9 +30,9 @@ void DocumentCreatePacket::readPayload(QDataStream& stream)
 /** Document Open packet **/
 // Inherit from a DocumentBaseActionClass?
 DocumentOpenPacket::DocumentOpenPacket(): Packet(PACK_TYPE_DOC_OPEN){}
-DocumentOpenPacket::DocumentOpenPacket(QString docName, qint32 userId ): Packet(PACK_TYPE_DOC_OPEN), userId(userId), docName(docName){};
+DocumentOpenPacket::DocumentOpenPacket(qint32 userId, QString docName): Packet(PACK_TYPE_DOC_OPEN), userId(userId), docName(docName){};
 
-QString DocumentOpenPacket::getuserId() const {
+qint32 DocumentOpenPacket::getuserId() const {
     return userId;
 }
 
@@ -77,9 +54,9 @@ void DocumentOpenPacket::readPayload(QDataStream& stream)
 /** Delete Document packet **/
 // Inherit from a DocumentBaseActionClass?
 DocumentDelPacket::DocumentDelPacket(): Packet(PACK_TYPE_DOC_DEL){}
-DocumentDelPacket::DocumentDelPacket(QString docName, qint32 userId ): Packet(PACK_TYPE_DOC_DEL), userId(userId), docName(docName){};
+DocumentDelPacket::DocumentDelPacket(qint32 userId, QString docName): Packet(PACK_TYPE_DOC_DEL), userId(userId), docName(docName){};
 
-QString DocumentDelPacket::getuserId() const {
+qint32 DocumentDelPacket::getuserId() const {
     return userId;
 }
 
@@ -100,9 +77,9 @@ void DocumentDelPacket::readPayload(QDataStream& stream)
 /** Document Ok packet **/
 // Inherit from a DocumentBaseActionClass?
 DocumentOkPacket::DocumentOkPacket(): Packet(PACK_TYPE_DOC_OK){}
-DocumentOkPacket::DocumentOkPacket(QString docName, qint32 userId ): Packet(PACK_TYPE_DOC_OK), userId(userId), docName(docName){};
+DocumentOkPacket::DocumentOkPacket(qint32 userId, QString docName): Packet(PACK_TYPE_DOC_OK), userId(userId), docName(docName){};
 
-QString DocumentOkPacket::getuserId() const {
+qint32 DocumentOkPacket::getuserId() const {
     return userId;
 }
 
@@ -123,9 +100,9 @@ void DocumentOkPacket::readPayload(QDataStream& stream)
 /** DocumentAskSharableURIPacket packet **/
 // Inherit from a DocumentBaseActionClass?
 DocumentAskSharableURIPacket::DocumentAskSharableURIPacket(): Packet(PACK_TYPE_DOC_ASKSURI){}
-DocumentAskSharableURIPacket::DocumentAskSharableURIPacket(QString docName, qint32 userId, QString sharableURI ): Packet(PACK_TYPE_DOC_ASKSURI), userId(userId), docName(docName), sharableURI(sharableURI){};
+DocumentAskSharableURIPacket::DocumentAskSharableURIPacket(qint32 userId, QString docName, QString sharableURI ): Packet(PACK_TYPE_DOC_ASKSURI), userId(userId), docName(docName), sharableURI(sharableURI){};
 
-QString DocumentAskSharableURIPacket::getuserId() const {
+qint32 DocumentAskSharableURIPacket::getuserId() const {
     return userId;
 }
 

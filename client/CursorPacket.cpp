@@ -11,11 +11,11 @@ CursorPacket::CursorPacket(qint32 userId, qint32 newPosition): Packet(PACK_TYPE_
 
 
 
-QString CursorPacket::getuserId() const {
+qint32 CursorPacket::getuserId() const {
     return userId;
 }
 
-QString CursorPacket::getnewPosition() const {
+qint32 CursorPacket::getnewPosition() const {
     return newPosition;
 }
 

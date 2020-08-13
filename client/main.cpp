@@ -12,6 +12,13 @@ int main(int argc, char *argv[])
 {
 
     QApplication a(argc, argv);
+    
+    //exe icon for mac/linux
+    QIcon icon(":/appIcon/CoText.ico");
+    a.setWindowIcon(icon);
+    //exe icon for Win
+    
+    //apply custom stylesheet
 	QFile styleFile(":/style/darkTheme.qss");
 	styleFile.open(QFile::ReadOnly);
 	QString stylesheetString = QLatin1String(styleFile.readAll());

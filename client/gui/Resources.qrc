@@ -27,8 +27,14 @@
         <file>icons/bold.png</file>
         <file>icons/underline.png</file>
         <file>icons/italic.png</file>
+        <file>icons/noun_bold_1076853.svg</file>
+        <file>icons/noun_color_3170276.svg</file>
+        <file>icons/noun_font_2669552.svg</file>
+        <file>icons/noun_italics_1076852.svg</file>
+        <file>icons/noun_underline_1384032.svg</file>
     </qresource>
     <qresource prefix="/appIcon">
+        <file>icons/CoText_landing.png</file>
         <file>CoText.icns</file>
         <file>CoText.ico</file>
     </qresource>

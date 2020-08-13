@@ -23,6 +23,6 @@ protected:
 public:
     CursorPacket(qint32 userId, qint32 newPosition);
     ~CursorPacket() {};
-    QString getuserId() const;
-    QString getnewPosition() const;
+    qint32 getuserId() const;
+    qint32 getnewPosition() const;
 };

@@ -22,8 +22,8 @@ protected:
 public:
     DocumentCreatePacket(qint32 userId, QString docName);
     ~DocumentCreatePacket() {};
-    QString getuserId() const;
-    QString getdocName const;
+    qint32 getuserId() const;
+    QString getdocName() const;
 };
 
 /** Document open packet **/
@@ -41,8 +41,8 @@ protected:
 public:
     DocumentOpenPacket(qint32 userId, QString docName);
     ~DocumentOpenPacket() {};
-    QString getuserId() const;
-    QString getdocName const;
+    qint32 getuserId() const;
+    QString getdocName() const;
 };
 
 /** Document delete packet **/
@@ -60,8 +60,8 @@ protected:
 public:
     DocumentDelPacket(qint32 userId, QString docName);
     ~DocumentDelPacket() {};
-    QString getuserId() const;
-    QString getdocName const;
+    qint32 getuserId() const;
+    QString getdocName() const;
 };
 
 /** Document Ok packet: the desirable response for a DocumentOpen packet **/
@@ -80,8 +80,8 @@ protected:
 public:
     DocumentOkPacket(qint32 userId, QString docName);
     ~DocumentOkPacket() {};
-    QString getuserId() const;
-    QString getdocName const;
+    qint32 getuserId() const;
+    QString getdocName() const;
 };
 
 /** DocumentAskSharableURIPacket: the  packet used to check permission and get the URI used to invite people**/
@@ -101,6 +101,6 @@ protected:
 public:
     DocumentAskSharableURIPacket(qint32 userId, QString docName, QString sharableURI);
     ~DocumentAskSharableURIPacket() {};
-    QString getuserId() const;
-    QString getdocName const;
+    qint32 getuserId() const;
+    QString getdocName() const;
 };

@@ -59,7 +59,7 @@
      <x>0</x>
      <y>0</y>
      <width>992</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="palette">
@@ -429,7 +429,7 @@
   <action name="actionFont">
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/imgs/icons/font.png</normaloff>:/imgs/icons/font.png</iconset>
+     <normaloff>:/imgs/icons/noun_font_2669552.svg</normaloff>:/imgs/icons/noun_font_2669552.svg</iconset>
    </property>
    <property name="text">
     <string>Font</string>
@@ -444,7 +444,7 @@
    </property>
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/imgs/icons/italic.png</normaloff>:/imgs/icons/italic.png</iconset>
+     <normaloff>:/imgs/icons/noun_italics_1076852.svg</normaloff>:/imgs/icons/noun_italics_1076852.svg</iconset>
    </property>
    <property name="text">
     <string>Italic</string>
@@ -462,7 +462,7 @@
    </property>
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/imgs/icons/bold.png</normaloff>:/imgs/icons/bold.png</iconset>
+     <normaloff>:/imgs/icons/noun_bold_1076853.svg</normaloff>:/imgs/icons/noun_bold_1076853.svg</iconset>
    </property>
    <property name="text">
     <string>actionBold</string>
@@ -480,7 +480,7 @@
    </property>
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/imgs/icons/underline.png</normaloff>:/imgs/icons/underline.png</iconset>
+     <normaloff>:/imgs/icons/noun_underline_1384032.svg</normaloff>:/imgs/icons/noun_underline_1384032.svg</iconset>
    </property>
    <property name="text">
     <string>Underline</string>
@@ -493,6 +493,10 @@
    </property>
   </action>
   <action name="actionTextColor">
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/imgs/icons/noun_color_3170276.svg</normaloff>:/imgs/icons/noun_color_3170276.svg</iconset>
+   </property>
    <property name="text">
     <string/>
    </property>
@@ -500,7 +504,7 @@
  </widget>
  <resources>
   <include location="Resources.qrc"/>
-  <include location="notepad.qrc"/>
+  <include location="Resources.qrc"/>
  </resources>
  <connections/>
 </ui>
