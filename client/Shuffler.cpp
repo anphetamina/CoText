@@ -17,6 +17,11 @@ std::mt19937& Shuffler::getGenerator() {
     return generator;
 }
 
+int Shuffler::getRandomInt() {
+    std::uniform_int_distribution<int> distribution(0, INT_MAX);
+    return distribution(generator);
+}
+
 Shuffler::~Shuffler() {
     delete[] instance;
     delete instance;

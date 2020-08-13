@@ -27,13 +27,8 @@ class TextEditor : public QObject {
 
     Q_OBJECT
 
-
-
 public:
-    explicit TextEditor(QWidget &parent, Ui::MainWindow &ui);
-    TextEditor(QWidget &parent, Ui::MainWindow &ui, SslEchoClient *client);
-
-    virtual ~TextEditor();
+    explicit TextEditor(QWidget &parent, Ui::MainWindow &ui, SslEchoClient *client);
 
 private:
 
@@ -41,7 +36,6 @@ private:
     Ui::MainWindow &ui;
     SharedEditor editor;
     SslEchoClient* sslEchoClient;
-    QThread *listener;
     std::vector<int> index;
 
     void fontChanged(const QFont &f);
@@ -62,6 +56,7 @@ private:
      * remote
      */
 
+    std::atomic<bool> isFromRemote;
     int getPosition(int row, int col);
 
 
@@ -72,9 +67,6 @@ public slots:
     void remoteErase(Symbol symbol);
 
 private slots:
-
-    //void remoteInsert(Symbol symbol);
-    //void remoteErase(Symbol symbol);
 
     /**
      * font style management

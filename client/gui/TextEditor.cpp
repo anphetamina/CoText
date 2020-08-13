@@ -6,14 +6,13 @@
 #include <QtWidgets/QColorDialog>
 #include <QtWidgets/QFontDialog>
 #include <QThread>
-
+#include "../Shuffler.h"
 #include "TextEditor.h"
 #include "../PacketDef.h"
 #include "../sslechoclient.h" // Removed import from .h and added forward decl
 
-bool isRemoteInsert = false;
 
-TextEditor::TextEditor(QWidget &parent, Ui::MainWindow &ui, SslEchoClient* client) : parent(parent), ui(ui), index({0}), editor(SharedEditor(1)), sslEchoClient(client) {
+TextEditor::TextEditor(QWidget &parent, Ui::MainWindow &ui, SslEchoClient* client) : parent(parent), ui(ui), index({0}), editor(SharedEditor(Shuffler::getInstance()->getRandomInt())), sslEchoClient(client), isFromRemote(false) {
 
     // todo set better margins
     ui.textEdit->document()->setDocumentMargin(50);
@@ -44,16 +43,6 @@ TextEditor::TextEditor(QWidget &parent, Ui::MainWindow &ui, SslEchoClient* clien
 
     qRegisterMetaType<Symbol>("Symbol");
 
-    //listener = new QThread(&parent);
-    //(*sslEchoClient).moveToThread(listener);
-
-
-    //connect(sslEchoClient, &SslEchoClient::insertSymbol, this, &TextEditor::remoteInsert);
-    //connect(sslEchoClient, &SslEchoClient::removeSymbol, this, &TextEditor::remoteErase);
-
-    //&QThread::started
-    //connect(this, &TextEditor::sendSymbol, sslEchoClient, &SslEchoClient::sendMessage);
-    //listener->start();
     sslEchoClient->connectToEditor(this);
 
 }
@@ -108,6 +97,12 @@ void TextEditor::colorChanged(const QColor &c) {
 }
 
 void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) {
+
+    if (isFromRemote) {
+        isFromRemote = false;
+        return;
+    }
+
     /**
      * QTextEdit bug
      * pasting >= 1 characters gives wrong number of added and removed chars
@@ -213,8 +208,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
         std::vector<Symbol> erasedSymbols = editor.localErase(startRow, startCol, endRow, endCol);
 
         for (Symbol symbol : erasedSymbols) {
-            if(!isRemoteInsert)
-                emit sendSymbol(symbol, MSG_DELETE_SYM, editor.getSiteId());
+            emit sendSymbol(symbol, MSG_DELETE_SYM, editor.getSiteId());
         }
 
         int newSize = editor.getSymbols().size();
@@ -243,16 +237,11 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
             if (addedChar == QChar::LineFeed || addedChar == QChar::ParagraphSeparator) {
                 Symbol symbol = editor.localInsert(row, col, '\n');
-                qDebug() << editor.getSiteId() << symbol.getSiteId();
-                if(!isRemoteInsert)
-                    emit sendSymbol(symbol, MSG_INSERT_SYM, editor.getSiteId());
+                emit sendSymbol(symbol, MSG_INSERT_SYM, editor.getSiteId());
                 newRows++;
             } else {
                 Symbol symbol = editor.localInsert(row, col, addedChar.toLatin1());
-                qDebug() << editor.getSiteId() << symbol.getSiteId();
-                if(!isRemoteInsert)
-                    emit sendSymbol(symbol, MSG_INSERT_SYM, editor.getSiteId());
-
+                emit sendSymbol(symbol, MSG_INSERT_SYM, editor.getSiteId());
             }
 
 
@@ -276,6 +265,8 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
     /**
      * print the current document in the console
      */
+
+    std::cout << std::endl << "---" << std::endl;
     const auto& symbols = editor.getSymbols();
     for (int i = 0; i < symbols.size(); i++) {
         std::cout << "[" << index[i] << "] ";
@@ -285,7 +276,6 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
     }
 
     std::cout << std::endl << "---" << std::endl;
-    isRemoteInsert = false;
 }
 
 /**
@@ -385,18 +375,13 @@ int TextEditor::getRow(int position) {
 /**
  * insert symbol received from the server
  * @param symbol
- * Note: here we loose info about original symb
  */
 void TextEditor::remoteInsert(Symbol symbol) {
+    isFromRemote = true;
     std::pair<int, int> pos = editor.remoteInsert(symbol);
     if (pos.first != -1 || pos.second != -1) {
         int position = getPosition(pos.first, pos.second);
         ui.textEdit->textCursor().setPosition(position);
-        qDebug() << symbol.getSiteId() << editor.getSiteId();
-        if(symbol.getSiteId() == editor.getSiteId())
-            isRemoteInsert = false;
-        else
-            isRemoteInsert = true;
         ui.textEdit->textCursor().insertText(QChar::fromLatin1(symbol.getC()));
 
         incrementIndex(pos.first, 1);
@@ -410,6 +395,7 @@ void TextEditor::remoteInsert(Symbol symbol) {
  * @param symbol
  */
 void TextEditor::remoteErase(Symbol symbol) {
+    isFromRemote = true;
     std::pair<int, int> pos = editor.remoteErase(symbol);
     if (pos.first != -1 || pos.second != -1) {
         int position = getPosition(pos.first, pos.second);
@@ -433,9 +419,4 @@ int TextEditor::getPosition(int row, int col) {
     int pos = index[row];
     pos += col;
     return pos;
-}
-
-TextEditor::~TextEditor() {
-    listener->quit();
-    listener->wait();
 }

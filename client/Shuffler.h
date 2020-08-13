@@ -20,6 +20,8 @@ public:
     static Shuffler* getInstance();
     std::mt19937& getGenerator();
 
+    int getRandomInt();
+
     ~Shuffler();
 };
 
