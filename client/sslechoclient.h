@@ -24,12 +24,13 @@ public:
 
 signals:
 
-    void insertSymbol(Symbol symbol);
-    void removeSymbol(Symbol symbol);
+    void insertReceived(Symbol symbol);
+    void eraseReceived(Symbol symbol);
 
 public slots:
 
-    void sendMessage(Symbol symbol, int type, int siteId);
+    void sendInsert(std::vector<Symbol> symbols, int siteId);
+    void sendErase(std::vector<Symbol> symbols, int siteId);
 
 private Q_SLOTS:
     void onConnected();

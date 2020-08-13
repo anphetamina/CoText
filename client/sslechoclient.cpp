@@ -174,12 +174,12 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             Message *msg = dynamic_cast<Message *>(rcvd_packet.get());
             switch (msg->getType()) {
                 case(MSG_INSERT_SYM): {
-                    emit insertSymbol(msg->getS());
+                    emit insertReceived(msg->getS());
                     break;
                 }
 
-                case(MSG_DELETE_SYM): {
-                    emit removeSymbol(msg->getS());
+                case(MSG_ERASE_SYM): {
+                    emit eraseReceived(msg->getS());
                     break;
                 }
             }
@@ -188,17 +188,28 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
     }
 }
 
-void SslEchoClient::sendMessage(Symbol symbol, int type, int siteId) {
-    Message msg = Message(type, symbol.toSerializable(), siteId);
-    msg.send(*pServer);
-    qDebug() << "sent" << ((symbol.getC() == '\n') ? "LF" : QString(symbol.getC())) << "(" << type << ")";
+void SslEchoClient::sendInsert(std::vector<Symbol> symbols, int siteId) {
+    for (Symbol symbol : symbols) {
+        Message msg = Message(MSG_INSERT_SYM, symbol.toSerializable(), siteId);
+        msg.send(*pServer);
+//        qDebug() << "sent" << ((symbol.getC() == '\n') ? "LF" : QString(symbol.getC())) << "(" << type << ")";
+    }
+}
+
+void SslEchoClient::sendErase(std::vector<Symbol> symbols, int siteId) {
+    for (Symbol symbol : symbols) {
+        Message msg = Message(MSG_ERASE_SYM, symbol.toSerializable(), siteId);
+        msg.send(*pServer);
+//        qDebug() << "sent" << ((symbol.getC() == '\n') ? "LF" : QString(symbol.getC())) << "(" << type << ")";
+    }
 }
 
 void SslEchoClient::connectToEditor(TextEditor* te) {
 //kink to
-    connect(this, &SslEchoClient::insertSymbol, te, &TextEditor::remoteInsert);
-    connect(this, &SslEchoClient::removeSymbol, te, &TextEditor::remoteErase);
-    connect(te, &TextEditor::sendSymbol, this, &SslEchoClient::sendMessage);
+    connect(this, &SslEchoClient::insertReceived, te, &TextEditor::remoteInsert);
+    connect(this, &SslEchoClient::eraseReceived, te, &TextEditor::remoteErase);
+    connect(te, &TextEditor::symbolsInserted, this, &SslEchoClient::sendInsert);
+    connect(te, &TextEditor::symbolsErased, this, &SslEchoClient::sendErase);
 
 }
 

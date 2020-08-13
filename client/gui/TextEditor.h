@@ -89,7 +89,8 @@ private slots:
 
 signals:
 
-    void sendSymbol(Symbol symbol, int type, int siteId);
+    void symbolsInserted(std::vector<Symbol> symbols, int siteId);
+    void symbolsErased(std::vector<Symbol> symbols, int siteId);
 
 
 };

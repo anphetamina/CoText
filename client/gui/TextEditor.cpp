@@ -207,16 +207,12 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
         std::vector<Symbol> erasedSymbols = editor.localErase(startRow, startCol, endRow, endCol);
 
-        for (Symbol symbol : erasedSymbols) {
-            emit sendSymbol(symbol, MSG_DELETE_SYM, editor.getSiteId());
-        }
-
         int newSize = editor.getSymbols().size();
 
         decrementIndex(startRow, charsRemoved);
         deleteRow(startRow, oldSize - newSize);
 
-
+        emit symbolsErased(erasedSymbols, editor.getSiteId());
     }
 
     if (charsAdded > 0) {
@@ -232,16 +228,20 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
         int pos = row;
         int newRows = 0;
 
+        std::vector<Symbol> insertedSymbols;
+
         while (charsAdded > 0) {
             QChar addedChar = ui.textEdit->document()->characterAt(position++);
 
             if (addedChar == QChar::LineFeed || addedChar == QChar::ParagraphSeparator) {
                 Symbol symbol = editor.localInsert(row, col, '\n');
-                emit sendSymbol(symbol, MSG_INSERT_SYM, editor.getSiteId());
+                insertedSymbols.push_back(symbol);
+//                emit sendSymbol(symbol, MSG_INSERT_SYM, editor.getSiteId());
                 newRows++;
             } else {
                 Symbol symbol = editor.localInsert(row, col, addedChar.toLatin1());
-                emit sendSymbol(symbol, MSG_INSERT_SYM, editor.getSiteId());
+                insertedSymbols.push_back(symbol);
+//                emit sendSymbol(symbol, MSG_INSERT_SYM, editor.getSiteId());
             }
 
 
@@ -259,21 +259,24 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
         incrementIndex(pos, n);
         insertRow(pos, newRows);
+
+        emit symbolsInserted(insertedSymbols, editor.getSiteId());
     }
 
 
     /**
      * print the current document in the console
      */
-    qDebug() << endl << "---" << endl;
+
+    /*QDebug dbg(QtDebugMsg);
+    qDebug() << "---";
     const auto& symbols = editor.getSymbols();
     for (int i = 0; i < symbols.size(); i++) {
-        qDebug() << "[" << index[i] << "] ";
+        dbg << "[" << index[i] << "]";
         for (int j = 0; j < symbols[i].size(); j++) {
-            qDebug() << symbols[i][j].getC();
+            dbg << symbols[i][j].getC();
         }
-    }
-    qDebug() << endl << "---" << endl;
+    }*/
 }
 
 /**
@@ -391,6 +394,7 @@ void TextEditor::remoteInsert(Symbol symbol) {
             insertRow(pos.first, 1);
         }
     }
+
 }
 /**
  * erase symbol received from the server
@@ -413,6 +417,7 @@ void TextEditor::remoteErase(Symbol symbol) {
             deleteRow(pos.first, 1);
         }
     }
+
 }
 
 /**
