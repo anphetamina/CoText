@@ -471,3 +471,11 @@ int TextEditor::getPosition(int row, int col) {
     pos += col;
     return pos;
 }
+
+void TextEditor::remoteInsertBlock(std::vector<Symbol> symbols) {
+    // todo
+}
+
+void TextEditor::remoteEraseBlock(std::vector<Symbol> symbols) {
+    // todo
+}

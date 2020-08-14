@@ -66,7 +66,9 @@ private:
 public slots:
 
     void remoteInsert(Symbol symbol);
+    void remoteInsertBlock(std::vector<Symbol> symbols);
     void remoteErase(Symbol symbol);
+    void remoteEraseBlock(std::vector<Symbol> symbols);
 
 private slots:
 

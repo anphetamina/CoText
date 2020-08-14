@@ -26,6 +26,8 @@ signals:
 
     void insertReceived(Symbol symbol);
     void eraseReceived(Symbol symbol);
+    void insertBlockReceived(std::vector<Symbol> symbols);
+    void eraseBlockReceived(std::vector<Symbol> symbols);
 
 public slots:
 
