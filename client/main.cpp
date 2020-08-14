@@ -49,9 +49,21 @@ int main(int argc, char *argv[])
     ////DO SOME RESIZING
     ////TODO
 
+
+    TextEditor editor(*w->getUi());
+
+    /**
+     * place the QTextEditor object in the central position of the main window
+     */
+    w->setCentralWidget(&editor);
+
+    /**
+     * connect the echo client to enable remote operations on the editor
+     */
+    client->connectToEditor(&editor);
+
     w->show();
 
-    TextEditor editor(*w, *w->getUi(), client);
     //delete client;
     return a.exec();
 

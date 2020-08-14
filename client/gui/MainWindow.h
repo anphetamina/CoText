@@ -14,7 +14,6 @@
 #include <QtGui/QTextCharFormat>
 
 #include "UserWidget.h"
-#include "TextEditor.h"
 
 //#include <QSqlDatabase>
 

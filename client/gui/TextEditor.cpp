@@ -8,39 +8,38 @@
 #include <QThread>
 #include "../Shuffler.h"
 #include "TextEditor.h"
-#include "../sslechoclient.h" // Removed import from .h and added forward decl
 
 
-TextEditor::TextEditor(QWidget &parent, Ui::MainWindow &ui, SslEchoClient* client) : parent(parent), ui(ui), index({0}), editor(SharedEditor(Shuffler::getInstance()->getRandomInt())), sslEchoClient(client), isFromRemote(false), testSymbols({{}}) {
+TextEditor::TextEditor(Ui::MainWindow &ui, QWidget *parent) :
+    parent(parent),
+    ui(ui),
+    index({0}),
+    editor(SharedEditor(Shuffler::getInstance()->getRandomInt())),
+    isFromRemote(false),
+    testSymbols({{}}),
+    painter(viewport()) {
 
-    // todo set better margins
-    ui.textEdit->document()->setDocumentMargin(50);
+
+    document()->setDocumentMargin(50);
     qDebug() << "Current sID: "<< editor.getSiteId();
 
     /**
     * font styling connections
     */
 
-    connect(ui.textEdit, &QTextEdit::currentCharFormatChanged, this, &TextEditor::currentCharFormatChanged);
-    connect(ui.textEdit, &QTextEdit::cursorPositionChanged, this, &TextEditor::cursorPositionChanged);
-
+    connect(this, &QTextEdit::currentCharFormatChanged, this, &TextEditor::updateToolbar);
+    
     connect(ui.actionFont, &QAction::triggered, this, &TextEditor::selectFont);
     connect(ui.actionBold, &QAction::triggered, this, &TextEditor::setFontBold);
-    connect(ui.actionItalic, &QAction::triggered, this, &TextEditor::setFontItalic);
-    connect(ui.actionUnderline, &QAction::triggered, this, &TextEditor::setFontUnderline);
     connect(ui.actionTextColor, &QAction::triggered, this, &TextEditor::setFontColor);
 
     /**
      * document content connections
      */
 
-    connect(ui.textEdit->document(), &QTextDocument::contentsChange, this, &TextEditor::contentsChange);
+    connect(document(), &QTextDocument::contentsChange, this, &TextEditor::contentsChange);
 
-    /**
-     * remote connections
-     */
-
-    sslEchoClient->connectToEditor(this);
+//    painter.setPen(Qt::yellow);
 
 
     /**
@@ -60,40 +59,34 @@ TextEditor::TextEditor(QWidget &parent, Ui::MainWindow &ui, SslEchoClient* clien
 }
 
 void TextEditor::selectFont() {
-    bool fontSelected;
+    // todo per character
+    /*bool fontSelected;
     QFont font = QFontDialog::getFont(&fontSelected, &parent);
     if (fontSelected)
-        ui.textEdit->setFont(font);
+        setFont(font);*/
 }
 
 void TextEditor::setFontBold(bool bold) {
-    bold ? ui.textEdit->setFontWeight(QFont::Bold) :
-    ui.textEdit->setFontWeight(QFont::Normal);
-}
-
-void TextEditor::setFontUnderline(bool underline) {
-    ui.textEdit->setFontUnderline(underline);
-}
-
-void TextEditor::setFontItalic(bool italic) {
-    ui.textEdit->setFontItalic(italic);
+    bold ? setFontWeight(QFont::Bold) :
+    setFontWeight(QFont::Normal);
 }
 
 void TextEditor::setFontColor() {
-    QColor col = QColorDialog::getColor(ui.textEdit->textColor(), &parent);
+    // todo per character
+    /*QColor col = QColorDialog::getColor(textColor(), &parent);
     if (!col.isValid())
         return;
-    ui.textEdit->setTextColor(col);
-    colorChanged(col);
+    setTextColor(col);
+    colorChanged(col);*/
 }
 
-void TextEditor::currentCharFormatChanged(const QTextCharFormat &format) {
+/**
+ * given the current format updates the icons on the editor toolbar in the main window
+ * @param format
+ */
+void TextEditor::updateToolbar(const QTextCharFormat &format) {
     fontChanged(format.font());
     colorChanged(format.foreground().color());
-}
-
-void TextEditor::cursorPositionChanged() {
-    QTextCursor cursor = ui.textEdit->textCursor();
 }
 
 void TextEditor::fontChanged(const QFont &f) {
@@ -103,6 +96,7 @@ void TextEditor::fontChanged(const QFont &f) {
 }
 
 void TextEditor::colorChanged(const QColor &c) {
+    // todo fix icon in the toolbar
     QPixmap pix(16, 16);
     pix.fill(c);
     ui.actionTextColor->setIcon(pix);
@@ -178,7 +172,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 //
 //        int pos = position;
 //        for (int i = 0; i < charsAdded; ++i) {
-//            QChar addedChar = ui.textEdit->document()->characterAt(pos);
+//            QChar addedChar = document()->characterAt(pos);
 //
 //            if (addedChar == QChar::LineFeed || addedChar == QChar::ParagraphSeparator) {
 //                editor.localInsert(line, index, '\n');
@@ -244,7 +238,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
         std::vector<Symbol> insertedSymbols;
 
         while (charsAdded > 0) {
-            QChar addedChar = ui.textEdit->document()->characterAt(position++);
+            QChar addedChar = document()->characterAt(position++);
 
             // todo fetch char format
 
@@ -396,13 +390,13 @@ void TextEditor::remoteInsert(Symbol symbol) {
     std::pair<int, int> pos = editor.remoteInsert(symbol);
     if (pos.first != -1 || pos.second != -1) {
         int position = getPosition(pos.first, pos.second);
-        QTextCursor oldCursor = ui.textEdit->textCursor();
-        QTextCursor cursor = ui.textEdit->textCursor();
+        QTextCursor oldCursor = textCursor();
+        QTextCursor cursor = textCursor();
         cursor.setPosition(position);
-        ui.textEdit->setTextCursor(cursor);
+        setTextCursor(cursor);
         // todo apply format
-        ui.textEdit->textCursor().insertText(QChar::fromLatin1(symbol.getC()));
-        ui.textEdit->setTextCursor(oldCursor);
+        textCursor().insertText(QChar::fromLatin1(symbol.getC()));
+        setTextCursor(oldCursor);
 
         incrementIndex(pos.first, 1);
         if (symbol.getC() == '\n') {
@@ -420,12 +414,12 @@ void TextEditor::remoteInsert(Symbol symbol) {
             std::pair<int, int> pos = editor.remoteInsert(sym);
             if (pos.first != -1 || pos.second != -1) {
                 int position = getPosition(pos.first, pos.second);
-                QTextCursor oldCursor = ui.textEdit->textCursor();
-                QTextCursor cursor = ui.textEdit->textCursor();
+                QTextCursor oldCursor = textCursor();
+                QTextCursor cursor = textCursor();
                 cursor.setPosition(position);
-                ui.textEdit->setTextCursor(cursor);
-                ui.textEdit->textCursor().insertText(QChar::fromLatin1(sym.getC()));
-                ui.textEdit->setTextCursor(oldCursor);
+                setTextCursor(cursor);
+                textCursor().insertText(QChar::fromLatin1(sym.getC()));
+                setTextCursor(oldCursor);
 
                 incrementIndex(pos.first, 1);
                 if (sym.getC() == '\n') {
@@ -445,12 +439,12 @@ void TextEditor::remoteErase(Symbol symbol) {
     std::pair<int, int> pos = editor.remoteErase(symbol);
     if (pos.first != -1 || pos.second != -1) {
         int position = getPosition(pos.first, pos.second);
-        QTextCursor oldCursor = ui.textEdit->textCursor();
-        QTextCursor cursor = ui.textEdit->textCursor();
+        QTextCursor oldCursor = textCursor();
+        QTextCursor cursor = textCursor();
         cursor.setPosition(position);
-        ui.textEdit->setTextCursor(cursor);
-        ui.textEdit->textCursor().deleteChar();
-        ui.textEdit->setTextCursor(oldCursor);
+        setTextCursor(cursor);
+        textCursor().deleteChar();
+        setTextCursor(oldCursor);
 
         decrementIndex(pos.first, 1);
         if (symbol.getC() == '\n') {

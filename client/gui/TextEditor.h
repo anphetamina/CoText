@@ -8,34 +8,28 @@
 
 #include <QDebug>
 #include <iostream>
-#include <thread>
-#include <mutex>
-#include <condition_variable>
-#include <stack>
 #include <QtWidgets/QTextEdit>
-#include "MainWindow.h"
+#include <QtGui/QPainter>
 #include "../SharedEditor.h"
-//#include "../sslechoclient.h"
 
 namespace Ui { class MainWindow; }
 
-
-// Forward declaration (im using just pointer and in this way avoid the circular dep. issue)
-class SslEchoClient;
-
-class TextEditor : public QObject {
+class TextEditor : public QTextEdit {
 
     Q_OBJECT
 
 public:
-    explicit TextEditor(QWidget &parent, Ui::MainWindow &ui, SslEchoClient *client);
+    explicit TextEditor(Ui::MainWindow &ui, QWidget *parent = nullptr);
 
 private:
 
-    QWidget &parent;
+    QWidget *parent;
+
+    /**
+     * to access to the toolbar icons
+     */
     Ui::MainWindow &ui;
     SharedEditor editor;
-    SslEchoClient* sslEchoClient;
     std::vector<int> index;
 
     std::vector<std::vector<Symbol>> testSymbols;
@@ -61,6 +55,7 @@ private:
     std::atomic<bool> isFromRemote;
     int getPosition(int row, int col);
 
+    QPainter painter;
 
 
 public slots:
@@ -75,13 +70,12 @@ private slots:
     /**
      * font style management
      */
+
+
     void selectFont();
     void setFontBold(bool bold);
-    void setFontUnderline(bool underline);
-    void setFontItalic(bool italic);
     void setFontColor();
-
-    void currentCharFormatChanged(const QTextCharFormat &format);
+    void updateToolbar(const QTextCharFormat &format);
 
 
     /**
@@ -89,13 +83,11 @@ private slots:
      */
 
     void contentsChange(int position, int charsRemoved, int charsAdded);
-    void cursorPositionChanged();
 
 signals:
 
     void symbolsInserted(std::vector<Symbol> symbols, int siteId);
     void symbolsErased(std::vector<Symbol> symbols, int siteId);
-
 
 };
 

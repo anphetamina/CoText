@@ -47,11 +47,7 @@
    <property name="styleSheet">
     <string notr="true"/>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_3">
-    <item>
-     <widget class="QTextEdit" name="textEdit"/>
-    </item>
-   </layout>
+   <layout class="QHBoxLayout" name="horizontalLayout_3"/>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -59,7 +55,7 @@
      <x>0</x>
      <y>0</y>
      <width>992</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <property name="palette">

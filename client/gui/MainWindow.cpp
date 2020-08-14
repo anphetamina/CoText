@@ -14,20 +14,22 @@
 #include <QEvent>
 
 bool isLogged = true;
-MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow){
+MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
 	
     QApplication::instance()->setAttribute(Qt::AA_DontShowIconsInMenus, true);
     
     ui->setupUi(this);
     //this->user = nullptr;
     if(!isLogged) {
-    	ui->textEdit->setDisabled(true);
+        // todo check
+//    	ui->textEdit->setDisabled(true);
     	//ui->page->hide();
     	//ui->page_2->show();
     	
     	
     } else {
-    	ui->textEdit->setDisabled(false);
+        // todo check
+//    	ui->textEdit->setDisabled(false);
     	//ui->page_2->hide();
     	//ui->page->show();
     }
@@ -157,7 +159,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
 void MainWindow::on_actionNew_triggered() {
     currentFileName.clear();
     setWindowTitle("untitled");
-    ui->textEdit->setText(QString());
+//    ui->textEdit->setText(QString());
 
 }
 
@@ -179,7 +181,7 @@ void MainWindow::on_actionOpen_triggered() {
         setWindowTitle((filename));
         QTextStream in(&file);
         QString text = in.readAll();
-        ui->textEdit->setText(text);
+//        ui->textEdit->setText(text);
         file.close();
 
     } else {
@@ -200,8 +202,8 @@ void MainWindow::Save_as() {
     currentFileName = filename;
     setWindowTitle(filename);
     QTextStream out(&file);
-    QString text = ui->textEdit->toPlainText();
-    out << text;
+//    QString text = ui->textEdit->toPlainText();
+//    out << text;
     file.close();
     return;
 
@@ -224,8 +226,8 @@ void MainWindow::on_actionSave_triggered() {
         return;
     } else {
         QTextStream out(&file);
-        QString text = ui->textEdit->toPlainText();
-        out << text;
+//        QString text = ui->textEdit->toPlainText();
+//        out << text;
         file.close();
         return;
     }
@@ -274,25 +276,25 @@ void MainWindow::on_actionExit_triggered() {
 }
 
 void MainWindow::on_actionCopy_triggered() {
-    ui->textEdit->copy();
+//    ui->textEdit->copy();
 
 }
 
 void MainWindow::on_actionPaste_triggered() {
-    ui->textEdit->paste();
+//    ui->textEdit->paste();
 }
 
 void MainWindow::on_actionCut_triggered() {
 
-    ui->textEdit->cut();
+//    ui->textEdit->cut();
 }
 
 void MainWindow::on_actionUndo_triggered() {
-    ui->textEdit->undo();
+//    ui->textEdit->undo();
 }
 
 void MainWindow::on_actionRedo_triggered() {
-    ui->textEdit->redo();
+//    ui->textEdit->redo();
 }
 
 
