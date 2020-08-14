@@ -1,39 +1,35 @@
 
-#include "dbConf.h"
+#include "DBConf.h"
 #include "User.h"
 #include <QtCore>
 #include <QDebug>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 
+#include "DBAuthData.h"
+
+// Perform connection to the DB
 bool dbConfigure() {
 
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
-    db.setHostName("localhost");
-    db.setConnectOptions("UNIX_SOCKET=/Applications/MAMP/tmp/mysql/mysql.sock"); // Needed for MAMP
+    db.setHostName(DB_HOST);
+    db.setConnectOptions(DB_OPT); // Needed for MAMP
 
-    db.setUserName("root");
-    db.setPassword("lolloasd92!");
-    db.setDatabaseName("CoText");
-    //db.setPort(3306);//8889
+    db.setUserName(DB_USER);
+    db.setPassword(DB_PASSWORD);
+    db.setDatabaseName(DB_NAME);
+    //db.setPort(DB_PORT);//8889
 
-    bool ok = db.open();
-    //qDebug() << ok;
     //qDebug() << QCoreApplication::libraryPaths();
     //qDebug() << QSqlDatabase::drivers();
-
-    if(db.open()) {
+    bool db_res = db.open();
+    if(db_res) {
         qDebug() << "[DB] Connected to DB.";
         return true;
     }
     else {
         return false;
     }
-
-    if(ok == true)
-        return true;
-    else
-        return false;
 }
 
 bool getUserlist(){
@@ -45,6 +41,7 @@ bool getUserlist(){
         int id = query.value(1).toInt();
         qDebug() << "\t(" << username << ", " << id << ")";
      }
+    // return qvector or some other data struct
 }
 
 User checkLoginData(QString email, QString password){
@@ -107,6 +104,7 @@ User* checkUserLoginData(QString email, QString password){
 QIcon loadProfilePic(int id){
     QString pictureFileName = QString::number(id)+".png";
     QIcon myicon = QIcon("./profilePictures/"+pictureFileName);
+    return myicon;
 }
 
 bool saveProfilePic(int id, QIcon newIcon){
