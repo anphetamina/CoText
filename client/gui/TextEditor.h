@@ -38,6 +38,8 @@ private:
     SslEchoClient* sslEchoClient;
     std::vector<int> index;
 
+    std::vector<std::vector<Symbol>> testSymbols;
+
     void fontChanged(const QFont &f);
     void colorChanged(const QColor &c);
 

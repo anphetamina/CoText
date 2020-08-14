@@ -425,9 +425,9 @@ std::pair<int, int> SharedEditor::remoteInsert(const Symbol &symbol) {
 
     if (*line_it->begin() == symbol) {
         if (symbol.getC() == '\n') {
-            qDebug() << "remoteInsert symbol 'CRLF' (" << symbol.getC() << ") already exists" << endl;
+            qDebug() << "remoteInsert symbol 'CRLF' ("+QString::fromStdString(symbol.getId())+") already exists";
         } else {
-            qDebug() << "remoteInsert symbol '" << symbol.getC()  << "' (" << QString::fromStdString(symbol.getId()) << ") already exists" << endl;
+            qDebug() << "remoteInsert symbol '"+ QString::fromStdString(std::string(1, symbol.getC())) +"' ("+QString::fromStdString(symbol.getId())+") already exists";
         }
 
     } else {
@@ -443,10 +443,9 @@ std::pair<int, int> SharedEditor::remoteInsert(const Symbol &symbol) {
 
         if (*index_it == symbol) {
             if (symbol.getC() == '\n') {
-
-                qDebug() << "remoteInsert symbol 'CRLF'" <<  symbol.getC() <<  "(" << QString::fromStdString(symbol.getId()) << ") already exists" << endl;
+                qDebug() << "remoteInsert symbol 'CRLF' ("+QString::fromStdString(symbol.getId())+") already exists";
             } else {
-                qDebug() << "remoteInsert symbol '" << symbol.getC()  << "' (" << QString::fromStdString(symbol.getId()) << ") already exists" << endl;
+                qDebug() << "remoteInsert symbol '"+ QString::fromStdString(std::string(1, symbol.getC())) +"' ("+QString::fromStdString(symbol.getId())+") already exists";
             }
         } else {
             if (index_it->getC() == '\n') {
@@ -512,9 +511,9 @@ std::pair<int, int> SharedEditor::remoteErase(const Symbol &symbol) {
 
         if (index_it == line_it->end()) {
             if (symbol.getC() == '\n') {
-                qDebug() << "remoteErase symbol 'CRLF' (" << QString::fromStdString(symbol.getId()) << ") not found" << endl;
+                qDebug() << "remoteErase symbol 'CRLF' ("+QString::fromStdString(symbol.getId())+") not found";
             } else {
-                qDebug() << "remoteErase symbol '" <<  symbol.getC()  << "' ("+QString::fromStdString(symbol.getId()) << ") not found" << endl;
+                qDebug() << "remoteErase symbol '"+ QString::fromStdString(std::string(1, symbol.getC())) +"' ("+QString::fromStdString(symbol.getId())+") not found";
             }
         } else {
             int index = index_it - line_it->begin();
@@ -584,4 +583,12 @@ int SharedEditor::getBoundary() const {
 
 void SharedEditor::setBoundary(int boundary) {
     SharedEditor::boundary = boundary;
+}
+
+void SharedEditor::clear() {
+    symbols.clear();
+    symbols.emplace_back();
+    strategies.clear();
+    counter = 0;
+    idCounter = 0;
 }

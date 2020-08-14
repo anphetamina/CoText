@@ -8,11 +8,10 @@
 #include <QThread>
 #include "../Shuffler.h"
 #include "TextEditor.h"
-#include "../PacketDef.h"
 #include "../sslechoclient.h" // Removed import from .h and added forward decl
 
 
-TextEditor::TextEditor(QWidget &parent, Ui::MainWindow &ui, SslEchoClient* client) : parent(parent), ui(ui), index({0}), editor(SharedEditor(Shuffler::getInstance()->getRandomInt())), sslEchoClient(client), isFromRemote(false) {
+TextEditor::TextEditor(QWidget &parent, Ui::MainWindow &ui, SslEchoClient* client) : parent(parent), ui(ui), index({0}), editor(SharedEditor(Shuffler::getInstance()->getRandomInt())), sslEchoClient(client), isFromRemote(false), testSymbols({{}}) {
 
     // todo set better margins
     ui.textEdit->document()->setDocumentMargin(50);
@@ -41,10 +40,23 @@ TextEditor::TextEditor(QWidget &parent, Ui::MainWindow &ui, SslEchoClient* clien
      * remote connections
      */
 
-    qRegisterMetaType<Symbol>("Symbol");
-
     sslEchoClient->connectToEditor(this);
 
+
+    /**
+     * testing code
+     */
+
+    /*for (int i = 0; i < 2000; i++) {
+        for (int j = 0; j < 3; j++) {
+            Symbol s = editor.localInsert(i, j,'a');
+            testSymbols[i].push_back(s);
+        }
+        Symbol s = editor.localInsert(i, editor.getSymbols()[i].size(), '\n');
+        testSymbols[i].push_back(s);
+        testSymbols.emplace_back();
+    }
+    editor.clear();*/
 }
 
 void TextEditor::selectFont() {
@@ -228,20 +240,21 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
         int pos = row;
         int newRows = 0;
 
+        // todo change to QSymbol
         std::vector<Symbol> insertedSymbols;
 
         while (charsAdded > 0) {
             QChar addedChar = ui.textEdit->document()->characterAt(position++);
 
+            // todo fetch char format
+
             if (addedChar == QChar::LineFeed || addedChar == QChar::ParagraphSeparator) {
                 Symbol symbol = editor.localInsert(row, col, '\n');
                 insertedSymbols.push_back(symbol);
-//                emit sendSymbol(symbol, MSG_INSERT_SYM, editor.getSiteId());
                 newRows++;
             } else {
                 Symbol symbol = editor.localInsert(row, col, addedChar.toLatin1());
                 insertedSymbols.push_back(symbol);
-//                emit sendSymbol(symbol, MSG_INSERT_SYM, editor.getSiteId());
             }
 
 
@@ -378,6 +391,7 @@ int TextEditor::getRow(int position) {
  * @param symbol
  */
 void TextEditor::remoteInsert(Symbol symbol) {
+
     isFromRemote = true;
     std::pair<int, int> pos = editor.remoteInsert(symbol);
     if (pos.first != -1 || pos.second != -1) {
@@ -386,6 +400,7 @@ void TextEditor::remoteInsert(Symbol symbol) {
         QTextCursor cursor = ui.textEdit->textCursor();
         cursor.setPosition(position);
         ui.textEdit->setTextCursor(cursor);
+        // todo apply format
         ui.textEdit->textCursor().insertText(QChar::fromLatin1(symbol.getC()));
         ui.textEdit->setTextCursor(oldCursor);
 
@@ -395,6 +410,31 @@ void TextEditor::remoteInsert(Symbol symbol) {
         }
     }
 
+    /**
+     * testing code
+     */
+
+    /*for (std::vector<Symbol> row : testSymbols) {
+        for (Symbol sym : row) {
+            isFromRemote = true;
+            std::pair<int, int> pos = editor.remoteInsert(sym);
+            if (pos.first != -1 || pos.second != -1) {
+                int position = getPosition(pos.first, pos.second);
+                QTextCursor oldCursor = ui.textEdit->textCursor();
+                QTextCursor cursor = ui.textEdit->textCursor();
+                cursor.setPosition(position);
+                ui.textEdit->setTextCursor(cursor);
+                ui.textEdit->textCursor().insertText(QChar::fromLatin1(sym.getC()));
+                ui.textEdit->setTextCursor(oldCursor);
+
+                incrementIndex(pos.first, 1);
+                if (sym.getC() == '\n') {
+                    insertRow(pos.first, 1);
+                }
+            }
+        }
+
+    }*/
 }
 /**
  * erase symbol received from the server
