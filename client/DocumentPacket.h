@@ -9,6 +9,8 @@
 
 /** Document creation packet **/
 class DocumentCreatePacket : public Packet {
+    DocumentCreatePacket(QString docName, qint32 userId);
+
     friend PacketBuilder;
 private:
     qint32 userId;
@@ -22,12 +24,50 @@ protected:
 public:
     DocumentCreatePacket(qint32 userId, QString docName);
     ~DocumentCreatePacket() {};
-    qint32 getuserId() const;
+    int getuserId() const;
     QString getdocName() const;
+};
+
+/** Document ask list packet **/
+class DocumentAskListPacket : public Packet {
+    friend PacketBuilder;
+private:
+    qint32 userId;
+protected:
+DocumentAskListPacket();
+
+    void writePayload(QDataStream& stream) const override;
+    void readPayload(QDataStream& stream) override;
+
+public:
+    DocumentAskListPacket(qint32 userId);
+    ~DocumentAskListPacket() {};
+    int getuserId() const;
+};
+
+/** Document list packet **/
+class DocumentListPacket : public Packet {
+    friend PacketBuilder;
+private:
+    qint32 userId;
+    QVector<QString> docList;
+protected:
+    DocumentListPacket();
+
+    void writePayload(QDataStream& stream) const override;
+    void readPayload(QDataStream& stream) override;
+
+public:
+    DocumentListPacket(qint32 userId, QVector<QString> docList);
+    ~DocumentListPacket() {};
+    int getuserId() const;
+    QVector<QString> getdocList() const;
 };
 
 /** Document open packet **/
 class DocumentOpenPacket : public Packet {
+    DocumentOpenPacket(QString docName, qint32 userId);
+
     friend PacketBuilder;
 private:
     qint32 userId;
@@ -41,12 +81,14 @@ protected:
 public:
     DocumentOpenPacket(qint32 userId, QString docName);
     ~DocumentOpenPacket() {};
-    qint32 getuserId() const;
+    int getuserId() const;
     QString getdocName() const;
 };
 
 /** Document delete packet **/
 class DocumentDelPacket : public Packet {
+    DocumentDelPacket(QString docName, qint32 userId);
+
     friend PacketBuilder;
 private:
     qint32 userId;
@@ -60,17 +102,22 @@ protected:
 public:
     DocumentDelPacket(qint32 userId, QString docName);
     ~DocumentDelPacket() {};
-    qint32 getuserId() const;
+    int getuserId() const;
     QString getdocName() const;
 };
 
 /** Document Ok packet: the desirable response for a DocumentOpen packet **/
 //TODO: Add attribute for whatever will be used to exchange the whole document in bulk
 class DocumentOkPacket : public Packet {
+    DocumentOkPacket(int docId, QString docName, int siteId, std::vector<std::vector<Symbol>> symbols);
+
     friend PacketBuilder;
 private:
-    qint32 userId;
+    int docId;
     QString docName;
+
+    int siteId;
+    QVector<QVector<QSymbol>> qsymbols;
 protected:
     DocumentOkPacket();
 
@@ -78,14 +125,21 @@ protected:
     void readPayload(QDataStream& stream) override;
 
 public:
-    DocumentOkPacket(qint32 userId, QString docName);
+    DocumentOkPacket(int docId, QString docName, int siteId, QVector<QVector<QSymbol>> qsymbols);
     ~DocumentOkPacket() {};
-    qint32 getuserId() const;
+    int getsiteId() const;
+    int getdocId() const;
     QString getdocName() const;
+
+    QVector<QVector<QSymbol>> getqsymbols() const;
+
+    std::vector<std::vector<Symbol>> getsymbols() const;
 };
 
 /** DocumentAskSharableURIPacket: the  packet used to check permission and get the URI used to invite people**/
 class DocumentAskSharableURIPacket : public Packet {
+    DocumentAskSharableURIPacket(QString docName, qint32 userId, QString sharableURI);
+
     friend PacketBuilder;
 private:
     qint32 userId;
@@ -101,6 +155,10 @@ protected:
 public:
     DocumentAskSharableURIPacket(qint32 userId, QString docName, QString sharableURI);
     ~DocumentAskSharableURIPacket() {};
-    qint32 getuserId() const;
+    int getuserId() const;
     QString getdocName() const;
+
 };
+
+QVector<QVector<QSymbol>> toQVector(std::vector<std::vector<Symbol>> symbols);
+std::vector<std::vector<Symbol>> toVector(QVector<QVector<QSymbol>> qsymbols);
