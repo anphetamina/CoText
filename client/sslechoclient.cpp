@@ -208,6 +208,8 @@ void SslEchoClient::connectToEditor(TextEditor* te) {
 //kink to
     connect(this, &SslEchoClient::insertReceived, te, &TextEditor::remoteInsert);
     connect(this, &SslEchoClient::eraseReceived, te, &TextEditor::remoteErase);
+    connect(this, &SslEchoClient::insertBlockReceived, te, &TextEditor::remoteInsertBlock);
+    connect(this, &SslEchoClient::eraseBlockReceived, te, &TextEditor::remoteEraseBlock);
     connect(te, &TextEditor::symbolsInserted, this, &SslEchoClient::sendInsert);
     connect(te, &TextEditor::symbolsErased, this, &SslEchoClient::sendErase);
 
