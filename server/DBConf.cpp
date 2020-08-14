@@ -1,21 +1,23 @@
 
-#include "dbConf.h"
+#include "DBConf.h"
 #include "User.h"
 #include <QtCore>
 #include <QDebug>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 
+#include "DBAuthData.h"
+
 bool dbConfigure() {
 
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
-    db.setHostName("localhost");
-    db.setConnectOptions("UNIX_SOCKET=/Applications/MAMP/tmp/mysql/mysql.sock"); // Needed for MAMP
+    db.setHostName(DB_HOST);
+    db.setConnectOptions(DB_OPT); // Needed for MAMP
 
-    db.setUserName("root");
-    db.setPassword("lolloasd92!");
-    db.setDatabaseName("CoText");
-    //db.setPort(3306);//8889
+    db.setUserName(DB_USER);
+    db.setPassword(DB_PASSWORD);
+    db.setDatabaseName(DB_NAME);
+    //db.setPort(DB_PORT);//8889
 
     bool ok = db.open();
     //qDebug() << ok;
