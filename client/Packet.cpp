@@ -296,7 +296,7 @@ PacketHandler PacketBuilder::Container(quint8 type)
         case PACK_TYPE_ACC_OK:			    return new AccountOkPacket();
         case PACK_TYPE_ACC_UPDATE:			return new class AccountUpdatePacket();
         case PACK_TYPE_MSG:			        return new class Message();
-        //case PACK_TYPE_CURSOR_POS:			return new class CursorPacket();
+        case PACK_TYPE_CURSOR_POS:			return new class CursorPacket();
         //case PACK_TYPE_DOC_CREATE:			return new class DocumentCreatePacket();
         //case PACK_TYPE_DOC_OPEN:			    return new class DocumentOpenPacket();
         //case PACK_TYPE_DOC_DEL:			    return new class DocumentDelPacket();

@@ -297,7 +297,8 @@ PacketHandler PacketBuilder::Container(quint8 type)
         case PACK_TYPE_ACC_OK:			    return new AccountOkPacket();
         case PACK_TYPE_ACC_UPDATE:			return new class AccountUpdatePacket();
         case PACK_TYPE_MSG:			        return new class Message();
-        
+        case PACK_TYPE_CURSOR_POS:			return new class CursorPacket();
+
         default:
             throw std::exception();//TODO: create custom exception
             break;

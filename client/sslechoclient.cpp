@@ -210,7 +210,7 @@ void SslEchoClient::sendErase(std::vector<Symbol> symbols, int siteId) {
     }
 }
 
-void SslEchoClient::sendCursor(int userId, int position) {
+void SslEchoClient::sendCursor(qint32 userId, qint32 position) {
     CursorPacket cp = CursorPacket(userId, position);
     cp.send(*pServer);
 }

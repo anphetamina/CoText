@@ -284,7 +284,6 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             break;
         }
         */
-
         case(PACK_TYPE_CURSOR_POS): {
             CursorPacket *cp = dynamic_cast<CursorPacket*>(rcvd_packet.get());
             //qDebug() << msg->getData();
