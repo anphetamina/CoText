@@ -11,6 +11,7 @@
 #include <QtNetwork/QSslError>
 #include "Packet.h"
 #include "Client.h"
+#include "CursorPacket.h"
 
 QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
 QT_FORWARD_DECLARE_CLASS(QWebSocket)

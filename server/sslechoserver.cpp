@@ -285,8 +285,21 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
         }
         */
 
-
+        case(PACK_TYPE_CURSOR_POS): {
+            CursorPacket *cp = dynamic_cast<CursorPacket*>(rcvd_packet.get());
+            //qDebug() << msg->getData();
+            qDebug() << "[CP] New cursor position received." << endl << "Pos: " << cp->getnewPosition() << " User id: " <<  cp->getuserId();
+            // Broadcast to all the connected client of a document
+            for (QWebSocket* onlineClient : clientMapping.keys()) {
+                if(onlineClient != pClient) {
+                    cp->send(*(onlineClient));
+                    qDebug() << "from: " << pClient->peerPort() << "sent to " << onlineClient->peerPort() ;
+                }
+            }
+            break;
         }
+
+    }
         /* Debug send always ping for each packet received */
         /*
         for (QWebSocket* onlineClient : clientMapping.keys()) {
