@@ -155,6 +155,7 @@ public:
     static PacketHandler AccountOk(User user);
     static PacketHandler AccountUpdatePacket(QString username,QString password, QString name, QString surname, QIcon profilePic);
     static PacketHandler Message(int type, QSymbol qs, int siteId);
+    static PacketHandler CursorPacket(qint32 userId, qint32 newPosition);
 
 };
 /*

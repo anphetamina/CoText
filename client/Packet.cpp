@@ -16,6 +16,7 @@
 #include "LoginPacket.h"
 #include "AccountPacket.h"
 #include "Message.h"
+#include "CursorPacket.h"
 
 /** Packet **/
 Packet::Packet(uint16_t type) : header(0xAF), type(type), flags(0x00)
@@ -343,13 +344,13 @@ PacketHandler PacketBuilder::Message(int type, QSymbol qs, int siteId)
     return new class Message(type, qs, siteId);
 }
 
-/*
+
 PacketHandler PacketBuilder::CursorPacket(qint32 userId, qint32 newPosition)
 {
     return new class CursorPacket(userId, newPosition);
 }
 
- */
+
 
 /*
 PacketHandler DocumentCreatePacket::DocumentCreatePacket(QString docName, qint32 userId)

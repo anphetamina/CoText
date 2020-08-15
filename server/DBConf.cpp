@@ -1,4 +1,3 @@
-
 #include "DBConf.h"
 #include "User.h"
 #include <QtCore>

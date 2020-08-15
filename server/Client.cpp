@@ -5,7 +5,6 @@
 #include <QWebSocket>
 #include "Client.h"
 
-
 Client::Client(QWebSocket* s) :
         websocket(s), user(nullptr), loggedFlag(false), packetBuffer(PacketBuffer())
 {
