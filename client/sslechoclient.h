@@ -12,6 +12,7 @@
 #include <QtCore/QUrl>
 #include "Packet.h"
 #include "Message.h"
+#include "CursorPacket.h"
 #include "gui/TextEditor.h"
 
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
@@ -28,11 +29,13 @@ signals:
     void eraseReceived(Symbol symbol);
     void insertBlockReceived(std::vector<Symbol> symbols);
     void eraseBlockReceived(std::vector<Symbol> symbols);
+    void updateCursorReceived(int userId, int position);
 
 public slots:
 
     void sendInsert(std::vector<Symbol> symbols, int siteId);
     void sendErase(std::vector<Symbol> symbols, int siteId);
+    void sendCursor(int userId, int position);
 
 private Q_SLOTS:
     void onConnected();

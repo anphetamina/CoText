@@ -29,11 +29,14 @@ private:
      * to access to the toolbar icons
      */
     Ui::MainWindow &ui;
+
     SharedEditor editor;
     std::vector<int> index;
-
     std::vector<std::vector<Symbol>> testSymbols;
 
+    /**
+     * toolbar updates
+     */
     void fontChanged(const QFont &f);
     void colorChanged(const QColor &c);
 
@@ -51,11 +54,14 @@ private:
     /**
      * remote
      */
-
     std::atomic<bool> isFromRemote;
     int getPosition(int row, int col);
 
-    QPainter painter;
+    /**
+     * user id, (position, color) map that contains the current connected users
+     * in the document
+     */
+    std::map<int, std::pair<int, QColor>> cursors;
 
 
 public slots:
@@ -65,29 +71,26 @@ public slots:
     void remoteErase(Symbol symbol);
     void remoteEraseBlock(std::vector<Symbol> symbols);
 
+    void updateCursor(int userId, int position);
+
 private slots:
-
-    /**
-     * font style management
-     */
-
 
     void selectFont();
     void setFontBold(bool bold);
     void setFontColor();
     void updateToolbar(const QTextCharFormat &format);
 
-
-    /**
-     * document content management
-     */
-
     void contentsChange(int position, int charsRemoved, int charsAdded);
+    void cursorPositionChange();
+
+protected:
+    void paintEvent(QPaintEvent *e) override;
 
 signals:
 
     void symbolsInserted(std::vector<Symbol> symbols, int siteId);
     void symbolsErased(std::vector<Symbol> symbols, int siteId);
+    void cursorPositionChanged(int userId, int position);
 
 };
 

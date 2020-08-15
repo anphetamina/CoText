@@ -17,7 +17,7 @@ TextEditor::TextEditor(Ui::MainWindow &ui, QWidget *parent) :
     editor(SharedEditor(Shuffler::getInstance()->getRandomInt())),
     isFromRemote(false),
     testSymbols({{}}),
-    painter(viewport()) {
+    cursors({}) {
 
 
     document()->setDocumentMargin(50);
@@ -39,7 +39,7 @@ TextEditor::TextEditor(Ui::MainWindow &ui, QWidget *parent) :
 
     connect(document(), &QTextDocument::contentsChange, this, &TextEditor::contentsChange);
 
-//    painter.setPen(Qt::yellow);
+    connect(this, &QTextEdit::cursorPositionChanged, this, &TextEditor::cursorPositionChange);
 
 
     /**
@@ -472,4 +472,29 @@ void TextEditor::remoteInsertBlock(std::vector<Symbol> symbols) {
 
 void TextEditor::remoteEraseBlock(std::vector<Symbol> symbols) {
     // todo
+}
+
+void TextEditor::paintEvent(QPaintEvent *e) {
+    QTextEdit::paintEvent(e);
+    QPainter painter(viewport());
+    painter.setPen(Qt::yellow); // todo remove
+    QTextCursor old_qTextCursor = textCursor();
+    for (const std::pair<int, std::pair<int, QColor>> &cursor : cursors) {
+        QTextCursor qTextCursor = QTextCursor();
+        qTextCursor.setPosition(cursor.second.first);
+        setTextCursor(qTextCursor);
+        painter.drawRect(cursorRect());
+        document()->drawContents(&painter);
+    }
+//    setTextCursor(old_qTextCursor);
+}
+
+void TextEditor::cursorPositionChange() {
+    // todo change user id
+    emit cursorPositionChanged(0, textCursor().position());
+}
+
+void TextEditor::updateCursor(int userId, int position) {
+    cursors[userId].first = position;
+    // todo update color
 }
