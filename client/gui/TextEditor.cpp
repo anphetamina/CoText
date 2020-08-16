@@ -19,7 +19,8 @@ TextEditor::TextEditor(Ui::MainWindow &ui, QWidget *parent) :
     editor(SharedEditor(Shuffler::getInstance()->getRandomInt())),
     isFromRemote(false),
     testSymbols({{}}),
-    cursors({}) {
+    cursors({}),
+    currentSelectedChars(0) {
 
 
     document()->setDocumentMargin(50);
@@ -43,6 +44,7 @@ TextEditor::TextEditor(Ui::MainWindow &ui, QWidget *parent) :
     connect(document(), &QTextDocument::contentsChange, this, &TextEditor::contentsChange);
 
     connect(this, &QTextEdit::cursorPositionChanged, this, &TextEditor::cursorPositionChange);
+    connect(this, &QTextEdit::selectionChanged, this, &TextEditor::selectionChange);
 
 
     /**
@@ -113,12 +115,14 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
     }
 
     /**
-     * QTextEdit bug
-     * pasting >= 1 characters gives wrong number of added and removed chars
+     * workaround for https://github.com/anphetamina/CoText/issues/22
      */
-    if (charsAdded >= 1 && charsRemoved >= 1) {
-        charsAdded--;
-        charsRemoved--;
+    if (position == 0 && charsAdded >= 1 && charsRemoved >= 1) {
+        int oldSize = charsRemoved-1;
+        int newSize = charsAdded-1;
+        int diff = std::abs(newSize - oldSize);
+        charsRemoved = currentSelectedChars;
+        charsAdded = std::abs(charsRemoved - diff);
     }
 
     /**
@@ -486,5 +490,15 @@ void TextEditor::updateCursor(int userId, int position) {
     cursors[userId].first = position;
     if(!cursors[userId].second.isValid()) {
         cursors[userId].second = QColor::fromRgb(QRandomGenerator::global()->generate()); //Qt::yellow; // todo change with different colors
+    }
+}
+
+void TextEditor::selectionChange() {
+    int selectionEnd = textCursor().selectionEnd();
+    int selectionStart = textCursor().selectionStart();
+    if (selectionStart != selectionEnd) {
+        currentSelectedChars = selectionEnd - selectionStart;
+    } else {
+        currentSelectedChars = 0;
     }
 }

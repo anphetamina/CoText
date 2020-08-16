@@ -34,6 +34,7 @@ private:
     SharedEditor editor;
     std::vector<int> index;
     std::vector<std::vector<Symbol>> testSymbols;
+    int currentSelectedChars;
 
     /**
      * toolbar updates
@@ -83,6 +84,7 @@ private slots:
 
     void contentsChange(int position, int charsRemoved, int charsAdded);
     void cursorPositionChange();
+    void selectionChange();
 
 protected:
     void paintEvent(QPaintEvent *e) override;
