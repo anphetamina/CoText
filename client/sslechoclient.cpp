@@ -134,9 +134,10 @@ void SslEchoClient::packetParse(QByteArray rcvd_packet) {
                 qDebug() << "[INFO] Parsed new packet. Type: " << mType;
                 QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
                 dispatch(packetH, pClient);
-            } else
+            } else {
                 qDebug() << "---";
                 qDebug() << "[ERROR] Unknown packet type!\nUknType: " << mType;
+            }
         }
         catch (std::exception me)//(MyException& me)
         {
