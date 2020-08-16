@@ -6,6 +6,7 @@
 #include <QtWidgets/QColorDialog>
 #include <QtWidgets/QFontDialog>
 #include <QThread>
+#include <QRandomGenerator>
 #include "../Shuffler.h"
 #include "TextEditor.h"
 #include "../QSymbol.h"
@@ -483,5 +484,7 @@ void TextEditor::cursorPositionChange() {
 
 void TextEditor::updateCursor(int userId, int position) {
     cursors[userId].first = position;
-    cursors[userId].second = Qt::yellow; // todo change with different colors
+    if(!cursors[userId].second.isValid()) {
+        cursors[userId].second = QColor::fromRgb(QRandomGenerator::global()->generate()); //Qt::yellow; // todo change with different colors
+    }
 }
