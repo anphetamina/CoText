@@ -468,12 +468,6 @@ void TextEditor::paintEvent(QPaintEvent *e) {
             painter.drawRect(cursorRect(cursor));
             document()->drawContents(&painter);
         }
-        else if (position == count) {
-            cursor.setPosition(position-1);
-            painter.setPen(c.second.second);
-            painter.drawRect(cursorRect(cursor));
-            document()->drawContents(&painter);
-        }
     }
 }
 
