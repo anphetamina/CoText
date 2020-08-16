@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <QTextCharFormat>
 #include "Identifier.h"
 
 
@@ -11,8 +12,19 @@ class QSymbol;
 
 class Symbol {
 private:
+    /**
+     * char inserted in the document
+     */
     char c;
+
+    /**
+     * combination of id counter and site id
+     */
     std::string id;
+
+    /**
+     * fractional position
+     */
     std::vector<Identifier> position;
 public:
     Symbol();
@@ -33,10 +45,10 @@ public:
     bool operator==(const Symbol &symbol) const;
     bool operator<(const Symbol &symbol) const;
 
-    QSymbol toSerializable();
+    QSymbol toSerializable(QTextCharFormat cf);
+
 
     int getSiteId() const;
-
 };
 
 
