@@ -45,11 +45,16 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
 
 
+
     //this->setCentralWidget(ui->textEdit);
     QPixmap icon(":/appIcon/CoText.ico");
     //ui->iconLabel->setPixmap(icon);
    // ui->statusbar->addPermanentWidget();
 
+    ui->actionCut->setShortcut(QKeySequence::Cut);
+    ui->actionCopy->setShortcut(QKeySequence::Copy);
+    ui->actionPaste->setShortcut(QKeySequence::Paste);
+    //ui->actionRemove->setShortcut(QKeySequence::Delete);
 
 
 
