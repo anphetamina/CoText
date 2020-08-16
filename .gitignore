@@ -107,5 +107,4 @@ fabric.properties
 
 server/.idea/server.iml
 # Authentication data and configuration
-server/DBAuthData.h
-server/DBAuthData.h
+#server/DBAuthData.h
