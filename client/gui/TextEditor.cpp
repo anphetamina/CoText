@@ -21,6 +21,7 @@ TextEditor::TextEditor(Ui::MainWindow &ui, QWidget *parent) :
 
 
     document()->setDocumentMargin(50);
+    setTextColor(Qt::white);
     qDebug() << "Current sID: "<< editor.getSiteId();
 
     /**
@@ -390,45 +391,19 @@ void TextEditor::remoteInsert(Symbol symbol) {
     std::pair<int, int> pos = editor.remoteInsert(symbol);
     if (pos.first != -1 || pos.second != -1) {
         int position = getPosition(pos.first, pos.second);
-        QTextCursor oldCursor = textCursor();
-        QTextCursor cursor = textCursor();
+        int oldPosition = textCursor().position();
+        QTextCursor cursor(textCursor());
         cursor.setPosition(position);
-        setTextCursor(cursor);
         // todo apply format
-        textCursor().insertText(QChar::fromLatin1(symbol.getC()));
-        setTextCursor(oldCursor);
+        cursor.insertText(QChar::fromLatin1(symbol.getC()));
+        cursor.setPosition(oldPosition);
+        setTextCursor(cursor);
 
         incrementIndex(pos.first, 1);
         if (symbol.getC() == '\n') {
             insertRow(pos.first, 1);
         }
     }
-
-    /**
-     * testing code
-     */
-
-    /*for (std::vector<Symbol> row : testSymbols) {
-        for (Symbol sym : row) {
-            isFromRemote = true;
-            std::pair<int, int> pos = editor.remoteInsert(sym);
-            if (pos.first != -1 || pos.second != -1) {
-                int position = getPosition(pos.first, pos.second);
-                QTextCursor oldCursor = textCursor();
-                QTextCursor cursor = textCursor();
-                cursor.setPosition(position);
-                setTextCursor(cursor);
-                textCursor().insertText(QChar::fromLatin1(sym.getC()));
-                setTextCursor(oldCursor);
-
-                incrementIndex(pos.first, 1);
-                if (sym.getC() == '\n') {
-                    insertRow(pos.first, 1);
-                }
-            }
-        }
-
-    }*/
 }
 /**
  * erase symbol received from the server
@@ -477,24 +452,21 @@ void TextEditor::remoteEraseBlock(std::vector<Symbol> symbols) {
 void TextEditor::paintEvent(QPaintEvent *e) {
     QTextEdit::paintEvent(e);
     QPainter painter(viewport());
-    painter.setPen(Qt::yellow); // todo remove
-    QTextCursor old_qTextCursor = textCursor();
-    for (const std::pair<int, std::pair<int, QColor>> &cursor : cursors) {
-        QTextCursor qTextCursor = QTextCursor();
-        qTextCursor.setPosition(cursor.second.first);
-        setTextCursor(qTextCursor);
-        painter.drawRect(cursorRect());
+    QTextCursor cursor(document());
+    for (const std::pair<int, std::pair<int, QColor>> &c : cursors) {
+        cursor.setPosition(c.second.first);
+        painter.setPen(c.second.second);
+        painter.drawRect(cursorRect(cursor));
         document()->drawContents(&painter);
     }
-//    setTextCursor(old_qTextCursor);
 }
 
 void TextEditor::cursorPositionChange() {
-    // todo change user id
-    emit cursorPositionChanged(0, textCursor().position());
+    // todo change with user id
+    emit cursorPositionChanged(editor.getSiteId(), textCursor().position());
 }
 
 void TextEditor::updateCursor(int userId, int position) {
     cursors[userId].first = position;
-    // todo update color
+    cursors[userId].second = Qt::yellow; // todo change with different colors
 }

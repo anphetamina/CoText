@@ -54,6 +54,7 @@ void Packet::send(QWebSocket& m_webSocket) {
     // We set and write the size after the serialization because we dont know the qByteArray length in a previous moment
     this->setSize(qbuf.size());
     this->writeSize(stream);
+    qDebug() << "---";
     qDebug() << "Buf size:" << qbuf.size();
     qDebug() << "A packet was just sent";
     m_webSocket.sendBinaryMessage(qbuf);

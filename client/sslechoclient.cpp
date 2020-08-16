@@ -130,10 +130,12 @@ void SslEchoClient::packetParse(QByteArray rcvd_packet) {
 
             // If the type is correct TODO: add HeadID check
             if (mType == PACK_TYPE_PING || mType <= PACK_TYPE_LAST_CODE) {
+                qDebug() << "---";
                 qDebug() << "[INFO] Parsed new packet. Type: " << mType;
                 QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
                 dispatch(packetH, pClient);
             } else
+                qDebug() << "---";
                 qDebug() << "[ERROR] Unknown packet type!\nUknType: " << mType;
         }
         catch (std::exception me)//(MyException& me)
