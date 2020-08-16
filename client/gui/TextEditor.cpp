@@ -396,6 +396,11 @@ void TextEditor::remoteInsert(Symbol symbol) {
         cursor.setPosition(position);
         // todo apply format
         cursor.insertText(QChar::fromLatin1(symbol.getC()));
+        /**
+         * this step is necessary due to the cursor changing position
+         * when an operation is done when the text cursor is in the same position
+         * as of the remote cursor
+         */
         cursor.setPosition(oldPosition);
         setTextCursor(cursor);
 
@@ -414,12 +419,9 @@ void TextEditor::remoteErase(Symbol symbol) {
     std::pair<int, int> pos = editor.remoteErase(symbol);
     if (pos.first != -1 || pos.second != -1) {
         int position = getPosition(pos.first, pos.second);
-        QTextCursor oldCursor = textCursor();
-        QTextCursor cursor = textCursor();
+        QTextCursor cursor(textCursor());
         cursor.setPosition(position);
-        setTextCursor(cursor);
-        textCursor().deleteChar();
-        setTextCursor(oldCursor);
+        cursor.deleteChar();
 
         decrementIndex(pos.first, 1);
         if (symbol.getC() == '\n') {
@@ -454,10 +456,14 @@ void TextEditor::paintEvent(QPaintEvent *e) {
     QPainter painter(viewport());
     QTextCursor cursor(document());
     for (const std::pair<int, std::pair<int, QColor>> &c : cursors) {
-        cursor.setPosition(c.second.first);
-        painter.setPen(c.second.second);
-        painter.drawRect(cursorRect(cursor));
-        document()->drawContents(&painter);
+        int position = c.second.first;
+        int count = document()->characterCount();
+        if (position < count) {
+            cursor.setPosition(position);
+            painter.setPen(c.second.second);
+            painter.drawRect(cursorRect(cursor));
+            document()->drawContents(&painter);
+        }
     }
 }
 
