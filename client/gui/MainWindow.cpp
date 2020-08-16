@@ -1,7 +1,6 @@
 #include "MainWindow.h"
 #include "ui_mainwindow.h"
 #include "Login.h"
-#include "DBConf.h"
 
 
 
