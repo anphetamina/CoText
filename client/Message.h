@@ -18,11 +18,15 @@ public:
     int getType() const;
 
     Symbol getS() const;
+    QSymbol getQS() const;
+
     int getSiteId() const;
 
     int getCounter() const;
+
 protected:
     Message();
     void writePayload(QDataStream& stream) const override;
     void readPayload(QDataStream& stream) override;
+
 };

@@ -388,9 +388,10 @@ int TextEditor::getRow(int position) {
  * insert symbol received from the server
  * @param symbol
  */
-void TextEditor::remoteInsert(Symbol symbol) {
+void TextEditor::remoteInsert(QSymbol qsymbol) {
 
     isFromRemote = true;
+    Symbol symbol = qsymbol.toOriginal();
     std::pair<int, int> pos = editor.remoteInsert(symbol);
     if (pos.first != -1 || pos.second != -1) {
         int position = getPosition(pos.first, pos.second);
@@ -398,7 +399,8 @@ void TextEditor::remoteInsert(Symbol symbol) {
         QTextCursor cursor(textCursor());
         cursor.setPosition(position);
         // todo apply format
-        cursor.insertText(QChar::fromLatin1(symbol.getC()));
+
+        cursor.insertText(QChar::fromLatin1(symbol.getC()), qsymbol.getcf());
         /**
          * this step is necessary due to the cursor changing position
          * when an operation is done when the text cursor is in the same position

@@ -25,7 +25,7 @@ public:
 
 signals:
 
-    void insertReceived(Symbol symbol);
+    void insertReceived(QSymbol qsymbol);
     void eraseReceived(Symbol symbol);
     void insertBlockReceived(std::vector<Symbol> symbols);
     void eraseBlockReceived(std::vector<Symbol> symbols);

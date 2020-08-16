@@ -11,6 +11,7 @@
 #include <QtWidgets/QTextEdit>
 #include <QtGui/QPainter>
 #include "../SharedEditor.h"
+#include "../QSymbol.h"
 
 namespace Ui { class MainWindow; }
 
@@ -66,7 +67,7 @@ private:
 
 public slots:
 
-    void remoteInsert(Symbol symbol);
+    void remoteInsert(QSymbol qsymbol);
     void remoteInsertBlock(std::vector<Symbol> symbols);
     void remoteErase(Symbol symbol);
     void remoteEraseBlock(std::vector<Symbol> symbols);

@@ -14,6 +14,9 @@ int Message::getType() const {
 Symbol Message::getS() const {
     return qs.toOriginal();
 }
+QSymbol Message::getQS() const {
+    return qs;
+}
 
 int Message::getSiteId() const {
     return siteId;

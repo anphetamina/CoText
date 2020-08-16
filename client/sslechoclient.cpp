@@ -178,7 +178,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             Message *msg = dynamic_cast<Message *>(rcvd_packet.get());
             switch (msg->getType()) {
                 case(MSG_INSERT_SYM): {
-                    emit insertReceived(msg->getS());
+                    emit insertReceived(msg->getQS());
                     break;
                 }
 
