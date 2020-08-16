@@ -33,8 +33,8 @@ signals:
 
 public slots:
 
-    void sendInsert(std::vector<Symbol> symbols, int siteId, QTextCharFormat cf);
-    void sendErase(std::vector<Symbol> symbols, int siteId, QTextCharFormat cf);
+    void sendInsert(std::vector<QSymbol> symbols, int siteId);
+    void sendErase(std::vector<QSymbol> symbols, int siteId);
     void sendCursor(int userId, int position);
 
 private Q_SLOTS:

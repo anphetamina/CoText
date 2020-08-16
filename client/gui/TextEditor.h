@@ -88,8 +88,8 @@ protected:
 
 signals:
 
-    void symbolsInserted(std::vector<Symbol> symbols, int siteId, std::vector<QTextCharFormat> vcf);
-    void symbolsErased(std::vector<Symbol> symbols, int siteId, std::vector<QTextCharFormat> vcf);
+    void symbolsInserted(std::vector<QSymbol> symbols, int siteId);
+    void symbolsErased(std::vector<QSymbol> symbols, int siteId);
     void cursorPositionChanged(int userId, int position);
 
 };

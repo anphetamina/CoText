@@ -50,3 +50,7 @@ QDataStream & operator >> (QDataStream & s, QSymbol& qs) {
     s >> qs.c >> qs.id >> qs.position >> qs.cf ;
     return s;
 }
+
+void QSymbol::setCf(const QTextCharFormat &cf) {
+    QSymbol::cf = cf;
+}

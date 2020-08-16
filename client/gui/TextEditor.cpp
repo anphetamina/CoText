@@ -8,6 +8,7 @@
 #include <QThread>
 #include "../Shuffler.h"
 #include "TextEditor.h"
+#include "../QSymbol.h"
 
 
 TextEditor::TextEditor(Ui::MainWindow &ui, QWidget *parent) :
@@ -219,7 +220,12 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
         decrementIndex(startRow, charsRemoved);
         deleteRow(startRow, oldSize - newSize);
 
-        emit symbolsErased(erasedSymbols, editor.getSiteId());
+        std::vector<QSymbol> erasedQSymbols = {};
+        for (Symbol symbol : erasedSymbols) {
+            erasedQSymbols.push_back(symbol.toSerializable(currentCharFormat()));
+        }
+
+        emit symbolsErased(erasedQSymbols, editor.getSiteId());
     }
 
     if (charsAdded > 0) {
@@ -235,21 +241,18 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
         int pos = row;
         int newRows = 0;
 
-        // todo change to QSymbol
-        std::vector<Symbol> insertedSymbols;
+        std::vector<QSymbol> insertedSymbols;
 
         while (charsAdded > 0) {
             QChar addedChar = document()->characterAt(position++);
 
-            // todo fetch char format
-
             if (addedChar == QChar::LineFeed || addedChar == QChar::ParagraphSeparator) {
                 Symbol symbol = editor.localInsert(row, col, '\n');
-                insertedSymbols.push_back(symbol);
+                insertedSymbols.push_back(symbol.toSerializable(currentCharFormat()));
                 newRows++;
             } else {
                 Symbol symbol = editor.localInsert(row, col, addedChar.toLatin1());
-                insertedSymbols.push_back(symbol);
+                insertedSymbols.push_back(symbol.toSerializable(currentCharFormat()));
             }
 
 

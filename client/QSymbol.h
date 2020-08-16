@@ -45,6 +45,8 @@ public:
     const QVector<Identifier> &getPosition() const;
     QTextCharFormat &getcf() ;
 
+    void setCf(const QTextCharFormat &cf);
+
     Symbol toOriginal() const;
 
 
