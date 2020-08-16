@@ -17,6 +17,7 @@ void Symbol::setC(char c) {
 const std::string &Symbol::getId() const {
     return id;
 }
+
 int Symbol::getSiteId() const {
     std::string delimiter = "-";
     std::string siteId = id.substr(0, id.find(delimiter)); // id is composed by siteId-counter
@@ -57,12 +58,12 @@ bool Symbol::operator<(const Symbol &symbol) const {
     return this->position.size() < symbol.getPosition().size();
 }
 
-QSymbol Symbol::toSerializable() {
+QSymbol Symbol::toSerializable(QTextCharFormat cf) {
     QVector<Identifier> position = {};
     for (auto identifier : this->position) {
         position.push_back(identifier);//.toSerializable()
     }
-    return QSymbol(QChar(c), QString::fromStdString(id), position);
+    return QSymbol(QChar(c), QString::fromStdString(id), position, cf);
 }
 
 /*

@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <QTextCharFormat>
 #include "Identifier.h"
 
 
@@ -44,7 +45,7 @@ public:
     bool operator==(const Symbol &symbol) const;
     bool operator<(const Symbol &symbol) const;
 
-    QSymbol toSerializable();
+    QSymbol toSerializable(QTextCharFormat cf);
 
 
     int getSiteId() const;

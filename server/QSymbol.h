@@ -9,6 +9,7 @@
 #include <QtCore/QChar>
 #include <QtCore/QString>
 #include <QtCore/QVector>
+#include <QTextCharFormat>
 #include "Symbol.h"
 
 class QSymbol {
@@ -19,11 +20,13 @@ class QSymbol {
     QChar c;
     QString id;
     QVector<Identifier> position;
-
+    QTextCharFormat cf;
 public:
     QSymbol();
-    QSymbol(const QChar &c, const QString &id, const QVector<Identifier> &position);
-    QSymbol( QChar &c,  QString &id,  QVector<Identifier> &position);
+    QSymbol(const QChar &c, const QString &id, const QVector<Identifier> &position, QTextCharFormat cf);
+    QSymbol( QChar &c,  QString &id,  QVector<Identifier> &position, QTextCharFormat cf);
+
+    //QSymbol(const QChar &c, const QString &id, const QVector<Identifier> &position);
 
     void setC(const QChar &c);
 
@@ -31,13 +34,18 @@ public:
 
     void setPosition(QVector<Identifier> &position);
 
+    void setPosition(const QVector<Identifier> &position);
+
     QChar &getC();
 
     QString &getId() ;
 
     QVector<Identifier> &getPosition() ;
 
-    Symbol toOriginal();
+    const QVector<Identifier> &getPosition() const;
+    QTextCharFormat &getcf() ;
+
+    Symbol toOriginal() const;
 
 
 };

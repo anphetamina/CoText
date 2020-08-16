@@ -86,7 +86,8 @@ void SslEchoClient::sendTest() {
     QVector<Identifier> sym_position;
     QString test("test_qstring");
     QChar qc = test.at(0);//t
-    QSymbol qs = QSymbol(qc, test, sym_position);
+    QTextCharFormat cf = QTextCharFormat();
+    QSymbol qs = QSymbol(qc, test, sym_position, cf);
     Message msg = Message(MSG_INSERT_SYM, qs, 3);
     //msg.send(m_webSocket);
     qDebug() << "[NETWORK] ** Network Test Packet were all sent ** ";
@@ -197,17 +198,17 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
     }
 }
 
-void SslEchoClient::sendInsert(std::vector<Symbol> symbols, int siteId) {
+void SslEchoClient::sendInsert(std::vector<Symbol> symbols, int siteId, QTextCharFormat cf) {
     for (Symbol symbol : symbols) {
-        Message msg = Message(MSG_INSERT_SYM, symbol.toSerializable(), siteId);
+        Message msg = Message(MSG_INSERT_SYM, symbol.toSerializable(cf), siteId);
         msg.send(*pServer);
 //        qDebug() << "sent" << ((symbol.getC() == '\n') ? "LF" : QString(symbol.getC())) << "(" << type << ")";
     }
 }
 
-void SslEchoClient::sendErase(std::vector<Symbol> symbols, int siteId) {
+void SslEchoClient::sendErase(std::vector<Symbol> symbols, int siteId, QTextCharFormat cf) {
     for (Symbol symbol : symbols) {
-        Message msg = Message(MSG_ERASE_SYM, symbol.toSerializable(), siteId);
+        Message msg = Message(MSG_ERASE_SYM, symbol.toSerializable(cf), siteId);
         msg.send(*pServer);
 //        qDebug() << "sent" << ((symbol.getC() == '\n') ? "LF" : QString(symbol.getC())) << "(" << type << ")";
     }

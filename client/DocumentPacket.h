@@ -109,7 +109,7 @@ public:
 /** Document Ok packet: the desirable response for a DocumentOpen packet **/
 //TODO: Add attribute for whatever will be used to exchange the whole document in bulk
 class DocumentOkPacket : public Packet {
-    DocumentOkPacket(int docId, QString docName, int siteId, std::vector<std::vector<Symbol>> symbols);
+    DocumentOkPacket(int docId, QString docName, int siteId, std::vector<std::vector<Symbol>> symbols, std::vector<QTextCharFormat> vcf);
 
     friend PacketBuilder;
 private:

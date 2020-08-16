@@ -5,10 +5,10 @@
 #include "QSymbol.h"
 
 QSymbol::QSymbol(){}
-QSymbol::QSymbol(const QChar &c, const QString &id, const QVector<Identifier> &position) : c(c), id(id),
-                                                                                            position(position) {}
-QSymbol::QSymbol( QChar &c,  QString &id,  QVector<Identifier> &position) : c(c), id(id),
-                                                                                            position(position) {}
+QSymbol::QSymbol(const QChar &c, const QString &id, const QVector<Identifier> &position, QTextCharFormat cf) : c(c), id(id),
+                                                                                            position(position), cf(cf) {}
+QSymbol::QSymbol( QChar &c,  QString &id,  QVector<Identifier> &position, QTextCharFormat cf) : c(c), id(id),
+                                                                                            position(position), cf(cf) {}
 
 
  QChar &QSymbol::getC()  {
@@ -22,7 +22,9 @@ QSymbol::QSymbol( QChar &c,  QString &id,  QVector<Identifier> &position) : c(c)
  QVector<Identifier> &QSymbol::getPosition()  {
     return position;
 }
-
+QTextCharFormat &QSymbol::getcf() {
+    return cf;
+}
 void QSymbol::setC(const QChar &c) {
     QSymbol::c = c;
 }
@@ -40,11 +42,11 @@ Symbol QSymbol::toOriginal() const {
 }
 
 QDataStream & operator << (QDataStream & s, const QSymbol &qs) {
-    s << qs.c << qs.id << qs.position ;
+    s << qs.c << qs.id << qs.position << qs.cf;
     return s;
 }
 
 QDataStream & operator >> (QDataStream & s, QSymbol& qs) {
-    s >> qs.c >> qs.id >> qs.position ;
+    s >> qs.c >> qs.id >> qs.position >> qs.cf ;
     return s;
 }
