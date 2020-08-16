@@ -458,9 +458,13 @@ void TextEditor::paintEvent(QPaintEvent *e) {
     for (const std::pair<int, std::pair<int, QColor>> &c : cursors) {
         int position = c.second.first;
         int count = document()->characterCount();
+        painter.setPen(c.second.second);
         if (position < count) {
             cursor.setPosition(position);
-            painter.setPen(c.second.second);
+            painter.drawRect(cursorRect(cursor));
+            document()->drawContents(&painter);
+        } else if (position == count) {
+            cursor.setPosition(position - 1);
             painter.drawRect(cursorRect(cursor));
             document()->drawContents(&painter);
         }
