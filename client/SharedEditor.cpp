@@ -448,7 +448,7 @@ std::pair<int, int> SharedEditor::remoteInsert(const Symbol &symbol) {
                 qDebug() << "remoteInsert symbol '"+ QString::fromStdString(std::string(1, symbol.getC())) +"' ("+QString::fromStdString(symbol.getId())+") already exists";
             }
         } else {
-            if (index_it->getC() == '\n') {
+            if (index_it->getC() == '\n' && index_it->getPosition() < symbol.getPosition()) {
                 line++;
                 index = 0;
             }
