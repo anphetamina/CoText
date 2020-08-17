@@ -196,6 +196,7 @@
    <addaction name="actionBold"/>
    <addaction name="actionItalic"/>
    <addaction name="actionUnderline"/>
+   <addaction name="actionToggle_user_colors"/>
   </widget>
   <action name="actionNew">
    <property name="checkable">
@@ -495,6 +496,18 @@
    </property>
    <property name="text">
     <string/>
+   </property>
+  </action>
+  <action name="actionToggle_user_colors">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/imgs/icons/noun_color_3170276.svg</normaloff>:/imgs/icons/noun_color_3170276.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Toggle user colors</string>
    </property>
   </action>
  </widget>

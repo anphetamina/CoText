@@ -21,9 +21,13 @@ TextEditor::TextEditor(Ui::MainWindow &ui, QWidget *parent) :
     testSymbols({{}}),
     cursors({}),
     currentSelectedChars(0),
-    selections({}) {
+    selections({}),
+    userColors({}),
+    highlighter(userColors, document()),
+    isUserColorsToggled(false) {
 
 
+    userColors[editor.getSiteId()] = QColor::fromRgb(QRandomGenerator::global()->generate());
     document()->setDocumentMargin(50);
     setTextColor(Qt::white);
     qDebug() << "Current sID: "<< editor.getSiteId();
@@ -46,6 +50,8 @@ TextEditor::TextEditor(Ui::MainWindow &ui, QWidget *parent) :
 
     connect(this, &QTextEdit::cursorPositionChanged, this, &TextEditor::cursorPositionChange);
     connect(this, &QTextEdit::selectionChanged, this, &TextEditor::selectionChange);
+
+    connect(ui.actionToggle_user_colors, &QAction::triggered, this, &TextEditor::toggleUserColors);
 
 
     /**
@@ -227,8 +233,10 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
         deleteRow(startRow, oldSize - newSize);
 
         std::vector<QSymbol> erasedQSymbols = {};
+        int p = position;
         for (Symbol symbol : erasedSymbols) {
             erasedQSymbols.push_back(symbol.toSerializable(currentCharFormat()));
+            highlighter.removePosition(p++);
         }
 
         emit symbolsErased(erasedQSymbols, editor.getSiteId());
@@ -248,6 +256,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
         int newRows = 0;
 
         std::vector<QSymbol> insertedSymbols;
+        int p = position;
 
         while (charsAdded > 0) {
             QChar addedChar = document()->characterAt(position++);
@@ -272,6 +281,8 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
             col++;
             charsAdded--;
+
+            highlighter.updatePosition(p++, editor.getSiteId()); // todo change with user id
         }
 
         incrementIndex(pos, n);
@@ -394,10 +405,10 @@ int TextEditor::getRow(int position) {
  * insert symbol received from the server
  * @param symbol
  */
-void TextEditor::remoteInsert(QSymbol qsymbol) {
+void TextEditor::remoteInsert(QSymbol qSymbol) {
 
     isFromRemote = true;
-    Symbol symbol = qsymbol.toOriginal();
+    Symbol symbol = qSymbol.toOriginal();
     std::pair<int, int> pos = editor.remoteInsert(symbol);
     if (pos.first != -1 || pos.second != -1) {
         int position = getPosition(pos.first, pos.second);
@@ -405,7 +416,7 @@ void TextEditor::remoteInsert(QSymbol qsymbol) {
         QTextCursor cursor(textCursor());
         cursor.setPosition(position);
 
-        cursor.insertText(QChar::fromLatin1(symbol.getC()), qsymbol.getcf());
+        cursor.insertText(QChar::fromLatin1(symbol.getC()), qSymbol.getcf());
         /**
          * this step is necessary due to the cursor changing position
          * when an operation is done when the text cursor is in the same position
@@ -420,6 +431,8 @@ void TextEditor::remoteInsert(QSymbol qsymbol) {
         if (symbol.getC() == '\n') {
             insertRow(pos.first, 1);
         }
+
+        highlighter.updatePosition(position, symbol.getSiteId()); // todo change with user id
     }
 }
 /**
@@ -441,6 +454,8 @@ void TextEditor::remoteErase(Symbol symbol) {
         if (symbol.getC() == '\n') {
             deleteRow(pos.first, 1);
         }
+
+        highlighter.removePosition(position);
     }
 
 }
@@ -469,10 +484,10 @@ void TextEditor::paintEvent(QPaintEvent *e) {
     QTextEdit::paintEvent(e);
     QPainter painter(viewport());
     QTextCursor cursor(document());
-    for (const std::pair<int, std::pair<int, QColor>> &c : cursors) {
-        int position = c.second.first;
+    for (const std::pair<int, int> &c : cursors) {
+        int position = c.second;
         int count = document()->characterCount();
-        painter.setPen(c.second.second);
+        painter.setPen(userColors[c.first]);
         if (position < count) {
             cursor.setPosition(position);
             painter.drawRect(cursorRect(cursor));
@@ -491,9 +506,9 @@ void TextEditor::cursorPositionChange() {
 }
 
 void TextEditor::updateCursor(int userId, int position) {
-    cursors[userId].first = position;
-    if(!cursors[userId].second.isValid()) {
-        cursors[userId].second = QColor::fromRgb(QRandomGenerator::global()->generate()); //Qt::yellow; // todo change with different colors
+    cursors[userId] = position;
+    if(!userColors[userId].isValid()) {
+        userColors[userId] = QColor::fromRgb(QRandomGenerator::global()->generate()); //Qt::yellow; // todo change with different colors
     }
 }
 
@@ -524,4 +539,17 @@ void TextEditor::updateSelection(int userId, QTextCursor cursor) {
         extraSelections.push_back(selection.second);
     }
     setExtraSelections(extraSelections);
+}
+
+void TextEditor::toggleUserColors() {
+    if (isUserColorsToggled) {
+        highlighter.disable();
+    } else {
+        highlighter.enable();
+    }
+    isUserColorsToggled = !isUserColorsToggled;
+}
+
+const std::map<int, QColor> &TextEditor::getUserColors() {
+    return userColors;
 }
