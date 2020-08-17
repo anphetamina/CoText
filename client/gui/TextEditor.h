@@ -12,6 +12,7 @@
 #include <QtGui/QPainter>
 #include "../SharedEditor.h"
 #include "../QSymbol.h"
+#include "UserHighlighter.h"
 
 namespace Ui { class MainWindow; }
 
@@ -21,6 +22,8 @@ class TextEditor : public QTextEdit {
 
 public:
     explicit TextEditor(Ui::MainWindow &ui, QWidget *parent = nullptr);
+
+    const std::map<int, QColor>& getUserColors();
 
 private:
 
@@ -35,6 +38,7 @@ private:
     std::vector<int> index;
     std::vector<std::vector<Symbol>> testSymbols;
     int currentSelectedChars;
+    UserHighlighter highlighter;
 
     /**
      * toolbar updates
@@ -59,13 +63,11 @@ private:
     std::atomic<bool> isFromRemote;
     int getPosition(int row, int col);
 
-    /**
-     * user id, (position, color) map that contains the current connected users
-     * in the document
-     */
-    std::map<int, std::pair<int, QColor>> cursors;
-
+    std::map<int, int> cursors;
     std::map<int, QTextEdit::ExtraSelection> selections;
+    std::map<int, QColor> userColors;
+
+    std::atomic<bool> isUserColorsToggled;
 
 
 public slots:
@@ -88,6 +90,8 @@ private slots:
     void contentsChange(int position, int charsRemoved, int charsAdded);
     void cursorPositionChange();
     void selectionChange();
+
+    void toggleUserColors();
 
 protected:
     void paintEvent(QPaintEvent *e) override;
