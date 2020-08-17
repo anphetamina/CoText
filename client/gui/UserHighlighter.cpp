@@ -13,15 +13,19 @@ UserHighlighter::UserHighlighter(const TextEditor &editor, QTextDocument *parent
 
 void UserHighlighter::highlightBlock(const QString &text) {
 
-    for (int i = currentBlock().position(), j = 0; i < currentBlock().position() + text.length(); i++, j++) {
-        QTextCharFormat format;
-        format.setFontWeight(QFont::Bold);
-        const int &row = editor.getRow(i);
-        const int &col = editor.getCol(row, i);
-        const int &userId = editor.getUserId(row, col);
-        const QColor &color = editor.getUserColor(userId);
-        format.setForeground(color);
-        setFormat(j, 1, format);
+    try {
+        for (int i = currentBlock().position(), j = 0; i < currentBlock().position() + text.length(); i++, j++) {
+            QTextCharFormat format;
+            format.setFontWeight(QFont::Bold);
+            const int &row = editor.getRow(i);
+            const int &col = editor.getCol(row, i);
+            const int &userId = editor.getUserId(row, col);
+            const QColor &color = editor.getUserColor(userId);
+            format.setForeground(color);
+            setFormat(j, 1, format);
+        }
+    } catch (const std::exception &e) {
+        qDebug() << e.what();
     }
 }
 
