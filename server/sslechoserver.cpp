@@ -69,13 +69,15 @@ void SslEchoServer::onNewConnection()
 
     // Create a new client object
     QSharedPointer<Client> client(new Client(pSocket));
+
+    // in every case add to client->socket map
     clientMapping.insert(pSocket, client);
 
     connect(pSocket, &QWebSocket::textMessageReceived, this, &SslEchoServer::processTextMessage);
     connect(pSocket, &QWebSocket::binaryMessageReceived,
             this, &SslEchoServer::processBinaryMessage);
     connect(pSocket, &QWebSocket::disconnected, this, &SslEchoServer::socketDisconnected);
-    //TODO: Check if user already exist in the map values, (i.e. connected from 1 device first and then an other)
+
 
     //m_clients << pSocket;
 }
@@ -121,12 +123,13 @@ void SslEchoServer::socketDisconnected()
         if (client->isLogged()) {
             qDebug() << "User " << client->getEmail() << " disconnected";
         }
-        client->logout();
 
+        client->logout();
         // Remove from documentopen map
         this->findAndDeleteFromDoclist(client);
         // Remove client element from map and close the socket
         clientMapping.remove(pClient);
+
         pClient->close();
         pClient->deleteLater();
     }
@@ -237,8 +240,13 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             User* loggedUser = checkUserLoginData(username, password);
             client->setAsLogged(loggedUser);
 
+            // Check if user changed connections (Do after login, userID is used)
+            this->pruneOldConnectionsIfAny(client, pClient);
+
+            // Send loginOk
             LoginOkPacket lop = LoginOkPacket(*loggedUser);
             lop.send(*pClient);
+
             //qDebug() << loginReq->getUsername();
             break;
         }
@@ -267,42 +275,27 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             //qDebug() << msg->getData();
             qDebug() << "[MSG] New symbol received." << endl << "Char: " << msg->getS().getC() << " SiteId: " <<  msg->getSiteId();
             // Broadcast to all the connected client of a document
-            //TODO: dont use clientMapping.keys() but the vector with all the clients with that document opened
-            //documentMapping
-            /*for (auto it = documentMapping.begin(); it != documentMapping.end();) { // iterate over documents and find what is openened by current user #TONOTE this works since 1 file only can be openend by a user
-                if (it.value().contains(clientMapping[pClient])) {
-                    for (QSharedPointer<Client> onlineClient : it.value()) {
-                        if(onlineClient != pClient) {
+            for (auto it = documentMapping.begin(); it != documentMapping.end();) { // iterate over documents and find what is openened by current user #TONOTE this works since 1 file only can be openend by a user
+                QList<QSharedPointer<Client>> onlineClientPerDoc = it.value();
+                    for (QSharedPointer<Client> onlineClient : onlineClientPerDoc) {
+                        if(onlineClient != client && client->isLogged()) {
                             msg->send(*onlineClient->getSocket());
                             qDebug() << "from: " << pClient->peerPort() << "sent to " << onlineClient->getSocket()->peerPort() ;
                         }
                     }
-                }
-            }*/
-
-            for (QWebSocket* onlineClient : clientMapping.keys()) {
+                it++;
+            }
+            // Full broadcast (no per document behaviour) follows. *Debug only usage*
+            /*for (QWebSocket* onlineClient : clientMapping.keys()) {
                 if(onlineClient != pClient) {
                     msg->send(*(onlineClient));
                     qDebug() << "from: " << pClient->peerPort() << "sent to " << onlineClient->peerPort() ;
                 }
-            }
+            }*/
 
             break;
         }
-        /*
-        case(PACK_TYPE_DOC_OPEN): {
-            if (!client->isLogged()) {
-                break;
-            }
-            DocumentOkPacket* msg = dynamic_cast<DocumentOkPacket*>(rcvd_packet.get());
-            // Check if user already had an open document
-            // Check permission of the user for that doc
-            // Set the document in the packet as the current opened doc
-            //documentMapping.insert(docId, client)
-            // Send the content of the document
-            break;
-        }
-        */
+
         case(PACK_TYPE_CURSOR_POS): {
             CursorPacket *cp = dynamic_cast<CursorPacket*>(rcvd_packet.get());
             //qDebug() << msg->getData();
@@ -349,8 +342,11 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             // Check permission of the user for that doc
             int docId = docIdByName(dop->getdocName(), dop->getuserId());
             //checkDocPermission(docId, dop->getuserId());
-            if(docId < 0 ) // doesnt have permission (no document was found with that name associated to that user)
+            if(docId < 0 ){ // doesnt have permission (no document was found with that name associated to that user)
+                DocumentOkPacket dokp = DocumentOkPacket(-1, dop->getdocName(), QVector<QVector<QSymbol>>());
+                dokp.send(*pClient);
                 break;
+            }
             // Set the document in the packet as the current opened doc
             documentMapping[docId].insert(0, client);
             // Send the content of the document
@@ -391,14 +387,40 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
 }
 
 bool SslEchoServer::findAndDeleteFromDoclist(QSharedPointer<Client> client){
+    bool wasRemoved = false;
     for (auto it = documentMapping.begin(); it != documentMapping.end();) {
-        if (it.value().contains(client)) {
-            //it = documentMapping.erase(it);
-            it.value().removeOne(client);
-            return true;
+        QList<QSharedPointer<Client>> onlineClientPerDoc = it.value();
+        for (QSharedPointer<Client> onlineClient : onlineClientPerDoc) {
+            if(onlineClient->getUserId() == client->getUserId()) {
+                onlineClientPerDoc.removeOne(onlineClient);
+                wasRemoved = true;
+                break;
+            }
+        }
+        *it = onlineClientPerDoc;
+        it++;
+    }
+    return wasRemoved;
+}
+
+void SslEchoServer::pruneOldConnectionsIfAny(QSharedPointer<Client> client, QWebSocket* pClient){
+
+    //TODO: Check if user already exist in the map values, (i.e. connected from 1 device first and then an other)
+    QWebSocket* duplicatedConnection = nullptr;
+    for (auto it = this->clientMapping.begin(); it != this->clientMapping.end();) {
+        if ( (it.value()->getSocket() != pClient) && (it.value()->getUserId() == client->getUserId()) ) {
+            duplicatedConnection = it.value()->getSocket();
+            // Set user as logged out
+            it.value()->logout();
+            qDebug() << "[WARN] A user (#" << client->getUserId() << ") is now using a new connection." ;
+            break; // uncomment for multiple document
         } else {
             ++it;
         }
-        return false;
     }
+    if(duplicatedConnection != nullptr) {
+        //this->clientMapping.remove(duplicatedConnection);
+        duplicatedConnection->close();  // Close gracefully connection to the old client instance
+    }
+
 }

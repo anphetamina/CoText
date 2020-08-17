@@ -37,6 +37,8 @@ void SslEchoClient::onConnected()
     connect(&m_webSocket, &QWebSocket::binaryMessageReceived,
             this, &SslEchoClient::onBinaryMessageReceived);
 
+    connect(&m_webSocket, &QWebSocket::disconnected, this, &SslEchoClient::socketDisconnected);
+
     this->sendPing();
     this->sendTest();
 
@@ -71,6 +73,14 @@ void SslEchoClient::onSslErrors(const QList<QSslError> &errors)
 }
 //! [onTextMessageReceived]
 
+//! [socketDisconnected]
+void SslEchoClient::socketDisconnected()
+{
+    qDebug() << "Server closed the connection.\n[HINT]Duplicated instance with the same user?";
+
+    qApp->exit(-2);
+}
+
 void SslEchoClient::sendPing() {
     // Create buffer
     PingPacket pp = PingPacket("test");
@@ -82,7 +92,7 @@ void SslEchoClient::sendPing() {
 
 void SslEchoClient::sendTest() {
     qDebug() << "[NETWORK] ** Network Test Start ** ";
-    this->authenticate("test@test.test", "test");
+    this->sendLogin();
     qDebug() << "[NETWORK] ** Sending Message packet ** ";
     QVector<Identifier> sym_position;
     QString test("test_qstring");
@@ -95,12 +105,22 @@ void SslEchoClient::sendTest() {
 
 }
 
+void SslEchoClient::set_username(QString username){
+    this->username = username;
+}
+void SslEchoClient::set_password(QString password){
+    this->password = password;
+}
 void SslEchoClient::authenticate(QString username, QString password) {
     qDebug() << "[NETWORK] ** Sending login req packet ** ";
     QString hashedPassword = password;
     LoginReqPacket lrp = LoginReqPacket(username, hashedPassword);
     lrp.send(m_webSocket);
 }
+void SslEchoClient::sendLogin(){
+    this->authenticate(username, password);
+}
+
 
 void SslEchoClient::packetParse(QByteArray rcvd_packet) {
 
@@ -171,7 +191,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
                 qDebug() << "[AUTH] FAILED. See the server for the log.";
             }
             pServer = qobject_cast<QWebSocket *>(sender());
-            // .... DEBUG
+            // .... DEBUG TODO: REMOVE when opendoc GUI is implemented and linked here
             this->sendDocOpen("AAA", loggedUser.getId());
 
             break;
@@ -200,7 +220,11 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
         }
         case (PACK_TYPE_DOC_OK): {
             DocumentOkPacket *doc = dynamic_cast<DocumentOkPacket *>(rcvd_packet.get());
-            qDebug() << "[OPEN_DOC]";
+            if(doc->getdocId() > 0) {
+                qDebug() << "[OPEN_DOC] (" << doc->getdocName() << ") with id " << doc->getdocId();
+            } else{
+                qDebug() << "[OPEN_DOC] FAILED (No permission for " << doc->getdocName() << ") with docId " << doc->getdocId();
+            }
             break;
         }
         case (PACK_TYPE_DOC_LIST): {

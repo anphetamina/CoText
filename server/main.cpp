@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     SslEchoServer server(12345);
     dbConfigure();
     getUserlist();
-    checkLoginData("test@test.test", "test");
+    //checkLoginData("test@test.test", "test");
     //qDebug() <<  createDoc("AAA", 1);
     //addDocPermission(1,2);
     //qDebug() <<  checkDocPermission(1,1);

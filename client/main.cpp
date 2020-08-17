@@ -25,10 +25,24 @@ int main(int argc, char *argv[])
 	a.setStyleSheet(stylesheetString);
 
 
+	// user/pass test authentication for now
+    QString quser, qpass;
+	if (argc > 1) {
+        std::string username = argv[1];
+        std::string password = argv[2];
+        quser = QString::fromStdString(username);
+        qpass = QString::fromStdString(password);
+    }else{
+	    quser = QString::fromStdString("test@test.test");
+	    qpass = QString::fromStdString("test");
+	}
     // ** Network testing code
+
     //QCoreApplication a(argc, argv);
     SslEchoClient* client = new SslEchoClient(QUrl(QStringLiteral("wss://localhost:12345")));
     Q_UNUSED(*client);
+    client->set_username(quser);
+    client->set_password(qpass);
     // ** End of network testing code
 
     /*QThread *listener = new QThread();
@@ -61,6 +75,7 @@ int main(int argc, char *argv[])
      * connect the echo client to enable remote operations on the editor
      */
     client->connectToEditor(&editor);
+
 
     w->show();
 
