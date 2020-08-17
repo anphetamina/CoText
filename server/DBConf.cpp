@@ -122,7 +122,6 @@ QList<QString> getDocuments(int userId){
          QString docName = query.value(1).toString();
          QString docPath = query.value(2).toString();
          docList.insert(0, docName);
-        //qDebug() << username << id;
      }
      return docList;
 }
@@ -168,20 +167,35 @@ bool addDocPermission(int docId, int userId){
     return true;
 }
 
-/*
-void saveToDisk(QString doc){
+void saveToDisk(QVector<QVector<QSymbol>> qdoc){
     QFile file("docX.dat");
     file.open(QIODevice::WriteOnly);
     QDataStream out(&file);   // we will serialize the data into the file
-    out << doc;
+    out << qdoc;
     file.close();
 
 }
 
-QString loadFromDisk(){
-    QFile file("docX.dat");
+QVector<QVector<QSymbol>> loadFromDisk(int docId){
+    QString qdocId = QString::number(docId);
+    QFile file("doc"+qdocId+".dat");
     QString doc;
     file.open(QIODevice::ReadOnly);
+    QDataStream out(&file);   // we will serialize the data into the file
     out >> doc;
 }
- */
+
+
+QString GetRandomString(int randomStringLength=100)
+{
+    const QString possibleCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
+
+    QString randomString;
+    for(int i=0; i<randomStringLength; ++i)
+    {
+        int index = qrand() % possibleCharacters.length();
+        QChar nextChar = possibleCharacters.at(index);
+        randomString.append(nextChar);
+    }
+    return randomString;
+}

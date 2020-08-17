@@ -7,6 +7,7 @@
 #include <QSqlDatabase>
 #include <QtCore>
 #include "User.h"
+#include "QSymbol.h"
 
 extern QString HostName;
 extern QString UserName;
@@ -22,3 +23,6 @@ QIcon loadProfilePic(int id);
 QList<QString> getDocuments(int userId);
 bool checkDocPermission(int docId, int userId);
 bool addDocPermission(int docId, int userId);
+QString GetRandomString(int randomStringLength);
+void saveToDisk(QVector<QVector<QSymbol>> qdoc);
+QVector<QVector<QSymbol>> loadFromDisk(int docId);
