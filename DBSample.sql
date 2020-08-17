@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Aug 11, 2020 at 07:57 PM
+-- Generation Time: Aug 17, 2020 at 02:28 PM
 -- Server version: 5.7.26
 -- PHP Version: 7.2.22
 
@@ -25,17 +25,19 @@ USE `CoText`;
 CREATE TABLE `Permission` (
   `ID` int(11) NOT NULL,
   `UserID` int(11) NOT NULL,
-  `DocumentID` int(11) NOT NULL,
+  `DocumentID` int(11) DEFAULT NULL,
   `DocumentPath` varchar(260) NOT NULL,
-  `DocumentName` varchar(255) NOT NULL
+  `DocumentName` varchar(255) NOT NULL,
+  `URI` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `Permission`
 --
 
-INSERT INTO `Permission` (`ID`, `UserID`, `DocumentID`, `DocumentPath`, `DocumentName`) VALUES
-(1, 1, 1, '', 'TestDocument1');
+INSERT INTO `Permission` (`ID`, `UserID`, `DocumentID`, `DocumentPath`, `DocumentName`, `URI`) VALUES
+(1, 1, 1, '', 'TestDocument1', ''),
+(12, 1, 12, '', 'AAA', NULL);
 
 -- --------------------------------------------------------
 
@@ -57,7 +59,8 @@ CREATE TABLE `User` (
 --
 
 INSERT INTO `User` (`ID`, `Username`, `Email`, `Password`, `Name`, `Surname`) VALUES
-(1, 'test', 'test@test.test', 'test', 'Mario', 'Rossi');
+(1, 'test', 'test@test.test', 'test', 'Mario', 'Rossi'),
+(2, 'tester', 'test@domain.tld', 'test2HashedPassword', 'Giovanni', 'Muciaccia');
 
 --
 -- Indexes for dumped tables
@@ -83,11 +86,11 @@ ALTER TABLE `User`
 -- AUTO_INCREMENT for table `Permission`
 --
 ALTER TABLE `Permission`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `User`
 --
 ALTER TABLE `User`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
