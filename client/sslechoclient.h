@@ -24,7 +24,6 @@ class SslEchoClient : public QObject
 Q_OBJECT
 public:
     explicit SslEchoClient(const QUrl &url, QObject *parent = nullptr);
-
 signals:
 
     void insertReceived(QSymbol qsymbol);
@@ -49,6 +48,7 @@ private Q_SLOTS:
     void onSslErrors(const QList<QSslError> &errors);
 
 private:
+    QString username, password;
     QWebSocket m_webSocket;
 
     void sendPing();
@@ -57,11 +57,7 @@ private:
 
     void packetParse(QByteArray rcvd_packet);
 
-    void sendLogin();
-
     void sendTest();
-
-    void authenticate(QString username, QString password);
 
     void dispatch(PacketHandler rcvd_packet, QWebSocket *pClient);
 
@@ -69,5 +65,14 @@ public:
     void connectToEditor(TextEditor* te);
 
     void sendDocOpen(QString docName, qint32 userId);
+    void authenticate(QString username, QString password);
+
+    void set_username(QString username);
+
+    void set_password(QString password);
+
+    void sendLogin();
+
+    void socketDisconnected();
 };
 

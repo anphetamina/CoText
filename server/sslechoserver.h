@@ -42,14 +42,12 @@ private:
 
     void packetParse(QByteArray rcvd_packet);
 
-    //void tryLogin(QByteArray rcvd_packet);
-
-
-    //void tryLogin(Packet rcvd_packet);
 
     void dispatch(PacketHandler rcvd_packet, QWebSocket* pClient);
 
     bool findAndDeleteFromDoclist(QSharedPointer<Client> client);
+
+    void pruneOldConnectionsIfAny(QSharedPointer<Client> client, QWebSocket* pClient);
 };
 
 #endif //SSLECHOSERVER_H
