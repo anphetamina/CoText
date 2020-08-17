@@ -65,6 +65,8 @@ private:
      */
     std::map<int, std::pair<int, QColor>> cursors;
 
+    std::map<int, QTextEdit::ExtraSelection> selections;
+
 
 public slots:
 
@@ -74,6 +76,7 @@ public slots:
     void remoteEraseBlock(std::vector<Symbol> symbols);
 
     void updateCursor(int userId, int position);
+    void updateSelection(int userId, QTextCursor cursor);
 
 private slots:
 
@@ -94,6 +97,7 @@ signals:
     void symbolsInserted(std::vector<QSymbol> symbols, int siteId);
     void symbolsErased(std::vector<QSymbol> symbols, int siteId);
     void cursorPositionChanged(int userId, int position);
+    void selectionChanged(int userId, QTextCursor cursor);
 
 };
 
