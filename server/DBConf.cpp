@@ -145,6 +145,29 @@ bool checkDocPermission(int docId, int userId){
     }
 }
 
+bool addDocPermission(int docId, int userId){
+    QSqlQuery query, query2, query3;
+    QString quserId = QString::number(userId);
+    QString qdocId = QString::number(docId);
+    QString docName, docPath;
+    query.exec("SELECT documentid, documentname, documentpath FROM Permission WHERE documentid="+qdocId);
+    if (query.next()) {
+        int id = query.value(0).toInt();
+        docName = query.value(1).toString();
+        docPath = query.value(2).toString();
+    }
+    else{
+        return false;
+    }
+    // Check if it was already added (userid, docID) should be UNIQUE
+    query2.exec("SELECT documentid, documentname, documentpath FROM Permission WHERE userid="+quserId+" AND documentid="+qdocId);
+    if (query2.next()) {
+        return true;
+    }
+    query3.exec("INSERT INTO Permission(documentid, documentname, documentpath, userid) VALUES ("+qdocId+", '"+docName+"','"+docPath+"',"+quserId+")");
+    return true;
+}
+
 /*
 void saveToDisk(QString doc){
     QFile file("docX.dat");

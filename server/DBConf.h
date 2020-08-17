@@ -21,3 +21,4 @@ User* checkUserLoginData(QString email, QString password);
 QIcon loadProfilePic(int id);
 QList<QString> getDocuments(int userId);
 bool checkDocPermission(int docId, int userId);
+bool addDocPermission(int docId, int userId);
