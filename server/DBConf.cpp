@@ -112,8 +112,8 @@ bool saveProfilePic(int id, QIcon newIcon){
     return pixmap.save("./profilePictures/"+pictureFileName);
 }
 
-QList<QString> getDocuments(int userId){
-    QList<QString> docList = QList<QString>();
+QVector<QString> getDocuments(int userId){
+    QVector<QString> docList = QVector<QString>();
     QSqlQuery query;
     QString quserId = QString::number(userId);
     query.exec("SELECT documentid, documentname, documentpath FROM Permission WHERE userid="+quserId);
@@ -122,7 +122,6 @@ QList<QString> getDocuments(int userId){
          QString docName = query.value(1).toString();
          QString docPath = query.value(2).toString();
          docList.insert(0, docName);
-        //qDebug() << username << id;
      }
      return docList;
 }
@@ -145,20 +144,94 @@ bool checkDocPermission(int docId, int userId){
     }
 }
 
-/*
-void saveToDisk(QString doc){
-    QFile file("docX.dat");
+bool createDoc(QString docName, int userId){
+    QSqlQuery query, query2, query3;
+    QString quserId = QString::number(userId);
+    QString docPath = QString();
+    query.exec("INSERT INTO Permission(documentname, documentpath, userid) VALUES ('"+docName+"','"+docPath+"',"+quserId+")");
+    // Check if it was already added (userid, docID) should be UNIQUE
+    query2.exec("SELECT id, documentname FROM Permission WHERE userid="+quserId+" ORDER BY ID DESC");
+
+    if (query2.next()) {
+        int id = query2.value(0).toInt();
+        QString qdocId = QString::number(id);
+        docName = query2.value(1).toString();
+        query3.exec("UPDATE Permission SET documentid="+qdocId+" WHERE id="+qdocId);
+        return true;
+    } else{
+        return false;
+    }
+}
+
+bool addDocPermission(int docId, int userId){
+    QSqlQuery query, query2, query3;
+    QString quserId = QString::number(userId);
+    QString qdocId = QString::number(docId);
+    QString docName, docPath;
+    query.exec("SELECT documentid, documentname, documentpath FROM Permission WHERE documentid="+qdocId);
+    if (query.next()) {
+        int id = query.value(0).toInt();
+        docName = query.value(1).toString();
+        docPath = query.value(2).toString();
+    }
+    else{
+        return false;
+    }
+    // Check if it was already added (userid, docID) should be UNIQUE
+    query2.exec("SELECT documentid, documentname, documentpath FROM Permission WHERE userid="+quserId+" AND documentid="+qdocId);
+    if (query2.next()) {
+        return true;
+    }
+    query3.exec("INSERT INTO Permission(documentid, documentname, documentpath, userid) VALUES ("+qdocId+", '"+docName+"','"+docPath+"',"+quserId+")");
+    return true;
+}
+
+void saveToDisk(QVector<QVector<QSymbol>> qdoc, int docId){
+    QString qdocId = QString::number(docId);
+    QFile file("doc"+qdocId+".dat");
     file.open(QIODevice::WriteOnly);
     QDataStream out(&file);   // we will serialize the data into the file
-    out << doc;
+    out << qdoc;
     file.close();
 
 }
 
-QString loadFromDisk(){
-    QFile file("docX.dat");
-    QString doc;
-    file.open(QIODevice::ReadOnly);
-    out >> doc;
+QVector<QVector<QSymbol>> loadFromDisk(int docId){
+    QString qdocId = QString::number(docId);
+    QFile file("doc"+qdocId+".dat");
+    QVector<QVector<QSymbol>> qdoc;
+    if(!file.open(QIODevice::ReadOnly)){
+        qdoc = QVector<QVector<QSymbol>>();  // if no file is found, maybe it's an empty document for now.
+    } else {
+        QDataStream out(&file);   // we will serialize the data into the file
+        out >> qdoc;
+    }
+    return qdoc;
 }
- */
+
+
+QString GetRandomString(int randomStringLength=100)
+{
+    const QString possibleCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
+
+    QString randomString;
+    for(int i=0; i<randomStringLength; ++i)
+    {
+        int index = qrand() % possibleCharacters.length();
+        QChar nextChar = possibleCharacters.at(index);
+        randomString.append(nextChar);
+    }
+    return randomString;
+}
+
+int docIdByName(QString docName, int userId){
+    QSqlQuery query;
+    QString quserId = QString::number(userId);
+    query.exec("SELECT documentid FROM Permission WHERE userid="+quserId+" AND documentname='"+docName+"'");
+    if (query.next()) {
+        int id = query.value(0).toInt();
+        return id;
+    }
+    else
+        return -1;
+}

@@ -13,6 +13,8 @@
 #include "Packet.h"
 #include "Message.h"
 #include "CursorPacket.h"
+#include "DocumentPacket.h"
+
 #include "gui/TextEditor.h"
 
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
@@ -66,5 +68,6 @@ private:
 public:
     void connectToEditor(TextEditor* te);
 
+    void sendDocOpen(QString docName, qint32 userId);
 };
 

@@ -38,7 +38,7 @@ private:
     QMap<QWebSocket*, QSharedPointer<Client>> clientMapping;
 
     //Association of opened doc and user
-    QMap<int, QSharedPointer<Client>> documentMapping;
+    QMap<int, QList<QSharedPointer<Client>>> documentMapping;
 
     void packetParse(QByteArray rcvd_packet);
 
@@ -48,6 +48,8 @@ private:
     //void tryLogin(Packet rcvd_packet);
 
     void dispatch(PacketHandler rcvd_packet, QWebSocket* pClient);
+
+    bool findAndDeleteFromDoclist(QSharedPointer<Client> client);
 };
 
 #endif //SSLECHOSERVER_H

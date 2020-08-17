@@ -62,6 +62,14 @@ bool Client::isLogged()
     return loggedFlag;
 }
 
+int Client::getUserId() const
+{
+    if (user == nullptr)
+        return -1;
+    else
+        return this->user->getId();
+}
+
 bool Client::authenticate(QByteArray token)
 {
     return true;

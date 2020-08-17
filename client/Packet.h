@@ -151,33 +151,18 @@ public:
     static PacketHandler LoginReqPacket(QString username, QString hashedPassword);
     static PacketHandler LoginOk(User user);
     static PacketHandler LogoutReq();
+
     static PacketHandler AccountCreationPacket(QString username,QString password, QString name, QString surname, QIcon profilePic);
     static PacketHandler AccountOk(User user);
     static PacketHandler AccountUpdatePacket(QString username,QString password, QString name, QString surname, QIcon profilePic);
+
     static PacketHandler Message(int type, QSymbol qs, int siteId);
+    static PacketHandler CursorPacket(qint32 userId, qint32 newPosition);
 
-    PacketHandler CursorPacket(qint32 userId, qint32 newPosition);
+    static PacketHandler DocumentCreatePacket(QString docName, qint32 userId);
+    static PacketHandler DocumentOpenPacket(QString docName, qint32 userId);
+    static PacketHandler DocumentDelPacket(QString docName, qint32 userId);
+    static PacketHandler DocumentOkPacket(QString docName, qint32 userId, QVector<QVector<QSymbol>> qsymbols);
+    static PacketHandler DocumentAskSharableURIPacket(QString docName, qint32 userId, QString sharableURI);
+    static PacketHandler DocumentListPacket(qint32 userId, QVector<QString> docList);
 };
-/*
-
-
-static PacketHandler AccountErr(QString error);
-
-static PacketHandler LoginErr(QString error);
-
-static PacketHandler DocumentCreation(QString docName);
-static PacketHandler DocumentRemoval(QString docURI);
-static PacketHandler DocumentOpen(QString docURI);
-static PacketHandler DocumentDismissal();
-static PacketHandler DocumentClose();
-static PacketHandler DocumentErr(QString error);
-
-static PacketHandler CharsInsert(QVector<Symbol> symbols, bool isLast, TextBlockID bId, QTextBlockFormat blkFmt);
-static PacketHandler CharsDelete(QVector<Position> positions);
-static PacketHandler CursorSeek(qint32 userId, qint32 newPosition);
-
-static PacketHandler PresenceRefresh(qint32 userId, QString nickname, QImage icon);
-static PacketHandler PresenceRegister(qint32 userId, QString nickname, QImage icon);
-static PacketHandler PresenceUnregister(qint32 userId);
-
-static PacketHandler Error(QString error);*/
