@@ -565,7 +565,7 @@ int SharedEditor::getSiteId() const {
     return siteId;
 }
 
-std::vector<std::vector<Symbol>>& SharedEditor::getSymbols() {
+const std::vector<std::vector<Symbol>>& SharedEditor::getSymbols() const {
     return symbols;
 }
 

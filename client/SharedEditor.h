@@ -42,7 +42,7 @@ public:
 
     void setSiteId(int siteId);
 
-    std::vector<std::vector<Symbol>>& getSymbols();
+    const std::vector<std::vector<Symbol>>& getSymbols() const;
 
     void clear();
 

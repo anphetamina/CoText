@@ -14,6 +14,8 @@
 #include "../QSymbol.h"
 #include "UserHighlighter.h"
 
+class UserHighlighter;
+
 namespace Ui { class MainWindow; }
 
 class TextEditor : public QTextEdit {
@@ -23,7 +25,11 @@ class TextEditor : public QTextEdit {
 public:
     explicit TextEditor(Ui::MainWindow &ui, QWidget *parent = nullptr);
 
-    const std::map<int, QColor>& getUserColors();
+    int getRow(int position) const;
+    int getCol(int row, int position) const;
+    QColor getUserColor(int userId) const;
+    int getUserId(int row, int col) const;
+
 
 private:
 
@@ -40,26 +46,14 @@ private:
     int currentSelectedChars;
     UserHighlighter highlighter;
 
-    /**
-     * toolbar updates
-     */
     void fontChanged(const QFont &f);
     void colorChanged(const QColor &c);
 
-    /**
-     * local
-     */
     void insertRow(int pos, int n);
     void deleteRow(int pos, int n);
     void incrementIndex(int pos, int n);
     void decrementIndex(int pos, int n);
-    int getRow(int position);
-    int getCol(int row, int position);
 
-
-    /**
-     * remote
-     */
     std::atomic<bool> isFromRemote;
     int getPosition(int row, int col);
 
