@@ -112,8 +112,8 @@ bool saveProfilePic(int id, QIcon newIcon){
     return pixmap.save("./profilePictures/"+pictureFileName);
 }
 
-QList<QString> getDocuments(int userId){
-    QList<QString> docList = QList<QString>();
+QVector<QString> getDocuments(int userId){
+    QVector<QString> docList = QVector<QString>();
     QSqlQuery query;
     QString quserId = QString::number(userId);
     query.exec("SELECT documentid, documentname, documentpath FROM Permission WHERE userid="+quserId);
@@ -144,6 +144,25 @@ bool checkDocPermission(int docId, int userId){
     }
 }
 
+bool createDoc(QString docName, int userId){
+    QSqlQuery query, query2, query3;
+    QString quserId = QString::number(userId);
+    QString docPath = QString();
+    query.exec("INSERT INTO Permission(documentname, documentpath, userid) VALUES ('"+docName+"','"+docPath+"',"+quserId+")");
+    // Check if it was already added (userid, docID) should be UNIQUE
+    query2.exec("SELECT id, documentname FROM Permission WHERE userid="+quserId+" ORDER BY ID DESC");
+
+    if (query2.next()) {
+        int id = query2.value(0).toInt();
+        QString qdocId = QString::number(id);
+        docName = query2.value(1).toString();
+        query3.exec("UPDATE Permission SET documentid="+qdocId+" WHERE id="+qdocId);
+        return true;
+    } else{
+        return false;
+    }
+}
+
 bool addDocPermission(int docId, int userId){
     QSqlQuery query, query2, query3;
     QString quserId = QString::number(userId);
@@ -167,8 +186,9 @@ bool addDocPermission(int docId, int userId){
     return true;
 }
 
-void saveToDisk(QVector<QVector<QSymbol>> qdoc){
-    QFile file("docX.dat");
+void saveToDisk(QVector<QVector<QSymbol>> qdoc, int docId){
+    QString qdocId = QString::number(docId);
+    QFile file("doc"+qdocId+".dat");
     file.open(QIODevice::WriteOnly);
     QDataStream out(&file);   // we will serialize the data into the file
     out << qdoc;
@@ -179,10 +199,14 @@ void saveToDisk(QVector<QVector<QSymbol>> qdoc){
 QVector<QVector<QSymbol>> loadFromDisk(int docId){
     QString qdocId = QString::number(docId);
     QFile file("doc"+qdocId+".dat");
-    QString doc;
-    file.open(QIODevice::ReadOnly);
-    QDataStream out(&file);   // we will serialize the data into the file
-    out >> doc;
+    QVector<QVector<QSymbol>> qdoc;
+    if(!file.open(QIODevice::ReadOnly)){
+        qdoc = QVector<QVector<QSymbol>>();  // if no file is found, maybe it's an empty document for now.
+    } else {
+        QDataStream out(&file);   // we will serialize the data into the file
+        out >> qdoc;
+    }
+    return qdoc;
 }
 
 
@@ -198,4 +222,16 @@ QString GetRandomString(int randomStringLength=100)
         randomString.append(nextChar);
     }
     return randomString;
+}
+
+int docIdByName(QString docName, int userId){
+    QSqlQuery query;
+    QString quserId = QString::number(userId);
+    query.exec("SELECT documentid FROM Permission WHERE userid="+quserId+" AND documentname='"+docName+"'");
+    if (query.next()) {
+        int id = query.value(0).toInt();
+        return id;
+    }
+    else
+        return -1;
 }

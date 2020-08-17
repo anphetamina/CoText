@@ -10,6 +10,7 @@
 #include "LoginPacket.h"
 #include "Message.h"
 #include "DBConf.h"
+#include "DocumentPacket.h"
 #include <QtCore/QDebug>
 #include <QtCore/QFile>
 #include <QtNetwork/QSslCertificate>
@@ -122,6 +123,8 @@ void SslEchoServer::socketDisconnected()
         }
         client->logout();
 
+        // Remove from documentopen map
+        this->findAndDeleteFromDoclist(client);
         // Remove client element from map and close the socket
         clientMapping.remove(pClient);
         pClient->close();
@@ -247,6 +250,9 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             if (client->isLogged()) {
                 qDebug() << "User " << client->getEmail() << " disconnected";
             }
+            // Remove from documentopen map
+            this->findAndDeleteFromDoclist(client);
+
             client->logout();  // --> set peer as logged out and free the memory used for User structure
             clientMapping.remove(pClient);  // Remove entry from connected peer->user mapping
             // Close websocket for that peer
@@ -262,12 +268,25 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             qDebug() << "[MSG] New symbol received." << endl << "Char: " << msg->getS().getC() << " SiteId: " <<  msg->getSiteId();
             // Broadcast to all the connected client of a document
             //TODO: dont use clientMapping.keys() but the vector with all the clients with that document opened
+            //documentMapping
+            /*for (auto it = documentMapping.begin(); it != documentMapping.end();) { // iterate over documents and find what is openened by current user #TONOTE this works since 1 file only can be openend by a user
+                if (it.value().contains(clientMapping[pClient])) {
+                    for (QSharedPointer<Client> onlineClient : it.value()) {
+                        if(onlineClient != pClient) {
+                            msg->send(*onlineClient->getSocket());
+                            qDebug() << "from: " << pClient->peerPort() << "sent to " << onlineClient->getSocket()->peerPort() ;
+                        }
+                    }
+                }
+            }*/
+
             for (QWebSocket* onlineClient : clientMapping.keys()) {
                 if(onlineClient != pClient) {
                     msg->send(*(onlineClient));
                     qDebug() << "from: " << pClient->peerPort() << "sent to " << onlineClient->peerPort() ;
                 }
             }
+
             break;
         }
         /*
@@ -297,6 +316,69 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             }
             break;
         }
+        case(PACK_TYPE_DOC_CREATE): {
+            DocumentCreatePacket *dcp = dynamic_cast<DocumentCreatePacket*>(rcvd_packet.get());
+
+            if (!client->isLogged() || client->getUserId() != dcp->getuserId()) {
+                break;
+            }
+
+            createDoc(dcp->getdocName(), dcp->getuserId());
+            break;
+        }
+
+        case(PACK_TYPE_DOC_ASKLIST): {
+            DocumentAskListPacket *dalp = dynamic_cast<DocumentAskListPacket*>(rcvd_packet.get());
+
+            if (!client->isLogged() || client->getUserId() != dalp->getuserId()) {
+                break;
+            }
+
+            DocumentListPacket dlp = DocumentListPacket(dalp->getuserId(), getDocuments(dalp->getuserId()));
+            dlp.send(*pClient);
+            break;
+        }
+
+        case(PACK_TYPE_DOC_OPEN): {
+            if (!client->isLogged()) {
+                break;
+            }
+            DocumentOpenPacket* dop = dynamic_cast<DocumentOpenPacket*>(rcvd_packet.get());
+            // Check if user already had an open document and delete that entry eventually #TONOTE: 1 document opened for user as of now
+            this->findAndDeleteFromDoclist(client);
+            // Check permission of the user for that doc
+            int docId = docIdByName(dop->getdocName(), dop->getuserId());
+            //checkDocPermission(docId, dop->getuserId());
+            if(docId < 0 ) // doesnt have permission (no document was found with that name associated to that user)
+                break;
+            // Set the document in the packet as the current opened doc
+            documentMapping[docId].insert(0, client);
+            // Send the content of the document
+            QVector<QVector<QSymbol>> qsymbols = loadFromDisk(docId);
+            DocumentOkPacket dokp = DocumentOkPacket(docId, dop->getdocName(), qsymbols);
+            dokp.send(*pClient);
+
+            break;
+        }
+        case(PACK_TYPE_DOC_DEL): {
+            if (!client->isLogged()) {
+                break;
+            }
+            break;
+        }
+
+        case(PACK_TYPE_DOC_ASKSURI): {
+            if (!client->isLogged()) {
+                break;
+            }
+            //DocumentOkPacket* msg = dynamic_cast<DocumentOkPacket*>(rcvd_packet.get());
+            // Check if user already had an open document
+            // Check permission of the user for that doc
+            // Set the document in the packet as the current opened doc
+            //documentMapping.insert(docId, client)
+            // Send the content of the document
+            break;
+        }
 
     }
         /* Debug send always ping for each packet received */
@@ -306,4 +388,17 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             pp.send(*onlineClient);
         }
          */
+}
+
+bool SslEchoServer::findAndDeleteFromDoclist(QSharedPointer<Client> client){
+    for (auto it = documentMapping.begin(); it != documentMapping.end();) {
+        if (it.value().contains(client)) {
+            //it = documentMapping.erase(it);
+            it.value().removeOne(client);
+            return true;
+        } else {
+            ++it;
+        }
+        return false;
+    }
 }

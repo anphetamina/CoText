@@ -7,6 +7,7 @@
 #include "PingPacket.h"
 #include "LoginPacket.h"
 #include "gui/TextEditor.h"
+#include "DocumentPacket.h"
 #include <QtWebSockets/QWebSocket>
 #include <QCoreApplication>
 
@@ -38,7 +39,7 @@ void SslEchoClient::onConnected()
 
     this->sendPing();
     this->sendTest();
-    //this->sendLogin();
+
     //m_webSocket.sendTextMessage(QStringLiteral("Hello, world!"));
 }
 //! [onConnected]
@@ -170,6 +171,8 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
                 qDebug() << "[AUTH] FAILED. See the server for the log.";
             }
             pServer = qobject_cast<QWebSocket *>(sender());
+            // .... DEBUG
+            this->sendDocOpen("AAA", loggedUser.getId());
 
             break;
         }
@@ -195,6 +198,20 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             emit updateCursorReceived(cp->getuserId(), cp->getnewPosition());
             break;
         }
+        case (PACK_TYPE_DOC_OK): {
+            DocumentOkPacket *doc = dynamic_cast<DocumentOkPacket *>(rcvd_packet.get());
+            qDebug() << "[OPEN_DOC]";
+            break;
+        }
+        case (PACK_TYPE_DOC_LIST): {
+            DocumentListPacket *docList = dynamic_cast<DocumentListPacket *>(rcvd_packet.get());
+            break;
+        }
+        case (PACK_TYPE_DOC_ASKSURI): {
+            // When a client receive this it means it was a response to an invite for ANOTHER CLIENT (that will SEND **NOT receive** a similar packet
+            DocumentAskSharableURIPacket *docInvite = dynamic_cast<DocumentAskSharableURIPacket *>(rcvd_packet.get());
+            break;
+        }
     }
 }
 
@@ -217,6 +234,13 @@ void SslEchoClient::sendErase(std::vector<QSymbol> symbols, int siteId) {
 void SslEchoClient::sendCursor(qint32 userId, qint32 position) {
     CursorPacket cp = CursorPacket(userId, position);
     cp.send(*pServer);
+}
+
+void SslEchoClient::sendDocOpen(QString docName, qint32 userId) {
+    if(!pServer->isValid()) // if u call this and login wasnt performed
+        return;
+    DocumentOpenPacket dop = DocumentOpenPacket(docName, userId );
+    dop.send(*pServer);
 }
 
 void SslEchoClient::sendSelection(int userId, QTextCursor cursor) {

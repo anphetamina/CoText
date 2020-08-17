@@ -17,6 +17,7 @@
 #include "AccountPacket.h"
 #include "Message.h"
 #include "CursorPacket.h"
+#include "DocumentPacket.h"
 
 
 /** Packet **/
@@ -298,6 +299,12 @@ PacketHandler PacketBuilder::Container(quint8 type)
         case PACK_TYPE_ACC_UPDATE:			return new class AccountUpdatePacket();
         case PACK_TYPE_MSG:			        return new class Message();
         case PACK_TYPE_CURSOR_POS:			return new class CursorPacket();
+        case PACK_TYPE_DOC_CREATE:			return new class DocumentCreatePacket();
+        case PACK_TYPE_DOC_OPEN:			return new class DocumentOpenPacket();
+        case PACK_TYPE_DOC_DEL:			    return new class DocumentDelPacket();
+        case PACK_TYPE_DOC_OK:			    return new class DocumentOkPacket();
+        case PACK_TYPE_DOC_ASKSURI:			return new class DocumentAskSharableURIPacket();
+        case PACK_TYPE_DOC_LIST:			return new class DocumentListPacket();
 
         default:
             throw std::exception();//TODO: create custom exception
@@ -342,6 +349,37 @@ PacketHandler PacketBuilder::Message(int type, QSymbol qs, int siteId)
 PacketHandler PacketBuilder::CursorPacket(qint32 userId, qint32 newPosition)
 {
     return new class CursorPacket(userId, newPosition);
+}
+
+
+PacketHandler PacketBuilder::DocumentCreatePacket(QString docName, qint32 userId)
+{
+    return new class DocumentCreatePacket(docName, userId);
+}
+
+PacketHandler PacketBuilder::DocumentOpenPacket(QString docName, qint32 userId)
+{
+    return new class DocumentOpenPacket(docName, userId);
+}
+
+PacketHandler PacketBuilder::DocumentDelPacket(QString docName, qint32 userId)
+{
+    return new class DocumentDelPacket(docName, userId);
+}
+
+PacketHandler PacketBuilder::DocumentOkPacket(QString docName, qint32 userId, QVector<QVector<QSymbol>> qsymbols)
+{
+    return new class DocumentOkPacket(userId, docName, qsymbols);
+}
+
+PacketHandler PacketBuilder::DocumentAskSharableURIPacket(QString docName, qint32 userId, QString sharableURI)
+{
+    return new class DocumentAskSharableURIPacket(docName, userId, sharableURI);
+}
+
+PacketHandler PacketBuilder::DocumentListPacket(qint32 userId, QVector<QString> docList)
+{
+    return new class DocumentListPacket( userId,  docList);
 }
 
 /*
