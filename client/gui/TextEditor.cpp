@@ -508,7 +508,7 @@ void TextEditor::cursorPositionChange() {
 void TextEditor::updateCursor(int userId, int position) {
     cursors[userId] = position;
     if(!userColors[userId].isValid()) {
-        userColors[userId] = QColor::fromRgb(QRandomGenerator::global()->generate()); //Qt::yellow; // todo change with different colors
+        userColors[userId] = QColor::fromRgb(QRandomGenerator::global()->generate()); // todo change with different colors
     }
 }
 

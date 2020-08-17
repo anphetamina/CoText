@@ -14,7 +14,7 @@ class UserHighlighter : public QSyntaxHighlighter {
     Q_OBJECT
 
 public:
-    UserHighlighter(std::map<int, QColor> &colors, QTextDocument *parent = 0);
+    UserHighlighter(const std::map<int, QColor> &colors, QTextDocument *parent = 0);
 
     void updatePosition(int position, int userId);
     void removePosition(int position);
@@ -29,7 +29,7 @@ private:
 
     QTextDocument &document;
     std::map<int, int> positions;
-    std::map<int, QColor> &colors;
+    const std::map<int, QColor> &colors;
 
 };
 

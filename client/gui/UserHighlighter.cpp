@@ -5,16 +5,18 @@
 #include <QDebug>
 #include "UserHighlighter.h"
 
-UserHighlighter::UserHighlighter(std::map<int, QColor> &colors, QTextDocument *parent) : QSyntaxHighlighter(parent), document(*parent), positions({}), colors(colors) {
+UserHighlighter::UserHighlighter(const std::map<int, QColor> &colors, QTextDocument *parent) : QSyntaxHighlighter(parent), document(*parent), positions({}), colors(colors) {
     setDocument(nullptr);
 }
 
 void UserHighlighter::highlightBlock(const QString &text) {
 
-    for (int i = currentBlock().position(), j = 0; i < currentBlock().position() + currentBlock().length(); i++, j++) {
+    for (int i = currentBlock().position(), j = 0; i < currentBlock().position() + text.length(); i++, j++) {
         QTextCharFormat format;
         format.setFontWeight(QFont::Bold);
-        format.setForeground(colors[positions[i]]);
+        const int &userId = positions.at(i);
+        const QColor &color = colors.at(userId);
+        format.setForeground(color);
         setFormat(j, 1, format);
     }
 }
