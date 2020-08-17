@@ -30,12 +30,14 @@ signals:
     void insertBlockReceived(std::vector<Symbol> symbols);
     void eraseBlockReceived(std::vector<Symbol> symbols);
     void updateCursorReceived(int userId, int position);
+    void updateSelectionReceived(int userId, QTextCursor cursor);
 
 public slots:
 
     void sendInsert(std::vector<QSymbol> symbols, int siteId);
     void sendErase(std::vector<QSymbol> symbols, int siteId);
     void sendCursor(int userId, int position);
+    void sendSelection(int userId, QTextCursor cursor);
 
 private Q_SLOTS:
     void onConnected();

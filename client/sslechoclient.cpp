@@ -219,6 +219,11 @@ void SslEchoClient::sendCursor(qint32 userId, qint32 position) {
     cp.send(*pServer);
 }
 
+void SslEchoClient::sendSelection(int userId, QTextCursor cursor) {
+    // todo
+
+}
+
 void SslEchoClient::connectToEditor(TextEditor* te) {
 //kink to
     connect(this, &SslEchoClient::insertReceived, te, &TextEditor::remoteInsert);
@@ -226,9 +231,11 @@ void SslEchoClient::connectToEditor(TextEditor* te) {
     connect(this, &SslEchoClient::insertBlockReceived, te, &TextEditor::remoteInsertBlock);
     connect(this, &SslEchoClient::eraseBlockReceived, te, &TextEditor::remoteEraseBlock);
     connect(this, &SslEchoClient::updateCursorReceived, te, &TextEditor::updateCursor);
+    connect(this, &SslEchoClient::updateSelectionReceived, te, &TextEditor::updateSelection);
     connect(te, &TextEditor::symbolsInserted, this, &SslEchoClient::sendInsert);
     connect(te, &TextEditor::symbolsErased, this, &SslEchoClient::sendErase);
     connect(te, &TextEditor::cursorPositionChanged, this, &SslEchoClient::sendCursor);
+    connect(te, &TextEditor::selectionChanged, this, &SslEchoClient::sendSelection);
 
 }
 

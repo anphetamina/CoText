@@ -16,11 +16,12 @@ TextEditor::TextEditor(Ui::MainWindow &ui, QWidget *parent) :
     parent(parent),
     ui(ui),
     index({0}),
-    editor(SharedEditor(Shuffler::getInstance()->getRandomInt())),
+    editor(SharedEditor(Shuffler::getInstance()->getRandomInt())), // todo get site id from server
     isFromRemote(false),
     testSymbols({{}}),
     cursors({}),
-    currentSelectedChars(0) {
+    currentSelectedChars(0),
+    selections({}) {
 
 
     document()->setDocumentMargin(50);
@@ -403,7 +404,6 @@ void TextEditor::remoteInsert(QSymbol qsymbol) {
         int oldPosition = textCursor().position();
         QTextCursor cursor(textCursor());
         cursor.setPosition(position);
-        // todo apply format
 
         cursor.insertText(QChar::fromLatin1(symbol.getC()), qsymbol.getcf());
         /**
@@ -411,6 +411,8 @@ void TextEditor::remoteInsert(QSymbol qsymbol) {
          * when an operation is done when the text cursor is in the same position
          * as of the remote cursor
          */
+
+        // todo check range
         cursor.setPosition(oldPosition);
         setTextCursor(cursor);
 
@@ -429,6 +431,8 @@ void TextEditor::remoteErase(Symbol symbol) {
     std::pair<int, int> pos = editor.remoteErase(symbol);
     if (pos.first != -1 || pos.second != -1) {
         int position = getPosition(pos.first, pos.second);
+
+        // todo check cursor for position
         QTextCursor cursor(textCursor());
         cursor.setPosition(position);
         cursor.deleteChar();
@@ -498,7 +502,26 @@ void TextEditor::selectionChange() {
     int selectionStart = textCursor().selectionStart();
     if (selectionStart != selectionEnd) {
         currentSelectedChars = selectionEnd - selectionStart;
+        QTextCursor selection = cursorForPosition(QPoint(selectionStart, selectionStart));
+        selection.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, currentSelectedChars);
+        emit selectionChanged(editor.getSiteId(), selection);
     } else {
         currentSelectedChars = 0;
+        emit selectionChanged(editor.getSiteId(), QTextCursor());
     }
+}
+
+void TextEditor::updateSelection(int userId, QTextCursor cursor) {
+    QTextCharFormat format;
+    // todo change color setting
+    format.setUnderlineColor(QColor::fromRgb(QRandomGenerator::global()->generate()));
+    QTextEdit::ExtraSelection es;
+    es.cursor = cursor;
+    es.format = format;
+    selections[userId] = es;
+    QList<QTextEdit::ExtraSelection> extraSelections;
+    for (const auto &selection : selections) {
+        extraSelections.push_back(selection.second);
+    }
+    setExtraSelections(extraSelections);
 }
