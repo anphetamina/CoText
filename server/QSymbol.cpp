@@ -38,7 +38,7 @@ void QSymbol::setPosition(QVector<Identifier> &position) {
 }
 
 Symbol QSymbol::toOriginal() const {
-    return Symbol(c.toLatin1(), id.toStdString(), std::vector(position.begin(), position.end()));
+    return Symbol(c.toLatin1(), id.toStdString(), position.toStdVector());
 }
 
 QDataStream & operator << (QDataStream & s, const QSymbol &qs) {

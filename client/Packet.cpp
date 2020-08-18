@@ -305,6 +305,7 @@ PacketHandler PacketBuilder::Container(quint8 type)
         case PACK_TYPE_DOC_OK:			    return new class DocumentOkPacket();
         case PACK_TYPE_DOC_ASKSURI:			return new class DocumentAskSharableURIPacket();
         case PACK_TYPE_DOC_LIST:			return new class DocumentListPacket();
+        case PACK_TYPE_DOC_USERLIST:		return new class DocumentBeaconOnlineUsers();
 
 
         default:
@@ -382,4 +383,8 @@ PacketHandler PacketBuilder::DocumentAskSharableURIPacket(QString docName, qint3
 PacketHandler PacketBuilder::DocumentListPacket(qint32 userId, QVector<QString> docList)
 {
     return new class DocumentListPacket( userId,  docList);
+}
+PacketHandler PacketBuilder::DocumentBeaconOnlineUsers(QVector<User> userList, qint32 docId)
+{
+    return new class DocumentBeaconOnlineUsers( userList,  docId);
 }

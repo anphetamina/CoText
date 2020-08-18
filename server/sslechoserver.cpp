@@ -125,10 +125,14 @@ void SslEchoServer::socketDisconnected()
         }
 
         client->logout();
+        // Get opened document id so that i can send to all the user connected to the same document a new online user lst
+        int closedDocId = getDocIdOpenedByUserId(client->getUserId());
         // Remove from documentopen map
         this->findAndDeleteFromDoclist(client);
         // Remove client element from map and close the socket
         clientMapping.remove(pClient);
+        // Send to all the the user connected to the document that was just closed by the client the new userlist
+        sendUpdatedOnlineUserByDocId(closedDocId);
 
         pClient->close();
         pClient->deleteLater();
@@ -354,7 +358,8 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             DocumentOkPacket dokp = DocumentOkPacket(docId, dop->getdocName(), qsymbols);
             dokp.send(*pClient);
 
-            break;
+            sendUpdatedOnlineUserByDocId(docId);
+
         }
         case(PACK_TYPE_DOC_DEL): {
             if (!client->isLogged()) {
@@ -423,4 +428,36 @@ void SslEchoServer::pruneOldConnectionsIfAny(QSharedPointer<Client> client, QWeb
         duplicatedConnection->close();  // Close gracefully connection to the old client instance
     }
 
+}
+void SslEchoServer::sendUpdatedOnlineUserByDocId(int docId) {
+    if(docId < 0)
+        return;
+
+    // Compose the updated userlist of online user per document
+    QVector<User> onlineUserPerDoc = {};
+    for (QSharedPointer<Client> onlineClient : documentMapping[docId]) {
+        if(onlineClient->isLogged()) {
+            onlineUserPerDoc.insert(0, onlineClient->getUser());
+        }
+    }
+    // Send to all the client the new userlist
+    for (QSharedPointer<Client> onlineClient : documentMapping[docId]) {
+        if(onlineClient->isLogged()) {
+            DocumentBeaconOnlineUsers bou = DocumentBeaconOnlineUsers(onlineUserPerDoc, docId);
+            bou.send(*onlineClient->getSocket());
+        }
+    }
+}
+
+int SslEchoServer::getDocIdOpenedByUserId(int userId){
+    for (auto it = documentMapping.begin(); it != documentMapping.end();) {
+        QList<QSharedPointer<Client>> onlineClientPerDoc = it.value();
+        for (QSharedPointer<Client> onlineClient : onlineClientPerDoc) {
+            if(onlineClient->getUserId() == userId) {
+                return it.key();
+            }
+        }
+        it++;
+    }
+    return -1;
 }

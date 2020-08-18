@@ -48,6 +48,10 @@ private:
     bool findAndDeleteFromDoclist(QSharedPointer<Client> client);
 
     void pruneOldConnectionsIfAny(QSharedPointer<Client> client, QWebSocket* pClient);
+
+    void sendUpdatedOnlineUserByDocId(int docId);
+
+    int getDocIdOpenedByUserId(int userId);
 };
 
 #endif //SSLECHOSERVER_H

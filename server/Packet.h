@@ -167,4 +167,5 @@ public:
     static PacketHandler DocumentAskSharableURIPacket(QString docName, qint32 userId, QString sharableURI);
     static PacketHandler DocumentListPacket(qint32 userId, QVector<QString> docList);
 
+    PacketHandler DocumentBeaconOnlineUsers(QVector<User> userList, qint32 docId);
 };

@@ -236,6 +236,12 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             DocumentAskSharableURIPacket *docInvite = dynamic_cast<DocumentAskSharableURIPacket *>(rcvd_packet.get());
             break;
         }
+        case (PACK_TYPE_DOC_USERLIST): {
+            // When a client receive this it means it was a response to an invite for ANOTHER CLIENT (that will SEND **NOT receive** a similar packet
+            DocumentBeaconOnlineUsers *bou = dynamic_cast<DocumentBeaconOnlineUsers *>(rcvd_packet.get());
+            qDebug() << "[DOC] Online userlist updated for DocId: " << bou->getdocId();
+            break;
+        }
     }
 }
 

@@ -27,9 +27,9 @@ PacketBuffer& Client::getPacketBuffer()
     return packetBuffer;
 }
 
-User* Client::getUser() const
+User Client::getUser() const
 {
-    return user;
+    return *user;
 }
 
 // Usr get email wrapper
