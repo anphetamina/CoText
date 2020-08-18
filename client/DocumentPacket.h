@@ -156,3 +156,4 @@ public:
 };
 
 std::vector<std::vector<Symbol>> toVector(QVector<QVector<QSymbol>> qsymbols);
+QVector<QTextCharFormat> toCFVector(QVector<QVector<QSymbol>> qsymbols);

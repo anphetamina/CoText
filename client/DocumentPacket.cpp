@@ -187,3 +187,15 @@ std::vector<std::vector<Symbol>> toVector(QVector<QVector<QSymbol>> qsymbols){
     }
     return symbols;
 }
+// Convert a bidimensional qvector of qsymbolsto a   std::vector of charformat to
+QVector<QTextCharFormat> toCFVector(QVector<QVector<QSymbol>> qsymbols){
+    QVector<QTextCharFormat> vcf = {};
+    for (auto symbolQArr : qsymbols) {
+        std::vector<Symbol> symbolArr = {};
+        for (auto qsymbol : symbolQArr) {  // Iterate over the Symbols
+            QTextCharFormat cf = qsymbol.getcf();
+            vcf.push_back(cf);
+        }
+    }
+    return vcf;
+}
