@@ -65,14 +65,3 @@ QSymbol Symbol::toSerializable(QTextCharFormat cf) {
     }
     return QSymbol(QChar(c), QString::fromStdString(id), position, cf);
 }
-
-/*
- *
-QDataStream & operator << (QDataStream & s, const Symbol& sy) {
-    s << sy.c << sy.getId() << sy.getPosition() ;
-    return s;
-}
-
-QDataStream & operator >> (QDataStream & s, Symbol sy) {
-    s >> sy.c >> sy.id >> sy.position ;
-}*/

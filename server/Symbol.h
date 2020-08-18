@@ -1,6 +1,4 @@
-#ifndef PDS_CPP_SYMBOL_H
-#define PDS_CPP_SYMBOL_H
-
+#pragma once
 
 #include <string>
 #include <vector>
@@ -50,6 +48,3 @@ public:
 
     int getSiteId() const;
 };
-
-
-#endif //PDS_CPP_SYMBOL_H

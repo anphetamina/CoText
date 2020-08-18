@@ -1,10 +1,7 @@
 //
 // Created by Antonio Santoro on 09/08/2020.
 //
-
-#ifndef COTEXT_CLIENT_QSYMBOL_H
-#define COTEXT_CLIENT_QSYMBOL_H
-
+#pragma once
 
 #include <QtCore/QChar>
 #include <QtCore/QString>
@@ -49,6 +46,3 @@ public:
 
 
 };
-
-
-#endif //COTEXT_CLIENT_QSYMBOL_H
