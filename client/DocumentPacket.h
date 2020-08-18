@@ -155,5 +155,23 @@ public:
 
 };
 
+class DocumentBeaconOnlineUsers : public Packet {
+    friend PacketBuilder;
+private:
+    QVector<User> userList;
+    qint32 docId;
+
+protected:
+    DocumentBeaconOnlineUsers();
+    void writePayload(QDataStream& stream) const override;
+    void readPayload(QDataStream& stream) override;
+public:
+    DocumentBeaconOnlineUsers(QVector<User> userList, qint32 docId);
+    ~DocumentBeaconOnlineUsers() {};
+    int getdocId() const;
+    QVector<User> getuserList() const;
+
+};
+
 std::vector<std::vector<Symbol>> toVector(QVector<QVector<QSymbol>> qsymbols);
 QVector<QTextCharFormat> toCFVector(QVector<QVector<QSymbol>> qsymbols);

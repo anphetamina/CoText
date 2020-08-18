@@ -305,6 +305,7 @@ PacketHandler PacketBuilder::Container(quint8 type)
         case PACK_TYPE_DOC_OK:			    return new class DocumentOkPacket();
         case PACK_TYPE_DOC_ASKSURI:			return new class DocumentAskSharableURIPacket();
         case PACK_TYPE_DOC_LIST:			return new class DocumentListPacket();
+        case PACK_TYPE_DOC_USERLIST:		return new class DocumentBeaconOnlineUsers();
 
         default:
             throw std::exception();//TODO: create custom exception
@@ -381,7 +382,10 @@ PacketHandler PacketBuilder::DocumentListPacket(qint32 userId, QVector<QString> 
 {
     return new class DocumentListPacket( userId,  docList);
 }
-
+PacketHandler PacketBuilder::DocumentBeaconOnlineUsers(QVector<User> userList, qint32 docId)
+{
+    return new class DocumentBeaconOnlineUsers( userList,  docId);
+}
 /*
  * Add new PacketBuilder method to create the empty packet (-> add def to Packet.cpp and PAcket.h and add #include newpacket.h in both file)
  * Create and define new code for packet in PacketDef.h

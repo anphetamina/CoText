@@ -172,6 +172,29 @@ void DocumentAskSharableURIPacket::readPayload(QDataStream& stream)
     stream >> userId >> docName >> sharableURI;
 }
 
+/** DocumentBeaconOnlineUsers packet **/
+// Inherit from a DocumentBaseActionClass?
+DocumentBeaconOnlineUsers::DocumentBeaconOnlineUsers(): Packet(PACK_TYPE_DOC_USERLIST){}
+DocumentBeaconOnlineUsers::DocumentBeaconOnlineUsers(QVector<User> userList, qint32 docId): Packet(PACK_TYPE_DOC_USERLIST), userList(userList), docId(docId){};
+
+int DocumentBeaconOnlineUsers::getdocId() const {
+    return docId;
+}
+
+QVector<User> DocumentBeaconOnlineUsers::getuserList() const {
+    return userList;
+}
+
+void DocumentBeaconOnlineUsers::writePayload(QDataStream& stream) const
+{
+    stream << userList << docId;
+}
+
+void DocumentBeaconOnlineUsers::readPayload(QDataStream& stream)
+{
+    stream >> userList >> docId;
+}
+
 //QVector::fromStdVector ( const std::vector<T> & vector )
 
 // Convert a bidimensional qvector of qsymbolsto a  bidimensional std::vector of symbols to

@@ -32,7 +32,7 @@ public:
     bool authenticate(QByteArray token);
 
     /* getters */
-    User* getUser() const;
+    User getUser() const;
     int getUserId() const;
     QString getEmail() const;
     QWebSocket* getSocket() const;
