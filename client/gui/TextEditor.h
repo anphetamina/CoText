@@ -23,7 +23,7 @@ class TextEditor : public QTextEdit {
     Q_OBJECT
 
 public:
-    explicit TextEditor(Ui::MainWindow &ui, QWidget *parent = nullptr);
+    explicit TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent = nullptr);
 
     int getRow(int position) const;
     int getCol(int row, int position) const;
@@ -43,6 +43,7 @@ private:
     SharedEditor editor;
     std::vector<int> index;
     std::vector<std::vector<Symbol>> testSymbols;
+    QVector<QVector<QSymbol>> testQSymbols;
     int currentSelectedChars;
     UserHighlighter highlighter;
 
@@ -73,6 +74,8 @@ public slots:
 
     void updateCursor(int userId, int position);
     void updateSelection(int userId, QTextCursor cursor);
+
+    void openDocument(QVector<QVector<QSymbol>> qSymbols);
 
 private slots:
 

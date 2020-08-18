@@ -592,3 +592,11 @@ void SharedEditor::clear() {
     counter = 0;
     idCounter = 0;
 }
+
+void SharedEditor::setSymbols(std::vector<std::vector<Symbol>> symbols) {
+    this->symbols.clear();
+    strategies.clear();
+    this->symbols = symbols;
+    counter = std::accumulate(symbols.begin(), symbols.end(), 0, [](int acc, const std::vector<Symbol>& a){ return acc+a.size(); });
+    idCounter = 0;
+}

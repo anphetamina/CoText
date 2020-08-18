@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     ////TODO
 
 
-    TextEditor editor(*w->getUi());
+    TextEditor editor(0, *w->getUi()); // todo get site id from server
 
     /**
      * place the QTextEditor object in the central position of the main window

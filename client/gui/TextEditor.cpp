@@ -7,17 +7,19 @@
 #include <QtWidgets/QFontDialog>
 #include <QThread>
 #include <QRandomGenerator>
+#include <QtWidgets/QLabel>
 #include "../Shuffler.h"
 #include "TextEditor.h"
 
 
-TextEditor::TextEditor(Ui::MainWindow &ui, QWidget *parent) :
+TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     parent(parent),
     ui(ui),
     index({0}),
     editor(SharedEditor(Shuffler::getInstance()->getRandomInt())), // todo get site id from server
     isFromRemote(false),
     testSymbols({{}}),
+    testQSymbols({{}}),
     cursors({}),
     currentSelectedChars(0),
     selections({}),
@@ -26,8 +28,8 @@ TextEditor::TextEditor(Ui::MainWindow &ui, QWidget *parent) :
     isUserColorsToggled(false) {
 
 
-    userColors[editor.getSiteId()] = QColor::fromRgb(QRandomGenerator::global()->generate());
-    document()->setDocumentMargin(50);
+    userColors[editor.getSiteId()] = QColor::fromRgb(QRandomGenerator::global()->generate()); // todo get from connected user list
+    document()->setDocumentMargin(50); // todo better margins
     setTextColor(Qt::white);
     qDebug() << "Current sID: "<< editor.getSiteId();
 
@@ -57,16 +59,23 @@ TextEditor::TextEditor(Ui::MainWindow &ui, QWidget *parent) :
      * testing code
      */
 
-    /*for (int i = 0; i < 2000; i++) {
-        for (int j = 0; j < 3; j++) {
+    QTextCharFormat f;
+    f.setFontWeight(QFont::Bold);
+    for (int i = 0; i < 200; i++) {
+        for (int j = 0; j < 40; j++) {
             Symbol s = editor.localInsert(i, j,'a');
             testSymbols[i].push_back(s);
+            testQSymbols[i].push_back(s.toSerializable(f));
         }
         Symbol s = editor.localInsert(i, editor.getSymbols()[i].size(), '\n');
         testSymbols[i].push_back(s);
+        testQSymbols[i].push_back(s.toSerializable(f));
         testSymbols.emplace_back();
+        testQSymbols.push_back({});
     }
-    editor.clear();*/
+    editor.clear();
+
+    openDocument(testQSymbols);
 }
 
 void TextEditor::selectFont() {
@@ -156,7 +165,6 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
             deleteRow(startRow, oldSize - newSize);
 
             std::vector<QSymbol> erasedQSymbols = {};
-            int p = position;
             for (Symbol symbol : erasedSymbols) {
                 erasedQSymbols.push_back(symbol.toSerializable(currentCharFormat()));
             }
@@ -183,7 +191,6 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
             int newRows = 0;
 
             std::vector<QSymbol> insertedSymbols;
-            int p = position;
 
             while (charsAdded > 0) {
                 QChar addedChar = document()->characterAt(position++);
@@ -431,6 +438,7 @@ void TextEditor::remoteInsert(QSymbol qSymbol) {
             cursor.setPosition(position);
 
             cursor.insertText(QChar::fromLatin1(symbol.getC()), qSymbol.getcf());
+
             /**
              * this step is necessary due to the cursor changing position
              * when an operation is done when the text cursor is in the same position
@@ -505,14 +513,26 @@ void TextEditor::paintEvent(QPaintEvent *e) {
         for (const std::pair<int, int> &c : cursors) {
             int position = c.second;
             int count = document()->characterCount();
-            painter.setPen(userColors[c.first]);
+            QColor color = userColors[c.first];
+            painter.setPen(color);
             if (position < count) {
                 cursor.setPosition(position);
-                painter.drawRect(cursorRect(cursor));
+                QRect cRect = cursorRect(cursor);
+                painter.drawRect(cRect);
+
+                /*QRect lRect(cRect.left(), cRect.top(), 50, 10);
+                painter.fillRect(lRect, color);
+                painter.drawRect(lRect);
+                painter.setPen(Qt::white);
+                QRect boundingRect;
+                painter.drawText(lRect, 0, tr("TEST"), &boundingRect);*/
+
                 document()->drawContents(&painter);
             } else if (position == count) {
                 cursor.setPosition(position - 1);
-                painter.drawRect(cursorRect(cursor));
+                QRect cRect = cursorRect(cursor);
+                painter.drawRect(cRect);
+
                 document()->drawContents(&painter);
             }
         }
@@ -584,4 +604,24 @@ QColor TextEditor::getUserColor(int userId) const {
 
 int TextEditor::getUserId(int row, int col) const {
     return editor.getSymbols()[row][col].getSiteId();
+}
+
+void TextEditor::openDocument(QVector<QVector<QSymbol>> qSymbols) {
+    isFromRemote = true;
+    std::vector<std::vector<Symbol>> symbols = {{}};
+    index.clear();
+    index.push_back(0);
+    int pos = 0;
+    for (int i = 0; i < qSymbols.size(); i++) {
+        for (int j = 0; j < qSymbols[i].size(); j++, ++pos) {
+            QSymbol qSymbol = qSymbols[i][j];
+            symbols[i].push_back(qSymbol.toOriginal());
+            textCursor().insertText(qSymbol.getC());
+            setCurrentCharFormat(qSymbol.getcf());
+            textCursor().movePosition(QTextCursor::Right);
+        }
+        index.push_back(pos);
+        symbols.emplace_back();
+    }
+    editor.setSymbols(symbols);
 }

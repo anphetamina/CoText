@@ -44,6 +44,8 @@ public:
 
     const std::vector<std::vector<Symbol>>& getSymbols() const;
 
+    void setSymbols(std::vector<std::vector<Symbol>> symbols);
+
     void clear();
 
     int getCounter() const;
