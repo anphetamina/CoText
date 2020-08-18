@@ -9,7 +9,6 @@
 #include <QRandomGenerator>
 #include "../Shuffler.h"
 #include "TextEditor.h"
-#include "../QSymbol.h"
 
 
 TextEditor::TextEditor(Ui::MainWindow &ui, QWidget *parent) :
@@ -23,7 +22,7 @@ TextEditor::TextEditor(Ui::MainWindow &ui, QWidget *parent) :
     currentSelectedChars(0),
     selections({}),
     userColors({}),
-    highlighter(userColors, document()),
+    highlighter(*this, document()),
     isUserColorsToggled(false) {
 
 
@@ -133,7 +132,97 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
     }
 
     /**
-     * first solution maps a 1-dimensional index (position) to a 2-dimensional one
+     * first exploits a vector of indexes that keeps track of the initial position
+     * in terms of 1-dimensional numbers
+     */
+
+
+    if (charsRemoved > 0) {
+
+        try {
+            int endPosition = position + charsRemoved - 1;
+            int startRow = getRow(position);
+            int startCol = getCol(startRow, position);
+            int endRow = getRow(endPosition);
+            int endCol = getCol(endRow, endPosition);
+
+            int oldSize = editor.getSymbols().size();
+
+            std::vector<Symbol> erasedSymbols = editor.localErase(startRow, startCol, endRow, endCol);
+
+            int newSize = editor.getSymbols().size();
+
+            decrementIndex(startRow, charsRemoved);
+            deleteRow(startRow, oldSize - newSize);
+
+            std::vector<QSymbol> erasedQSymbols = {};
+            int p = position;
+            for (Symbol symbol : erasedSymbols) {
+                erasedQSymbols.push_back(symbol.toSerializable(currentCharFormat()));
+            }
+
+            emit symbolsErased(erasedQSymbols, editor.getSiteId());
+        } catch (const std::exception &e) {
+            qDebug() << e.what();
+        }
+
+    }
+
+    if (charsAdded > 0) {
+
+        try {
+            /**
+         * get row and col from the index
+         * save the number of chars to increment the index rows right after
+         * save the number of new rows to insert
+         */
+            int row = getRow(position);
+            int col = getCol(row, position);
+            int n = charsAdded;
+            int pos = row;
+            int newRows = 0;
+
+            std::vector<QSymbol> insertedSymbols;
+            int p = position;
+
+            while (charsAdded > 0) {
+                QChar addedChar = document()->characterAt(position++);
+
+                if (addedChar == QChar::LineFeed || addedChar == QChar::ParagraphSeparator) {
+                    Symbol symbol = editor.localInsert(row, col, '\n');
+                    insertedSymbols.push_back(symbol.toSerializable(currentCharFormat()));
+                    newRows++;
+                } else {
+                    Symbol symbol = editor.localInsert(row, col, addedChar.toLatin1());
+                    insertedSymbols.push_back(symbol.toSerializable(currentCharFormat()));
+                }
+
+
+                /**
+                 * if it reaches the end of the line go in the next one
+                 */
+                if (col == editor.getSymbols()[row].size()) {
+                    row++;
+                    col = 0;
+                }
+
+                col++;
+                charsAdded--;
+            }
+
+            incrementIndex(pos, n);
+            insertRow(pos, newRows);
+
+            emit symbolsInserted(insertedSymbols, editor.getSiteId());
+        } catch (const std::exception &e) {
+            qDebug() << e.what();
+        }
+
+
+    }
+
+    /**
+     * second solution maps a 1-dimensional index (position) to a 2-dimensional one
      */
 
 //
@@ -208,88 +297,6 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 //            pos++;
 //        }
 //    }
-
-
-    /**
-     * second solution exploits a vector of indexes that keeps track of the initial position
-     * in terms of 1-dimensional numbers
-     */
-
-
-    if (charsRemoved > 0) {
-        int endPosition = position + charsRemoved - 1;
-        int startRow = getRow(position);
-        int startCol = getCol(startRow, position);
-        int endRow = getRow(endPosition);
-        int endCol = getCol(endRow, endPosition);
-
-        int oldSize = editor.getSymbols().size();
-
-        std::vector<Symbol> erasedSymbols = editor.localErase(startRow, startCol, endRow, endCol);
-
-        int newSize = editor.getSymbols().size();
-
-        decrementIndex(startRow, charsRemoved);
-        deleteRow(startRow, oldSize - newSize);
-
-        std::vector<QSymbol> erasedQSymbols = {};
-        int p = position;
-        for (Symbol symbol : erasedSymbols) {
-            erasedQSymbols.push_back(symbol.toSerializable(currentCharFormat()));
-            highlighter.removePosition(p++);
-        }
-
-        emit symbolsErased(erasedQSymbols, editor.getSiteId());
-    }
-
-    if (charsAdded > 0) {
-
-        /**
-         * get row and col from the index
-         * save the number of chars to increment the index rows right after
-         * save the number of new rows to insert
-         */
-        int row = getRow(position);
-        int col = getCol(row, position);
-        int n = charsAdded;
-        int pos = row;
-        int newRows = 0;
-
-        std::vector<QSymbol> insertedSymbols;
-        int p = position;
-
-        while (charsAdded > 0) {
-            QChar addedChar = document()->characterAt(position++);
-
-            if (addedChar == QChar::LineFeed || addedChar == QChar::ParagraphSeparator) {
-                Symbol symbol = editor.localInsert(row, col, '\n');
-                insertedSymbols.push_back(symbol.toSerializable(currentCharFormat()));
-                newRows++;
-            } else {
-                Symbol symbol = editor.localInsert(row, col, addedChar.toLatin1());
-                insertedSymbols.push_back(symbol.toSerializable(currentCharFormat()));
-            }
-
-
-            /**
-             * if it reaches the end of the line go in the next one
-             */
-            if (col == editor.getSymbols()[row].size()) {
-                row++;
-                col = 0;
-            }
-
-            col++;
-            charsAdded--;
-
-            highlighter.updatePosition(p++, editor.getSiteId()); // todo change with user id
-        }
-
-        incrementIndex(pos, n);
-        insertRow(pos, newRows);
-
-        emit symbolsInserted(insertedSymbols, editor.getSiteId());
-    }
 
 
     /**
@@ -374,7 +381,7 @@ void TextEditor::decrementIndex(int pos, int n) {
  * @param position
  * @return the relative offset from the starting index of row
  */
-int TextEditor::getCol(int row, int position) {
+int TextEditor::getCol(int row, int position) const {
     return position - index[row];
 }
 
@@ -388,7 +395,7 @@ int TextEditor::getCol(int row, int position) {
  * 3)
  * for position 8 returns row 2
  */
-int TextEditor::getRow(int position) {
+int TextEditor::getRow(int position) const {
 
     auto it = std::lower_bound(index.begin(), index.end(), position);
     if (it == index.end()) {
@@ -407,55 +414,64 @@ int TextEditor::getRow(int position) {
  */
 void TextEditor::remoteInsert(QSymbol qSymbol) {
 
-    isFromRemote = true;
-    Symbol symbol = qSymbol.toOriginal();
-    std::pair<int, int> pos = editor.remoteInsert(symbol);
-    if (pos.first != -1 || pos.second != -1) {
-        int position = getPosition(pos.first, pos.second);
-        int oldPosition = textCursor().position();
-        QTextCursor cursor(textCursor());
-        cursor.setPosition(position);
+    try {
+        isFromRemote = true;
+        Symbol symbol = qSymbol.toOriginal();
+        std::pair<int, int> pos = editor.remoteInsert(symbol);
+        if (pos.first != -1 || pos.second != -1) {
 
-        cursor.insertText(QChar::fromLatin1(symbol.getC()), qSymbol.getcf());
-        /**
-         * this step is necessary due to the cursor changing position
-         * when an operation is done when the text cursor is in the same position
-         * as of the remote cursor
-         */
+            incrementIndex(pos.first, 1);
+            if (symbol.getC() == '\n') {
+                insertRow(pos.first, 1);
+            }
 
-        // todo check range
-        cursor.setPosition(oldPosition);
-        setTextCursor(cursor);
+            int position = getPosition(pos.first, pos.second);
+            int oldPosition = textCursor().position();
+            QTextCursor cursor(textCursor());
+            cursor.setPosition(position);
 
-        incrementIndex(pos.first, 1);
-        if (symbol.getC() == '\n') {
-            insertRow(pos.first, 1);
+            cursor.insertText(QChar::fromLatin1(symbol.getC()), qSymbol.getcf());
+            /**
+             * this step is necessary due to the cursor changing position
+             * when an operation is done when the text cursor is in the same position
+             * as of the remote cursor
+             */
+
+            // todo check range
+            cursor.setPosition(oldPosition);
+            setTextCursor(cursor);
+
         }
-
-        highlighter.updatePosition(position, symbol.getSiteId()); // todo change with user id
+    } catch (const std::exception &e) {
+        qDebug() << e.what();
     }
+
 }
 /**
  * erase symbol received from the server
  * @param symbol
  */
 void TextEditor::remoteErase(Symbol symbol) {
-    isFromRemote = true;
-    std::pair<int, int> pos = editor.remoteErase(symbol);
-    if (pos.first != -1 || pos.second != -1) {
-        int position = getPosition(pos.first, pos.second);
 
-        // todo check cursor for position
-        QTextCursor cursor(textCursor());
-        cursor.setPosition(position);
-        cursor.deleteChar();
+    try {
+        isFromRemote = true;
+        std::pair<int, int> pos = editor.remoteErase(symbol);
+        if (pos.first != -1 || pos.second != -1) {
 
-        decrementIndex(pos.first, 1);
-        if (symbol.getC() == '\n') {
-            deleteRow(pos.first, 1);
+            decrementIndex(pos.first, 1);
+            if (symbol.getC() == '\n') {
+                deleteRow(pos.first, 1);
+            }
+
+            int position = getPosition(pos.first, pos.second);
+
+            // todo check cursor for position
+            QTextCursor cursor(textCursor());
+            cursor.setPosition(position);
+            cursor.deleteChar();
         }
-
-        highlighter.removePosition(position);
+    } catch (const std::exception &e) {
+        qDebug() << e.what();
     }
 
 }
@@ -481,23 +497,30 @@ void TextEditor::remoteEraseBlock(std::vector<Symbol> symbols) {
 }
 
 void TextEditor::paintEvent(QPaintEvent *e) {
-    QTextEdit::paintEvent(e);
-    QPainter painter(viewport());
-    QTextCursor cursor(document());
-    for (const std::pair<int, int> &c : cursors) {
-        int position = c.second;
-        int count = document()->characterCount();
-        painter.setPen(userColors[c.first]);
-        if (position < count) {
-            cursor.setPosition(position);
-            painter.drawRect(cursorRect(cursor));
-            document()->drawContents(&painter);
-        } else if (position == count) {
-            cursor.setPosition(position - 1);
-            painter.drawRect(cursorRect(cursor));
-            document()->drawContents(&painter);
+
+    try {
+        QTextEdit::paintEvent(e);
+        QPainter painter(viewport());
+        QTextCursor cursor(document());
+        for (const std::pair<int, int> &c : cursors) {
+            int position = c.second;
+            int count = document()->characterCount();
+            painter.setPen(userColors[c.first]);
+            if (position < count) {
+                cursor.setPosition(position);
+                painter.drawRect(cursorRect(cursor));
+                document()->drawContents(&painter);
+            } else if (position == count) {
+                cursor.setPosition(position - 1);
+                painter.drawRect(cursorRect(cursor));
+                document()->drawContents(&painter);
+            }
         }
+    } catch (const std::exception &e) {
+        qDebug() << e.what();
     }
+
+
 }
 
 void TextEditor::cursorPositionChange() {
@@ -505,6 +528,11 @@ void TextEditor::cursorPositionChange() {
     emit cursorPositionChanged(editor.getSiteId(), textCursor().position());
 }
 
+/**
+ * update the cursor of userId at position
+ * @param userId
+ * @param position
+ */
 void TextEditor::updateCursor(int userId, int position) {
     cursors[userId] = position;
     if(!userColors[userId].isValid()) {
@@ -550,6 +578,10 @@ void TextEditor::toggleUserColors() {
     isUserColorsToggled = !isUserColorsToggled;
 }
 
-const std::map<int, QColor> &TextEditor::getUserColors() {
-    return userColors;
+QColor TextEditor::getUserColor(int userId) const {
+    return userColors.at(userId);
+}
+
+int TextEditor::getUserId(int row, int col) const {
+    return editor.getSymbols()[row][col].getSiteId();
 }
