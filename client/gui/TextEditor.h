@@ -64,6 +64,8 @@ private:
 
     std::atomic<bool> isUserColorsToggled;
 
+    void printSymbols();
+
 
 public slots:
 

@@ -59,7 +59,7 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
      * testing code
      */
 
-    QTextCharFormat f;
+    /*QTextCharFormat f;
     f.setFontWeight(QFont::Bold);
     for (int i = 0; i < 200; i++) {
         for (int j = 0; j < 40; j++) {
@@ -75,7 +75,7 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     }
     editor.clear();
 
-    openDocument(testQSymbols);
+    openDocument(testQSymbols);*/
 }
 
 void TextEditor::selectFont() {
@@ -306,19 +306,8 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 //    }
 
 
-    /**
-     * print the current document in the console
-     */
+    printSymbols();
 
-    /*QDebug dbg(QtDebugMsg);
-    qDebug() << "---";
-    const auto& symbols = editor.getSymbols();
-    for (int i = 0; i < symbols.size(); i++) {
-        dbg << "[" << index[i] << "]";
-        for (int j = 0; j < symbols[i].size(); j++) {
-            dbg << symbols[i][j].getC();
-        }
-    }*/
 }
 
 /**
@@ -624,4 +613,15 @@ void TextEditor::openDocument(QVector<QVector<QSymbol>> qSymbols) {
         symbols.emplace_back();
     }
     editor.setSymbols(symbols);
+}
+
+void TextEditor::printSymbols() {
+    std::cout << "---" << std::endl;
+    const auto& symbols = editor.getSymbols();
+    for (int i = 0; i < symbols.size(); i++) {
+        std::cout << "[" << index[i] << "]";
+        for (int j = 0; j < symbols[i].size(); j++) {
+            std::cout << symbols[i][j].getC();
+        }
+    }
 }
