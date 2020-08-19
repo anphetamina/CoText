@@ -191,7 +191,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
                 if (addedChar == QChar::LineFeed || addedChar == QChar::ParagraphSeparator) {
                     newRows++;
                 }
-
+                insertedSymbols.push_back(symbol);
 
                 /**
                  * if it reaches the end of the line go in the next one
