@@ -49,3 +49,7 @@ QDataStream & operator>>(QDataStream& s, Identifier& i) {
     s >> i.digit >> i.siteId ;
     return s;
 }
+
+bool Identifier::isValid() const {
+    return siteId < 0 || digit < 0;
+}

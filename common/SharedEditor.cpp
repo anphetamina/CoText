@@ -12,7 +12,7 @@ SharedEditor::SharedEditor(int siteId)
 
 bool SharedEditor::retrieveStrategy(int level) {
     if (level < 0) {
-        throw std::invalid_argument("level is negative");
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": level is negative");
     }
     if (level < strategies.size() && level != 0) {
         return strategies.at(level);
@@ -35,19 +35,19 @@ bool SharedEditor::retrieveStrategy(int level) {
 int SharedEditor::generateIdBetween(int min, int max, bool strategy) {
 
     if (min < 0 && max < 0) {
-        throw std::invalid_argument("min and max is negative");
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": min and max is negative");
     }
     if (min < 0) {
-        throw std::invalid_argument("min is negative");
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": min is negative");
     }
     if (max < 0) {
-        throw std::invalid_argument("max is negative");
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": max is negative");
     }
     if (max < min) {
-        throw std::range_error("min is greater than max");
+        throw std::range_error(std::string{} + __PRETTY_FUNCTION__ + ": min is greater than max");
     }
     if (min == max) {
-        throw std::range_error("min is equal to max");
+        throw std::range_error(std::string{} + __PRETTY_FUNCTION__ + ": min is equal to max");
     }
 
     if ((max - min) == 2) {
@@ -119,10 +119,10 @@ std::vector<Identifier> SharedEditor::findPosAfter(int line, int index) {
  */
 std::vector<Identifier> SharedEditor::generatePosBetween(std::vector<Identifier> pos1, std::vector<Identifier> pos2, std::vector<Identifier> newPos, int level) {
     if (pos1.empty()) {
-        throw std::invalid_argument("pos1 is empty");
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": pos1 is empty");
     }
     if (level < 0) {
-        throw std::invalid_argument("level is negative");
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": level is negative");
     }
 
     int id1 = 0;
@@ -242,13 +242,13 @@ void SharedEditor::insertSymbol(int line, int index, QSymbol symbol) {
 QSymbol SharedEditor::localInsert(int line, int index, QChar value, QTextCharFormat format) {
 
     if (line < 0) {
-        throw std::out_of_range("line "+std::to_string(line)+" is negative");
+        throw std::out_of_range(std::string{} + __PRETTY_FUNCTION__ + ": line "+std::to_string(line)+" is negative");
     } else if (line >= symbols.size()) {
-        throw std::out_of_range("line "+std::to_string(line)+" >= "+std::to_string(symbols.size()));
+        throw std::out_of_range(std::string{} + __PRETTY_FUNCTION__ + ": line "+std::to_string(line)+" >= "+std::to_string(symbols.size()));
     } else if (index < 0) {
-        throw std::out_of_range("index "+std::to_string(index)+" is negative");
+        throw std::out_of_range(std::string{} + __PRETTY_FUNCTION__ + ": index "+std::to_string(index)+" is negative");
     } else if (index > symbols[line].size()) {
-        throw std::out_of_range("index "+std::to_string(index)+" > "+std::to_string(symbols[line].size()));
+        throw std::out_of_range(std::string{} + __PRETTY_FUNCTION__ + ": index "+std::to_string(index)+" > "+std::to_string(symbols[line].size()));
     }
 
 
@@ -352,17 +352,17 @@ std::vector<QSymbol> SharedEditor::eraseMultipleLines(int startLine, int startIn
 std::vector<QSymbol> SharedEditor::localErase(int startLine, int startIndex, int endLine, int endIndex) {
 
     if (startLine < 0) {
-        throw std::out_of_range("startLine "+std::to_string(startLine)+" is negative");
+        throw std::out_of_range(std::string{} + __PRETTY_FUNCTION__ + ": startLine "+std::to_string(startLine)+" is negative");
     } else if (endLine > symbols.size()) {
-        throw std::out_of_range("endLine "+std::to_string(endLine)+" > num of lines "+std::to_string(symbols.size()));
+        throw std::out_of_range(std::string{} + __PRETTY_FUNCTION__ + ": endLine "+std::to_string(endLine)+" > num of lines "+std::to_string(symbols.size()));
     } else if (startIndex < 0) {
-        throw std::out_of_range("startIndex "+std::to_string(startIndex)+" is negative");
+        throw std::out_of_range(std::string{} + __PRETTY_FUNCTION__ + ": startIndex "+std::to_string(startIndex)+" is negative");
     } else if (endIndex > symbols[endLine].size()) {
-        throw std::out_of_range("endIndex "+std::to_string(endIndex)+" > num of symbols "+std::to_string(symbols[endLine].size())+" line "+std::to_string(endLine));
+        throw std::out_of_range(std::string{} + __PRETTY_FUNCTION__ + ": endIndex "+std::to_string(endIndex)+" > num of symbols "+std::to_string(symbols[endLine].size())+" line "+std::to_string(endLine));
     } else if (startLine > endLine) {
-        throw std::invalid_argument("startLine "+std::to_string(startLine)+" > endLine "+std::to_string(endLine));
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": startLine "+std::to_string(startLine)+" > endLine "+std::to_string(endLine));
     } else if (startLine == endLine && startIndex > endIndex) {
-        throw std::invalid_argument("startIndex "+std::to_string(startLine)+" > endIndex "+std::to_string(endIndex));
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": startIndex "+std::to_string(startLine)+" > endIndex "+std::to_string(endIndex));
     }
 
     std::vector<QSymbol> erasedSymbols;
@@ -402,6 +402,10 @@ std::vector<QSymbol> SharedEditor::localErase(int startLine, int startIndex, int
  * @return the pair (line,index) and insert symbol right before the first one with the higher fractional position
  */
 std::pair<int, int> SharedEditor::remoteInsert(const QSymbol &symbol) {
+
+    if (!symbol.isValid()) {
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": symbol is invalid");
+    }
 
     if (symbols.front().empty()) {
         insertSymbol(0, 0, symbol);
@@ -476,6 +480,11 @@ std::pair<int, int> SharedEditor::remoteInsert(const QSymbol &symbol) {
  * @return the pair (line,index) of the removed symbol
  */
 std::pair<int, int> SharedEditor::remoteErase(const QSymbol &symbol) {
+
+    if (!symbol.isValid()) {
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": symbol is invalid");
+    }
+
     if (!symbols.front().empty()) {
         bool mergeLines = false;
         std::vector<std::vector<QSymbol>>::iterator line_it;

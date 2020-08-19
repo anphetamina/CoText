@@ -304,6 +304,13 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
  * @param n
  */
 void TextEditor::insertRow(int pos, int n) {
+
+    if (pos < 0) {
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": pos is negative");
+    } else if (n < 0) {
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": n is negative");
+    }
+
     if (pos >= index.size()) {
         return;
     }
@@ -318,6 +325,13 @@ void TextEditor::insertRow(int pos, int n) {
  * @param n
  */
 void TextEditor::deleteRow(int pos, int n) {
+
+    if (pos < 0) {
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": pos is negative");
+    } else if (n < 0) {
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": n is negative");
+    }
+
     if (pos+n >= index.size() || n == 0) {
         return;
     }
@@ -336,6 +350,13 @@ void TextEditor::deleteRow(int pos, int n) {
  * @param n
  */
 void TextEditor::incrementIndex(int pos, int n) {
+
+    if (pos < 0) {
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": pos is negative");
+    } else if (n < 0) {
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": n is negative");
+    }
+
     if (pos+1 >= index.size()) {
         return;
     }
@@ -351,6 +372,13 @@ void TextEditor::incrementIndex(int pos, int n) {
  * @param n
  */
 void TextEditor::decrementIndex(int pos, int n) {
+
+    if (pos < 0) {
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": pos is negative");
+    } else if (n < 0) {
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": n is negative");
+    }
+
     if (pos+1 >= index.size()) {
         return;
     }
@@ -366,6 +394,13 @@ void TextEditor::decrementIndex(int pos, int n) {
  * @return the relative offset from the starting index of row
  */
 int TextEditor::getCol(int row, int position) const {
+
+    if (position < 0) {
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": position is negative");
+    } else if (row < 0) {
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": row is negative");
+    }
+
     return position - index[row];
 }
 
@@ -380,6 +415,10 @@ int TextEditor::getCol(int row, int position) const {
  * for position 8 returns row 2
  */
 int TextEditor::getRow(int position) const {
+
+    if (position < 0) {
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": position is negative");
+    }
 
     auto it = std::lower_bound(index.begin(), index.end(), position);
     if (it == index.end()) {
@@ -399,6 +438,7 @@ int TextEditor::getRow(int position) const {
 void TextEditor::remoteInsert(QSymbol symbol) {
 
     try {
+
         isFromRemote = true;
         std::pair<int, int> pos = editor.remoteInsert(symbol);
         if (pos.first != -1 || pos.second != -1) {
@@ -410,6 +450,11 @@ void TextEditor::remoteInsert(QSymbol symbol) {
             }
 
             int position = getPosition(pos.first, pos.second);
+
+            if (position < 0 || position > document()->characterCount()) {
+                throw std::runtime_error(std::string{} + __PRETTY_FUNCTION__ + ": invalid cursor position");
+            }
+
             int oldPosition = textCursor().position();
             QTextCursor cursor(textCursor());
             cursor.setPosition(position);
@@ -422,7 +467,6 @@ void TextEditor::remoteInsert(QSymbol symbol) {
              * as of the remote cursor
              */
 
-            // todo check range
             cursor.setPosition(oldPosition);
             setTextCursor(cursor);
 
@@ -450,7 +494,10 @@ void TextEditor::remoteErase(QSymbol symbol) {
 
             int position = getPosition(pos.first, pos.second);
 
-            // todo check cursor for position
+            if (position < 0 || position > document()->characterCount()) {
+                throw std::runtime_error(std::string{} + __PRETTY_FUNCTION__ + ": invalid cursor position");
+            }
+
             QTextCursor cursor(textCursor());
             cursor.setPosition(position);
             cursor.deleteChar();
@@ -542,16 +589,19 @@ void TextEditor::selectionChange() {
     int selectionStart = textCursor().selectionStart();
     if (selectionStart != selectionEnd) {
         currentSelectedChars = selectionEnd - selectionStart;
-        QTextCursor selection = cursorForPosition(QPoint(selectionStart, selectionStart));
-        selection.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, currentSelectedChars);
-        emit selectionChanged(editor.getSiteId(), selection);
+//        QTextCursor selection = cursorForPosition(QPoint(selectionStart, selectionStart));
+//        selection.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, currentSelectedChars);
+//        emit selectionChanged(editor.getSiteId(), selection);
     } else {
         currentSelectedChars = 0;
-        emit selectionChanged(editor.getSiteId(), QTextCursor());
+//        emit selectionChanged(editor.getSiteId(), QTextCursor());
     }
 }
 
 void TextEditor::updateSelection(int userId, QTextCursor cursor) {
+    /**
+     * unused
+     */
     QTextCharFormat format;
     // todo change color setting
     format.setUnderlineColor(QColor::fromRgb(QRandomGenerator::global()->generate()));
@@ -576,6 +626,11 @@ void TextEditor::toggleUserColors() {
 }
 
 QColor TextEditor::getUserColor(int userId) const {
+
+    if (userColors.find(userId) == userColors.end()) {
+        throw std::runtime_error(std::string{} + __PRETTY_FUNCTION__ + ": color for user id not found");
+    }
+
     return userColors.at(userId);
 }
 
@@ -584,6 +639,13 @@ int TextEditor::getUserId(int row, int col) const {
 }
 
 void TextEditor::openDocument(std::vector<std::vector<QSymbol>> symbols) {
+
+    if (std::any_of(symbols.begin(), symbols.end(), [](const std::vector<QSymbol> &row){
+        return std::any_of(row.begin(), row.end(), [](const QSymbol &s){ return !s.isValid(); });
+    })) {
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": document is invalid");
+    }
+
     index.clear();
     index.push_back(0);
     int pos = 0;

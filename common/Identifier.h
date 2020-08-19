@@ -34,4 +34,6 @@ public:
 
     bool operator<(const Identifier &rhs) const;
 
+    bool isValid() const;
+
 };

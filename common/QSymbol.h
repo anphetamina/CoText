@@ -40,6 +40,8 @@ public:
     const std::vector<Identifier> &getPosition() const;
     void setPosition(const std::vector<Identifier> &position);
 
+    bool isValid() const;
+
     bool operator==(const QSymbol &symbol) const;
     bool operator<(const QSymbol &symbol) const;
 

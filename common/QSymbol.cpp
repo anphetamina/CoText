@@ -39,6 +39,9 @@ const std::vector<Identifier> &QSymbol::getPosition() const {
 }
 
 void QSymbol::setPosition(const std::vector<Identifier> &position) {
+    if (position.empty()) {
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": position is empty");
+    }
     this->position = position;
 }
 
@@ -47,6 +50,11 @@ bool QSymbol::operator==(const QSymbol &symbol) const {
 }
 
 bool QSymbol::operator<(const QSymbol &symbol) const {
+
+    if (symbol.position.empty()) {
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": symbol position is empty");
+    }
+
     int min = 0;
     if (this->position.size() < symbol.getPosition().size()) {
         min = this->getPosition().size();
@@ -64,9 +72,21 @@ bool QSymbol::operator<(const QSymbol &symbol) const {
 }
 
 int QSymbol::getSiteId() const {
-    // todo check site id exceptions
     QString delimiter("-");
     QString siteId = id.split(delimiter).front();
     int iSiteId = siteId.toInt();
+
+    if (siteId.isEmpty() || iSiteId == 0) {
+        throw std::runtime_error(std::string{} + __PRETTY_FUNCTION__ + ": invalid site id");
+    }
+
     return iSiteId;
+}
+
+bool QSymbol::isValid() const {
+    return c.isNull() ||
+           id.trimmed().isEmpty() ||
+           std::any_of(position.begin(), position.end(), [](const Identifier &i) { return !i.isValid(); }) ||
+           cf.isEmpty() ||
+           !cf.isValid();
 }
