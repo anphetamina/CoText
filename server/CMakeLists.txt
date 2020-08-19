@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.15)
 project(CoText-server)
 
+set(common_dir ../common)
+include_directories(${common_dir})
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
@@ -23,9 +26,10 @@ find_package(Qt5 COMPONENTS Gui REQUIRED)
 find_package(Qt5 COMPONENTS Sql REQUIRED)
 find_package(Qt5 COMPONENTS Network REQUIRED)
 
-file(GLOB SERVER "*.h" "*.cpp")
+file(GLOB server_src "*.h" "*.cpp")
+file(GLOB common_src "${common_dir}/*.h" "${common_dir}/*.cpp")
 
-add_executable(CoText-server main.cpp  PacketDef.h Packet.cpp Packet.h ${SERVER} sslechoserver.cpp sslechoserver.h PingPacket.cpp PingPacket.h LoginPacket.cpp LoginPacket.h AccountPacket.cpp AccountPacket.h Client.cpp Client.h User.cpp User.h Identifier.cpp Identifier.h Symbol.cpp Symbol.h QSymbol.h QSymbol.cpp Message.cpp Message.h DBConf.cpp DBConf.h)
+add_executable(CoText-server ${common_src} ${server_src})
 
 target_link_libraries(CoText-server PUBLIC
         Qt5::Network

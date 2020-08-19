@@ -10,8 +10,8 @@
 #include <iostream>
 #include <QtWidgets/QTextEdit>
 #include <QtGui/QPainter>
-#include "../SharedEditor.h"
-#include "../QSymbol.h"
+#include "../common/SharedEditor.h"
+#include "../common/QSymbol.h"
 #include "UserHighlighter.h"
 
 class UserHighlighter;
@@ -42,8 +42,7 @@ private:
 
     SharedEditor editor;
     std::vector<int> index;
-    std::vector<std::vector<Symbol>> testSymbols;
-    QVector<QVector<QSymbol>> testQSymbols;
+    std::vector<std::vector<QSymbol>> testSymbols;
     int currentSelectedChars;
     UserHighlighter highlighter;
 
@@ -69,15 +68,15 @@ private:
 
 public slots:
 
-    void remoteInsert(QSymbol qsymbol);
-    void remoteInsertBlock(std::vector<Symbol> symbols);
-    void remoteErase(Symbol symbol);
-    void remoteEraseBlock(std::vector<Symbol> symbols);
+    void remoteInsert(QSymbol symbol);
+    void remoteInsertBlock(std::vector<QSymbol> symbols);
+    void remoteErase(QSymbol symbol);
+    void remoteEraseBlock(std::vector<QSymbol> symbols);
 
     void updateCursor(int userId, int position);
     void updateSelection(int userId, QTextCursor cursor);
 
-    void openDocument(QVector<QVector<QSymbol>> qSymbols);
+    void openDocument(std::vector<std::vector<QSymbol>> symbols);
 
 private slots:
 

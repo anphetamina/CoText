@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Packet.h"
+#include "../common/Packet.h"
 #include "User.h"
 
 

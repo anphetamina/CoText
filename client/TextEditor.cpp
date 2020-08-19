@@ -8,7 +8,7 @@
 #include <QThread>
 #include <QRandomGenerator>
 #include <QtWidgets/QLabel>
-#include "../Shuffler.h"
+#include "../common/Shuffler.h"
 #include "TextEditor.h"
 
 
@@ -19,7 +19,6 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     editor(SharedEditor(Shuffler::getInstance()->getRandomInt())), // todo get site id from server
     isFromRemote(false),
     testSymbols({{}}),
-    testQSymbols({{}}),
     cursors({}),
     currentSelectedChars(0),
     selections({}),
@@ -63,19 +62,16 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     f.setFontWeight(QFont::Bold);
     for (int i = 0; i < 200; i++) {
         for (int j = 0; j < 40; j++) {
-            Symbol s = editor.localInsert(i, j,'a');
+            QSymbol s = editor.localInsert(i, j,'a', f);
             testSymbols[i].push_back(s);
-            testQSymbols[i].push_back(s.toSerializable(f));
         }
-        Symbol s = editor.localInsert(i, editor.getSymbols()[i].size(), '\n');
+        QSymbol s = editor.localInsert(i, editor.getSymbols()[i].size(), QChar::LineFeed, f);
         testSymbols[i].push_back(s);
-        testQSymbols[i].push_back(s.toSerializable(f));
         testSymbols.emplace_back();
-        testQSymbols.push_back({});
     }
     editor.clear();
 
-    openDocument(testQSymbols);*/
+    openDocument(testSymbols);*/
 }
 
 void TextEditor::selectFont() {
@@ -141,7 +137,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
     }
 
     /**
-     * first exploits a vector of indexes that keeps track of the initial position
+     * first solution exploits a vector of indexes that keeps track of the initial position
      * in terms of 1-dimensional numbers
      */
 
@@ -157,19 +153,14 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
             int oldSize = editor.getSymbols().size();
 
-            std::vector<Symbol> erasedSymbols = editor.localErase(startRow, startCol, endRow, endCol);
+            std::vector<QSymbol> erasedSymbols = editor.localErase(startRow, startCol, endRow, endCol);
 
             int newSize = editor.getSymbols().size();
 
             decrementIndex(startRow, charsRemoved);
             deleteRow(startRow, oldSize - newSize);
 
-            std::vector<QSymbol> erasedQSymbols = {};
-            for (Symbol symbol : erasedSymbols) {
-                erasedQSymbols.push_back(symbol.toSerializable(currentCharFormat()));
-            }
-
-            emit symbolsErased(erasedQSymbols, editor.getSiteId());
+            emit symbolsErased(erasedSymbols, editor.getSiteId());
         } catch (const std::exception &e) {
             qDebug() << e.what();
         }
@@ -180,10 +171,10 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
         try {
             /**
-         * get row and col from the index
-         * save the number of chars to increment the index rows right after
-         * save the number of new rows to insert
-         */
+             * get row and col from the index
+             * save the number of chars to increment the index rows right after
+             * save the number of new rows to insert
+             */
             int row = getRow(position);
             int col = getCol(row, position);
             int n = charsAdded;
@@ -194,14 +185,11 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
             while (charsAdded > 0) {
                 QChar addedChar = document()->characterAt(position++);
+                QSymbol symbol = editor.localInsert(row, col, addedChar, currentCharFormat());
 
+                // todo check QChar::LineSeparator
                 if (addedChar == QChar::LineFeed || addedChar == QChar::ParagraphSeparator) {
-                    Symbol symbol = editor.localInsert(row, col, '\n');
-                    insertedSymbols.push_back(symbol.toSerializable(currentCharFormat()));
                     newRows++;
-                } else {
-                    Symbol symbol = editor.localInsert(row, col, addedChar.toLatin1());
-                    insertedSymbols.push_back(symbol.toSerializable(currentCharFormat()));
                 }
 
 
@@ -408,16 +396,16 @@ int TextEditor::getRow(int position) const {
  * insert symbol received from the server
  * @param symbol
  */
-void TextEditor::remoteInsert(QSymbol qSymbol) {
+void TextEditor::remoteInsert(QSymbol symbol) {
 
     try {
         isFromRemote = true;
-        Symbol symbol = qSymbol.toOriginal();
         std::pair<int, int> pos = editor.remoteInsert(symbol);
         if (pos.first != -1 || pos.second != -1) {
 
             incrementIndex(pos.first, 1);
-            if (symbol.getC() == '\n') {
+            // todo check QChar::LineSeparator
+            if (symbol.getC() == QChar::LineFeed || symbol.getC() == QChar::ParagraphSeparator) {
                 insertRow(pos.first, 1);
             }
 
@@ -426,7 +414,7 @@ void TextEditor::remoteInsert(QSymbol qSymbol) {
             QTextCursor cursor(textCursor());
             cursor.setPosition(position);
 
-            cursor.insertText(QChar::fromLatin1(symbol.getC()), qSymbol.getcf());
+            cursor.insertText(symbol.getC(), symbol.getCF());
 
             /**
              * this step is necessary due to the cursor changing position
@@ -448,7 +436,7 @@ void TextEditor::remoteInsert(QSymbol qSymbol) {
  * erase symbol received from the server
  * @param symbol
  */
-void TextEditor::remoteErase(Symbol symbol) {
+void TextEditor::remoteErase(QSymbol symbol) {
 
     try {
         isFromRemote = true;
@@ -485,11 +473,11 @@ int TextEditor::getPosition(int row, int col) {
     return pos;
 }
 
-void TextEditor::remoteInsertBlock(std::vector<Symbol> symbols) {
+void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
     // todo
 }
 
-void TextEditor::remoteEraseBlock(std::vector<Symbol> symbols) {
+void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
     // todo
 }
 
@@ -595,22 +583,19 @@ int TextEditor::getUserId(int row, int col) const {
     return editor.getSymbols()[row][col].getSiteId();
 }
 
-void TextEditor::openDocument(QVector<QVector<QSymbol>> qSymbols) {
-    isFromRemote = true;
-    std::vector<std::vector<Symbol>> symbols = {{}};
+void TextEditor::openDocument(std::vector<std::vector<QSymbol>> symbols) {
     index.clear();
     index.push_back(0);
     int pos = 0;
-    for (int i = 0; i < qSymbols.size(); i++) {
-        for (int j = 0; j < qSymbols[i].size(); j++, ++pos) {
-            QSymbol qSymbol = qSymbols[i][j];
-            symbols[i].push_back(qSymbol.toOriginal());
-            textCursor().insertText(qSymbol.getC());
-            setCurrentCharFormat(qSymbol.getcf());
+    for (int i = 0; i < symbols.size(); i++) {
+        for (int j = 0; j < symbols[i].size(); j++, ++pos) {
+            QSymbol symbol = symbols[i][j];
+            isFromRemote = true;
+            textCursor().insertText(symbol.getC());
+            setCurrentCharFormat(symbol.getCF());
             textCursor().movePosition(QTextCursor::Right);
         }
         index.push_back(pos);
-        symbols.emplace_back();
     }
     editor.setSymbols(symbols);
 }
@@ -619,9 +604,11 @@ void TextEditor::printSymbols() {
     std::cout << "---" << std::endl;
     const auto& symbols = editor.getSymbols();
     for (int i = 0; i < symbols.size(); i++) {
-        std::cout << "[" << index[i] << "]";
+        std::cout << "[" << index[i] << "] ";
         for (int j = 0; j < symbols[i].size(); j++) {
-            std::cout << symbols[i][j].getC();
+            QChar c = symbols[i][j].getC();
+            c == QChar::LineFeed || c == QChar::ParagraphSeparator ? std::cout << std::endl : std::cout << c.toLatin1();
         }
     }
+    std::cout << std::endl;
 }

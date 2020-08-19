@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <unistd.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <QPointingDeviceUniqueId>
 #include <QMainWindow>
 #include <QFile>

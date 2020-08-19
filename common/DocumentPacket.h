@@ -129,7 +129,7 @@ public:
 
     QVector<QVector<QSymbol>> getqsymbols() const;
 
-    std::vector<std::vector<Symbol>> getsymbols() const;
+    std::vector<std::vector<QSymbol>> getsymbols() const;
 };
 
 /** DocumentAskSharableURIPacket: the  packet used to check permission and get the URI used to invite people**/
@@ -173,6 +173,4 @@ public:
 
 };
 
-
-std::vector<std::vector<Symbol>> toVector(QVector<QVector<QSymbol>> qsymbols);
-QVector<QTextCharFormat> toCFVector(QVector<QVector<QSymbol>> qsymbols);
+std::vector<std::vector<QSymbol>> toVector(QVector<QVector<QSymbol>> qsymbols);

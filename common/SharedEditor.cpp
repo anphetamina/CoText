@@ -2,7 +2,6 @@
 #include <iostream>
 #include "SharedEditor.h"
 #include "Shuffler.h"
-#include "QSymbol.h"
 #include <QDebug>
 
 
@@ -192,13 +191,14 @@ std::vector<Identifier> SharedEditor::generatePosBetween(std::vector<Identifier>
  * @param index
  * @param symbol
  */
-void SharedEditor::insertSymbol(int line, int index, Symbol symbol) {
+void SharedEditor::insertSymbol(int line, int index, QSymbol symbol) {
 
-    char value = symbol.getC();
+    QChar value = symbol.getC();
 
-    if (value == '\n') {
+    // todo check QChar::LineSeparator
+    if (value == QChar::LineFeed || value == QChar::ParagraphSeparator) {
 
-        std::vector<Symbol> lineAfter;
+        std::vector<QSymbol> lineAfter;
 
         if (index == symbols[line].size()) {
             lineAfter = {};
@@ -210,7 +210,7 @@ void SharedEditor::insertSymbol(int line, int index, Symbol symbol) {
             symbols[line].push_back(symbol);
             symbols.emplace_back();
         } else {
-            std::vector<Symbol> lineBefore(symbols[line].begin(), symbols[line].begin() + index);
+            std::vector<QSymbol> lineBefore(symbols[line].begin(), symbols[line].begin() + index);
             lineBefore.push_back(symbol);
             symbols[line] = lineBefore;
             symbols.insert(symbols.begin() + line + 1, lineAfter);
@@ -225,8 +225,10 @@ void SharedEditor::insertSymbol(int line, int index, Symbol symbol) {
 
 /**
  *
+ * @param line
  * @param index
  * @param value
+ * @param format
  * insert value at index in symbols
  * a tail insert must be done before a \n
  * so if we have a CRLF char at the end of the line
@@ -237,7 +239,7 @@ void SharedEditor::insertSymbol(int line, int index, Symbol symbol) {
  *
  * the insert in (0,5) is replaced with the insert in (1,0)
  */
-Symbol SharedEditor::localInsert(int line, int index, char value) {
+QSymbol SharedEditor::localInsert(int line, int index, QChar value, QTextCharFormat format) {
 
     if (line < 0) {
         throw std::out_of_range("line "+std::to_string(line)+" is negative");
@@ -250,16 +252,17 @@ Symbol SharedEditor::localInsert(int line, int index, char value) {
     }
 
 
-    std::string sym_id = std::to_string(siteId);
-    sym_id.append("-");
-    sym_id.append(std::to_string(idCounter));
+    QString sym_id = QString::number(siteId);
+    sym_id.append('-');
+    sym_id.append(QString::number(idCounter));
     std::vector<Identifier> sym_position;
     std::vector<Identifier> pos1;
     std::vector<Identifier> pos2;
-    Symbol sym(value, sym_id, {});
+    QSymbol sym(value, sym_id, {}, format);
 
     if (!symbols[line].empty()) {
-        if (index >= symbols[line].size() && symbols[line].back().getC() == '\n') {
+        bool newLine = symbols[line].back().getC() == QChar::LineFeed || symbols[line].back().getC() == QChar::LineFeed;
+        if (index >= symbols[line].size() && newLine) {
             line++;
             index = 0;
         }
@@ -290,7 +293,7 @@ Symbol SharedEditor::localInsert(int line, int index, char value) {
         std::cout << std::endl;*/
 
     } catch (std::exception& e) {
-        std::cerr << "line " << line << ", index " << index << ", value " << value << ", siteId " << siteId << std::endl;
+        std::cerr << "line " << line << ", index " << index << ", value " << QString(sym.getC()).toStdString() << ", siteId " << siteId << std::endl;
         std::cerr << e.what() << std::endl;
     }
     return sym;
@@ -304,10 +307,10 @@ Symbol SharedEditor::localInsert(int line, int index, char value) {
  * @param endIndex
  * @return erased symbols in [startIndex, endIndex]
  */
-std::vector<Symbol> SharedEditor::eraseSingleLine(int startLine, int startIndex, int endLine, int endIndex) {
+std::vector<QSymbol> SharedEditor::eraseSingleLine(int startLine, int startIndex, int endLine, int endIndex) {
     endIndex++;
 
-    std::vector<Symbol> erasedSymbols(symbols[startLine].begin() + startIndex, symbols[startLine].begin() + endIndex);
+    std::vector<QSymbol> erasedSymbols(symbols[startLine].begin() + startIndex, symbols[startLine].begin() + endIndex);
     symbols[startLine].erase(symbols[startLine].begin() + startIndex, symbols[startLine].begin() + endIndex);
     counter -= (endIndex - startIndex);
 
@@ -322,9 +325,9 @@ std::vector<Symbol> SharedEditor::eraseSingleLine(int startLine, int startIndex,
  * @param endIndex
  * @return erased symbols in [startIndex, endIndex] from [startLine, endLine]
  */
-std::vector<Symbol> SharedEditor::eraseMultipleLines(int startLine, int startIndex, int endLine, int endIndex) {
+std::vector<QSymbol> SharedEditor::eraseMultipleLines(int startLine, int startIndex, int endLine, int endIndex) {
 
-    std::vector<Symbol> erasedSymbols(symbols[startLine].begin() + startIndex, symbols[startLine].end());
+    std::vector<QSymbol> erasedSymbols(symbols[startLine].begin() + startIndex, symbols[startLine].end());
     for (int i = startLine+1; i < endLine; i++) {
         erasedSymbols.insert(erasedSymbols.end(), symbols[i].begin(), symbols[i].end());
     }
@@ -346,7 +349,7 @@ std::vector<Symbol> SharedEditor::eraseMultipleLines(int startLine, int startInd
  * @param endLine
  * @param endIndex
  */
-std::vector<Symbol> SharedEditor::localErase(int startLine, int startIndex, int endLine, int endIndex) {
+std::vector<QSymbol> SharedEditor::localErase(int startLine, int startIndex, int endLine, int endIndex) {
 
     if (startLine < 0) {
         throw std::out_of_range("startLine "+std::to_string(startLine)+" is negative");
@@ -362,7 +365,7 @@ std::vector<Symbol> SharedEditor::localErase(int startLine, int startIndex, int 
         throw std::invalid_argument("startIndex "+std::to_string(startLine)+" > endIndex "+std::to_string(endIndex));
     }
 
-    std::vector<Symbol> erasedSymbols;
+    std::vector<QSymbol> erasedSymbols;
     bool mergeLines = false;
     if (symbols[0].empty() || symbols.size() <= startLine) {
         return {};
@@ -374,7 +377,7 @@ std::vector<Symbol> SharedEditor::localErase(int startLine, int startIndex, int 
         mergeLines = true;
     } else {
         erasedSymbols = eraseSingleLine(startLine, startIndex, endLine, endIndex);
-        if (erasedSymbols.back().getC() == '\n') {
+        if (erasedSymbols.back().getC() == QChar::LineFeed || erasedSymbols.back().getC() == QChar::ParagraphSeparator) {
             if (symbols[startLine + 1].empty()) {
                 symbols.erase(symbols.begin() + startLine + 1);
             } else {
@@ -398,21 +401,21 @@ std::vector<Symbol> SharedEditor::localErase(int startLine, int startIndex, int 
  * @param symbol
  * @return the pair (line,index) and insert symbol right before the first one with the higher fractional position
  */
-std::pair<int, int> SharedEditor::remoteInsert(const Symbol &symbol) {
+std::pair<int, int> SharedEditor::remoteInsert(const QSymbol &symbol) {
 
     if (symbols.front().empty()) {
         insertSymbol(0, 0, symbol);
         return std::make_pair(0, 0);
     }
 
-    std::vector<std::vector<Symbol>>::iterator line_it;
-    std::vector<std::vector<Symbol>>::iterator last;
+    std::vector<std::vector<QSymbol>>::iterator line_it;
+    std::vector<std::vector<QSymbol>>::iterator last;
     if (symbols.back().empty()) {
         last = symbols.end()-1;
     } else {
         last = symbols.end();
     }
-    line_it = std::lower_bound(symbols.begin(), last, symbol, [](const std::vector<Symbol> & it, const Symbol& symbol){
+    line_it = std::lower_bound(symbols.begin(), last, symbol, [](const std::vector<QSymbol> & it, const QSymbol& symbol){
         return it[0] < symbol;
     });
 
@@ -424,14 +427,15 @@ std::pair<int, int> SharedEditor::remoteInsert(const Symbol &symbol) {
     int line = line_it - symbols.begin();
 
     if (*line_it->begin() == symbol) {
-        if (symbol.getC() == '\n') {
-            qDebug() << "remoteInsert symbol 'CRLF' ("+QString::fromStdString(symbol.getId())+") already exists";
+        // todo check QChar::LineSeparator
+        if (symbol.getC() == QChar::LineFeed || symbol.getC() == QChar::ParagraphSeparator) {
+            qDebug() << "remoteInsert symbol 'CRLF' ("+symbol.getId()+") already exists";
         } else {
-            qDebug() << "remoteInsert symbol '"+ QString::fromStdString(std::string(1, symbol.getC())) +"' ("+QString::fromStdString(symbol.getId())+") already exists";
+            qDebug() << "remoteInsert symbol '"+ QString(symbol.getC()) +"' ("+symbol.getId()+") already exists";
         }
 
     } else {
-        std::vector<Symbol>::iterator index_it;
+        std::vector<QSymbol>::iterator index_it;
         index_it = std::lower_bound(line_it->begin(), line_it->end(), symbol);
         int index = index_it - line_it->begin();
 
@@ -442,13 +446,14 @@ std::pair<int, int> SharedEditor::remoteInsert(const Symbol &symbol) {
         }
 
         if (*index_it == symbol) {
-            if (symbol.getC() == '\n') {
-                qDebug() << "remoteInsert symbol 'CRLF' ("+QString::fromStdString(symbol.getId())+") already exists";
+            if (symbol.getC() == QChar::LineFeed || symbol.getC() == QChar::ParagraphSeparator) {
+                qDebug() << "remoteInsert symbol 'CRLF' ("+symbol.getId()+") already exists";
             } else {
-                qDebug() << "remoteInsert symbol '"+ QString::fromStdString(std::string(1, symbol.getC())) +"' ("+QString::fromStdString(symbol.getId())+") already exists";
+                qDebug() << "remoteInsert symbol '"+ QString(symbol.getC()) +"' ("+symbol.getId()+") already exists";
             }
         } else {
-            if (index_it->getC() == '\n' && index_it->getPosition() < symbol.getPosition()) {
+            bool newLine = index_it->getC() == QChar::LineFeed || index_it->getC() == QChar::ParagraphSeparator;
+            if (newLine && index_it->getPosition() < symbol.getPosition()) {
                 line++;
                 index = 0;
             }
@@ -470,17 +475,17 @@ std::pair<int, int> SharedEditor::remoteInsert(const Symbol &symbol) {
  * @param symbol
  * @return the pair (line,index) of the removed symbol
  */
-std::pair<int, int> SharedEditor::remoteErase(const Symbol &symbol) {
+std::pair<int, int> SharedEditor::remoteErase(const QSymbol &symbol) {
     if (!symbols.front().empty()) {
         bool mergeLines = false;
-        std::vector<std::vector<Symbol>>::iterator line_it;
-        std::vector<std::vector<Symbol>>::iterator last;
+        std::vector<std::vector<QSymbol>>::iterator line_it;
+        std::vector<std::vector<QSymbol>>::iterator last;
         if (symbols.back().empty()) {
             last = symbols.end()-1;
         } else {
             last = symbols.end();
         }
-        line_it = std::lower_bound(symbols.begin(), last, symbol, [](const std::vector<Symbol> & it, const Symbol& symbol){
+        line_it = std::lower_bound(symbols.begin(), last, symbol, [](const std::vector<QSymbol> & it, const QSymbol& symbol){
             return it[0] < symbol;
         });
 
@@ -506,19 +511,19 @@ std::pair<int, int> SharedEditor::remoteErase(const Symbol &symbol) {
         }
         int line = line_it - symbols.begin();
 
-        std::vector<Symbol>::iterator index_it;
+        std::vector<QSymbol>::iterator index_it;
         index_it = std::find(line_it->begin(), line_it->end(), symbol);
 
         if (index_it == line_it->end()) {
-            if (symbol.getC() == '\n') {
-                qDebug() << "remoteErase symbol 'CRLF' ("+QString::fromStdString(symbol.getId())+") not found";
+            if (symbol.getC() == QChar::LineFeed || symbol.getC() == QChar::ParagraphSeparator) {
+                qDebug() << "remoteErase symbol 'CRLF' ("+symbol.getId()+") not found";
             } else {
-                qDebug() << "remoteErase symbol '"+ QString::fromStdString(std::string(1, symbol.getC())) +"' ("+QString::fromStdString(symbol.getId())+") not found";
+                qDebug() << "remoteErase symbol '"+ QString(symbol.getC()) +"' ("+symbol.getId()+") not found";
             }
         } else {
             int index = index_it - line_it->begin();
 
-            if (index_it->getC() == '\n') {
+            if (index_it->getC() == QChar::LineFeed || index_it->getC() == QChar::ParagraphSeparator) {
                 mergeLines = true;
             }
             eraseSingleLine(line, index, line, index);
@@ -535,54 +540,12 @@ std::pair<int, int> SharedEditor::remoteErase(const Symbol &symbol) {
     return std::make_pair(-1, -1);
 }
 
-std::string SharedEditor::to_string() {
-    std::string output{};
-    for (const auto& line : symbols) {
-        for (const auto& symbol : line) {
-            output.push_back(symbol.getC());
-        }
-    }
-    return output;
-}
-
-int SharedEditor::getBase() const {
-    return base;
-}
-
-void SharedEditor::setCounter(int counter) {
-    this->counter = counter;
-}
-
-uint64_t SharedEditor::getIdCounter() const {
-    return idCounter;
-}
-
-void SharedEditor::setIdCounter(uint64_t idCounter) {
-    this->idCounter = idCounter;
-}
-
 int SharedEditor::getSiteId() const {
     return siteId;
 }
 
-const std::vector<std::vector<Symbol>>& SharedEditor::getSymbols() const {
+const std::vector<std::vector<QSymbol>>& SharedEditor::getSymbols() const {
     return symbols;
-}
-
-int SharedEditor::getCounter() const {
-    return counter;
-}
-
-void SharedEditor::setSiteId(int siteId) {
-    SharedEditor::siteId = siteId;
-}
-
-int SharedEditor::getBoundary() const {
-    return boundary;
-}
-
-void SharedEditor::setBoundary(int boundary) {
-    SharedEditor::boundary = boundary;
 }
 
 void SharedEditor::clear() {
@@ -593,10 +556,10 @@ void SharedEditor::clear() {
     idCounter = 0;
 }
 
-void SharedEditor::setSymbols(std::vector<std::vector<Symbol>> symbols) {
+void SharedEditor::setSymbols(std::vector<std::vector<QSymbol>> symbols) {
     this->symbols.clear();
     strategies.clear();
     this->symbols = symbols;
-    counter = std::accumulate(symbols.begin(), symbols.end(), 0, [](int acc, const std::vector<Symbol>& a){ return acc+a.size(); });
+    counter = std::accumulate(symbols.begin(), symbols.end(), 0, [](int acc, const std::vector<QSymbol>& a){ return acc+a.size(); });
     idCounter = 0;
 }

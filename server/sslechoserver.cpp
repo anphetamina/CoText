@@ -7,10 +7,10 @@
 #include "QtWebSockets/QWebSocket"
 #include "PacketDef.h"
 #include "PingPacket.h"
-#include "LoginPacket.h"
+#include "../common/LoginPacket.h"
 #include "Message.h"
 #include "DBConf.h"
-#include "DocumentPacket.h"
+#include "../common/DocumentPacket.h"
 #include <QtCore/QDebug>
 #include <QtCore/QFile>
 #include <QtNetwork/QSslCertificate>
@@ -277,7 +277,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
         case(PACK_TYPE_MSG): {
             Message* msg = dynamic_cast<Message*>(rcvd_packet.get());
             //qDebug() << msg->getData();
-            qDebug() << "[MSG] New symbol received." << endl << "Char: " << msg->getS().getC() << " SiteId: " <<  msg->getSiteId();
+            qDebug() << "[MSG] New symbol received." << endl << "Char: " << msg->getQS().getC() << " SiteId: " <<  msg->getSiteId();
             // Broadcast to all the connected client of a document
             for (auto it = documentMapping.begin(); it != documentMapping.end();) { // iterate over documents and find what is openened by current user #TONOTE this works since 1 file only can be openend by a user
                 QList<QSharedPointer<Client>> onlineClientPerDoc = it.value();

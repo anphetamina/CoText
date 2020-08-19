@@ -1,6 +1,5 @@
 #include "Register.h"
 #include "ui_register.h"
-#include "UserWidget.h"
 
 
 #include <QMessageBox>

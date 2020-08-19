@@ -2,12 +2,14 @@ cmake_minimum_required(VERSION 3.1.0)
 
 project(CoText-client)
 
+set(common_dir ../common)
+include_directories(${common_dir})
+
 set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
 #set(CMAKE_BUILD_TYPE RELEASE)
 if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
@@ -33,9 +35,10 @@ find_package(Qt5 COMPONENTS Svg REQUIRED)
 find_package(Qt5 COMPONENTS PrintSupport REQUIRED)
 find_package(Qt5WebSockets REQUIRED)
 
-file(GLOB CLIENT "*.h" "*.cpp")
-file(GLOB GUI "gui/*.h" "gui/*.cpp" "gui/*.ui" "gui/Resources.qrc")
+file(GLOB client_src "*.h" "*.cpp" "Resources.qrc")
+file(GLOB common_src "${common_dir}/*.h" "${common_dir}/*.cpp")
 
-add_executable(CoText-client main.cpp ${CLIENT} ${GUI} PingPacket.cpp PingPacket.h LoginPacket.cpp LoginPacket.h AccountPacket.cpp AccountPacket.h  DocumentPacket.cpp DocumentPacket.h)
+
+add_executable(CoText-client ${common_src} ${client_src})
 
 target_link_libraries(CoText-client Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Network Qt5::Svg Qt5::PrintSupport Qt5::WebSockets ${OS_SPECIFIC_LIBS})

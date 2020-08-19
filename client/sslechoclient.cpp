@@ -3,11 +3,8 @@
 //
 
 #include "sslechoclient.h"
-#include "PacketDef.h"
-#include "PingPacket.h"
-#include "LoginPacket.h"
-#include "gui/TextEditor.h"
-#include "DocumentPacket.h"
+#include "../common/PingPacket.h"
+#include "../common/LoginPacket.h"
 #include <QtWebSockets/QWebSocket>
 #include <QCoreApplication>
 
@@ -94,7 +91,7 @@ void SslEchoClient::sendTest() {
     qDebug() << "[NETWORK] ** Network Test Start ** ";
     this->sendLogin();
     qDebug() << "[NETWORK] ** Sending Message packet ** ";
-    QVector<Identifier> sym_position;
+    std::vector<Identifier> sym_position;
     QString test("test_qstring");
     QChar qc = test.at(0);//t
     QTextCharFormat cf = QTextCharFormat();
@@ -206,7 +203,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
                 }
 
                 case(MSG_ERASE_SYM): {
-                    emit eraseReceived(msg->getS());
+                    emit eraseReceived(msg->getQS());
                     break;
                 }
             }
@@ -279,7 +276,7 @@ void SslEchoClient::sendSelection(int userId, QTextCursor cursor) {
 }
 
 void SslEchoClient::connectToEditor(TextEditor* te) {
-//kink to
+
     connect(this, &SslEchoClient::insertReceived, te, &TextEditor::remoteInsert);
     connect(this, &SslEchoClient::eraseReceived, te, &TextEditor::remoteErase);
     connect(this, &SslEchoClient::insertBlockReceived, te, &TextEditor::remoteInsertBlock);

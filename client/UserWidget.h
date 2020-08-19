@@ -4,7 +4,7 @@
 
 #include <QDialog>
 #include <QIcon>
-#include "../User.h"
+#include "../common/User.h"
 #include <QEvent>
 
 #define ACTIVE 20

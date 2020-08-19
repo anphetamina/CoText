@@ -135,7 +135,7 @@ QVector<QVector<QSymbol>> DocumentOkPacket::getqsymbols() const {
     return qsymbols;
 }
 
-std::vector<std::vector<Symbol>>  DocumentOkPacket::getsymbols() const {
+std::vector<std::vector<QSymbol>>  DocumentOkPacket::getsymbols() const {
     return toVector(qsymbols);
 }
 
@@ -198,28 +198,14 @@ void DocumentBeaconOnlineUsers::readPayload(QDataStream& stream)
 //QVector::fromStdVector ( const std::vector<T> & vector )
 
 // Convert a bidimensional qvector of qsymbolsto a  bidimensional std::vector of symbols to
-std::vector<std::vector<Symbol>> toVector(QVector<QVector<QSymbol>> qsymbols){
-    std::vector<std::vector<Symbol>> symbols = {};
+std::vector<std::vector<QSymbol>> toVector(QVector<QVector<QSymbol>> qsymbols){
+    std::vector<std::vector<QSymbol>> symbols = {};
     for (auto symbolQArr : qsymbols) {
-        std::vector<Symbol> symbolArr = {};
+        std::vector<QSymbol> symbolArr = {};
         for (auto qsymbol : symbolQArr) {  // Iterate over the Symbols
-            Symbol sym = qsymbol.toOriginal();
-            symbolArr.push_back(sym);
+            symbolArr.push_back(qsymbol);
         }
         symbols.push_back(symbolArr);
     }
     return symbols;
-}
-
-// Convert a bidimensional qvector of qsymbolsto a   std::vector of charformat to
-QVector<QTextCharFormat> toCFVector(QVector<QVector<QSymbol>> qsymbols){
-    QVector<QTextCharFormat> vcf = {};
-    for (auto symbolQArr : qsymbols) {
-        std::vector<Symbol> symbolArr = {};
-        for (auto qsymbol : symbolQArr) {  // Iterate over the Symbols
-            QTextCharFormat cf = qsymbol.getcf();
-            vcf.push_back(cf);
-        }
-    }
-    return vcf;
 }

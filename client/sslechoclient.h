@@ -10,12 +10,11 @@
 #include <QtCore/QList>
 #include <QtCore/QString>
 #include <QtCore/QUrl>
-#include "Packet.h"
-#include "Message.h"
-#include "CursorPacket.h"
-#include "DocumentPacket.h"
-
-#include "gui/TextEditor.h"
+#include "../common/Packet.h"
+#include "../common/Message.h"
+#include "../common/CursorPacket.h"
+#include "../common/DocumentPacket.h"
+#include "TextEditor.h"
 
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
 
@@ -27,9 +26,9 @@ public:
 signals:
 
     void insertReceived(QSymbol qsymbol);
-    void eraseReceived(Symbol symbol);
-    void insertBlockReceived(std::vector<Symbol> symbols);
-    void eraseBlockReceived(std::vector<Symbol> symbols);
+    void eraseReceived(QSymbol symbol);
+    void insertBlockReceived(std::vector<QSymbol> symbols);
+    void eraseBlockReceived(std::vector<QSymbol> symbols);
     void updateCursorReceived(int userId, int position);
     void updateSelectionReceived(int userId, QTextCursor cursor);
 

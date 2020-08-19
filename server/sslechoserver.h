@@ -9,9 +9,9 @@
 #include <QtCore/QList>
 #include <QtCore/QByteArray>
 #include <QtNetwork/QSslError>
-#include "Packet.h"
+#include "../common/Packet.h"
 #include "Client.h"
-#include "CursorPacket.h"
+#include "../common/CursorPacket.h"
 
 QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
 QT_FORWARD_DECLARE_CLASS(QWebSocket)

@@ -3,6 +3,13 @@
   <component name="CMakeWorkspace" PROJECT_DIR="$PROJECT_DIR$/client">
     <contentRoot DIR="$PROJECT_DIR$" />
   </component>
+  <component name="CidrRootsConfiguration">
+    <sourceRoots>
+      <file path="$PROJECT_DIR$/client" />
+      <file path="$PROJECT_DIR$/common" />
+      <file path="$PROJECT_DIR$/server" />
+    </sourceRoots>
+  </component>
   <component name="JavaScriptSettings">
     <option name="languageLevel" value="ES6" />
   </component>

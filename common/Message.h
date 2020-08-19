@@ -1,23 +1,19 @@
 #pragma once
-#include "Symbol.h"
 #include "Packet.h"
 #include "QSymbol.h"
 
-class Message : public Packet{
+class Message : public Packet {
     friend PacketBuilder;
 private:
     int type;
-    //Symbol s;
     QSymbol qs;
     int siteId;
 
 public:
     Message(int type, QSymbol qs, int siteId);
-    Message(int type, Symbol s, int siteId);
 
     int getType() const;
 
-    Symbol getS() const;
     QSymbol getQS() const;
 
     int getSiteId() const;
