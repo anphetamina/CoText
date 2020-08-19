@@ -56,8 +56,7 @@ void Packet::send(QWebSocket& m_webSocket) {
     this->setSize(qbuf.size());
     this->writeSize(stream);
     qDebug() << "---";
-    qDebug() << "Buf size:" << qbuf.size();
-    qDebug() << "A packet was just sent";
+    qDebug() << "[GENERIC SEND]" << "Buf size:" << qbuf.size();;
     m_webSocket.sendBinaryMessage(qbuf);
     // Try to force a flush of the websocket buffer
     m_webSocket.flush();//"\xAF\x00\x00\x01\x00\x00\x00\x04\x00\x00\x00\b\x00t\x00""e\x00s\x00t"
