@@ -41,6 +41,7 @@ public:
     void setPosition(const std::vector<Identifier> &position);
 
     bool isValid() const;
+    bool isNewLine() const;
 
     bool operator==(const QSymbol &symbol) const;
     bool operator<(const QSymbol &symbol) const;

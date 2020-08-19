@@ -195,8 +195,7 @@ void SharedEditor::insertSymbol(int line, int index, QSymbol symbol) {
 
     QChar value = symbol.getC();
 
-    // todo check QChar::LineSeparator
-    if (value == QChar::LineFeed || value == QChar::ParagraphSeparator) {
+    if (value == QChar::LineFeed || value == QChar::ParagraphSeparator || value == QChar::LineSeparator) {
 
         std::vector<QSymbol> lineAfter;
 
@@ -261,8 +260,7 @@ QSymbol SharedEditor::localInsert(int line, int index, QChar value, QTextCharFor
     QSymbol sym(value, sym_id, {}, format);
 
     if (!symbols[line].empty()) {
-        bool newLine = symbols[line].back().getC() == QChar::LineFeed || symbols[line].back().getC() == QChar::LineFeed;
-        if (index >= symbols[line].size() && newLine) {
+        if (index >= symbols[line].size() && symbols[line].back().isNewLine()) {
             line++;
             index = 0;
         }
@@ -377,7 +375,7 @@ std::vector<QSymbol> SharedEditor::localErase(int startLine, int startIndex, int
         mergeLines = true;
     } else {
         erasedSymbols = eraseSingleLine(startLine, startIndex, endLine, endIndex);
-        if (erasedSymbols.back().getC() == QChar::LineFeed || erasedSymbols.back().getC() == QChar::ParagraphSeparator) {
+        if (erasedSymbols.back().isNewLine()) {
             if (symbols[startLine + 1].empty()) {
                 symbols.erase(symbols.begin() + startLine + 1);
             } else {
@@ -432,7 +430,7 @@ std::pair<int, int> SharedEditor::remoteInsert(const QSymbol &symbol) {
 
     if (*line_it->begin() == symbol) {
         // todo check QChar::LineSeparator
-        if (symbol.getC() == QChar::LineFeed || symbol.getC() == QChar::ParagraphSeparator) {
+        if (symbol.isNewLine()) {
             qDebug() << "remoteInsert symbol 'CRLF' ("+symbol.getId()+") already exists";
         } else {
             qDebug() << "remoteInsert symbol '"+ QString(symbol.getC()) +"' ("+symbol.getId()+") already exists";
@@ -450,14 +448,13 @@ std::pair<int, int> SharedEditor::remoteInsert(const QSymbol &symbol) {
         }
 
         if (*index_it == symbol) {
-            if (symbol.getC() == QChar::LineFeed || symbol.getC() == QChar::ParagraphSeparator) {
+            if (symbol.isNewLine()) {
                 qDebug() << "remoteInsert symbol 'CRLF' ("+symbol.getId()+") already exists";
             } else {
                 qDebug() << "remoteInsert symbol '"+ QString(symbol.getC()) +"' ("+symbol.getId()+") already exists";
             }
         } else {
-            bool newLine = index_it->getC() == QChar::LineFeed || index_it->getC() == QChar::ParagraphSeparator;
-            if (newLine && index_it->getPosition() < symbol.getPosition()) {
+            if (index_it->isNewLine() && index_it->getPosition() < symbol.getPosition()) {
                 line++;
                 index = 0;
             }
@@ -524,7 +521,7 @@ std::pair<int, int> SharedEditor::remoteErase(const QSymbol &symbol) {
         index_it = std::find(line_it->begin(), line_it->end(), symbol);
 
         if (index_it == line_it->end()) {
-            if (symbol.getC() == QChar::LineFeed || symbol.getC() == QChar::ParagraphSeparator) {
+            if (symbol.isNewLine()) {
                 qDebug() << "remoteErase symbol 'CRLF' ("+symbol.getId()+") not found";
             } else {
                 qDebug() << "remoteErase symbol '"+ QString(symbol.getC()) +"' ("+symbol.getId()+") not found";
@@ -532,7 +529,7 @@ std::pair<int, int> SharedEditor::remoteErase(const QSymbol &symbol) {
         } else {
             int index = index_it - line_it->begin();
 
-            if (index_it->getC() == QChar::LineFeed || index_it->getC() == QChar::ParagraphSeparator) {
+            if (index_it->isNewLine()) {
                 mergeLines = true;
             }
             eraseSingleLine(line, index, line, index);

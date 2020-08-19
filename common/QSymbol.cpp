@@ -90,3 +90,7 @@ bool QSymbol::isValid() const {
            cf.isEmpty() ||
            !cf.isValid();
 }
+
+bool QSymbol::isNewLine() const {
+    return c == QChar::LineFeed || c == QChar::ParagraphSeparator || c == QChar::LineSeparator;
+}

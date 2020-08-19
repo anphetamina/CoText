@@ -187,10 +187,10 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
                 QChar addedChar = document()->characterAt(position++);
                 QSymbol symbol = editor.localInsert(row, col, addedChar, currentCharFormat());
 
-                // todo check QChar::LineSeparator
-                if (addedChar == QChar::LineFeed || addedChar == QChar::ParagraphSeparator) {
+                if (addedChar == QChar::LineFeed || addedChar == QChar::ParagraphSeparator || addedChar == QChar::LineSeparator) {
                     newRows++;
                 }
+
                 insertedSymbols.push_back(symbol);
 
                 /**
@@ -445,7 +445,7 @@ void TextEditor::remoteInsert(QSymbol symbol) {
 
             incrementIndex(pos.first, 1);
             // todo check QChar::LineSeparator
-            if (symbol.getC() == QChar::LineFeed || symbol.getC() == QChar::ParagraphSeparator) {
+            if (symbol.isNewLine()) {
                 insertRow(pos.first, 1);
             }
 
@@ -668,8 +668,8 @@ void TextEditor::printSymbols() {
     for (int i = 0; i < symbols.size(); i++) {
         std::cout << "[" << index[i] << "] ";
         for (int j = 0; j < symbols[i].size(); j++) {
-            QChar c = symbols[i][j].getC();
-            c == QChar::LineFeed || c == QChar::ParagraphSeparator ? std::cout << std::endl : std::cout << c.toLatin1();
+            const QSymbol &s = symbols[i][j];
+            s.isNewLine() ? std::cout << std::endl : std::cout << s.getC().toLatin1();
         }
     }
     std::cout << std::endl;
