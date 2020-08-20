@@ -163,6 +163,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
             emit symbolsErased(erasedSymbols, editor.getSiteId());
         } catch (const std::exception &e) {
             qDebug() << e.what();
+            undo();
         }
 
     }
@@ -184,25 +185,30 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
             std::vector<QSymbol> insertedSymbols;
 
             while (charsAdded > 0) {
-                QChar addedChar = document()->characterAt(position++);
-                QSymbol symbol = editor.localInsert(row, col, addedChar, currentCharFormat());
+                try {
+                    QChar addedChar = document()->characterAt(position++);
+                    QSymbol symbol = editor.localInsert(row, col, addedChar, currentCharFormat());
 
-                if (addedChar == QChar::LineFeed || addedChar == QChar::ParagraphSeparator || addedChar == QChar::LineSeparator) {
-                    newRows++;
+                    if (addedChar == QChar::LineFeed || addedChar == QChar::ParagraphSeparator || addedChar == QChar::LineSeparator) {
+                        newRows++;
+                    }
+
+                    insertedSymbols.push_back(symbol);
+
+                    /**
+                     * if it reaches the end of the line go in the next one
+                     */
+                    if (col == editor.getSymbols()[row].size()) {
+                        row++;
+                        col = 0;
+                    }
+
+                    col++;
+                    charsAdded--;
+                } catch (const std::exception &e) {
+                    textCursor().deleteChar();
+                    throw;
                 }
-
-                insertedSymbols.push_back(symbol);
-
-                /**
-                 * if it reaches the end of the line go in the next one
-                 */
-                if (col == editor.getSymbols()[row].size()) {
-                    row++;
-                    col = 0;
-                }
-
-                col++;
-                charsAdded--;
             }
 
             incrementIndex(pos, n);
@@ -444,7 +450,7 @@ void TextEditor::remoteInsert(QSymbol symbol) {
         if (pos.first != -1 || pos.second != -1) {
 
             incrementIndex(pos.first, 1);
-            // todo check QChar::LineSeparator
+
             if (symbol.isNewLine()) {
                 insertRow(pos.first, 1);
             }
@@ -674,3 +680,7 @@ void TextEditor::printSymbols() {
     }
     std::cout << std::endl;
 }
+
+// todo handle offline case
+
+// todo handle user disconnections

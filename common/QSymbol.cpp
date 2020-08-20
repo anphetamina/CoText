@@ -86,6 +86,7 @@ int QSymbol::getSiteId() const {
 bool QSymbol::isValid() const {
     return c.isNull() ||
            id.trimmed().isEmpty() ||
+           position.empty() ||
            std::any_of(position.begin(), position.end(), [](const Identifier &i) { return !i.isValid(); }) ||
            cf.isEmpty() ||
            !cf.isValid();
