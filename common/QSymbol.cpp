@@ -17,8 +17,9 @@ QDataStream & operator << (QDataStream & s, const QSymbol &qs) {
 }
 
 QDataStream & operator >> (QDataStream & s, QSymbol& qs) {
-    QVector<Identifier> position(qs.position.begin(), qs.position.end());
-    s >> qs.c >> qs.id >> position >> qs.cf;
+    QVector<Identifier> qposition(qs.position.begin(), qs.position.end());
+    s >> qs.c >> qs.id >> qposition >> qs.cf;
+    qs.position = qposition.toStdVector();
     return s;
 }
 
