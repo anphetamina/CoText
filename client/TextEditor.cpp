@@ -29,17 +29,17 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
 
     userColors[editor.getSiteId()] = QColor::fromRgb(QRandomGenerator::global()->generate()); // todo get from connected user list
     document()->setDocumentMargin(50); // todo better margins
-    setTextColor(Qt::white);
     qDebug() << "Current sID: "<< editor.getSiteId();
 
     /**
     * font styling connections
     */
-
-    connect(this, &QTextEdit::currentCharFormatChanged, this, &TextEditor::updateToolbar);
     
     connect(ui.actionFont, &QAction::triggered, this, &TextEditor::selectFont);
     connect(ui.actionBold, &QAction::triggered, this, &TextEditor::setFontBold);
+    connect(ui.actionItalic, &QAction::triggered, this, &TextEditor::setFontItalic);
+    connect(ui.actionUnderline, &QAction::triggered, this, &TextEditor::setFontUnderline);
+    // todo alignment
     connect(ui.actionTextColor, &QAction::triggered, this, &TextEditor::setFontColor);
 
     /**
@@ -48,8 +48,8 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
 
     connect(document(), &QTextDocument::contentsChange, this, &TextEditor::contentsChange);
 
-    connect(this, &QTextEdit::cursorPositionChanged, this, &TextEditor::cursorPositionChange);
-    connect(this, &QTextEdit::selectionChanged, this, &TextEditor::selectionChange);
+    connect(this, &QPlainTextEdit::cursorPositionChanged, this, &TextEditor::cursorPositionChange);
+    connect(this, &QPlainTextEdit::selectionChanged, this, &TextEditor::selectionChange);
 
     connect(ui.actionToggle_user_colors, &QAction::triggered, this, &TextEditor::toggleUserColors);
 
@@ -74,26 +74,56 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     openDocument(testSymbols);*/
 }
 
+void TextEditor::mergeFormat(const QTextCharFormat &format) {
+    QTextCursor c = textCursor();
+    int start = c.selectionStart();
+    int end = c.selectionEnd();
+    for (int i = start; i < end; i++) {
+        c.setPosition(i);
+        c.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+        c.mergeCharFormat(format);
+        c.clearSelection();
+    }
+}
+
 void TextEditor::selectFont() {
-    // todo per character
-    /*bool fontSelected;
-    QFont font = QFontDialog::getFont(&fontSelected, &parent);
-    if (fontSelected)
-        setFont(font);*/
+    bool fontSelected;
+    QFont font = QFontDialog::getFont(&fontSelected, parent);
+    if (fontSelected) {
+        QTextCharFormat f;
+        f.setFont(font);
+        mergeFormat(f);
+    }
 }
 
 void TextEditor::setFontBold(bool bold) {
-    bold ? setFontWeight(QFont::Bold) :
-    setFontWeight(QFont::Normal);
+    QTextCharFormat f;
+    bold ? f.setFontWeight(QFont::Bold) : f.setFontWeight(QFont::Normal);
+    mergeFormat(f);
+}
+
+void TextEditor::setFontItalic(bool italic) {
+    QTextCharFormat f;
+    f.setFontItalic(italic);
+    mergeFormat(f);
+}
+
+void TextEditor::setFontUnderline(bool underline) {
+    QTextCharFormat f;
+    f.setFontUnderline(underline);
+    mergeFormat(f);
 }
 
 void TextEditor::setFontColor() {
-    // todo per character
-    /*QColor col = QColorDialog::getColor(textColor(), &parent);
-    if (!col.isValid())
+    QColor color = QColorDialog::getColor(currentCharFormat().foreground().color(), parent);
+    if (!color.isValid())
         return;
-    setTextColor(col);
-    colorChanged(col);*/
+
+    QTextCharFormat f;
+    f.setForeground(color);
+    mergeFormat(f);
+
+    colorChanged(color);
 }
 
 /**
@@ -112,7 +142,7 @@ void TextEditor::fontChanged(const QFont &f) {
 }
 
 void TextEditor::colorChanged(const QColor &c) {
-    // todo fix icon in the toolbar
+    // todo remove?
     QPixmap pix(16, 16);
     pix.fill(c);
     ui.actionTextColor->setIcon(pix);
@@ -537,7 +567,7 @@ void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
 void TextEditor::paintEvent(QPaintEvent *e) {
 
     try {
-        QTextEdit::paintEvent(e);
+        QPlainTextEdit::paintEvent(e);
         QPainter painter(viewport());
         QTextCursor cursor(document());
         for (const std::pair<int, int> &c : cursors) {
@@ -574,6 +604,9 @@ void TextEditor::paintEvent(QPaintEvent *e) {
 }
 
 void TextEditor::cursorPositionChange() {
+
+    updateToolbar(currentCharFormat());
+
     // todo change with user id
     emit cursorPositionChanged(editor.getSiteId(), textCursor().position());
 }

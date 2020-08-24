@@ -8,7 +8,7 @@
 
 #include <QDebug>
 #include <iostream>
-#include <QtWidgets/QTextEdit>
+#include <QtWidgets/QPlainTextEdit>
 #include <QtGui/QPainter>
 #include "../common/SharedEditor.h"
 #include "../common/QSymbol.h"
@@ -18,7 +18,7 @@ class UserHighlighter;
 
 namespace Ui { class MainWindow; }
 
-class TextEditor : public QTextEdit {
+class TextEditor : public QPlainTextEdit {
 
     Q_OBJECT
 
@@ -80,8 +80,11 @@ public slots:
 
 private slots:
 
+    void mergeFormat(const QTextCharFormat &format);
     void selectFont();
     void setFontBold(bool bold);
+    void setFontItalic(bool italic);
+    void setFontUnderline(bool underline);
     void setFontColor();
     void updateToolbar(const QTextCharFormat &format);
 
