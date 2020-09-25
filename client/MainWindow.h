@@ -83,6 +83,7 @@ private slots:
     
     void on_actionSettings_triggered();
 
+    void on_actionUserList_triggered();
 
 private:
 

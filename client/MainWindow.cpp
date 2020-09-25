@@ -1,8 +1,8 @@
 #include "MainWindow.h"
 #include "ui_mainwindow.h"
 #include "Login.h"
-
-
+#include "UserList.h"
+#include "DBConfClient.h"
 
 #include <QPixmap> //allows to create a qpixmap onj which takes 1 arg
 #include <QPrinter>
@@ -18,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     QApplication::instance()->setAttribute(Qt::AA_DontShowIconsInMenus, true);
     
     ui->setupUi(this);
+    dbConfigure();
     //this->user = nullptr;
     if(!isLogged) {
         // todo check
@@ -42,6 +43,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionShare_Uri))->installEventFilter(this);
     dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionExit))->installEventFilter(this);
     dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionSettings))->installEventFilter(this);
+
+    dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUserList))->installEventFilter(this);
 
 
 
@@ -153,6 +156,19 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionSettings)) && event->type() == QEvent::Leave) {
         setCursor(Qt::ArrowCursor);
         ui->actionSettings->setIcon(QIcon(":/imgs/icons/noun_Settings_2324598.svg"));
+        return true;
+    }
+
+    //UserList
+    if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUserList)) && event->type() == QEvent::Enter) {
+        setCursor(Qt::PointingHandCursor);
+        ui->actionUserList->setIcon(QIcon(":/imgs/icons/user-group_white.svg"));
+        return true;
+    }
+
+    if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUserList)) && event->type() == QEvent::Leave) {
+        setCursor(Qt::ArrowCursor);
+        ui->actionUserList->setIcon(QIcon(":/imgs/icons/user-group.svg"));
         return true;
     }
 
@@ -332,6 +348,11 @@ void MainWindow::on_actionLogin_triggered()
 
 }
 
+void MainWindow::on_actionUserList_triggered() {
+    UserList userList;
+    userList.setModal(true);
+    userList.exec();
+}
 
 void MainWindow::on_actionShare_Uri_triggered() {
 	
