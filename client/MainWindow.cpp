@@ -2,8 +2,7 @@
 #include "ui_mainwindow.h"
 #include "Login.h"
 #include "UserList.h"
-#include "DBConfClient.h"
-
+#include "TextEditor.h"
 #include <QPixmap> //allows to create a qpixmap onj which takes 1 arg
 #include <QPrinter>
 #include <QColorDialog>
@@ -18,7 +17,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     QApplication::instance()->setAttribute(Qt::AA_DontShowIconsInMenus, true);
     
     ui->setupUi(this);
-    dbConfigure();
     //this->user = nullptr;
     if(!isLogged) {
         // todo check
@@ -58,9 +56,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     ui->actionCopy->setShortcut(QKeySequence::Copy);
     ui->actionPaste->setShortcut(QKeySequence::Paste);
     //ui->actionRemove->setShortcut(QKeySequence::Delete);
-
-
-
 }
 
 
@@ -349,9 +344,15 @@ void MainWindow::on_actionLogin_triggered()
 }
 
 void MainWindow::on_actionUserList_triggered() {
-    UserList userList;
-    userList.setModal(true);
-    userList.exec();
+
+    UserList uList(this, userList);
+    uList.setModal(true);
+    uList.exec();
+}
+
+void MainWindow::updateUserList(QVector<User> newUserList){
+    qDebug() << "User list updated";
+    userList = newUserList;
 }
 
 void MainWindow::on_actionShare_Uri_triggered() {
@@ -369,7 +370,6 @@ void MainWindow::on_actionSettings_triggered() {
 	uw.exec();
 	
 }
-
 
 Ui::MainWindow *MainWindow::getUi() const {
     return ui;

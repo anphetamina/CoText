@@ -10,6 +10,7 @@
 #include <iostream>
 #include <QtWidgets/QPlainTextEdit>
 #include <QtGui/QPainter>
+#include <User.h>
 #include "../common/SharedEditor.h"
 #include "../common/QSymbol.h"
 #include "UserHighlighter.h"
@@ -30,7 +31,6 @@ public:
     QColor getUserColor(int userId) const;
     int getUserId(int row, int col) const;
 
-
 private:
 
     QWidget *parent;
@@ -39,7 +39,6 @@ private:
      * to access to the toolbar icons
      */
     Ui::MainWindow &ui;
-
     SharedEditor editor;
     std::vector<int> index;
     std::vector<std::vector<QSymbol>> testSymbols;
@@ -48,23 +47,17 @@ private:
 
     void fontChanged(const QFont &f);
     void colorChanged(const QColor &c);
-
     void insertRow(int pos, int n);
     void deleteRow(int pos, int n);
     void incrementIndex(int pos, int n);
     void decrementIndex(int pos, int n);
-
     std::atomic<bool> isFromRemote;
     int getPosition(int row, int col);
-
     std::map<int, int> cursors;
     std::map<int, QTextEdit::ExtraSelection> selections;
     std::map<int, QColor> userColors;
-
     std::atomic<bool> isUserColorsToggled;
-
     void printSymbols();
-
 
 public slots:
 
@@ -72,10 +65,8 @@ public slots:
     void remoteInsertBlock(std::vector<QSymbol> symbols);
     void remoteErase(QSymbol symbol);
     void remoteEraseBlock(std::vector<QSymbol> symbols);
-
     void updateCursor(int userId, int position);
     void updateSelection(int userId, QTextCursor cursor);
-
     void openDocument(std::vector<std::vector<QSymbol>> symbols);
 
 private slots:
@@ -87,11 +78,9 @@ private slots:
     void setFontUnderline(bool underline);
     void setFontColor();
     void updateToolbar(const QTextCharFormat &format);
-
     void contentsChange(int position, int charsRemoved, int charsAdded);
     void cursorPositionChange();
     void selectionChange();
-
     void toggleUserColors();
 
 protected:

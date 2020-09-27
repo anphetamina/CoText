@@ -58,6 +58,8 @@ int main(int argc, char *argv[])
 	w->setWindowTitle("Welcome");
     
     w->setWindowIconText("Co-Text");
+
+    client->connectToMainWindow(w);
     //w->setWindowIcon(QIcon(":/CoText.ico"));
     //QPixmap pm(":/CoText.ico");
     ////DO SOME RESIZING
