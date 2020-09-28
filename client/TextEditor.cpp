@@ -565,7 +565,7 @@ void TextEditor::remoteErase(QSymbol symbol) {
         if (pos.first != -1 || pos.second != -1) {
 
             decrementIndex(pos.first, 1);
-            if (symbol.getC() == '\n') {
+            if (isNewLine(symbol.getC())) {
                 deleteRow(pos.first, 1);
             }
 
