@@ -55,7 +55,7 @@
      <x>0</x>
      <y>0</y>
      <width>992</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <property name="palette">
@@ -73,7 +73,6 @@
      <string>File</string>
     </property>
     <addaction name="actionNew"/>
-    <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_as"/>
     <addaction name="actionPrintPDF"/>
@@ -197,6 +196,7 @@
    <addaction name="actionItalic"/>
    <addaction name="actionUnderline"/>
    <addaction name="actionToggle_user_colors"/>
+   <addaction name="actionUserList"/>
    <addaction name="actionAlign_left"/>
    <addaction name="actionAlign_center"/>
    <addaction name="actionAlign_right"/>
@@ -512,6 +512,18 @@
    </property>
    <property name="text">
     <string>Toggle user colors</string>
+   </property>
+  </action>
+  <action name="actionUserList">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/imgs/icons/user-group.svg</normaloff>:/imgs/icons/user-group.svg</iconset>
+   </property>
+   <property name="text">
+    <string>UserList</string>
    </property>
   </action>
   <action name="actionJustify">

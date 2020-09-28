@@ -56,38 +56,29 @@ public:
 
 private slots:
     void on_actionNew_triggered();
-
     void on_actionOpen_triggered();
-
     void on_actionSave_as_triggered();
-
     void on_actionExit_triggered();
-
     void on_actionCopy_triggered();
-
     void on_actionPaste_triggered();
-
     void on_actionCut_triggered();
-
     void on_actionUndo_triggered();
-
     void on_actionRedo_triggered();
-
     void on_actionLogin_triggered();
-
     void on_actionPrintPDF_triggered();
-
     void on_actionSave_triggered();
-
     void on_actionShare_Uri_triggered();
-    
     void on_actionSettings_triggered();
+    void on_actionUserList_triggered();
 
+public slots:
+    void updateUserList(QVector<User> newUserList);
 
 private:
-
     Ui::MainWindow *ui;
     QString currentFileName = "";
+    QVector<User> userList;
+
     void Save_as();
     void closeEvent(QCloseEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;

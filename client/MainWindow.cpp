@@ -1,9 +1,8 @@
 #include "MainWindow.h"
 #include "ui_mainwindow.h"
 #include "Login.h"
-
-
-
+#include "UserList.h"
+#include "TextEditor.h"
 #include <QPixmap> //allows to create a qpixmap onj which takes 1 arg
 #include <QPrinter>
 #include <QColorDialog>
@@ -43,6 +42,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionExit))->installEventFilter(this);
     dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionSettings))->installEventFilter(this);
 
+    dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUserList))->installEventFilter(this);
+
 
 
 
@@ -55,9 +56,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     ui->actionCopy->setShortcut(QKeySequence::Copy);
     ui->actionPaste->setShortcut(QKeySequence::Paste);
     //ui->actionRemove->setShortcut(QKeySequence::Delete);
-
-
-
 }
 
 
@@ -153,6 +151,19 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionSettings)) && event->type() == QEvent::Leave) {
         setCursor(Qt::ArrowCursor);
         ui->actionSettings->setIcon(QIcon(":/imgs/icons/noun_Settings_2324598.svg"));
+        return true;
+    }
+
+    //UserList
+    if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUserList)) && event->type() == QEvent::Enter) {
+        setCursor(Qt::PointingHandCursor);
+        ui->actionUserList->setIcon(QIcon(":/imgs/icons/user-group_white.svg"));
+        return true;
+    }
+
+    if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUserList)) && event->type() == QEvent::Leave) {
+        setCursor(Qt::ArrowCursor);
+        ui->actionUserList->setIcon(QIcon(":/imgs/icons/user-group.svg"));
         return true;
     }
 
@@ -332,6 +343,17 @@ void MainWindow::on_actionLogin_triggered()
 
 }
 
+void MainWindow::on_actionUserList_triggered() {
+
+    UserList uList(this, userList);
+    uList.setModal(true);
+    uList.exec();
+}
+
+void MainWindow::updateUserList(QVector<User> newUserList){
+    qDebug() << "User list updated";
+    userList = newUserList;
+}
 
 void MainWindow::on_actionShare_Uri_triggered() {
 	
@@ -348,7 +370,6 @@ void MainWindow::on_actionSettings_triggered() {
 	uw.exec();
 	
 }
-
 
 Ui::MainWindow *MainWindow::getUi() const {
     return ui;

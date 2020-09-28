@@ -12,14 +12,13 @@ QSymbol::QSymbol(QChar &c, QString &id, std::vector<Identifier> &position, QText
                                                                                             position(position), cf(cf) {}
 
 QDataStream & operator << (QDataStream & s, const QSymbol &qs) {
-    s << qs.c << qs.id << QVector<Identifier>(qs.position.begin(), qs.position.end()) << qs.cf;
+    s << qs.c << qs.id << QVector<Identifier>::fromStdVector(qs.position) << qs.cf;
     return s;
 }
 
 QDataStream & operator >> (QDataStream & s, QSymbol& qs) {
-    QVector<Identifier> qposition(qs.position.begin(), qs.position.end());
-    s >> qs.c >> qs.id >> qposition >> qs.cf;
-    qs.position = qposition.toStdVector();
+    QVector<Identifier> position = QVector<Identifier>::fromStdVector(qs.position);
+    s >> qs.c >> qs.id >> position >> qs.cf;
     return s;
 }
 

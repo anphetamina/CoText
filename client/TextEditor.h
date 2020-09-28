@@ -10,6 +10,7 @@
 #include <iostream>
 #include <QtWidgets/QPlainTextEdit>
 #include <QtGui/QPainter>
+#include <User.h>
 #include "../common/SharedEditor.h"
 #include "../common/QSymbol.h"
 #include "UserHighlighter.h"
@@ -29,7 +30,6 @@ public:
     int getCol(int row, int position) const;
     QColor getUserColor(int userId) const;
     int getUserId(int row, int col) const;
-
 
 private:
 

@@ -15,6 +15,7 @@
 #include "../common/CursorPacket.h"
 #include "../common/DocumentPacket.h"
 #include "TextEditor.h"
+#include "MainWindow.h"
 
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
 
@@ -31,6 +32,8 @@ signals:
     void eraseBlockReceived(std::vector<QSymbol> symbols);
     void updateCursorReceived(int userId, int position);
     void updateSelectionReceived(int userId, QTextCursor cursor);
+
+    void updateUserListReceived(QVector<User> userlist);
 
 public slots:
 
@@ -62,6 +65,7 @@ private:
 
 public:
     void connectToEditor(TextEditor* te);
+    void connectToMainWindow(MainWindow* mw);
 
     void sendDocOpen(QString docName, qint32 userId);
     void authenticate(QString username, QString password);
