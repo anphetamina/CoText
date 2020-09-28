@@ -31,6 +31,21 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     document()->setDocumentMargin(50); // todo better margins
     qDebug() << "Current sID: "<< editor.getSiteId();
 
+
+    setAcceptRichText(false);
+    alignmentChanged(alignment());
+
+    /**
+     * each alignment option is mutual exclusive
+     */
+    QActionGroup *alignGroup = new QActionGroup(this);
+    alignGroup->addAction(ui.actionAlign_left);
+    alignGroup->addAction(ui.actionAlign_right);
+    alignGroup->addAction(ui.actionAlign_center);
+    alignGroup->addAction(ui.actionJustify);
+
+    connect(alignGroup, &QActionGroup::triggered, this, &TextEditor::setTextAlignment);
+
     /**
     * font styling connections
     */
@@ -39,7 +54,6 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     connect(ui.actionBold, &QAction::triggered, this, &TextEditor::setFontBold);
     connect(ui.actionItalic, &QAction::triggered, this, &TextEditor::setFontItalic);
     connect(ui.actionUnderline, &QAction::triggered, this, &TextEditor::setFontUnderline);
-    // todo alignment
     connect(ui.actionTextColor, &QAction::triggered, this, &TextEditor::setFontColor);
 
     /**
@@ -48,8 +62,8 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
 
     connect(document(), &QTextDocument::contentsChange, this, &TextEditor::contentsChange);
 
-    connect(this, &QPlainTextEdit::cursorPositionChanged, this, &TextEditor::cursorPositionChange);
-    connect(this, &QPlainTextEdit::selectionChanged, this, &TextEditor::selectionChange);
+    connect(this, &QTextEdit::cursorPositionChanged, this, &TextEditor::cursorPositionChange);
+    connect(this, &QTextEdit::selectionChanged, this, &TextEditor::selectionChange);
 
     connect(ui.actionToggle_user_colors, &QAction::triggered, this, &TextEditor::toggleUserColors);
 
@@ -126,6 +140,32 @@ void TextEditor::setFontColor() {
     colorChanged(color);
 }
 
+void TextEditor::setTextAlignment(QAction *action) {
+
+    if (action == ui.actionAlign_left) {
+        setAlignment(Qt::AlignLeft);
+    } else if (action == ui.actionAlign_right) {
+        setAlignment(Qt::AlignRight);
+    } else if (action == ui.actionAlign_center) {
+        setAlignment(Qt::AlignHCenter);
+    } else if (action == ui.actionJustify) {
+        setAlignment(Qt::AlignJustify);
+    }
+
+}
+
+void TextEditor::alignmentChanged(Qt::Alignment alignment) {
+    if (alignment & Qt::AlignLeft) {
+        ui.actionAlign_left->setChecked(true);
+    } else if (alignment & Qt::AlignCenter) {
+        ui.actionAlign_center->setChecked(true);
+    } else if (alignment & Qt::AlignRight) {
+        ui.actionAlign_right->setChecked(true);
+    } else if (alignment & Qt::AlignJustify) {
+        ui.actionJustify->setChecked(true);
+    }
+}
+
 /**
  * given the current format updates the icons on the editor toolbar in the main window
  * @param format
@@ -157,8 +197,9 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
     /**
      * workaround for https://github.com/anphetamina/CoText/issues/22
+     * when the alignment is changed in the last row, charsRemoved and charsAdded gives +1 of the actual number of chars
      */
-    if (position == 0 && charsAdded >= 1 && charsRemoved >= 1) {
+    if ((position == 0 || position+charsAdded >= index.back()) && charsAdded >= 1 && charsRemoved >= 1) {
         int oldSize = charsRemoved-1;
         int newSize = charsAdded-1;
         int diff = std::abs(newSize - oldSize);
@@ -219,7 +260,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
                     QChar addedChar = document()->characterAt(position++);
                     QSymbol symbol = editor.localInsert(row, col, addedChar, currentCharFormat());
 
-                    if (addedChar == QChar::LineFeed || addedChar == QChar::ParagraphSeparator || addedChar == QChar::LineSeparator) {
+                    if (isNewLine(addedChar)) {
                         newRows++;
                     }
 
@@ -567,7 +608,7 @@ void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
 void TextEditor::paintEvent(QPaintEvent *e) {
 
     try {
-        QPlainTextEdit::paintEvent(e);
+        QTextEdit::paintEvent(e);
         QPainter painter(viewport());
         QTextCursor cursor(document());
         for (const std::pair<int, int> &c : cursors) {
@@ -606,6 +647,7 @@ void TextEditor::paintEvent(QPaintEvent *e) {
 void TextEditor::cursorPositionChange() {
 
     updateToolbar(currentCharFormat());
+    alignmentChanged(alignment());
 
     // todo change with user id
     emit cursorPositionChanged(editor.getSiteId(), textCursor().position());
@@ -712,6 +754,10 @@ void TextEditor::printSymbols() {
         }
     }
     std::cout << std::endl;
+}
+
+bool TextEditor::isNewLine(QChar c) {
+    return c == QChar::LineFeed || c == QChar::ParagraphSeparator || c == QChar::LineSeparator;
 }
 
 // todo handle offline case

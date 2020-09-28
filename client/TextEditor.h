@@ -18,7 +18,7 @@ class UserHighlighter;
 
 namespace Ui { class MainWindow; }
 
-class TextEditor : public QPlainTextEdit {
+class TextEditor : public QTextEdit {
 
     Q_OBJECT
 
@@ -65,6 +65,8 @@ private:
 
     void printSymbols();
 
+    bool isNewLine(QChar c);
+
 
 public slots:
 
@@ -86,6 +88,8 @@ private slots:
     void setFontItalic(bool italic);
     void setFontUnderline(bool underline);
     void setFontColor();
+    void setTextAlignment(QAction *action);
+    void alignmentChanged(Qt::Alignment a);
     void updateToolbar(const QTextCharFormat &format);
 
     void contentsChange(int position, int charsRemoved, int charsAdded);
