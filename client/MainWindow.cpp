@@ -1,7 +1,6 @@
 #include "MainWindow.h"
 #include "ui_mainwindow.h"
 #include "Login.h"
-#include "UserList.h"
 #include "TextEditor.h"
 #include <QPixmap> //allows to create a qpixmap onj which takes 1 arg
 #include <QPrinter>
@@ -13,54 +12,77 @@
 
 bool isLogged = true;
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
-	
+
     QApplication::instance()->setAttribute(Qt::AA_DontShowIconsInMenus, true);
-    
+
     ui->setupUi(this);
     //this->user = nullptr;
-    if(!isLogged) {
+    if (!isLogged) {
         // todo check
 //    	ui->textEdit->setDisabled(true);
-    	//ui->page->hide();
-    	//ui->page_2->show();
-    	
-    	
+        //ui->page->hide();
+        //ui->page_2->show();
+
+
     } else {
         // todo check
 //    	ui->textEdit->setDisabled(false);
-    	//ui->page_2->hide();
-    	//ui->page->show();
+        //ui->page_2->hide();
+        //ui->page->show();
     }
-    
-
 
     //installing EventFilter for QToolButtons on the qToolBar
-    dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionLogin))->installEventFilter(this);
-    dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionOpen))->installEventFilter(this);
-    dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionNew))->installEventFilter(this);
-    dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionShare_Uri))->installEventFilter(this);
-    dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionExit))->installEventFilter(this);
-    dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionSettings))->installEventFilter(this);
-
-    dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUserList))->installEventFilter(this);
-
-
-
+    dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionLogin))->installEventFilter(this);
+    dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionOpen))->installEventFilter(this);
+    dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionNew))->installEventFilter(this);
+    dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionShare_Uri))->installEventFilter(this);
+    dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionExit))->installEventFilter(this);
+    dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionSettings))->installEventFilter(this);
+    dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionUserList))->installEventFilter(this);
 
     //this->setCentralWidget(ui->textEdit);
     QPixmap icon(":/appIcon/CoText.ico");
     //ui->iconLabel->setPixmap(icon);
-   // ui->statusbar->addPermanentWidget();
+    // ui->statusbar->addPermanentWidget();
 
     ui->actionCut->setShortcut(QKeySequence::Cut);
     ui->actionCopy->setShortcut(QKeySequence::Copy);
     ui->actionPaste->setShortcut(QKeySequence::Paste);
     //ui->actionRemove->setShortcut(QKeySequence::Delete);
+
+    actionUserList.insert(0,ui->actionUser0);
+    actionUserList.insert(1,ui->actionUser1);
+    actionUserList.insert(2,ui->actionUser2);
+    actionUserList.insert(3,ui->actionUser3);
+    actionUserList.insert(4,ui->actionUser4);
+    actionUserList.insert(5,ui->actionUser5);
+    actionUserList.insert(6,ui->actionUser6);
+    actionUserList.insert(7,ui->actionUser7);
+    actionUserList.insert(8,ui->actionUser8);
+    actionUserList.insert(9,ui->actionUser9);
+    actionUserList.insert(10,ui->actionUser10);
+    actionUserList.insert(11,ui->actionUser11);
+    actionUserList.insert(12,ui->actionUser12);
+    actionUserList.insert(13,ui->actionUser13);
+    actionUserList.insert(14,ui->actionUser14);
+    actionUserList.insert(15,ui->actionUser15);
+    actionUserList.insert(16,ui->actionUser16);
+    actionUserList.insert(17,ui->actionUser17);
+    actionUserList.insert(18,ui->actionUser18);
+    actionUserList.insert(19,ui->actionUser19);
+
+
+    /* ui->rightToolBar->widgetForAction(ui->actionUser2)->setStyleSheet("color:lime");
+     ui->rightToolBar->widgetForAction(ui->actionUser3)->setStyleSheet("color:red");
+     ui->actionUser0->setVisible(false);
+     ui->actionUser4->setVisible(false);
+     ui->actionUser11->setVisible(false);
+     ui->actionUser17->setVisible(false);*/
 }
 
 
 MainWindow::~MainWindow(){
-     delete ui;
+    delete ui;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -225,8 +247,8 @@ void MainWindow::Save_as() {
 
 }
 void MainWindow::on_actionSave_as_triggered() {
-  Save_as();
-  return;
+    Save_as();
+    return;
 }
 
 
@@ -345,34 +367,40 @@ void MainWindow::on_actionLogin_triggered()
 
 void MainWindow::on_actionUserList_triggered() {
 
-    UserList uList(this, userList, colorMap);
+    /*UserList uList(this, userList, colorMap);
     uList.setModal(true);
-    uList.exec();
+    uList.exec();*/
 }
 
 void MainWindow::updateUserList(QVector<User> newUserList){
+    for(int j=0; j<20; j++){
+        actionUserList[j]->setVisible(false);
+    }
     qDebug() << "User list updated";
     userList = newUserList;
     colorMap.clear();
     for(int i=0; i<newUserList.size();i++){
         colorMap.insert(newUserList[i].getId(),colorList.at(i));
+        actionUserList[i]->setVisible(true);
+        actionUserList[i]->setText(newUserList[i].getEmail());
+        ui->rightToolBar->widgetForAction(actionUserList[i])->setStyleSheet("color:"+colorList.at(i).name());
     }
 }
 
 void MainWindow::on_actionShare_Uri_triggered() {
-	
+
     QMessageBox::StandardButton reply = QMessageBox::warning(this, "ciao", "uri");
-    
+
 }
 
 void MainWindow::on_actionSettings_triggered() {
-	
-	UserWidget uw;
-	
-	uw.setModal(true);
-	
-	uw.exec();
-	
+
+    UserWidget uw;
+
+    uw.setModal(true);
+
+    uw.exec();
+
 }
 
 Ui::MainWindow *MainWindow::getUi() const {

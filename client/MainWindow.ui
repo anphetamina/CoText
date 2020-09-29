@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>992</width>
-    <height>583</height>
+    <width>946</width>
+    <height>548</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -54,7 +54,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>992</width>
+     <width>946</width>
      <height>26</height>
     </rect>
    </property>
@@ -201,6 +201,37 @@
    <addaction name="actionAlign_center"/>
    <addaction name="actionAlign_right"/>
    <addaction name="actionJustify"/>
+  </widget>
+  <widget class="QToolBar" name="rightToolBar">
+   <property name="windowTitle">
+    <string>toolBar_2</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>RightToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionUser0"/>
+   <addaction name="actionUser1"/>
+   <addaction name="actionUser2"/>
+   <addaction name="actionUser3"/>
+   <addaction name="actionUser4"/>
+   <addaction name="actionUser5"/>
+   <addaction name="actionUser6"/>
+   <addaction name="actionUser7"/>
+   <addaction name="actionUser8"/>
+   <addaction name="actionUser9"/>
+   <addaction name="actionUser10"/>
+   <addaction name="actionUser11"/>
+   <addaction name="actionUser12"/>
+   <addaction name="actionUser13"/>
+   <addaction name="actionUser14"/>
+   <addaction name="actionUser15"/>
+   <addaction name="actionUser16"/>
+   <addaction name="actionUser17"/>
+   <addaction name="actionUser18"/>
+   <addaction name="actionUser19"/>
   </widget>
   <action name="actionNew">
    <property name="checkable">
@@ -572,6 +603,343 @@
    </property>
    <property name="text">
     <string>Align center</string>
+   </property>
+  </action>
+  <action name="actionUser0">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>User0</string>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="actionUser1">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>User1</string>
+   </property>
+   <property name="toolTip">
+    <string>User1</string>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="actionUser2">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>User2</string>
+   </property>
+   <property name="toolTip">
+    <string>User2</string>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionUser3">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>User3</string>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="actionUser4">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>User4</string>
+   </property>
+   <property name="toolTip">
+    <string>User4</string>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="actionUser5">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>User5</string>
+   </property>
+   <property name="toolTip">
+    <string>User5</string>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="actionUser6">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>User6</string>
+   </property>
+   <property name="toolTip">
+    <string>User6</string>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="actionUser7">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>User7</string>
+   </property>
+   <property name="toolTip">
+    <string>User7</string>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="actionUser8">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>User8</string>
+   </property>
+   <property name="toolTip">
+    <string>User8</string>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="actionUser9">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>User9</string>
+   </property>
+   <property name="toolTip">
+    <string>User9</string>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="actionUser10">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>User10</string>
+   </property>
+   <property name="toolTip">
+    <string>User10</string>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="actionUser11">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>User11</string>
+   </property>
+   <property name="toolTip">
+    <string>User11</string>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="actionUser12">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>User12</string>
+   </property>
+   <property name="toolTip">
+    <string>User12</string>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="actionUser13">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>User13</string>
+   </property>
+   <property name="toolTip">
+    <string>User13</string>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="actionUser14">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>User14</string>
+   </property>
+   <property name="toolTip">
+    <string>User14</string>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="actionUser15">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>User15</string>
+   </property>
+   <property name="toolTip">
+    <string>User15</string>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="actionUser16">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>User16</string>
+   </property>
+   <property name="toolTip">
+    <string>User16</string>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="actionUser17">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>User17</string>
+   </property>
+   <property name="toolTip">
+    <string>User17</string>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="actionUser18">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>User18</string>
+   </property>
+   <property name="toolTip">
+    <string>User18</string>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="actionUser19">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>User19</string>
+   </property>
+   <property name="toolTip">
+    <string>User19</string>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
    </property>
   </action>
  </widget>

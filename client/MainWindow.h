@@ -34,13 +34,13 @@ QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
+Q_OBJECT
 
 public:
 
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    
+
     static void setUser(User* usr){
         user = new User();
         user->setName(usr->getName());
@@ -100,6 +100,8 @@ private:
                                  QColor(0,0,128),   //navy
                                  QColor(128,0,128)   //purple
     }; //is a static array of color
+
+    QVector<QAction*> actionUserList;
 
     void Save_as();
     void closeEvent(QCloseEvent *event) override;
