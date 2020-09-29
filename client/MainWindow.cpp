@@ -345,7 +345,7 @@ void MainWindow::on_actionLogin_triggered()
 
 void MainWindow::on_actionUserList_triggered() {
 
-    UserList uList(this, userList);
+    UserList uList(this, userList, colorMap);
     uList.setModal(true);
     uList.exec();
 }
@@ -353,6 +353,10 @@ void MainWindow::on_actionUserList_triggered() {
 void MainWindow::updateUserList(QVector<User> newUserList){
     qDebug() << "User list updated";
     userList = newUserList;
+    colorMap.clear();
+    for(int i=0; i<newUserList.size();i++){
+        colorMap.insert(newUserList[i].getId(),colorList.at(i));
+    }
 }
 
 void MainWindow::on_actionShare_Uri_triggered() {

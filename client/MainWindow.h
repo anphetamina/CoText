@@ -77,7 +77,29 @@ public slots:
 private:
     Ui::MainWindow *ui;
     QString currentFileName = "";
-    QVector<User> userList;
+    QVector<User> userList = {};
+    QMap<int, QColor> colorMap = {};
+    QVector<QColor> colorList = {QColor(255,0,0),   //red
+                                 QColor(0,255,0),   //lime
+                                 QColor(0,0,255),   //blue
+                                 QColor(255,255,0),   //yellow
+                                 QColor(0,255,255),   //aqua
+                                 QColor(255,0,255),   //magenta
+                                 QColor(210,105,30),   //chocolate
+                                 QColor(189,183,107),   //dark kaki
+                                 QColor(0,128,0),   //green
+                                 QColor(255,127,80),   //coral
+                                 QColor(154,205,50),   //yellow green
+                                 QColor(102,205,170),   //medium aqua marine
+                                 QColor(175,238,238),   //pale turquoise
+                                 QColor(147,112,219),   //medium purple
+                                 QColor(255,165,0),   //orange
+                                 QColor(176,196,222),   //light steel blue
+                                 QColor(255,182,193),   //light pink
+                                 QColor(0,128,128),   //teal
+                                 QColor(0,0,128),   //navy
+                                 QColor(128,0,128)   //purple
+    }; //is a static array of color
 
     void Save_as();
     void closeEvent(QCloseEvent *event) override;
