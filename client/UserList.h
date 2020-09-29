@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <User.h>
+#include <QtCore/QMap>
 
 namespace Ui {
 class UserList;
@@ -13,7 +14,7 @@ class UserList : public QDialog
     Q_OBJECT
 
 public:
-    explicit UserList(QWidget *parent = nullptr, QVector<User> userList = {});
+    explicit UserList(QWidget *parent = nullptr, QVector<User> uList = {}, QMap<int, QColor> colorMap = {});
     ~UserList();
 
 private slots:
