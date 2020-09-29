@@ -69,7 +69,6 @@ private slots:
     void on_actionSave_triggered();
     void on_actionShare_Uri_triggered();
     void on_actionSettings_triggered();
-    void on_actionUserList_triggered();
 
 public slots:
     void updateUserList(QVector<User> newUserList);

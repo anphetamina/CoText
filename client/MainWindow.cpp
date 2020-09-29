@@ -38,7 +38,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionShare_Uri))->installEventFilter(this);
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionExit))->installEventFilter(this);
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionSettings))->installEventFilter(this);
-    dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionUserList))->installEventFilter(this);
 
     //this->setCentralWidget(ui->textEdit);
     QPixmap icon(":/appIcon/CoText.ico");
@@ -71,13 +70,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     actionUserList.insert(18,ui->actionUser18);
     actionUserList.insert(19,ui->actionUser19);
 
-
-    /* ui->rightToolBar->widgetForAction(ui->actionUser2)->setStyleSheet("color:lime");
-     ui->rightToolBar->widgetForAction(ui->actionUser3)->setStyleSheet("color:red");
-     ui->actionUser0->setVisible(false);
-     ui->actionUser4->setVisible(false);
-     ui->actionUser11->setVisible(false);
-     ui->actionUser17->setVisible(false);*/
 }
 
 
@@ -173,19 +165,6 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionSettings)) && event->type() == QEvent::Leave) {
         setCursor(Qt::ArrowCursor);
         ui->actionSettings->setIcon(QIcon(":/imgs/icons/noun_Settings_2324598.svg"));
-        return true;
-    }
-
-    //UserList
-    if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUserList)) && event->type() == QEvent::Enter) {
-        setCursor(Qt::PointingHandCursor);
-        ui->actionUserList->setIcon(QIcon(":/imgs/icons/user-group_white.svg"));
-        return true;
-    }
-
-    if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUserList)) && event->type() == QEvent::Leave) {
-        setCursor(Qt::ArrowCursor);
-        ui->actionUserList->setIcon(QIcon(":/imgs/icons/user-group.svg"));
         return true;
     }
 
@@ -363,13 +342,6 @@ void MainWindow::on_actionLogin_triggered()
 
     //lf->show();
 
-}
-
-void MainWindow::on_actionUserList_triggered() {
-
-    /*UserList uList(this, userList, colorMap);
-    uList.setModal(true);
-    uList.exec();*/
 }
 
 void MainWindow::updateUserList(QVector<User> newUserList){
