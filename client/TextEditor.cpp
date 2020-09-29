@@ -196,15 +196,11 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
     }
 
     /**
-     * workaround for https://github.com/anphetamina/CoText/issues/22
-     * when the alignment is changed in the last row, charsRemoved and charsAdded gives +1 of the actual number of chars
+     * workaround for https://github.com/anphetamina/CoText/issues/32
      */
-    if ((position == 0 || position+charsAdded >= index.back()) && charsAdded >= 1 && charsRemoved >= 1) {
-        int oldSize = charsRemoved-1;
-        int newSize = charsAdded-1;
-        int diff = std::abs(newSize - oldSize);
-        charsRemoved = currentSelectedChars;
-        charsAdded = std::abs(charsRemoved - diff);
+    if (charsAdded >= 1 && charsRemoved >= 1 && position+charsRemoved > index.back()+static_cast<int>(editor.getSymbols()[index.size()-1].size()-1)) {
+        charsRemoved--;
+        charsAdded--;
     }
 
     /**
