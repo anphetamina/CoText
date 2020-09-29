@@ -77,6 +77,7 @@ public slots:
 
     void updateCursor(int userId, int position);
     void updateSelection(int userId, QTextCursor cursor);
+    void updateAlignment(Qt::Alignment alignment, int position);
 
     void openDocument(std::vector<std::vector<QSymbol>> symbols);
 
@@ -107,6 +108,7 @@ signals:
     void symbolsErased(std::vector<QSymbol> symbols, int siteId);
     void cursorPositionChanged(int userId, int position);
     void selectionChanged(int userId, QTextCursor cursor);
+    void textAlignmentChanged(Qt::Alignment alignment, int position);
 
 };
 

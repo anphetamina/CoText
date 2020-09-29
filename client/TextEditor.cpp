@@ -144,12 +144,16 @@ void TextEditor::setTextAlignment(QAction *action) {
 
     if (action == ui.actionAlign_left) {
         setAlignment(Qt::AlignLeft);
+        emit textAlignmentChanged(Qt::AlignLeft, textCursor().position());
     } else if (action == ui.actionAlign_right) {
         setAlignment(Qt::AlignRight);
+        emit textAlignmentChanged(Qt::AlignRight, textCursor().position());
     } else if (action == ui.actionAlign_center) {
         setAlignment(Qt::AlignHCenter);
+        emit textAlignmentChanged(Qt::AlignHCenter, textCursor().position());
     } else if (action == ui.actionJustify) {
         setAlignment(Qt::AlignJustify);
+        emit textAlignmentChanged(Qt::AlignJustify, textCursor().position());
     }
 
 }
@@ -288,83 +292,6 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
 
     }
-
-    /**
-     * second solution maps a 1-dimensional index (position) to a 2-dimensional one
-     */
-
-//
-//    if (charsRemoved > 0) {
-//
-//        int startLine = 0, startIndex = 0, acc = 0;
-//
-//        /**
-//         * find the 2-dimensional index given the 1-dimensional one (position)
-//         * the equal has been introduced because the index points to a non-free position
-//         */
-//        while ((acc = editor.getSymbols()[startLine].size()+acc) <= position) {
-//            startLine++;
-//            startIndex = acc;
-//        }
-//        startIndex = position - startIndex;
-//
-//        int endLine = startLine;
-//        int endIndex = startIndex + charsRemoved - 1;
-//        int diff = charsRemoved - editor.getSymbols()[endLine].size() + startIndex;
-//
-//        /**
-//         * iterate until the remaining characters to remove are positive
-//         * and compute the difference line by line
-//         * the ending index is the number of the remaining character -1 in the end line
-//         */
-//        while (diff > 0) {
-//            endIndex = diff - 1;
-//            diff -= editor.getSymbols()[++endLine].size();
-//        }
-//
-////        qDebug() << "start line" << startLine << "start index" << startIndex << "end line" << endLine << "end index" << endIndex;
-//
-//        editor.localErase(startLine, startIndex, endLine, endIndex);
-//    }
-//
-//    if (charsAdded > 0) {
-//
-//        int line = 0, index = 0, acc = 0;
-//
-//        /**
-//         * first search for the x,y position inside the symbols
-//         * starting given the 1-dimensional index (position)
-//         */
-//        while ((acc = editor.getSymbols()[line].size()+acc) < position) {
-//            line++;
-//            index = acc;
-//        }
-//        index = position - index;
-//
-//        int pos = position;
-//        for (int i = 0; i < charsAdded; ++i) {
-//            QChar addedChar = document()->characterAt(pos);
-//
-//            if (addedChar == QChar::LineFeed || addedChar == QChar::ParagraphSeparator) {
-//                editor.localInsert(line, index, '\n');
-//            } else {
-//                editor.localInsert(line, index, addedChar.toLatin1());
-//            }
-//
-//            /**
-//             * index is always incremented due to the fact that if a line ends with a '\n'
-//             * the character is inserted at the beginning of the next line
-//             * thus the index must be incremented anyway
-//             */
-//            if (index == editor.getSymbols()[line].size()) {
-//                line++;
-//                index = 0;
-//            }
-//            index++;
-//
-//            pos++;
-//        }
-//    }
 
 
     printSymbols();
@@ -750,6 +677,10 @@ void TextEditor::printSymbols() {
         }
     }
     std::cout << std::endl;
+}
+
+void TextEditor::updateAlignment(Qt::Alignment alignment, int position) {
+    document()->findBlock(position).blockFormat().setAlignment(alignment);
 }
 
 bool TextEditor::isNewLine(QChar c) {
