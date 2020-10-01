@@ -14,6 +14,8 @@
 #include <QtGui/QTextCharFormat>
 
 #include "UserWidget.h"
+#include "TextEditor.h"
+
 
 //#include <QSqlDatabase>
 
@@ -25,8 +27,13 @@
 
 
  */
+class SslEchoClient;
 
-static User *user = nullptr;
+inline User *user = nullptr;
+inline SslEchoClient *client = nullptr;
+
+
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -36,11 +43,20 @@ class MainWindow : public QMainWindow
 {
 Q_OBJECT
 
-public:
 
+
+
+public:
+	
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    /*
+    void setClient(SslEchoClient* client) {
+    	this->client = client;
+    }
+    */
+    
     static void setUser(User* usr){
         user = new User();
         user->setName(usr->getName());
@@ -50,12 +66,17 @@ public:
         user->setProfilePic(usr->getProfilePic());
         user->setUserState(20); //ACTIVE USER
     }
+    
+    static User* getUser() {
+    	return user;
+    }
 
     Ui::MainWindow *getUi() const;
 
 
 private slots:
     void on_actionNew_triggered();
+
     void on_actionOpen_triggered();
     void on_actionSave_as_triggered();
     void on_actionExit_triggered();
@@ -69,12 +90,14 @@ private slots:
     void on_actionSave_triggered();
     void on_actionShare_Uri_triggered();
     void on_actionSettings_triggered();
+    void on_actionUserList_triggered();
 
 public slots:
     void updateUserList(QVector<User> newUserList);
 
 private:
     Ui::MainWindow *ui;
+    TextEditor *editor;
     QString currentFileName = "";
     QVector<User> userList = {};
     QMap<int, QColor> colorMap = {};
@@ -102,6 +125,7 @@ private:
 
     QVector<QAction*> actionUserList;
 
+    //SslEchoClient *client;
     void Save_as();
     void closeEvent(QCloseEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;

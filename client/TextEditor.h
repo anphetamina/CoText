@@ -10,7 +10,6 @@
 #include <iostream>
 #include <QtWidgets/QPlainTextEdit>
 #include <QtGui/QPainter>
-#include <User.h>
 #include "../common/SharedEditor.h"
 #include "../common/QSymbol.h"
 #include "UserHighlighter.h"

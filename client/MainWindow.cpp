@@ -18,14 +18,29 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     ui->setupUi(this);
     //this->user = nullptr;
     if (!isLogged) {
+    //this->setClient(client);
+    User* user = this->getUser();
+
+    
+    
+    if(user == nullptr || !user->isLogged()) {
         // todo check
 //    	ui->textEdit->setDisabled(true);
         //ui->page->hide();
         //ui->page_2->show();
 
 
+	    setUser(nullptr);
+	    //ui->textEdit->setDisabled(true);
+    	//ui->page->hide();
+    	//ui->page_2->show();
+    	
+    	
     } else {
         // todo check
+        setUser(user);
+	    this->editor = editor;
+	    
 //    	ui->textEdit->setDisabled(false);
         //ui->page_2->hide();
         //ui->page->show();
@@ -38,6 +53,11 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionShare_Uri))->installEventFilter(this);
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionExit))->installEventFilter(this);
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionSettings))->installEventFilter(this);
+
+    dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUserList))->installEventFilter(this);
+
+
+
 
     //this->setCentralWidget(ui->textEdit);
     QPixmap icon(":/appIcon/CoText.ico");
@@ -74,7 +94,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
 
 MainWindow::~MainWindow(){
-    delete ui;
+	 //delete client;
+     delete ui;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -165,6 +186,19 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionSettings)) && event->type() == QEvent::Leave) {
         setCursor(Qt::ArrowCursor);
         ui->actionSettings->setIcon(QIcon(":/imgs/icons/noun_Settings_2324598.svg"));
+        return true;
+    }
+
+    //UserList
+    if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUserList)) && event->type() == QEvent::Enter) {
+        setCursor(Qt::PointingHandCursor);
+        ui->actionUserList->setIcon(QIcon(":/imgs/icons/user-group_white.svg"));
+        return true;
+    }
+
+    if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUserList)) && event->type() == QEvent::Leave) {
+        setCursor(Qt::ArrowCursor);
+        ui->actionUserList->setIcon(QIcon(":/imgs/icons/user-group.svg"));
         return true;
     }
 
@@ -344,6 +378,13 @@ void MainWindow::on_actionLogin_triggered()
 
 }
 
+void MainWindow::on_actionUserList_triggered() {
+
+    UserList uList(this, userList);
+    uList.setModal(true);
+    uList.exec();
+}
+
 void MainWindow::updateUserList(QVector<User> newUserList){
     for(int j=0; j<20; j++){
         actionUserList[j]->setVisible(false);
@@ -358,6 +399,7 @@ void MainWindow::updateUserList(QVector<User> newUserList){
         ui->rightToolBar->widgetForAction(actionUserList[i])->setStyleSheet("color:"+colorList.at(i).name());
     }
 }
+
 
 void MainWindow::on_actionShare_Uri_triggered() {
 

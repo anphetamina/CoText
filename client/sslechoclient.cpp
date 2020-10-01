@@ -8,6 +8,8 @@
 #include <QtWebSockets/QWebSocket>
 #include <QCoreApplication>
 
+
+
 QT_USE_NAMESPACE
 
 //! [constructor]
@@ -89,7 +91,7 @@ void SslEchoClient::sendPing() {
 
 void SslEchoClient::sendTest() {
     qDebug() << "[NETWORK] ** Network Test Start ** ";
-    this->sendLogin();
+    //this->sendLogin();
     qDebug() << "[NETWORK] ** Sending Message packet ** ";
     std::vector<Identifier> sym_position;
     QString test("test_qstring");
@@ -183,6 +185,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             User loggedUser = loginOk->getUser();
             if ( loggedUser.isLogged() ){
                 qDebug() << "[AUTH] Logged in as: " << loggedUser.getEmail();
+
             }
             else {
                 qDebug() << "[AUTH] FAILED. See the server for the log.";
@@ -190,8 +193,11 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             pServer = qobject_cast<QWebSocket *>(sender());
             // .... DEBUG TODO: REMOVE when opendoc GUI is implemented and linked here
             this->sendDocOpen("AAA", loggedUser.getId());
-
-            break;
+            
+	        //emit auth(loggedUser);
+	        user = &loggedUser;
+	
+	        break;
         }
 
         case (PACK_TYPE_MSG): {
@@ -293,5 +299,6 @@ void SslEchoClient::connectToEditor(TextEditor* te) {
 void SslEchoClient::connectToMainWindow(MainWindow* mw) {
     connect(this, &SslEchoClient::updateUserListReceived, mw, &MainWindow::updateUserList);
 }
+
 
 //    // Save the secret key that will be used
