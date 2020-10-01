@@ -234,7 +234,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             break;
         }
         case (PACK_TYPE_DOC_USERLIST): {
-            // When a client receive this it means that some user just went online/offline 
+            // When a client receive this it means that some user just went online/offline
             DocumentBeaconOnlineUsers *bou = dynamic_cast<DocumentBeaconOnlineUsers *>(rcvd_packet.get());
             qDebug() << "[DOC] Online userlist updated for DocId: " << bou->getdocId();
             break;
