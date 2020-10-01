@@ -8,7 +8,7 @@
 
 Register::Register(QWidget *parent) : QDialog(parent), ui(new Ui::Register) {
     ui->setupUi(this);
-    ui->dropBox->setAcceptDrops(true);
+    //ui->dropBox->setAcceptDrops(true);
 }
 
 Register::~Register() {
@@ -26,7 +26,7 @@ void Register::clearInput() {
     ui->lineEdit_Pass2->text().clear();
     ui->lineEdit_email->text().clear();
 }
-
+/*
 void Register::dragEnterEvent(QDragEnterEvent *event) {
     qDebug() << "Dragging now...";
     if(event->mimeData()->hasImage()) {
@@ -55,6 +55,7 @@ void Register::dropEvent(QDropEvent *event) {
     }
 
 }
+*/
 void Register::on_pushButton_Register_clicked()
 {
     clearInput();

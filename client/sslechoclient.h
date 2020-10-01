@@ -34,6 +34,7 @@ signals:
     void updateSelectionReceived(int userId, QTextCursor cursor);
 
     void updateUserListReceived(QVector<User> userlist);
+    void auth(User loggedUser);
 
 public slots:
 
@@ -41,6 +42,7 @@ public slots:
     void sendErase(std::vector<QSymbol> symbols, int siteId);
     void sendCursor(int userId, int position);
     void sendSelection(int userId, QTextCursor cursor);
+    
 
 private Q_SLOTS:
     void onConnected();

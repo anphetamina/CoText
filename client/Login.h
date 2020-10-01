@@ -23,6 +23,8 @@ private slots:
 
 private:
     Ui::Login *ui;
+	void closeEvent(QCloseEvent *event) override;
+	
 };
 
 #endif // LOGIN_H

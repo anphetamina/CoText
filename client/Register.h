@@ -24,8 +24,8 @@ public:
 
 private slots:
     void on_pushButton_Register_clicked();
-    void dragEnterEvent(QDragEnterEvent *event) override;
-    void dropEvent(QDropEvent *event) override;
+    //void dragEnterEvent(QDragEnterEvent *event) override;
+    //void dropEvent(QDropEvent *event) override;
     //void dragLeaveEvent(QDragLeaveEvent *event) override;
 
 
