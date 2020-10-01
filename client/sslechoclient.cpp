@@ -226,6 +226,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
         }
         case (PACK_TYPE_DOC_LIST): {
             DocumentListPacket *docList = dynamic_cast<DocumentListPacket *>(rcvd_packet.get());
+            qDebug() << "[DOC_LIST] Received";
             break;
         }
         case (PACK_TYPE_DOC_ASKSURI): {
