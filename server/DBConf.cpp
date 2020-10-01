@@ -72,6 +72,7 @@ User checkLoginData(QString email, QString password){
 }
 
 User* checkUserLoginData(QString email, QString password){
+    /* Check login data and return a user istance. Check with the isLogged method the result of the performed auth*/
     QSqlQuery query;
     QString hashedpassword = password;
     qDebug() << "[AUTH] Trying authentication for Mario Rossi (test@test.test)";
@@ -127,6 +128,7 @@ QVector<QString> getDocuments(int userId){
 }
 
 bool checkDocPermission(int docId, int userId){
+    /* Check if a given user has the right to open/edit a given document */
     QSqlQuery query;
     QString quserId = QString::number(userId);
     QString qdocId = QString::number(docId);
@@ -163,7 +165,51 @@ bool createDoc(QString docName, int userId){
     }
 }
 
+QString createInvite(int docId){
+    QSqlQuery query, query2;
+
+    QString qdocId = QString::number(docId);
+    QString docName, docPath;
+    QString invURI;
+    query.exec("SELECT documentid, documentname, documentpath FROM Permission WHERE documentid="+qdocId);
+    if (query.next()) {
+        int id = query.value(0).toInt();
+        docName = query.value(1).toString();
+        docPath = query.value(2).toString();
+    }
+    else{
+        return invURI;
+    }
+
+    bool unique = false;
+    while(!unique){
+        QSqlQuery uquery;
+        invURI = GetRandomString(20);
+        uquery.exec("SELECT documentid FROM Permission WHERE URI="+invURI);
+        if (!uquery.next()) {
+            unique = true;
+        }
+    }
+    query2.exec("INSERT INTO Permission(documentname,documentID, documentpath, URI) VALUES ('"+docName+"',"+qdocId+",'"+docPath+"','"+invURI+"')");
+    // Check if it was already added (userid, docID) should be UNIQUE
+    return invURI;
+}
+
+bool acceptInvite(QString invURI, int userId){
+    /* Take the invitation uri and the userId that wants to validate the invite. Add the permission to the user*/
+    QSqlQuery query, query2;
+    QString quserId = QString::number(userId);
+    query.exec("SELECT documentid, documentname, documentpath FROM Permission WHERE URI='"+invURI+"'");
+    if (!query.next()) {
+        return false;
+    }
+    query2.exec("UPDATE Permission SET userid="+quserId+", URI=NULL WHERE URI='"+invURI+"'");
+
+}
+
+
 bool addDocPermission(int docId, int userId){
+    /*Add the document permission for a given set user, document */
     QSqlQuery query, query2, query3;
     QString quserId = QString::number(userId);
     QString qdocId = QString::number(docId);
@@ -235,3 +281,4 @@ int docIdByName(QString docName, int userId){
     else
         return -1;
 }
+
