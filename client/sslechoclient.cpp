@@ -237,6 +237,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             // When a client receive this it means that some user just went online/offline
             DocumentBeaconOnlineUsers *bou = dynamic_cast<DocumentBeaconOnlineUsers *>(rcvd_packet.get());
             qDebug() << "[DOC] Online userlist updated for DocId: " << bou->getdocId();
+            emit updateUserListReceived(bou->getuserList());
             break;
         }
     }
@@ -287,7 +288,10 @@ void SslEchoClient::connectToEditor(TextEditor* te) {
     connect(te, &TextEditor::symbolsErased, this, &SslEchoClient::sendErase);
     connect(te, &TextEditor::cursorPositionChanged, this, &SslEchoClient::sendCursor);
     connect(te, &TextEditor::selectionChanged, this, &SslEchoClient::sendSelection);
+}
 
+void SslEchoClient::connectToMainWindow(MainWindow* mw) {
+    connect(this, &SslEchoClient::updateUserListReceived, mw, &MainWindow::updateUserList);
 }
 
 //    // Save the secret key that will be used

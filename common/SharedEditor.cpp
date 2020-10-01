@@ -195,7 +195,7 @@ void SharedEditor::insertSymbol(int line, int index, QSymbol symbol) {
 
     QChar value = symbol.getC();
 
-    if (value == QChar::LineFeed || value == QChar::ParagraphSeparator || value == QChar::LineSeparator) {
+    if (isNewLine(value)) {
 
         std::vector<QSymbol> lineAfter;
 
@@ -568,4 +568,8 @@ void SharedEditor::setSymbols(std::vector<std::vector<QSymbol>> symbols) {
     this->symbols = symbols;
     counter = std::accumulate(symbols.begin(), symbols.end(), 0, [](int acc, const std::vector<QSymbol>& a){ return acc+a.size(); });
     idCounter = 0;
+}
+
+bool SharedEditor::isNewLine(QChar &c) {
+    return c == QChar::LineFeed || c == QChar::ParagraphSeparator || c == QChar::LineSeparator;;
 }

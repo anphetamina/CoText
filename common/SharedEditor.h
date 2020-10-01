@@ -53,6 +53,8 @@ public:
 
     std::pair<int, int> remoteInsert(const QSymbol &symbol);
     std::pair<int, int> remoteErase(const QSymbol &symbol);
+
+    bool isNewLine(QChar &c);
 };
 
 

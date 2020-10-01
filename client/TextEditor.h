@@ -10,6 +10,7 @@
 #include <iostream>
 #include <QtWidgets/QPlainTextEdit>
 #include <QtGui/QPainter>
+#include <User.h>
 #include "../common/SharedEditor.h"
 #include "../common/QSymbol.h"
 #include "UserHighlighter.h"
@@ -18,7 +19,7 @@ class UserHighlighter;
 
 namespace Ui { class MainWindow; }
 
-class TextEditor : public QPlainTextEdit {
+class TextEditor : public QTextEdit {
 
     Q_OBJECT
 
@@ -29,7 +30,6 @@ public:
     int getCol(int row, int position) const;
     QColor getUserColor(int userId) const;
     int getUserId(int row, int col) const;
-
 
 private:
 
@@ -65,6 +65,8 @@ private:
 
     void printSymbols();
 
+    bool isNewLine(QChar c);
+
 
 public slots:
 
@@ -75,6 +77,7 @@ public slots:
 
     void updateCursor(int userId, int position);
     void updateSelection(int userId, QTextCursor cursor);
+    void updateAlignment(Qt::Alignment alignment, int position);
 
     void openDocument(std::vector<std::vector<QSymbol>> symbols);
 
@@ -86,6 +89,8 @@ private slots:
     void setFontItalic(bool italic);
     void setFontUnderline(bool underline);
     void setFontColor();
+    void setTextAlignment(QAction *action);
+    void alignmentChanged(Qt::Alignment a);
     void updateToolbar(const QTextCharFormat &format);
 
     void contentsChange(int position, int charsRemoved, int charsAdded);
@@ -103,6 +108,7 @@ signals:
     void symbolsErased(std::vector<QSymbol> symbols, int siteId);
     void cursorPositionChanged(int userId, int position);
     void selectionChanged(int userId, QTextCursor cursor);
+    void textAlignmentChanged(Qt::Alignment alignment, int position);
 
 };
 
