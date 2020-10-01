@@ -200,16 +200,3 @@ void DocumentBeaconOnlineUsers::readPayload(QDataStream& stream)
 }
 
 //QVector::fromStdVector ( const std::vector<T> & vector )
-
-// Convert a bidimensional qvector of qsymbolsto a  bidimensional std::vector of symbols to
-std::vector<std::vector<QSymbol>> toVector(QVector<QVector<QSymbol>> qsymbols){
-    std::vector<std::vector<QSymbol>> symbols = {};
-    for (auto symbolQArr : qsymbols) {
-        std::vector<QSymbol> symbolArr = {};
-        for (auto qsymbol : symbolQArr) {  // Iterate over the Symbols
-            symbolArr.push_back(qsymbol);
-        }
-        symbols.push_back(symbolArr);
-    }
-    return symbols;
-}

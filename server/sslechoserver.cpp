@@ -252,6 +252,12 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             LoginOkPacket lop = LoginOkPacket(*loggedUser);
             lop.send(*pClient);
 
+            if(loggedUser->isLogged()) {
+                // Send user document list
+                QVector<QString> docList = getDocuments(loggedUser->getId());
+                DocumentListPacket dlp = DocumentListPacket(loggedUser->getId(), docList);
+                dlp.send(*pClient);
+            }
             //qDebug() << loginReq->getUsername();
             break;
         }
@@ -281,6 +287,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             qDebug() << "[MSG] New symbol received." << endl << "Char: " << msg->getQS().getC() << " SiteId: " <<  msg->getSiteId();
             // Broadcast to all the connected client of a document
             for (auto it = documentMapping.begin(); it != documentMapping.end();) { // iterate over documents and find what is openened by current user #TONOTE this works since 1 file only can be openend by a user
+                //onlineClientPerDoc = documentMapping[getDocIdOpenedByUserId(client->getUserId)] TODO: deccoment and delete for
                 QList<QSharedPointer<Client>> onlineClientPerDoc = it.value();
                     for (QSharedPointer<Client> onlineClient : onlineClientPerDoc) {
                         if(onlineClient != client && client->isLogged()) {
@@ -290,6 +297,21 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
                     }
                 it++;
             }
+            // Run actions on the CRDT instances of the server (one for each document)
+            int docId = getDocIdOpenedByUserId(client->getUserId());
+            switch (msg->getType()) {
+                case(MSG_INSERT_SYM): {
+                    editorMapping[docId]->remoteInsert(msg->getQS());
+                    break;
+                }
+
+                case(MSG_ERASE_SYM): {
+                    editorMapping[docId]->remoteErase(msg->getQS());
+                    break;
+                }
+            }
+
+
             // Full broadcast (no per document behaviour) follows. *Debug only usage*
             /*for (QWebSocket* onlineClient : clientMapping.keys()) {
                 if(onlineClient != pClient) {
@@ -341,6 +363,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             if (!client->isLogged()) {
                 break;
             }
+
             DocumentOpenPacket* dop = dynamic_cast<DocumentOpenPacket*>(rcvd_packet.get());
             // Check if user already had an open document and delete that entry eventually #TONOTE: 1 document opened for user as of now
             this->findAndDeleteFromDoclist(client);
@@ -355,12 +378,24 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             // Set the document in the packet as the current opened doc
             documentMapping[docId].insert(0, client);
             // Send the content of the document
-            QVector<QVector<QSymbol>> qsymbols = loadFromDisk(docId);
+            QVector<QVector<QSymbol>> qsymbols;
+            //Se non ancora aperto da nessun utente online carico da disco e inizializzo sharedEditor (istanza CRDT)
+            if(!isOpenedEditorForGivenDoc(docId)){
+                qsymbols = loadFromDisk(docId);
+                QSharedPointer<SharedEditor> se(new SharedEditor(0));
+                std::vector<std::vector<QSymbol>> symbols  = toVector(qsymbols);
+                se->setSymbols(symbols);
+                editorMapping[docId] = se;
+            } else // Altrimenti prendo lo stato soltanto
+            {
+                std::vector<std::vector<QSymbol>> symbols = editorMapping[docId]->getSymbols();
+                qsymbols = toQVector(symbols);
+            }
+
             DocumentOkPacket dokp = DocumentOkPacket(docId, dop->getdocName(), qsymbols);
             dokp.send(*pClient);
-
+            // Send current online userlist for the given document
             sendUpdatedOnlineUserByDocId(docId);
-
         }
         case(PACK_TYPE_DOC_DEL): {
             if (!client->isLogged()) {
@@ -476,3 +511,12 @@ int SslEchoServer::getDocIdOpenedByUserId(int userId){
     }
     return -1;
 }
+
+bool SslEchoServer::isOpenedEditorForGivenDoc(int docId){
+    for (auto editorit = editorMapping.begin(); editorit != editorMapping.end();) {
+        if(editorit.key() == docId){
+            return true;
+        }
+    }
+}
+//TODO: delete and call distructor for crdt istance after last user logged out

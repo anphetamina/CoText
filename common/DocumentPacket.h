@@ -173,4 +173,3 @@ public:
 
 };
 
-std::vector<std::vector<QSymbol>> toVector(QVector<QVector<QSymbol>> qsymbols);

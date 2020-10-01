@@ -48,6 +48,8 @@ public:
 
 
 };
+std::vector<std::vector<QSymbol>> toVector(QVector<QVector<QSymbol>> qsymbols);
+QVector<QVector<QSymbol>> toQVector(std::vector<std::vector<QSymbol>> symbols);
 
 
 #endif //COTEXT_CLIENT_QSYMBOL_H

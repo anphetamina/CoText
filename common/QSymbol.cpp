@@ -96,3 +96,30 @@ bool QSymbol::isValid() const {
 bool QSymbol::isNewLine() const {
     return c == QChar::LineFeed || c == QChar::ParagraphSeparator || c == QChar::LineSeparator;
 }
+
+// Convert a bidimensional qvector of qsymbolsto a  bidimensional std::vector of symbols to
+std::vector<std::vector<QSymbol>> toVector(QVector<QVector<QSymbol>> qsymbols){
+    std::vector<std::vector<QSymbol>> symbols = {};
+    for (auto symbolQArr : qsymbols) {
+        std::vector<QSymbol> symbolArr = {};
+        for (auto qsymbol : symbolQArr) {  // Iterate over the Symbols
+            symbolArr.push_back(qsymbol);
+        }
+        symbols.push_back(symbolArr);
+    }
+    return symbols;
+}
+
+
+// Convert a bidimensional std::vector of symbols to a bidimensional qvector of qsymbols
+QVector<QVector<QSymbol>> toQVector(std::vector<std::vector<QSymbol>> symbols){
+    QVector<QVector<QSymbol>> qsymbols = {};
+    for (auto symbolArr : symbols) {
+        QVector<QSymbol> qsymbolArr = {};
+        for (auto symbol : symbolArr) {  // Iterate over the Symbols
+            qsymbolArr.push_back(symbol);
+        }
+        qsymbols.push_back(qsymbolArr);
+    }
+    return qsymbols;
+}
