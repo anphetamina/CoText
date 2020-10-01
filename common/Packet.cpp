@@ -374,9 +374,9 @@ PacketHandler PacketBuilder::DocumentOkPacket(QString docName, qint32 userId, QV
     return new class DocumentOkPacket(userId, docName, qsymbols);
 }
 
-PacketHandler PacketBuilder::DocumentAskSharableURIPacket(QString docName, qint32 userId, QString sharableURI)
+PacketHandler PacketBuilder::DocumentAskSharableURIPacket(int docId, qint32 userId, QString sharableURI)
 {
-    return new class DocumentAskSharableURIPacket(docName, userId, sharableURI);
+    return new class DocumentAskSharableURIPacket(docId, userId, sharableURI);
 }
 
 PacketHandler PacketBuilder::DocumentListPacket(qint32 userId, QVector<QString> docList)

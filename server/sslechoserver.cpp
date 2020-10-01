@@ -51,6 +51,7 @@ SslEchoServer::SslEchoServer(quint16 port, QObject *parent) :
     } else{
         qDebug() << "Cant listen";
     }
+
 }
 //! [constructor]
 
@@ -372,12 +373,26 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             if (!client->isLogged()) {
                 break;
             }
-            //DocumentOkPacket* msg = dynamic_cast<DocumentOkPacket*>(rcvd_packet.get());
-            // Check if user already had an open document
+            DocumentAskSharableURIPacket* msg = dynamic_cast<DocumentAskSharableURIPacket*>(rcvd_packet.get());
+            int docId = msg->getdocId();
+            qint32 userId = msg->getuserId();
+            QString invCode = msg->getURI();
             // Check permission of the user for that doc
-            // Set the document in the packet as the current opened doc
-            //documentMapping.insert(docId, client)
-            // Send the content of the document
+            if(!checkDocPermission(docId, userId)){
+                break;
+            }
+            // Check if this is a request invite (URI is empty) or an invitation accept
+            if(invCode.size() > 0){
+                // Invitation accept
+                acceptInvite(invCode, userId);
+            }
+            else {
+                // Generate invitation code for a given document and insert to db
+                QString invCode = createInvite(docId);
+                // Send the code
+                DocumentAskSharableURIPacket dasup = DocumentAskSharableURIPacket(docId, userId, invCode);
+                dasup.send(*pClient);
+            }
             break;
         }
 
