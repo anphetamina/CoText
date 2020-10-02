@@ -20,8 +20,8 @@ int main(int argc, char *argv[]) {
 	//exe icon for mac/linux
     QIcon icon(":/appIcon/CoText.ico");
     a.setWindowIcon(icon);
-    //exe icon for Win
-    
+
+    //a.setQuitOnLastWindowClosed(false);// Avoid exit the whole app when just one windows (ie. login) was opened and closed
     //apply custom stylesheet
 	QFile styleFile(":/style/darkTheme.qss");
 	styleFile.open(QFile::ReadOnly);
@@ -37,18 +37,9 @@ int main(int argc, char *argv[]) {
         std::string password = argv[2];
         quser = QString::fromStdString(username);
         qpass = QString::fromStdString(password);
-    }else{
-	    quser = QString::fromStdString("test@test.test");
-	    qpass = QString::fromStdString("test");
-	}
+    }
 	*/
     // ** Network testing code
-
-    //QCoreApplication a(argc, argv);
-    
-
-	
-	
     //client->set_username(quser);
     //client->set_password(qpass);
     // ** End of network testing code
@@ -56,62 +47,41 @@ int main(int argc, char *argv[]) {
     /*QThread *listener = new QThread();
     client->moveToThread(listener);
     listener->start();
-
     qRegisterMetaType<QList<QSslError>>("QList<QSslError>");*/
 	
     /** Login Phase */
 	client = new SslEchoClient(QUrl(QStringLiteral("wss://localhost:12345")));
 	Q_UNUSED(*client);
-	
-	Login login;
-	
-    login.setWindowTitle("Welcome to CoText!");
-    login.setModal(true);
-    login.exec();
-    
+
+	Login* login = new Login();
+    MainWindow *w = new MainWindow();
+
+    // Set login GUI options
+    login->setWindowTitle("Welcome to CoText!");
+    login->setModal(true);
+    login->exec();
+
+    // Set MainWindow (Editor) GUI options
+    QCoreApplication::setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles, true);
+    w->setWindowTitle("Welcome");
+    w->setWindowIconText("Co-Text");
+    TextEditor editor(0, *w->getUi()); // todo get site id from server
+    //editor.setDisabled(true);
+    // place the QTextEditor object in the central position of the main window
+    w->setCentralWidget(&editor);
+
+    // Perform connection (signal/slot)
+    client->connectToMainWindow(w);
+    //connect the echo client to enable remote operations on the editor
+    client->connectToEditor(&editor);
+    //client->connectToLoginWindow(login, w); //TODO: use signal/slot for creating/closing diffent windows.tonote: login is a QDialog not QWindow
 
     while(user == nullptr || !user->isLogged()) {
-    
-    
+        QCoreApplication::processEvents();
     }
-    
-	
-	login.hide();
-	// Set GUI options
-	MainWindow *w = new MainWindow();
-	//w->setClient(client);
-	QCoreApplication::setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles, true);
-	
-	w->setWindowTitle("Welcome");
-	
-	w->setWindowIconText("Co-Text");
-	
-	client->connectToMainWindow(w);
-	
-	
-	TextEditor editor(0, *w->getUi()); // todo get site id from server
-	editor.setDisabled(true);
-	
-	/**
-	 * place the QTextEditor object in the central position of the main window
-	 */
-	w->setCentralWidget(&editor);
-	
-	/**
-	 * connect the echo client to enable remote operations on the editor
-	 */
-	client->connectToEditor(&editor);
-	
-	
-	w->show();
-	
-		
-	
-    
-    
-    
-   
+    // After login show main window
+    w->show();
+
     //delete client;
     return a.exec();
-
 }
