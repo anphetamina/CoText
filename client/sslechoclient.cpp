@@ -220,6 +220,9 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             } else{
                 qDebug() << "[OPEN_DOC] FAILED (No permission for " << doc->getdocName() << ") with docId " << doc->getdocId();
             }
+            QVector<QVector<QSymbol>> qsymbols = doc->getqsymbols();
+            std::vector<std::vector<QSymbol>> symbols  = toVector(qsymbols);
+            emit documentReceived(doc->getdocId(), doc->getdocName(), symbols);
             break;
         }
         case (PACK_TYPE_DOC_LIST): {
@@ -282,6 +285,8 @@ void SslEchoClient::connectToEditor(TextEditor* te) {
     connect(this, &SslEchoClient::insertBlockReceived, te, &TextEditor::remoteInsertBlock);
     connect(this, &SslEchoClient::eraseBlockReceived, te, &TextEditor::remoteEraseBlock);
     connect(this, &SslEchoClient::updateCursorReceived, te, &TextEditor::updateCursor);
+    connect(this, &SslEchoClient::documentReceived, te, &TextEditor::openDocument);
+
     connect(this, &SslEchoClient::updateSelectionReceived, te, &TextEditor::updateSelection);
     connect(te, &TextEditor::symbolsInserted, this, &SslEchoClient::sendInsert);
     connect(te, &TextEditor::symbolsErased, this, &SslEchoClient::sendErase);

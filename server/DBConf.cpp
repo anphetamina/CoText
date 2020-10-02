@@ -247,7 +247,11 @@ QVector<QVector<QSymbol>> loadFromDisk(int docId){
     QFile file("doc"+qdocId+".dat");
     QVector<QVector<QSymbol>> qdoc;
     if(!file.open(QIODevice::ReadOnly)){
-        qdoc = QVector<QVector<QSymbol>>();  // if no file is found, maybe it's an empty document for now.
+        qdoc = {{}};  // if no file is found, maybe it's an empty document for now.
+        //qdoc = QVector<QVector<QSymbol>>()
+        //QVector<QSymbol> temp;
+        //qdoc.push_back(temp);
+
     } else {
         QDataStream out(&file);   // we will serialize the data into the file
         out >> qdoc;

@@ -292,10 +292,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
 
     }
-
-
     printSymbols();
-
 }
 
 /**
@@ -642,7 +639,7 @@ int TextEditor::getUserId(int row, int col) const {
     return editor.getSymbols()[row][col].getSiteId();
 }
 
-void TextEditor::openDocument(std::vector<std::vector<QSymbol>> symbols) {
+void TextEditor::openDocument(int docId, QString docName, std::vector<std::vector<QSymbol>> symbols) {
 
     if (std::any_of(symbols.begin(), symbols.end(), [](const std::vector<QSymbol> &row){
         return std::any_of(row.begin(), row.end(), [](const QSymbol &s){ return !s.isValid(); });

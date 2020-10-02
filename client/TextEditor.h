@@ -78,7 +78,7 @@ public slots:
     void updateSelection(int userId, QTextCursor cursor);
     void updateAlignment(Qt::Alignment alignment, int position);
 
-    void openDocument(std::vector<std::vector<QSymbol>> symbols);
+    void openDocument(int docId, QString docName, std::vector<std::vector<QSymbol>> symbols);
 
 private slots:
 

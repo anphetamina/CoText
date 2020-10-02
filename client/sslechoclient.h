@@ -36,6 +36,7 @@ signals:
 
     void updateUserListReceived(QVector<User> userlist);
     void auth(User loggedUser);
+    void documentReceived(int docId, QString docName, std::vector<std::vector<QSymbol>> qsymbols);
 
 signals:
     void loginSuccessful();
