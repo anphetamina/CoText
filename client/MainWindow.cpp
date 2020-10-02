@@ -10,26 +10,11 @@
 #include <QtSvg>
 #include <QEvent>
 
-bool isLogged = true;
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
 
     QApplication::instance()->setAttribute(Qt::AA_DontShowIconsInMenus, true);
 
     ui->setupUi(this);
-    //this->user = nullptr;
-    if (!isLogged) {
-        // todo check
-//    	ui->textEdit->setDisabled(true);
-        //ui->page->hide();
-        //ui->page_2->show();
-
-
-    } else {
-        // todo check
-//    	ui->textEdit->setDisabled(false);
-        //ui->page_2->hide();
-        //ui->page->show();
-    }
 
     //installing EventFilter for QToolButtons on the qToolBar
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionLogin))->installEventFilter(this);
@@ -38,6 +23,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionShare_Uri))->installEventFilter(this);
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionExit))->installEventFilter(this);
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionSettings))->installEventFilter(this);
+
+    //dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUserList))->installEventFilter(this);
 
     //this->setCentralWidget(ui->textEdit);
     QPixmap icon(":/appIcon/CoText.ico");
@@ -49,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     ui->actionPaste->setShortcut(QKeySequence::Paste);
     //ui->actionRemove->setShortcut(QKeySequence::Delete);
 
+    // What about using a container?
     actionUserList.insert(0,ui->actionUser0);
     actionUserList.insert(1,ui->actionUser1);
     actionUserList.insert(2,ui->actionUser2);
@@ -70,11 +58,33 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     actionUserList.insert(18,ui->actionUser18);
     actionUserList.insert(19,ui->actionUser19);
 
+
+    /*actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser0));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser1));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser2));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser3));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser4));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser5));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser6));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser7));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser8));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser9));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser10));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser11));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser12));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser13));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser14));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser15));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser16));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser17));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser18));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser19));*/
 }
 
 
 MainWindow::~MainWindow(){
-    delete ui;
+	 //delete client;
+     delete ui;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -96,7 +106,6 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         ui->actionLogin->setIcon(QIcon(":/imgs/icons/noun_user login_178831_white.svg"));
         return true;
     }
-
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionLogin)) && event->type() == QEvent::Leave) {
         setCursor(Qt::ArrowCursor);
         ui->actionLogin->setIcon(QIcon(":/imgs/icons/noun_user login_178831.svg"));
@@ -109,7 +118,6 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         ui->actionOpen->setIcon(QIcon(":/imgs/icons/noun_Folder_2047792_white.svg"));
         return true;
     }
-
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionOpen)) && event->type() == QEvent::Leave) {
         setCursor(Qt::ArrowCursor);
         ui->actionOpen->setIcon(QIcon(":/imgs/icons/noun_Folder_2047792.svg"));
@@ -122,7 +130,6 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         ui->actionNew->setIcon(QIcon(":/imgs/icons/noun_new document_2429385_white.svg"));
         return true;
     }
-
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionNew)) && event->type() == QEvent::Leave) {
         setCursor(Qt::ArrowCursor);
         ui->actionNew->setIcon(QIcon(":/imgs/icons/noun_new document_2429385.svg"));
@@ -135,7 +142,6 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         ui->actionShare_Uri->setIcon(QIcon(":/imgs/icons/noun_url_887536_white.svg"));
         return true;
     }
-
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionShare_Uri)) && event->type() == QEvent::Leave) {
         setCursor(Qt::ArrowCursor);
         ui->actionShare_Uri->setIcon(QIcon(":/imgs/icons/noun_url_887536.svg"));
@@ -148,7 +154,6 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         ui->actionExit->setIcon(QIcon(":/imgs/icons/noun_Exit_1558251_white.svg"));
         return true;
     }
-
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionExit)) && event->type() == QEvent::Leave) {
         setCursor(Qt::ArrowCursor);
         ui->actionExit->setIcon(QIcon(":/imgs/icons/noun_Exit_1558251.svg"));
@@ -161,13 +166,26 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         ui->actionSettings->setIcon(QIcon(":/imgs/icons/noun_Settings_2324598_white.svg"));
         return true;
     }
-
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionSettings)) && event->type() == QEvent::Leave) {
         setCursor(Qt::ArrowCursor);
         ui->actionSettings->setIcon(QIcon(":/imgs/icons/noun_Settings_2324598.svg"));
         return true;
     }
 
+    //UserList
+    /*TODO: fix? USed or not?
+    if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUserList)) && event->type() == QEvent::Enter) {
+        setCursor(Qt::PointingHandCursor);
+        ui->actionUserList->setIcon(QIcon(":/imgs/icons/user-group_white.svg"));
+        return true;
+    }
+
+    if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUserList)) && event->type() == QEvent::Leave) {
+        setCursor(Qt::ArrowCursor);
+        ui->actionUserList->setIcon(QIcon(":/imgs/icons/user-group.svg"));
+        return true;
+    }
+    */
     return false;
 }
 
@@ -223,14 +241,11 @@ void MainWindow::Save_as() {
     file.close();
     return;
 
-
 }
 void MainWindow::on_actionSave_as_triggered() {
     Save_as();
     return;
 }
-
-
 
 void MainWindow::on_actionSave_triggered() {
     QString filename = currentFileName;
@@ -249,18 +264,13 @@ void MainWindow::on_actionSave_triggered() {
     }
 }
 
-
-
 void MainWindow::on_actionPrintPDF_triggered() {
     QPrinter printer;
     printer.setOutputFormat(QPrinter::PdfFormat);
     QString filename = QFileDialog::getSaveFileName(this, "Export PDF");
     printer.setOutputFileName(filename);
-
-
-
-
 }
+
 /*
 void MainWindow::on_actionPrint_triggered() {
     QPrinter printer;
@@ -271,11 +281,7 @@ void MainWindow::on_actionPrint_triggered() {
         QMessageBox::warning(this, "Warning", "Can not access the printer");
         return;
     }
-
     ui->textEdit->print(&printer);
-
-
-
 }
 */
 
@@ -314,68 +320,107 @@ void MainWindow::on_actionRedo_triggered() {
 }
 
 
-
 void MainWindow::on_actionLogin_triggered()
 {
     //Modal approach to create loginForm (cannot access mainWindow at same time)
     //It is on the stack, if we want it on the heap just have the pointer on mainwindow.h and call new here
-    //Connecting to MySql Database
-    /*
-    if(!dbConfigure()) {
-        QMessageBox::information(this, "DB-Connection", "Database not connected");
-    } else {
-        QMessageBox::information(this, "DB-Connection", "Database connected");
-        Login login;
-        login.setModal(true);
-        login.exec();
-    }
-    */
 
     Login login;
     login.setModal(true);
     login.exec();
 
-
     //hide(); //hide the MainWindow
-
     //lf = new loginform(this); //giving also the parent class
-
     //lf->show();
-
 }
-
+/*
+//TODO: fix? #on_actionUserList_triggered
+void MainWindow::on_actionUserList_triggered() {
+    UserList uList(this, userList);
+    uList.setModal(true);
+    uList.exec();
+    return;
+}
+*/
 void MainWindow::updateUserList(QVector<User> newUserList){
     for(int j=0; j<20; j++){
         actionUserList[j]->setVisible(false);
     }
+
     qDebug() << "User list updated";
     userList = newUserList;
     colorMap.clear();
     for(int i=0; i<newUserList.size();i++){
-        colorMap.insert(newUserList[i].getId(),colorList.at(i));
+        colorMap.insert(newUserList[i].getId(),colorList.at(i%19));
         actionUserList[i]->setVisible(true);
         actionUserList[i]->setText(newUserList[i].getEmail());
         ui->rightToolBar->widgetForAction(actionUserList[i])->setStyleSheet("color:"+colorList.at(i).name());
     }
+
+    emit newColorMapReceived(colorMap);
+
+    /*std::vector<User> newUserListStd = newUserList.toStdVector();
+    //users that before were online and now are offline
+    QVector<User> usersNoMoreOnline;
+    std::set_difference (userList.begin(), userList.end(), newUserListStd.begin(), newUserListStd.end(), usersNoMoreOnline.begin());
+    for(int i=0; i<usersNoMoreOnline.size(); i++){
+        //std::map<int,QColor> stdMap = colorMap.toStdMap();
+        auto nodeHandler = colorMap.extract(usersNoMoreOnline[i].getId());
+        nodeHandler.key() = -1;
+        colorMap.insert(std::move(nodeHandler));
+        //colorMap = QMultiMap(QMap(stdMap));
+
+        actionUserMap.find(usersNoMoreOnline[i].getId())->second->setVisible(false);
+
+       // std::map<int,QAction*> stdMap2 = actionUserMap.toStdMap();
+        auto nodeHandler2 = actionUserMap.extract(usersNoMoreOnline[i].getId());
+        nodeHandler2.key() = -1;
+        actionUserMap.insert(std::move(nodeHandler2));
+        //actionUserMap = QMultiMap(QMap(stdMap2));
+    }
+
+   ///users that before were offline and now are online
+    QVector<User> newUsersOnline;
+    std::set_difference ( newUserList.begin(), newUserList.end(), userList.begin(), userList.end(), newUsersOnline.begin());
+    for(int i=0; i<newUsersOnline.size(); i++){
+        std::map<int,QColor> stdMap = colorMap.toStdMap();
+        auto nodeHandler = stdMap.extract(-1);
+        nodeHandler.key() = newUsersOnline[i].getId();
+        stdMap.insert(std::move(nodeHandler));
+        colorMap = QMultiMap(QMap(stdMap));
+
+        std::map<int,QAction*> stdMap2 = actionUserMap.toStdMap();
+        auto nodeHandler2 = stdMap2.extract(-1);
+        nodeHandler2.key() = newUsersOnline[i].getId();
+        stdMap2.insert(std::move(nodeHandler2));
+        actionUserMap = QMultiMap(QMap(stdMap2));
+
+        actionUserMap.take(newUsersOnline[i].getId())->setVisible(true);
+        actionUserMap.take(newUsersOnline[i].getId())->setText(usersNoMoreOnline[i].getEmail());
+        ui->rightToolBar->widgetForAction(actionUserMap.take(newUsersOnline[i].getId()))->setStyleSheet("color:"+colorMap.take(newUsersOnline[i].getId()).name());
+    }
+
+    userList = newUserListStd;*/
 }
+
 
 void MainWindow::on_actionShare_Uri_triggered() {
 
     QMessageBox::StandardButton reply = QMessageBox::warning(this, "ciao", "uri");
-
 }
 
 void MainWindow::on_actionSettings_triggered() {
 
     UserWidget uw;
-
     uw.setModal(true);
-
     uw.exec();
-
 }
 
 Ui::MainWindow *MainWindow::getUi() const {
     return ui;
+}
+
+void MainWindow::connectToTextEditor(TextEditor* te) {
+    connect(this, &MainWindow::newColorMapReceived, te, &TextEditor::updateColorMap);
 }
 

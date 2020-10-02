@@ -1,21 +1,17 @@
 #include "Register.h"
 #include "ui_register.h"
-
-
 #include <QMessageBox>
 #include <QIcon>
 #include <QDebug>
 
 Register::Register(QWidget *parent) : QDialog(parent), ui(new Ui::Register) {
     ui->setupUi(this);
-    ui->dropBox->setAcceptDrops(true);
+    //ui->dropBox->setAcceptDrops(true);
 }
 
 Register::~Register() {
     delete ui;
 }
-
-
 
 void Register::clearInput() {
     qDebug() << "Input cleared";
@@ -26,7 +22,7 @@ void Register::clearInput() {
     ui->lineEdit_Pass2->text().clear();
     ui->lineEdit_email->text().clear();
 }
-
+/*
 void Register::dragEnterEvent(QDragEnterEvent *event) {
     qDebug() << "Dragging now...";
     if(event->mimeData()->hasImage()) {
@@ -55,6 +51,7 @@ void Register::dropEvent(QDropEvent *event) {
     }
 
 }
+*/
 void Register::on_pushButton_Register_clicked()
 {
     clearInput();
@@ -66,10 +63,6 @@ void Register::on_pushButton_Register_clicked()
     pass1 = ui->lineEdit_Pass1->text();
     pass2 = ui->lineEdit_Pass2->text();
     email = ui->lineEdit_email->text();
-
-
-
-
 
     if(name.isNull() || surname.isNull() || nickname.isNull() || pass1.isNull() || pass2.isNull() || email.isNull())
         null = true;
@@ -97,7 +90,6 @@ void Register::on_pushButton_Register_clicked()
                 email.clear();
             } else {
                 ////TODO
-                //all is correct, register user into DB
 
                 //1#. Fill User Object instance, set stautus on, start timer
                 User *usr = new User();

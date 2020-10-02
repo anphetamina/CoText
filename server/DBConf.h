@@ -23,6 +23,8 @@ QIcon loadProfilePic(int id);
 QVector<QString> getDocuments(int userId);
 bool checkDocPermission(int docId, int userId);
 bool createDoc(QString docName, int userId);
+QString createInvite(int docId);
+bool acceptInvite(QString invURI, int userId);
 bool addDocPermission(int docId, int userId);
 QString GetRandomString(int randomStringLength);
 void saveToDisk(QVector<QVector<QSymbol>> qdoc, int docId);

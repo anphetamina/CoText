@@ -12,6 +12,8 @@
 #include "../common/Packet.h"
 #include "Client.h"
 #include "../common/CursorPacket.h"
+#include "SharedEditor.h"
+
 
 QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
@@ -40,8 +42,10 @@ private:
     //Association of opened doc and user
     QMap<int, QList<QSharedPointer<Client>>> documentMapping;
 
-    void packetParse(QByteArray rcvd_packet);
+    // Association of opened document and crdt instances
+    QMap<int, QSharedPointer<SharedEditor>> editorMapping;
 
+    void packetParse(QByteArray rcvd_packet);
 
     void dispatch(PacketHandler rcvd_packet, QWebSocket* pClient);
 
@@ -52,6 +56,8 @@ private:
     void sendUpdatedOnlineUserByDocId(int docId);
 
     int getDocIdOpenedByUserId(int userId);
+
+    bool isOpenedEditorForGivenDoc(int docId);
 };
 
 #endif //SSLECHOSERVER_H

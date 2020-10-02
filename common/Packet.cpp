@@ -105,7 +105,6 @@ void Packet::writeSize(QDataStream& stream) {
     stream << (quint32)(size - 4 - sizeof(quint32));// Set full size
 }
 
-
 const QByteArray &Packet::getData() const {
     return data;
 }
@@ -123,7 +122,7 @@ void Packet::setSignature(quint8 signature) {
 }
 
 
-/** PAcket handler**/
+/** Packet handler**/
 PacketHandler::PacketHandler()
         : ptr(nullptr), ref(nullptr)
 {
@@ -217,8 +216,6 @@ PacketHandler::~PacketHandler()
 
 
 /*** Packet buffer ***/
-
-
 PacketBuffer::PacketBuffer()
         : mType(0), mSize(0)
 {
@@ -280,8 +277,6 @@ QDataStream& operator>>(QDataStream& in, PacketBuffer& PacketBuffer)
     return in;
 }
 
-
-
 /*** Packet forger **/
 
 PacketHandler PacketBuilder::Container(quint8 type)
@@ -296,8 +291,13 @@ PacketHandler PacketBuilder::Container(quint8 type)
         case PACK_TYPE_ACC_CREATE:			return new class AccountCreationPacket();
         case PACK_TYPE_ACC_OK:			    return new AccountOkPacket();
         case PACK_TYPE_ACC_UPDATE:			return new class AccountUpdatePacket();
+
         case PACK_TYPE_MSG:			        return new class Message();
+        case PACK_TYPE_BIGMSG:			    return new class BigMessage();
+        case PACK_TYPE_ALIGN:			    return new class AlignMessage();
+
         case PACK_TYPE_CURSOR_POS:			return new class CursorPacket();
+
         case PACK_TYPE_DOC_CREATE:			return new class DocumentCreatePacket();
         case PACK_TYPE_DOC_OPEN:			return new class DocumentOpenPacket();
         case PACK_TYPE_DOC_DEL:			    return new class DocumentDelPacket();
@@ -306,13 +306,11 @@ PacketHandler PacketBuilder::Container(quint8 type)
         case PACK_TYPE_DOC_LIST:			return new class DocumentListPacket();
         case PACK_TYPE_DOC_USERLIST:		return new class DocumentBeaconOnlineUsers();
 
-
         default:
             throw std::exception();//TODO: create custom exception
             break;
     }
 }
-
 
 PacketHandler PacketBuilder::Ping(QString msg)
 {
@@ -347,6 +345,15 @@ PacketHandler PacketBuilder::Message(int type, QSymbol qs, int siteId)
     return new class Message(type, qs, siteId);
 }
 
+PacketHandler PacketBuilder::BigMessage(int type, QVector<QSymbol> qss, int siteId)
+{
+    return new class BigMessage(type, qss, siteId);
+}
+
+PacketHandler PacketBuilder::AlignMessage(int positionStart, int delta, Qt::Alignment alignment, int siteId)
+{
+    return new class AlignMessage(positionStart, delta, alignment, siteId);
+}
 
 PacketHandler PacketBuilder::CursorPacket(qint32 userId, qint32 newPosition)
 {
@@ -374,9 +381,9 @@ PacketHandler PacketBuilder::DocumentOkPacket(QString docName, qint32 userId, QV
     return new class DocumentOkPacket(userId, docName, qsymbols);
 }
 
-PacketHandler PacketBuilder::DocumentAskSharableURIPacket(QString docName, qint32 userId, QString sharableURI)
+PacketHandler PacketBuilder::DocumentAskSharableURIPacket(int docId, qint32 userId, QString sharableURI)
 {
-    return new class DocumentAskSharableURIPacket(docName, userId, sharableURI);
+    return new class DocumentAskSharableURIPacket(docId, userId, sharableURI);
 }
 
 PacketHandler PacketBuilder::DocumentListPacket(qint32 userId, QVector<QString> docList)

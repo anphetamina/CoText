@@ -138,7 +138,7 @@ class DocumentAskSharableURIPacket : public Packet {
     friend PacketBuilder;
 private:
     qint32 userId;
-    QString docName;
+    int docId;
     QString sharableURI;
 
 protected:
@@ -148,11 +148,11 @@ protected:
     void readPayload(QDataStream& stream) override;
 
 public:
-    DocumentAskSharableURIPacket(QString docName, qint32 userId, QString sharableURI);
+    DocumentAskSharableURIPacket(int docId, qint32 userId, QString sharableURI);
     ~DocumentAskSharableURIPacket() {};
     int getuserId() const;
-    QString getdocName() const;
-
+    int getdocId() const;
+    QString getURI() const;
 };
 
 class DocumentBeaconOnlineUsers : public Packet {
@@ -173,4 +173,3 @@ public:
 
 };
 
-std::vector<std::vector<QSymbol>> toVector(QVector<QVector<QSymbol>> qsymbols);

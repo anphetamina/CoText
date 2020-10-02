@@ -40,7 +40,6 @@ private:
      * to access to the toolbar icons
      */
     Ui::MainWindow &ui;
-
     SharedEditor editor;
     std::vector<int> index;
     std::vector<std::vector<QSymbol>> testSymbols;
@@ -73,8 +72,8 @@ public slots:
 
     void updateCursor(int userId, int position);
     void updateAlignment(Qt::Alignment alignment, int position);
-
-    void openDocument(std::vector<std::vector<QSymbol>> symbols);
+    void openDocument(int docId, QString docName, std::vector<std::vector<QSymbol>> symbols);
+    void updateColorMap(QMap<int, QColor> colorMapReceived);
 
 private slots:
 

@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Aug 17, 2020 at 06:48 PM
--- Server version: 5.7.26
--- PHP Version: 7.2.22
+-- Creato il: Ott 01, 2020 alle 20:40
+-- Versione del server: 5.7.26
+-- Versione PHP: 7.2.22
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -13,18 +13,16 @@ SET time_zone = "+00:00";
 --
 -- Database: `CoText`
 --
-CREATE DATABASE IF NOT EXISTS `CoText` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-USE `CoText`;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Permission`
+-- Struttura della tabella `Permission`
 --
 
 CREATE TABLE `Permission` (
   `ID` int(11) NOT NULL,
-  `UserID` int(11) NOT NULL,
+  `UserID` int(11) DEFAULT NULL,
   `DocumentID` int(11) DEFAULT NULL,
   `DocumentPath` varchar(260) NOT NULL,
   `DocumentName` varchar(255) NOT NULL,
@@ -32,18 +30,20 @@ CREATE TABLE `Permission` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `Permission`
+-- Dump dei dati per la tabella `Permission`
 --
 
 INSERT INTO `Permission` (`ID`, `UserID`, `DocumentID`, `DocumentPath`, `DocumentName`, `URI`) VALUES
 (1, 1, 1, '', 'TestDocument1', ''),
 (12, 1, 12, '', 'AAA', NULL),
-(13, 2, 12, '', 'AAA', NULL);
+(13, 2, 12, '', 'AAA', NULL),
+(28, 3, 12, '', 'AAA', NULL),
+(29, 4, 12, '', 'AAA', NULL);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `User`
+-- Struttura della tabella `User`
 --
 
 CREATE TABLE `User` (
@@ -56,42 +56,44 @@ CREATE TABLE `User` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `User`
+-- Dump dei dati per la tabella `User`
 --
 
 INSERT INTO `User` (`ID`, `Username`, `Email`, `Password`, `Name`, `Surname`) VALUES
 (1, 'test', 'test@test.test', 'test', 'Mario', 'Rossi'),
-(2, 'tester', 'test@domain.tld', 'test2HashedPassword', 'Giovanni', 'Muciaccia');
+(2, 'tester', 'test@domain.tld', 'test2HashedPassword', 'Giovanni', 'Muciaccia'),
+(3, 'marco', 'marco@marco.it', 'marco', 'marco', 'marco'),
+(4, 'test2', 'test2@test2.test2', 'test2', 'Mario2', 'Rossi2'),
+(5, 'test3', 'test3@test3.test3', 'test3', 'Mario3', 'Rossi3');
 
 --
--- Indexes for dumped tables
+-- Indici per le tabelle scaricate
 --
 
 --
--- Indexes for table `Permission`
+-- Indici per le tabelle `Permission`
 --
 ALTER TABLE `Permission`
   ADD PRIMARY KEY (`ID`);
 
 --
--- Indexes for table `User`
+-- Indici per le tabelle `User`
 --
 ALTER TABLE `User`
   ADD PRIMARY KEY (`ID`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT per le tabelle scaricate
 --
 
 --
--- AUTO_INCREMENT for table `Permission`
+-- AUTO_INCREMENT per la tabella `Permission`
 --
 ALTER TABLE `Permission`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
--- AUTO_INCREMENT for table `User`
+-- AUTO_INCREMENT per la tabella `User`
 --
 ALTER TABLE `User`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;

@@ -152,24 +152,28 @@ void DocumentOkPacket::readPayload(QDataStream& stream)
 /** DocumentAskSharableURIPacket packet **/
 // Inherit from a DocumentBaseActionClass?
 DocumentAskSharableURIPacket::DocumentAskSharableURIPacket(): Packet(PACK_TYPE_DOC_ASKSURI){}
-DocumentAskSharableURIPacket::DocumentAskSharableURIPacket(QString docName, qint32 userId, QString sharableURI ): Packet(PACK_TYPE_DOC_ASKSURI), userId(userId), docName(docName), sharableURI(sharableURI){};
+DocumentAskSharableURIPacket::DocumentAskSharableURIPacket(int docId, qint32 userId, QString sharableURI ): Packet(PACK_TYPE_DOC_ASKSURI), userId(userId), docId(docId), sharableURI(sharableURI){};
 
 int DocumentAskSharableURIPacket::getuserId() const {
     return userId;
 }
 
-QString DocumentAskSharableURIPacket::getdocName() const {
-    return docName;
+int DocumentAskSharableURIPacket::getdocId() const {
+    return docId;
+}
+
+QString DocumentAskSharableURIPacket::getURI() const{
+    return sharableURI;
 }
 
 void DocumentAskSharableURIPacket::writePayload(QDataStream& stream) const
 {
-    stream << userId << docName << sharableURI;
+    stream << userId << docId << sharableURI;
 }
 
 void DocumentAskSharableURIPacket::readPayload(QDataStream& stream)
 {
-    stream >> userId >> docName >> sharableURI;
+    stream >> userId >> docId >> sharableURI;
 }
 
 /** DocumentBeaconOnlineUsers packet **/
@@ -196,16 +200,3 @@ void DocumentBeaconOnlineUsers::readPayload(QDataStream& stream)
 }
 
 //QVector::fromStdVector ( const std::vector<T> & vector )
-
-// Convert a bidimensional qvector of qsymbolsto a  bidimensional std::vector of symbols to
-std::vector<std::vector<QSymbol>> toVector(QVector<QVector<QSymbol>> qsymbols){
-    std::vector<std::vector<QSymbol>> symbols = {};
-    for (auto symbolQArr : qsymbols) {
-        std::vector<QSymbol> symbolArr = {};
-        for (auto qsymbol : symbolQArr) {  // Iterate over the Symbols
-            symbolArr.push_back(qsymbol);
-        }
-        symbols.push_back(symbolArr);
-    }
-    return symbols;
-}

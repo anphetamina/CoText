@@ -263,7 +263,6 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
     }
 
     printSymbols();
-
 }
 
 /**
@@ -434,7 +433,6 @@ void TextEditor::remoteInsert(QSymbol symbol) {
 
             cursor.setPosition(oldPosition);
             setTextCursor(cursor);
-
         }
     } catch (const std::exception &e) {
         qDebug() << e.what();
@@ -530,8 +528,6 @@ void TextEditor::paintEvent(QPaintEvent *e) {
     } catch (const std::exception &e) {
         qDebug() << e.what();
     }
-
-
 }
 
 void TextEditor::cursorPositionChange() {
@@ -590,7 +586,7 @@ int TextEditor::getUserId(int row, int col) const {
     return editor.getSymbols()[row][col].getSiteId();
 }
 
-void TextEditor::openDocument(std::vector<std::vector<QSymbol>> symbols) {
+void TextEditor::openDocument(int docId, QString docName, std::vector<std::vector<QSymbol>> symbols) {
 
     if (std::any_of(symbols.begin(), symbols.end(), [](const std::vector<QSymbol> &row){
         return std::any_of(row.begin(), row.end(), [](const QSymbol &s){ return !s.isValid(); });
@@ -604,14 +600,19 @@ void TextEditor::openDocument(std::vector<std::vector<QSymbol>> symbols) {
     for (int i = 0; i < symbols.size(); i++) {
         for (int j = 0; j < symbols[i].size(); j++, ++pos) {
             QSymbol symbol = symbols[i][j];
+            this->remoteInsert(symbol);
+            /*
             isFromRemote = true;
             textCursor().insertText(symbol.getC());
             setCurrentCharFormat(symbol.getCF());
-            textCursor().movePosition(QTextCursor::Right);
+            textCursor().movePosition(QTextCursor::Right);*/
         }
-        index.push_back(pos);
+        //index.push_back(pos);
     }
-    editor.setSymbols(symbols);
+    //editor.setSymbols(symbols);
+
+    //position, cursor.setPosition(position);
+
 }
 
 void TextEditor::printSymbols() {
@@ -634,6 +635,12 @@ void TextEditor::updateAlignment(Qt::Alignment alignment, int position) {
 bool TextEditor::isNewLine(QChar c) {
     return c == QChar::LineFeed || c == QChar::ParagraphSeparator || c == QChar::LineSeparator;
 }
+
+//the key (int) is the usarId
+void TextEditor:: updateColorMap(QMap<int, QColor> colorMapReceived){
+    colorMap = colorMapReceived;
+}
+
 
 // todo handle offline case
 

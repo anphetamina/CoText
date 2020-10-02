@@ -2,6 +2,7 @@
 #include "ui_login.h"
 #include "Register.h"
 #include "UserWidget.h"
+#include "sslechoclient.h"
 
 Login::Login(QWidget *parent) :
     QDialog(parent),
@@ -17,16 +18,18 @@ Login::~Login()
 
 void Login::on_pushButton_Login_clicked()
 {
-
-
     QString username = ui->lineEdit_User->text();
     QString password = ui->lineEdit_Pass->text();
-
-
-    //TODO in CLion
-    //1. Check if username exists and if password is correct
+	
+	//SslEchoClient* client = new SslEchoClient(QUrl(QStringLiteral("wss://localhost:12345")), this);
+	
+	client->set_username(username);
+	client->set_password(password);
+	client->sendLogin();
+	//this->~Login();
+    //this->hide();
+    this->close();
 }
-
 
 
 void Login::on_pushButton_Reg_clicked()
@@ -36,6 +39,5 @@ void Login::on_pushButton_Reg_clicked()
     Register regForm;
     regForm.setModal(true);
     regForm.exec();
-
-
 }
+

@@ -21,6 +21,7 @@ private:
      */
     int counter;
 
+
     /**
      * total number of symbols added in the document
      */
@@ -29,6 +30,8 @@ private:
     std::map<int, bool> strategies;
     int base;
     int boundary;
+
+    int connectedUsers = 1;
 public:
     SharedEditor(int siteId = 0);
 
@@ -55,6 +58,14 @@ public:
     std::pair<int, int> remoteErase(const QSymbol &symbol);
 
     bool isNewLine(QChar &c);
+
+    void connectedUsersDecrease();
+
+    void connectedUsersIncrease();
+
+    int getConnectedUsers();
+
+    void setConnectedUsers(int connectedUsers);
 };
 
 

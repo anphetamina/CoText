@@ -157,14 +157,18 @@ public:
     static PacketHandler AccountUpdatePacket(QString username,QString password, QString name, QString surname, QIcon profilePic);
 
     static PacketHandler Message(int type, QSymbol qs, int siteId);
+    static PacketHandler BigMessage(int type, QVector<QSymbol> qss, int siteId);
+    static PacketHandler AlignMessage(int positionStart, int delta, Qt::Alignment alignment, int siteId);
+
     static PacketHandler CursorPacket(qint32 userId, qint32 newPosition);
 
     static PacketHandler DocumentCreatePacket(QString docName, qint32 userId);
     static PacketHandler DocumentOpenPacket(QString docName, qint32 userId);
     static PacketHandler DocumentDelPacket(QString docName, qint32 userId);
     static PacketHandler DocumentOkPacket(QString docName, qint32 userId, QVector<QVector<QSymbol>> qsymbols);
-    static PacketHandler DocumentAskSharableURIPacket(QString docName, qint32 userId, QString sharableURI);
+    static PacketHandler DocumentAskSharableURIPacket(int docId, qint32 userId, QString sharableURI);
     static PacketHandler DocumentListPacket(qint32 userId, QVector<QString> docList);
 
     PacketHandler DocumentBeaconOnlineUsers(QVector<User> userList, qint32 docId);
+
 };

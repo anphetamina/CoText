@@ -5,6 +5,7 @@
 #include "sslechoclient.h"
 #include "../common/PingPacket.h"
 #include "../common/LoginPacket.h"
+#include "Login.h"
 #include <QtWebSockets/QWebSocket>
 #include <QCoreApplication>
 
@@ -37,9 +38,7 @@ void SslEchoClient::onConnected()
     connect(&m_webSocket, &QWebSocket::disconnected, this, &SslEchoClient::socketDisconnected);
 
     this->sendPing();
-    this->sendTest();
-
-    //m_webSocket.sendTextMessage(QStringLiteral("Hello, world!"));
+    //this->sendTest();
 }
 //! [onConnected]
 
@@ -47,7 +46,6 @@ void SslEchoClient::onConnected()
 void SslEchoClient::onTextMessageReceived(QString message)
 {
     qDebug() << "Message received:" << message;
-    //qApp->quit();
 }
 
 //! [onTextMessageReceived]
@@ -55,17 +53,13 @@ void SslEchoClient::onBinaryMessageReceived(QByteArray message)
 {
     //qDebug() << "Message received:" << message;
     this->packetParse(message);
-    //qApp->quit();
 }
 
 void SslEchoClient::onSslErrors(const QList<QSslError> &errors)
 {
     Q_UNUSED(errors);
-
     // WARNING: Never ignore SSL errors in production code.
-    // The proper way to handle self-signed certificates is to add a custom root
-    // to the CA store.
-
+    // The proper way to handle self-signed certificates is to add a custom root to the CA store.
     m_webSocket.ignoreSslErrors();
 }
 //! [onTextMessageReceived]
@@ -74,7 +68,6 @@ void SslEchoClient::onSslErrors(const QList<QSslError> &errors)
 void SslEchoClient::socketDisconnected()
 {
     qDebug() << "Server closed the connection.\n[HINT]Duplicated instance with the same user?";
-
     qApp->exit(-2);
 }
 
@@ -84,7 +77,6 @@ void SslEchoClient::sendPing() {
 
     pp.send(m_webSocket);
     qDebug() << "Ping sent";
-
 }
 
 void SslEchoClient::sendTest() {
@@ -99,7 +91,6 @@ void SslEchoClient::sendTest() {
     Message msg = Message(MSG_INSERT_SYM, qs, 3);
     //msg.send(m_webSocket);
     qDebug() << "[NETWORK] ** Network Test Packet were all sent ** ";
-
 }
 
 void SslEchoClient::set_username(QString username){
@@ -171,6 +162,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
     //qDebug() << rcvd_packet.get();  // print packet as hex
 //    qDebug() << "New packet type= " << rcvd_packet->getType();
     switch (rcvd_packet->getType()) {
+
         // Remeber to add {} scope to avoid jump from switch compilation error
         case (PACK_TYPE_PING): {
             PingPacket *ping = dynamic_cast<PingPacket *>(rcvd_packet.get());
@@ -183,15 +175,20 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             User loggedUser = loginOk->getUser();
             if ( loggedUser.isLogged() ){
                 qDebug() << "[AUTH] Logged in as: " << loggedUser.getEmail();
+                emit loginSuccessful();
             }
             else {
                 qDebug() << "[AUTH] FAILED. See the server for the log.";
+                emit loginFailed();
             }
             pServer = qobject_cast<QWebSocket *>(sender());
             // .... DEBUG TODO: REMOVE when opendoc GUI is implemented and linked here
             this->sendDocOpen("AAA", loggedUser.getId());
 
-            break;
+	        //emit auth(loggedUser);
+	        user = &loggedUser;
+
+	        break;
         }
 
         case (PACK_TYPE_MSG): {
@@ -209,7 +206,12 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             }
             break;
         }
-
+        case (PACK_TYPE_BIGMSG): {
+            break;
+        }
+        case (PACK_TYPE_ALIGN): {
+            break;
+        }
         case (PACK_TYPE_CURSOR_POS): {
             CursorPacket *cp = dynamic_cast<CursorPacket *>(rcvd_packet.get());
             emit updateCursorReceived(cp->getuserId(), cp->getnewPosition());
@@ -222,10 +224,14 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             } else{
                 qDebug() << "[OPEN_DOC] FAILED (No permission for " << doc->getdocName() << ") with docId " << doc->getdocId();
             }
+            QVector<QVector<QSymbol>> qsymbols = doc->getqsymbols();
+            std::vector<std::vector<QSymbol>> symbols  = toVector(qsymbols);
+            emit documentReceived(doc->getdocId(), doc->getdocName(), symbols);
             break;
         }
         case (PACK_TYPE_DOC_LIST): {
             DocumentListPacket *docList = dynamic_cast<DocumentListPacket *>(rcvd_packet.get());
+            qDebug() << "[DOC_LIST] Received";
             break;
         }
         case (PACK_TYPE_DOC_ASKSURI): {
@@ -234,7 +240,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             break;
         }
         case (PACK_TYPE_DOC_USERLIST): {
-            // When a client receive this it means that some user just went online/offline 
+            // When a client receive this it means that some user just went online/offline
             DocumentBeaconOnlineUsers *bou = dynamic_cast<DocumentBeaconOnlineUsers *>(rcvd_packet.get());
             qDebug() << "[DOC] Online userlist updated for DocId: " << bou->getdocId();
             emit updateUserListReceived(bou->getuserList());
@@ -278,6 +284,7 @@ void SslEchoClient::connectToEditor(TextEditor* te) {
     connect(this, &SslEchoClient::insertBlockReceived, te, &TextEditor::remoteInsertBlock);
     connect(this, &SslEchoClient::eraseBlockReceived, te, &TextEditor::remoteEraseBlock);
     connect(this, &SslEchoClient::updateCursorReceived, te, &TextEditor::updateCursor);
+    connect(this, &SslEchoClient::documentReceived, te, &TextEditor::openDocument);
     connect(te, &TextEditor::symbolsInserted, this, &SslEchoClient::sendInsert);
     connect(te, &TextEditor::symbolsErased, this, &SslEchoClient::sendErase);
     connect(te, &TextEditor::cursorPositionChanged, this, &SslEchoClient::sendCursor);
@@ -287,4 +294,21 @@ void SslEchoClient::connectToMainWindow(MainWindow* mw) {
     connect(this, &SslEchoClient::updateUserListReceived, mw, &MainWindow::updateUserList);
 }
 
+/*
+ * Dont delete pls. Possible enhancement
+void SslEchoClient::connectToLoginWindow(Login* login, MainWindow* mw) {//Qdialog as of now
+    // This would both close the login window and open the main one
+    connect(this, &SslEchoClient::loginSuccessful, login, &Login::close);
+    connect(this, &SslEchoClient::loginSuccessful, mw, &MainWindow::show);
+
+    // If login failed, just close the login window
+    connect(this, &SslEchoClient::loginFailed, login, &MainWindow::close);
+
+    // If login failed, or the main window was closed, quit the application
+    // This is needed, because we explicitly set the QGuiApplication::quitOnLastWindowClosed property to false.
+    //QObject::connect(w, MainWindow::closed, &a, &QCoreApplication::quit);
+    //QObject::connect(&login, &Login::loginFailed, &a, &QCoreApplication::quit);
+}
+
+*/
 //    // Save the secret key that will be used
