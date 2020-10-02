@@ -107,6 +107,7 @@ std::vector<std::vector<QSymbol>> toVector(QVector<QVector<QSymbol>> qsymbols){
         }
         symbols.push_back(symbolArr);
     }
+
     return symbols;
 }
 

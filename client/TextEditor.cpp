@@ -653,14 +653,19 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
     for (int i = 0; i < symbols.size(); i++) {
         for (int j = 0; j < symbols[i].size(); j++, ++pos) {
             QSymbol symbol = symbols[i][j];
+            this->remoteInsert(symbol);
+            /*
             isFromRemote = true;
             textCursor().insertText(symbol.getC());
             setCurrentCharFormat(symbol.getCF());
-            textCursor().movePosition(QTextCursor::Right);
+            textCursor().movePosition(QTextCursor::Right);*/
         }
-        index.push_back(pos);
+        //index.push_back(pos);
     }
-    editor.setSymbols(symbols);
+    //editor.setSymbols(symbols);
+
+    //position, cursor.setPosition(position);
+
 }
 
 void TextEditor::printSymbols() {
