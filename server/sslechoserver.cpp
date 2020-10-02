@@ -168,7 +168,6 @@ void SslEchoServer::packetParse(QByteArray rcvd_packet) {
     if (pBuffer->getDataSize() == 0) {
         streamRcv >> *pBuffer;
     }
-    // Append the continuation of the packet TODO:check
     QByteArray payload = rcvd_packet.mid(4+sizeof(quint32));//header+Payoadlen skip
     pBuffer->append(payload);
 

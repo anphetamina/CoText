@@ -90,7 +90,6 @@ void Register::on_pushButton_Register_clicked()
                 email.clear();
             } else {
                 ////TODO
-                //all is correct, register user into DB
 
                 //1#. Fill User Object instance, set stautus on, start timer
                 User *usr = new User();

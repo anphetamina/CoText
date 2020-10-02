@@ -9,7 +9,6 @@
 #include <QtWebSockets/QWebSocket>
 #include <QCoreApplication>
 
-
 QT_USE_NAMESPACE
 
 //! [constructor]
