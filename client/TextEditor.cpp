@@ -292,6 +292,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
 
     }
+
     printSymbols();
 }
 
@@ -466,7 +467,6 @@ void TextEditor::remoteInsert(QSymbol symbol) {
 
             cursor.setPosition(oldPosition);
             setTextCursor(cursor);
-
         }
     } catch (const std::exception &e) {
         qDebug() << e.what();
@@ -560,8 +560,6 @@ void TextEditor::paintEvent(QPaintEvent *e) {
     } catch (const std::exception &e) {
         qDebug() << e.what();
     }
-
-
 }
 
 void TextEditor::cursorPositionChange() {
@@ -683,6 +681,12 @@ void TextEditor::updateAlignment(Qt::Alignment alignment, int position) {
 bool TextEditor::isNewLine(QChar c) {
     return c == QChar::LineFeed || c == QChar::ParagraphSeparator || c == QChar::LineSeparator;
 }
+
+//the key (int) is the usarId
+void TextEditor:: updateColorMap(QMap<int, QColor> colorMapReceived){
+    colorMap = colorMapReceived;
+}
+
 
 // todo handle offline case
 

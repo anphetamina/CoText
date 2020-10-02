@@ -249,7 +249,8 @@ void SslEchoClient::sendInsert(std::vector<QSymbol> symbols, int siteId) {
     for (QSymbol symbol : symbols) {
         Message msg = Message(MSG_INSERT_SYM, symbol, siteId);
         msg.send(*pServer);
-//        qDebug() << "sent" << ((symbol.getC() == '\n') ? "LF" : QString(symbol.getC())) << "(" << type << ")";
+        //qDebug() << "sent" << ((symbol.getC() == '\n') ? "LF" : QString(symbol.getC())) << "(" << symbol.getCF() << ")";
+        //qDebug() << "symbol" << symbol.getC() << "Format " << symbol.getCF();
     }
 }
 

@@ -38,34 +38,27 @@ private:
      * to access to the toolbar icons
      */
     Ui::MainWindow &ui;
-
     SharedEditor editor;
     std::vector<int> index;
     std::vector<std::vector<QSymbol>> testSymbols;
     int currentSelectedChars;
     UserHighlighter highlighter;
+    QMap<int, QColor> colorMap;
 
     void fontChanged(const QFont &f);
     void colorChanged(const QColor &c);
-
     void insertRow(int pos, int n);
     void deleteRow(int pos, int n);
     void incrementIndex(int pos, int n);
     void decrementIndex(int pos, int n);
-
     std::atomic<bool> isFromRemote;
     int getPosition(int row, int col);
-
     std::map<int, int> cursors;
     std::map<int, QTextEdit::ExtraSelection> selections;
     std::map<int, QColor> userColors;
-
     std::atomic<bool> isUserColorsToggled;
-
     void printSymbols();
-
     bool isNewLine(QChar c);
-
 
 public slots:
 
@@ -73,12 +66,11 @@ public slots:
     void remoteInsertBlock(std::vector<QSymbol> symbols);
     void remoteErase(QSymbol symbol);
     void remoteEraseBlock(std::vector<QSymbol> symbols);
-
     void updateCursor(int userId, int position);
     void updateSelection(int userId, QTextCursor cursor);
     void updateAlignment(Qt::Alignment alignment, int position);
-
     void openDocument(int docId, QString docName, std::vector<std::vector<QSymbol>> symbols);
+    void updateColorMap(QMap<int, QColor> colorMapReceived);
 
 private slots:
 
@@ -91,11 +83,9 @@ private slots:
     void setTextAlignment(QAction *action);
     void alignmentChanged(Qt::Alignment a);
     void updateToolbar(const QTextCharFormat &format);
-
     void contentsChange(int position, int charsRemoved, int charsAdded);
     void cursorPositionChange();
     void selectionChange();
-
     void toggleUserColors();
 
 protected:

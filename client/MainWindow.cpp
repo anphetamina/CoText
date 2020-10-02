@@ -58,6 +58,27 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     actionUserList.insert(18,ui->actionUser18);
     actionUserList.insert(19,ui->actionUser19);
 
+
+    /*actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser0));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser1));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser2));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser3));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser4));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser5));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser6));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser7));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser8));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser9));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser10));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser11));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser12));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser13));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser14));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser15));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser16));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser17));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser18));
+    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser19));*/
 }
 
 
@@ -325,15 +346,61 @@ void MainWindow::updateUserList(QVector<User> newUserList){
     for(int j=0; j<20; j++){
         actionUserList[j]->setVisible(false);
     }
+
     qDebug() << "User list updated";
     userList = newUserList;
     colorMap.clear();
     for(int i=0; i<newUserList.size();i++){
-        colorMap.insert(newUserList[i].getId(),colorList.at(i));
+        colorMap.insert(newUserList[i].getId(),colorList.at(i%19));
         actionUserList[i]->setVisible(true);
         actionUserList[i]->setText(newUserList[i].getEmail());
         ui->rightToolBar->widgetForAction(actionUserList[i])->setStyleSheet("color:"+colorList.at(i).name());
     }
+
+    emit newColorMapReceived(colorMap);
+
+    /*std::vector<User> newUserListStd = newUserList.toStdVector();
+    //users that before were online and now are offline
+    QVector<User> usersNoMoreOnline;
+    std::set_difference (userList.begin(), userList.end(), newUserListStd.begin(), newUserListStd.end(), usersNoMoreOnline.begin());
+    for(int i=0; i<usersNoMoreOnline.size(); i++){
+        //std::map<int,QColor> stdMap = colorMap.toStdMap();
+        auto nodeHandler = colorMap.extract(usersNoMoreOnline[i].getId());
+        nodeHandler.key() = -1;
+        colorMap.insert(std::move(nodeHandler));
+        //colorMap = QMultiMap(QMap(stdMap));
+
+        actionUserMap.find(usersNoMoreOnline[i].getId())->second->setVisible(false);
+
+       // std::map<int,QAction*> stdMap2 = actionUserMap.toStdMap();
+        auto nodeHandler2 = actionUserMap.extract(usersNoMoreOnline[i].getId());
+        nodeHandler2.key() = -1;
+        actionUserMap.insert(std::move(nodeHandler2));
+        //actionUserMap = QMultiMap(QMap(stdMap2));
+    }
+
+   ///users that before were offline and now are online
+    QVector<User> newUsersOnline;
+    std::set_difference ( newUserList.begin(), newUserList.end(), userList.begin(), userList.end(), newUsersOnline.begin());
+    for(int i=0; i<newUsersOnline.size(); i++){
+        std::map<int,QColor> stdMap = colorMap.toStdMap();
+        auto nodeHandler = stdMap.extract(-1);
+        nodeHandler.key() = newUsersOnline[i].getId();
+        stdMap.insert(std::move(nodeHandler));
+        colorMap = QMultiMap(QMap(stdMap));
+
+        std::map<int,QAction*> stdMap2 = actionUserMap.toStdMap();
+        auto nodeHandler2 = stdMap2.extract(-1);
+        nodeHandler2.key() = newUsersOnline[i].getId();
+        stdMap2.insert(std::move(nodeHandler2));
+        actionUserMap = QMultiMap(QMap(stdMap2));
+
+        actionUserMap.take(newUsersOnline[i].getId())->setVisible(true);
+        actionUserMap.take(newUsersOnline[i].getId())->setText(usersNoMoreOnline[i].getEmail());
+        ui->rightToolBar->widgetForAction(actionUserMap.take(newUsersOnline[i].getId()))->setStyleSheet("color:"+colorMap.take(newUsersOnline[i].getId()).name());
+    }
+
+    userList = newUserListStd;*/
 }
 
 
@@ -351,5 +418,9 @@ void MainWindow::on_actionSettings_triggered() {
 
 Ui::MainWindow *MainWindow::getUi() const {
     return ui;
+}
+
+void MainWindow::connectToTextEditor(TextEditor* te) {
+    connect(this, &MainWindow::newColorMapReceived, te, &TextEditor::updateColorMap);
 }
 
