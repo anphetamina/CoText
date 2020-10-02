@@ -1,7 +1,5 @@
 #include "Register.h"
 #include "ui_register.h"
-
-
 #include <QMessageBox>
 #include <QIcon>
 #include <QDebug>
@@ -14,8 +12,6 @@ Register::Register(QWidget *parent) : QDialog(parent), ui(new Ui::Register) {
 Register::~Register() {
     delete ui;
 }
-
-
 
 void Register::clearInput() {
     qDebug() << "Input cleared";
@@ -67,10 +63,6 @@ void Register::on_pushButton_Register_clicked()
     pass1 = ui->lineEdit_Pass1->text();
     pass2 = ui->lineEdit_Pass2->text();
     email = ui->lineEdit_email->text();
-
-
-
-
 
     if(name.isNull() || surname.isNull() || nickname.isNull() || pass1.isNull() || pass2.isNull() || email.isNull())
         null = true;

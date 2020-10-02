@@ -8,11 +8,7 @@
 
 //#include <QtCore/QCoreApplication>
 
-bool isLogged = false;
 bool closed = false;
-
-//extern SslEchoClient *client;
-
 
 int main(int argc, char *argv[]) {
 	
@@ -20,15 +16,13 @@ int main(int argc, char *argv[]) {
 	//exe icon for mac/linux
     QIcon icon(":/appIcon/CoText.ico");
     a.setWindowIcon(icon);
-
     //a.setQuitOnLastWindowClosed(false);// Avoid exit the whole app when just one windows (ie. login) was opened and closed
-    //apply custom stylesheet
+    // Apply custom stylesheet (Theme)
 	QFile styleFile(":/style/darkTheme.qss");
 	styleFile.open(QFile::ReadOnly);
 	QString stylesheetString = QLatin1String(styleFile.readAll());
 	a.setStyleSheet(stylesheetString);
 
-	
 	/*
 	// user/pass test authentication for now
     QString quser, qpass;
@@ -37,17 +31,9 @@ int main(int argc, char *argv[]) {
         std::string password = argv[2];
         quser = QString::fromStdString(username);
         qpass = QString::fromStdString(password);
+        client->set_username(quser);
+        client->set_password(qpass);
     }
-	*/
-    // ** Network testing code
-    //client->set_username(quser);
-    //client->set_password(qpass);
-    // ** End of network testing code
-
-    /*QThread *listener = new QThread();
-    client->moveToThread(listener);
-    listener->start();
-    qRegisterMetaType<QList<QSslError>>("QList<QSslError>");*/
 	
     /** Login Phase */
 	client = new SslEchoClient(QUrl(QStringLiteral("wss://localhost:12345")));
@@ -79,6 +65,7 @@ int main(int argc, char *argv[]) {
     while(user == nullptr || !user->isLogged()) {
         QCoreApplication::processEvents();
     }
+
     // After login show main window
     w->show();
 

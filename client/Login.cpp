@@ -4,14 +4,11 @@
 #include "UserWidget.h"
 #include "sslechoclient.h"
 
-
-
 Login::Login(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Login)
 {
     ui->setupUi(this);
-    
 }
 
 Login::~Login()
@@ -35,7 +32,6 @@ void Login::on_pushButton_Login_clicked()
 }
 
 
-
 void Login::on_pushButton_Reg_clicked()
 {
     //open Register Form
@@ -43,7 +39,5 @@ void Login::on_pushButton_Reg_clicked()
     Register regForm;
     regForm.setModal(true);
     regForm.exec();
-
-
 }
 

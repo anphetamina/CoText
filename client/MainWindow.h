@@ -24,15 +24,11 @@
     (37, 37, 37) greydark
     (51, 51, 51) grey light
     (0, 99, 161) blue buttons
-
-
  */
 class SslEchoClient;
 
 inline User *user = nullptr;
 inline SslEchoClient *client = nullptr;
-
-
 
 
 QT_BEGIN_NAMESPACE
@@ -43,20 +39,11 @@ class MainWindow : public QMainWindow
 {
 Q_OBJECT
 
-
-
-
 public:
 	
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    /*
-    void setClient(SslEchoClient* client) {
-    	this->client = client;
-    }
-    */
-    
     static void setUser(User* usr){
         user = new User();
         user->setName(usr->getName());
@@ -76,7 +63,6 @@ public:
 
 private slots:
     void on_actionNew_triggered();
-
     void on_actionOpen_triggered();
     void on_actionSave_as_triggered();
     void on_actionExit_triggered();

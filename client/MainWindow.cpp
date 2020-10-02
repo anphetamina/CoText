@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     ui->actionPaste->setShortcut(QKeySequence::Paste);
     //ui->actionRemove->setShortcut(QKeySequence::Delete);
 
-
+    // What about using a container?
     actionUserList.insert(0,ui->actionUser0);
     actionUserList.insert(1,ui->actionUser1);
     actionUserList.insert(2,ui->actionUser2);
@@ -85,7 +85,6 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         ui->actionLogin->setIcon(QIcon(":/imgs/icons/noun_user login_178831_white.svg"));
         return true;
     }
-
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionLogin)) && event->type() == QEvent::Leave) {
         setCursor(Qt::ArrowCursor);
         ui->actionLogin->setIcon(QIcon(":/imgs/icons/noun_user login_178831.svg"));
@@ -98,7 +97,6 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         ui->actionOpen->setIcon(QIcon(":/imgs/icons/noun_Folder_2047792_white.svg"));
         return true;
     }
-
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionOpen)) && event->type() == QEvent::Leave) {
         setCursor(Qt::ArrowCursor);
         ui->actionOpen->setIcon(QIcon(":/imgs/icons/noun_Folder_2047792.svg"));
@@ -111,7 +109,6 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         ui->actionNew->setIcon(QIcon(":/imgs/icons/noun_new document_2429385_white.svg"));
         return true;
     }
-
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionNew)) && event->type() == QEvent::Leave) {
         setCursor(Qt::ArrowCursor);
         ui->actionNew->setIcon(QIcon(":/imgs/icons/noun_new document_2429385.svg"));
@@ -124,7 +121,6 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         ui->actionShare_Uri->setIcon(QIcon(":/imgs/icons/noun_url_887536_white.svg"));
         return true;
     }
-
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionShare_Uri)) && event->type() == QEvent::Leave) {
         setCursor(Qt::ArrowCursor);
         ui->actionShare_Uri->setIcon(QIcon(":/imgs/icons/noun_url_887536.svg"));
@@ -137,7 +133,6 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         ui->actionExit->setIcon(QIcon(":/imgs/icons/noun_Exit_1558251_white.svg"));
         return true;
     }
-
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionExit)) && event->type() == QEvent::Leave) {
         setCursor(Qt::ArrowCursor);
         ui->actionExit->setIcon(QIcon(":/imgs/icons/noun_Exit_1558251.svg"));
@@ -150,7 +145,6 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         ui->actionSettings->setIcon(QIcon(":/imgs/icons/noun_Settings_2324598_white.svg"));
         return true;
     }
-
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionSettings)) && event->type() == QEvent::Leave) {
         setCursor(Qt::ArrowCursor);
         ui->actionSettings->setIcon(QIcon(":/imgs/icons/noun_Settings_2324598.svg"));
@@ -226,14 +220,11 @@ void MainWindow::Save_as() {
     file.close();
     return;
 
-
 }
 void MainWindow::on_actionSave_as_triggered() {
     Save_as();
     return;
 }
-
-
 
 void MainWindow::on_actionSave_triggered() {
     QString filename = currentFileName;
@@ -269,11 +260,7 @@ void MainWindow::on_actionPrint_triggered() {
         QMessageBox::warning(this, "Warning", "Can not access the printer");
         return;
     }
-
     ui->textEdit->print(&printer);
-
-
-
 }
 */
 
@@ -310,7 +297,6 @@ void MainWindow::on_actionUndo_triggered() {
 void MainWindow::on_actionRedo_triggered() {
 //    ui->textEdit->redo();
 }
-
 
 
 void MainWindow::on_actionLogin_triggered()
@@ -354,17 +340,13 @@ void MainWindow::updateUserList(QVector<User> newUserList){
 void MainWindow::on_actionShare_Uri_triggered() {
 
     QMessageBox::StandardButton reply = QMessageBox::warning(this, "ciao", "uri");
-
 }
 
 void MainWindow::on_actionSettings_triggered() {
 
     UserWidget uw;
-
     uw.setModal(true);
-
     uw.exec();
-
 }
 
 Ui::MainWindow *MainWindow::getUi() const {
