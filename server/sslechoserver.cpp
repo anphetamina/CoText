@@ -301,12 +301,22 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             int docId = getDocIdOpenedByUserId(client->getUserId());
             switch (msg->getType()) {
                 case(MSG_INSERT_SYM): {
-                    editorMapping[docId]->remoteInsert(msg->getQS());
+                    std::pair<int, int> pos = editorMapping[docId]->remoteInsert(msg->getQS());
+                    std::vector<std::vector<QSymbol>> qs = editorMapping[docId]->getSymbols();
+                    for (int i = 0; i < qs.size(); i++)
+                    {
+                        for (int j = 0; j < qs[i].size(); j++)
+                        {
+                            qDebug() <<"pff"<< qs[i][j].getC();
+                        }
+                    }
+
+                    QVector<QVector<QSymbol>> qvs = toQVector(qs);
                     break;
                 }
 
                 case(MSG_ERASE_SYM): {
-                    editorMapping[docId]->remoteErase(msg->getQS());
+                    std::pair<int, int> pos = editorMapping[docId]->remoteErase(msg->getQS());
                     break;
                 }
             }
@@ -377,15 +387,16 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             }
             // Set the document in the packet as the current opened doc
             documentMapping[docId].insert(0, client);
-            // Send the content of the document
+
+            //** Send the content of the document
             QVector<QVector<QSymbol>> qsymbols;
             //Se non ancora aperto da nessun utente online carico da disco e inizializzo sharedEditor (istanza CRDT)
             if(!isOpenedEditorForGivenDoc(docId)){
                 qsymbols = loadFromDisk(docId);
-                QSharedPointer<SharedEditor> se(new SharedEditor(0));
+                QSharedPointer<SharedEditor> se(new SharedEditor(9999));
                 std::vector<std::vector<QSymbol>> symbols  = toVector(qsymbols);
                 se->setSymbols(symbols);
-                editorMapping[docId] = se;
+                editorMapping.insert(docId, se);
             } else // Altrimenti prendo lo stato soltanto
             {
                 std::vector<std::vector<QSymbol>> symbols = editorMapping[docId]->getSymbols();
@@ -396,6 +407,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             dokp.send(*pClient);
             // Send current online userlist for the given document
             sendUpdatedOnlineUserByDocId(docId);
+            break;
         }
         case(PACK_TYPE_DOC_DEL): {
             if (!client->isLogged()) {
