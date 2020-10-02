@@ -573,3 +573,18 @@ void SharedEditor::setSymbols(std::vector<std::vector<QSymbol>> symbols) {
 bool SharedEditor::isNewLine(QChar &c) {
     return c == QChar::LineFeed || c == QChar::ParagraphSeparator || c == QChar::LineSeparator;;
 }
+
+void SharedEditor::connectedUsersIncrease() {
+    connectedUsers++;
+}
+void SharedEditor::connectedUsersDecrease() {
+    connectedUsers--;
+}
+
+int SharedEditor::getConnectedUsers(){
+    return connectedUsers;
+}
+
+void SharedEditor::setConnectedUsers(int connectedUsers){
+    this->connectedUsers = connectedUsers;
+}
