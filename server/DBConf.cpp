@@ -239,7 +239,6 @@ void saveToDisk(QVector<QVector<QSymbol>> qdoc, int docId){
     QDataStream out(&file);   // we will serialize the data into the file
     out << qdoc;
     file.close();
-
 }
 
 QVector<QVector<QSymbol>> loadFromDisk(int docId){

@@ -124,12 +124,25 @@ void SslEchoServer::socketDisconnected()
         client->logout();
         // Get opened document id so that i can send to all the user connected to the same document a new online user lst
         int closedDocId = getDocIdOpenedByUserId(client->getUserId());
-        // Remove from documentopen map
-        this->findAndDeleteFromDoclist(client);
+        if(closedDocId > 0) {
+            // Remove from documentopen map
+            this->findAndDeleteFromDoclist(client);
+
+            // Decrease the counter of current online user per document
+            editorMapping[closedDocId]->connectedUsersDecrease();
+            qDebug() << "Remaining online user in the same document: " << editorMapping[closedDocId]->getConnectedUsers();
+            // Every time a user disconnect itself the server save a copy
+            saveToDisk(toQVector(editorMapping[closedDocId]->getSymbols()), closedDocId);
+
+            // if last user online is disconnecting,  delete the editorMapping entry
+            if(editorMapping[closedDocId]->getConnectedUsers() == 0)
+                editorMapping.remove(closedDocId);
+
+            // Send to all the the user connected to the document that was just closed by the client the new userlist
+            sendUpdatedOnlineUserByDocId(closedDocId);
+        }
         // Remove client element from map and close the socket
         clientMapping.remove(pClient);
-        // Send to all the the user connected to the document that was just closed by the client the new userlist
-        sendUpdatedOnlineUserByDocId(closedDocId);
 
         pClient->close();
         pClient->deleteLater();
@@ -385,7 +398,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             } else // Altrimenti prendo lo stato soltanto
             {
                 std::vector<std::vector<QSymbol>> symbols = editorMapping[docId]->getSymbols();
-                qsymbols = toQVector(symbols);
+                editorMapping[docId]->connectedUsersIncrease();
             }
 
             DocumentOkPacket dokp = DocumentOkPacket(docId, dop->getdocName(), qsymbols);
@@ -515,5 +528,6 @@ bool SslEchoServer::isOpenedEditorForGivenDoc(int docId){
             return true;
         }
     }
+    return false;
 }
 //TODO: delete and call distructor for crdt istance after last user logged out
