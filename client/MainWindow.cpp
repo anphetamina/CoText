@@ -10,41 +10,11 @@
 #include <QtSvg>
 #include <QEvent>
 
-bool isLogged = true;
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
 
     QApplication::instance()->setAttribute(Qt::AA_DontShowIconsInMenus, true);
 
     ui->setupUi(this);
-    //this->user = nullptr;
-    if (!isLogged) {
-    //this->setClient(client);
-    User* user = this->getUser();
-
-    
-    
-    if(user == nullptr || !user->isLogged()) {
-        // todo check
-//    	ui->textEdit->setDisabled(true);
-        //ui->page->hide();
-        //ui->page_2->show();
-
-
-	    setUser(nullptr);
-	    //ui->textEdit->setDisabled(true);
-    	//ui->page->hide();
-    	//ui->page_2->show();
-    	
-    	
-    } else {
-        // todo check
-        setUser(user);
-	    this->editor = editor;
-	    
-//    	ui->textEdit->setDisabled(false);
-        //ui->page_2->hide();
-        //ui->page->show();
-    }
 
     //installing EventFilter for QToolButtons on the qToolBar
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionLogin))->installEventFilter(this);
@@ -54,10 +24,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionExit))->installEventFilter(this);
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionSettings))->installEventFilter(this);
 
-    dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUserList))->installEventFilter(this);
-
-
-
+    //dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUserList))->installEventFilter(this);
 
     //this->setCentralWidget(ui->textEdit);
     QPixmap icon(":/appIcon/CoText.ico");
@@ -68,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     ui->actionCopy->setShortcut(QKeySequence::Copy);
     ui->actionPaste->setShortcut(QKeySequence::Paste);
     //ui->actionRemove->setShortcut(QKeySequence::Delete);
+
 
     actionUserList.insert(0,ui->actionUser0);
     actionUserList.insert(1,ui->actionUser1);
@@ -190,6 +158,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
     }
 
     //UserList
+    /*TODO: fix? USed or not?
     if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUserList)) && event->type() == QEvent::Enter) {
         setCursor(Qt::PointingHandCursor);
         ui->actionUserList->setIcon(QIcon(":/imgs/icons/user-group_white.svg"));
@@ -201,7 +170,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         ui->actionUserList->setIcon(QIcon(":/imgs/icons/user-group.svg"));
         return true;
     }
-
+    */
     return false;
 }
 
@@ -283,18 +252,13 @@ void MainWindow::on_actionSave_triggered() {
     }
 }
 
-
-
 void MainWindow::on_actionPrintPDF_triggered() {
     QPrinter printer;
     printer.setOutputFormat(QPrinter::PdfFormat);
     QString filename = QFileDialog::getSaveFileName(this, "Export PDF");
     printer.setOutputFileName(filename);
-
-
-
-
 }
+
 /*
 void MainWindow::on_actionPrint_triggered() {
     QPrinter printer;
@@ -353,38 +317,24 @@ void MainWindow::on_actionLogin_triggered()
 {
     //Modal approach to create loginForm (cannot access mainWindow at same time)
     //It is on the stack, if we want it on the heap just have the pointer on mainwindow.h and call new here
-    //Connecting to MySql Database
-    /*
-    if(!dbConfigure()) {
-        QMessageBox::information(this, "DB-Connection", "Database not connected");
-    } else {
-        QMessageBox::information(this, "DB-Connection", "Database connected");
-        Login login;
-        login.setModal(true);
-        login.exec();
-    }
-    */
 
     Login login;
     login.setModal(true);
     login.exec();
 
-
     //hide(); //hide the MainWindow
-
     //lf = new loginform(this); //giving also the parent class
-
     //lf->show();
-
 }
-
+/*
+//TODO: fix? #on_actionUserList_triggered
 void MainWindow::on_actionUserList_triggered() {
-
     UserList uList(this, userList);
     uList.setModal(true);
     uList.exec();
+    return;
 }
-
+*/
 void MainWindow::updateUserList(QVector<User> newUserList){
     for(int j=0; j<20; j++){
         actionUserList[j]->setVisible(false);

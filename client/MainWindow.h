@@ -90,7 +90,7 @@ private slots:
     void on_actionSave_triggered();
     void on_actionShare_Uri_triggered();
     void on_actionSettings_triggered();
-    void on_actionUserList_triggered();
+    //void on_actionUserList_triggered();//TODO: fix? #on_actionUserList_triggered
 
 public slots:
     void updateUserList(QVector<User> newUserList);
@@ -124,7 +124,7 @@ private:
     }; //is a static array of color
 
     QVector<QAction*> actionUserList;
-
+    //QAction* actionUserList;
     //SslEchoClient *client;
     void Save_as();
     void closeEvent(QCloseEvent *event) override;
