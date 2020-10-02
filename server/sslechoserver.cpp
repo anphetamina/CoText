@@ -79,8 +79,6 @@ void SslEchoServer::onNewConnection()
             this, &SslEchoServer::processBinaryMessage);
     connect(pSocket, &QWebSocket::disconnected, this, &SslEchoServer::socketDisconnected);
 
-
-    //m_clients << pSocket;
 }
 //! [onNewConnection]
 
@@ -104,9 +102,7 @@ void SslEchoServer::processBinaryMessage(QByteArray message)
     /* //Send back (echoing) the packets for debug
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
     if (pClient)
-    {
         pClient->sendBinaryMessage(message);
-    }
     */
 }
 //! [processBinaryMessage]
@@ -302,16 +298,6 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             switch (msg->getType()) {
                 case(MSG_INSERT_SYM): {
                     std::pair<int, int> pos = editorMapping[docId]->remoteInsert(msg->getQS());
-                    std::vector<std::vector<QSymbol>> qs = editorMapping[docId]->getSymbols();
-                    for (int i = 0; i < qs.size(); i++)
-                    {
-                        for (int j = 0; j < qs[i].size(); j++)
-                        {
-                            qDebug() <<"pff"<< qs[i][j].getC();
-                        }
-                    }
-
-                    QVector<QVector<QSymbol>> qvs = toQVector(qs);
                     break;
                 }
 
@@ -320,7 +306,6 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
                     break;
                 }
             }
-
 
             // Full broadcast (no per document behaviour) follows. *Debug only usage*
             /*for (QWebSocket* onlineClient : clientMapping.keys()) {

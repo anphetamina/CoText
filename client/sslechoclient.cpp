@@ -207,7 +207,12 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             }
             break;
         }
-
+        case (PACK_TYPE_BIGMSG): {
+            break;
+        }
+        case (PACK_TYPE_ALIGN): {
+            break;
+        }
         case (PACK_TYPE_CURSOR_POS): {
             CursorPacket *cp = dynamic_cast<CursorPacket *>(rcvd_packet.get());
             emit updateCursorReceived(cp->getuserId(), cp->getnewPosition());
@@ -274,8 +279,9 @@ void SslEchoClient::sendDocOpen(QString docName, qint32 userId) {
 }
 
 void SslEchoClient::sendSelection(int userId, QTextCursor cursor) {
-    // todo
-
+    // TODO: 
+    //BigMessage bmsg = BigMessage(int type, QVector<QSymbol> qss, int siteId);
+    //bmsg.send(*pServer);
 }
 
 void SslEchoClient::connectToEditor(TextEditor* te) {
