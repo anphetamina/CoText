@@ -11,11 +11,14 @@ class Login : public QDialog
 {
     Q_OBJECT
 
+
 public:
     explicit Login(QWidget *parent = nullptr);
     ~Login();
 
+
 private slots:
+
 
     void on_pushButton_Reg_clicked();
 
@@ -23,7 +26,7 @@ private slots:
 
 private:
     Ui::Login *ui;
-	void closeEvent(QCloseEvent *event) override;
+	//void closeEvent(QCloseEvent *event) override;
 	
 };
 

@@ -21,8 +21,6 @@ Login::~Login()
 
 void Login::on_pushButton_Login_clicked()
 {
-
-
     QString username = ui->lineEdit_User->text();
     QString password = ui->lineEdit_Pass->text();
 	
@@ -31,8 +29,9 @@ void Login::on_pushButton_Login_clicked()
 	client->set_username(username);
 	client->set_password(password);
 	client->sendLogin();
-	//client->authenticate(username, password);
-	
+	//this->~Login();
+    //this->hide();
+    this->close();
 }
 
 
@@ -48,11 +47,3 @@ void Login::on_pushButton_Reg_clicked()
 
 }
 
-void Login::closeEvent(QCloseEvent *event) {
-	QMessageBox::StandardButton resBtn = QMessageBox::question(this, "CoText", tr("Are your sure to quit?\n"), QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
-	if(resBtn != QMessageBox::Yes) {
-		event->ignore();
-	} else {
-		event->accept();
-	}
-}
