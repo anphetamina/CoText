@@ -55,8 +55,8 @@ void Packet::send(QWebSocket& m_webSocket) {
     // We set and write the size after the serialization because we dont know the qByteArray length in a previous moment
     this->setSize(qbuf.size());
     this->writeSize(stream);
-    qDebug() << "---";
-    qDebug() << "[GENERIC SEND]" << "Buf size:" << qbuf.size();;
+//    qDebug() << "---";
+//    qDebug() << "[GENERIC SEND]" << "Buf size:" << qbuf.size();;
     m_webSocket.sendBinaryMessage(qbuf);
     // Try to force a flush of the websocket buffer
     m_webSocket.flush();//"\xAF\x00\x00\x01\x00\x00\x00\x04\x00\x00\x00\b\x00t\x00""e\x00s\x00t"
@@ -265,7 +265,7 @@ void PacketBuffer::clearBuffer()
 
 bool PacketBuffer::isComplete()
 {
-    qDebug() << mSize << getReceivedSize();
+//    qDebug() << mSize << getReceivedSize();
     return mSize == getReceivedSize();
 };
 

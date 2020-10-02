@@ -21,19 +21,22 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     testSymbols({{}}),
     cursors({}),
     currentSelectedChars(0),
-    selections({}),
     userColors({}),
     highlighter(*this, document()),
     isUserColorsToggled(false) {
 
 
     userColors[editor.getSiteId()] = QColor::fromRgb(QRandomGenerator::global()->generate()); // todo get from connected user list
-    document()->setDocumentMargin(50); // todo better margins
     qDebug() << "Current sID: "<< editor.getSiteId();
 
+    /**
+     * document default styling
+     */
 
     setAcceptRichText(false);
     alignmentChanged(alignment());
+
+    setStyleSheet("QTextEdit {margin-left: 40px; margin-right: 40px; margin-top: 10px; margin-bottom: 10px; color: white; font-size: 16px; border: hidden}");
 
     /**
      * each alignment option is mutual exclusive
@@ -55,6 +58,8 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     connect(ui.actionItalic, &QAction::triggered, this, &TextEditor::setFontItalic);
     connect(ui.actionUnderline, &QAction::triggered, this, &TextEditor::setFontUnderline);
     connect(ui.actionTextColor, &QAction::triggered, this, &TextEditor::setFontColor);
+
+    connect(this, &QTextEdit::currentCharFormatChanged, this, &TextEditor::currentCharFormatChanged);
 
     /**
      * document content connections
@@ -88,56 +93,30 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     openDocument(testSymbols);*/
 }
 
-void TextEditor::mergeFormat(const QTextCharFormat &format) {
-    QTextCursor c = textCursor();
-    int start = c.selectionStart();
-    int end = c.selectionEnd();
-    for (int i = start; i < end; i++) {
-        c.setPosition(i);
-        c.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
-        c.mergeCharFormat(format);
-        c.clearSelection();
-    }
-}
-
 void TextEditor::selectFont() {
     bool fontSelected;
     QFont font = QFontDialog::getFont(&fontSelected, parent);
-    if (fontSelected) {
-        QTextCharFormat f;
-        f.setFont(font);
-        mergeFormat(f);
-    }
+    if (fontSelected)
+        setFont(font);
 }
 
 void TextEditor::setFontBold(bool bold) {
-    QTextCharFormat f;
-    bold ? f.setFontWeight(QFont::Bold) : f.setFontWeight(QFont::Normal);
-    mergeFormat(f);
+    bold ? setFontWeight(QFont::Bold) : setFontWeight(QFont::Normal);
 }
 
 void TextEditor::setFontItalic(bool italic) {
-    QTextCharFormat f;
-    f.setFontItalic(italic);
-    mergeFormat(f);
+    QTextEdit::setFontItalic(italic);
 }
 
 void TextEditor::setFontUnderline(bool underline) {
-    QTextCharFormat f;
-    f.setFontUnderline(underline);
-    mergeFormat(f);
+    QTextEdit::setFontUnderline(underline);
 }
 
 void TextEditor::setFontColor() {
-    QColor color = QColorDialog::getColor(currentCharFormat().foreground().color(), parent);
+    QColor color = QColorDialog::getColor(textColor(), parent);
     if (!color.isValid())
         return;
-
-    QTextCharFormat f;
-    f.setForeground(color);
-    mergeFormat(f);
-
-    colorChanged(color);
+    setTextColor(color);
 }
 
 void TextEditor::setTextAlignment(QAction *action) {
@@ -170,26 +149,10 @@ void TextEditor::alignmentChanged(Qt::Alignment alignment) {
     }
 }
 
-/**
- * given the current format updates the icons on the editor toolbar in the main window
- * @param format
- */
-void TextEditor::updateToolbar(const QTextCharFormat &format) {
-    fontChanged(format.font());
-    colorChanged(format.foreground().color());
-}
-
-void TextEditor::fontChanged(const QFont &f) {
-    ui.actionBold->setChecked(f.bold());
-    ui.actionItalic->setChecked(f.italic());
-    ui.actionUnderline->setChecked(f.underline());
-}
-
-void TextEditor::colorChanged(const QColor &c) {
-    // todo remove?
-    QPixmap pix(16, 16);
-    pix.fill(c);
-    ui.actionTextColor->setIcon(pix);
+void TextEditor::currentCharFormatChanged(const QTextCharFormat &f) {
+    ui.actionBold->setChecked(f.font().bold());
+    ui.actionItalic->setChecked(f.font().italic());
+    ui.actionUnderline->setChecked(f.font().underline());
 }
 
 void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) {
@@ -200,9 +163,14 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
     }
 
     /**
-     * workaround for https://github.com/anphetamina/CoText/issues/32
+     * https://github.com/anphetamina/CoText/issues/32 workaround
      */
-    if (charsAdded >= 1 && charsRemoved >= 1 && position+charsRemoved > index.back()+static_cast<int>(editor.getSymbols()[index.size()-1].size()-1)) {
+    /*if (charsAdded >= 1 && charsRemoved >= 1 && position+charsRemoved > index.back()+static_cast<int>(editor.getSymbols()[index.size()-1].size()-1)) {
+        charsRemoved--;
+        charsAdded--;
+    }*/
+
+    if (document()->characterAt(position+charsAdded) == '\0') {
         charsRemoved--;
         charsAdded--;
     }
@@ -211,7 +179,6 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
      * first solution exploits a vector of indexes that keeps track of the initial position
      * in terms of 1-dimensional numbers
      */
-
 
     if (charsRemoved > 0) {
 
@@ -257,8 +224,10 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
             while (charsAdded > 0) {
                 try {
-                    QChar addedChar = document()->characterAt(position++);
-                    QSymbol symbol = editor.localInsert(row, col, addedChar, currentCharFormat());
+                    QChar addedChar = document()->characterAt(position);
+                    QTextCursor qTextCursor = textCursor();
+                    qTextCursor.setPosition(position);
+                    QSymbol symbol = editor.localInsert(row, col, addedChar, qTextCursor.charFormat());
 
                     if (isNewLine(addedChar)) {
                         newRows++;
@@ -274,6 +243,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
                         col = 0;
                     }
 
+                    position++;
                     col++;
                     charsAdded--;
                 } catch (const std::exception &e) {
@@ -290,9 +260,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
             qDebug() << e.what();
         }
 
-
     }
-
 
     printSymbols();
 
@@ -332,13 +300,8 @@ void TextEditor::deleteRow(int pos, int n) {
         throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": n is negative");
     }
 
-    if (pos+n >= index.size() || n == 0) {
-        return;
-    }
     index.erase(index.begin() + pos + 1, index.begin() + pos + n + 1);
-    if (pos+1 >= index.size()) {
-        return;
-    }
+
     for (int i = pos; i < index.size()-1; i++) {
         index[i+1] = index[i] + editor.getSymbols()[i].size();
     }
@@ -437,6 +400,8 @@ int TextEditor::getRow(int position) const {
  */
 void TextEditor::remoteInsert(QSymbol symbol) {
 
+    qDebug() << "received add " << symbol.getC();
+
     try {
 
         isFromRemote = true;
@@ -482,6 +447,8 @@ void TextEditor::remoteInsert(QSymbol symbol) {
  */
 void TextEditor::remoteErase(QSymbol symbol) {
 
+    qDebug() << "received del " << symbol.getC();
+
     try {
         isFromRemote = true;
         std::pair<int, int> pos = editor.remoteErase(symbol);
@@ -521,11 +488,11 @@ int TextEditor::getPosition(int row, int col) {
 }
 
 void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
-    // todo
+    std::for_each(symbols.begin(), symbols.end(), [this](const QSymbol &it){ remoteInsert(it); });
 }
 
 void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
-    // todo
+    std::for_each(symbols.begin(), symbols.end(), [this](const QSymbol &it){ remoteErase(it); });
 }
 
 void TextEditor::paintEvent(QPaintEvent *e) {
@@ -551,13 +518,13 @@ void TextEditor::paintEvent(QPaintEvent *e) {
                 QRect boundingRect;
                 painter.drawText(lRect, 0, tr("TEST"), &boundingRect);*/
 
-                document()->drawContents(&painter);
+                update();
             } else if (position == count) {
                 cursor.setPosition(position - 1);
                 QRect cRect = cursorRect(cursor);
                 painter.drawRect(cRect);
 
-                document()->drawContents(&painter);
+                update();
             }
         }
     } catch (const std::exception &e) {
@@ -569,7 +536,6 @@ void TextEditor::paintEvent(QPaintEvent *e) {
 
 void TextEditor::cursorPositionChange() {
 
-    updateToolbar(currentCharFormat());
     alignmentChanged(alignment());
 
     // todo change with user id
@@ -600,24 +566,6 @@ void TextEditor::selectionChange() {
         currentSelectedChars = 0;
 //        emit selectionChanged(editor.getSiteId(), QTextCursor());
     }
-}
-
-void TextEditor::updateSelection(int userId, QTextCursor cursor) {
-    /**
-     * unused
-     */
-    QTextCharFormat format;
-    // todo change color setting
-    format.setUnderlineColor(QColor::fromRgb(QRandomGenerator::global()->generate()));
-    QTextEdit::ExtraSelection es;
-    es.cursor = cursor;
-    es.format = format;
-    selections[userId] = es;
-    QList<QTextEdit::ExtraSelection> extraSelections;
-    for (const auto &selection : selections) {
-        extraSelections.push_back(selection.second);
-    }
-    setExtraSelections(extraSelections);
 }
 
 void TextEditor::toggleUserColors() {

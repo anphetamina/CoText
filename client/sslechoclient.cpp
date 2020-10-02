@@ -149,8 +149,8 @@ void SslEchoClient::packetParse(QByteArray rcvd_packet) {
 
             // If the type is correct TODO: add HeadID check
             if (mType == PACK_TYPE_PING || mType <= PACK_TYPE_LAST_CODE) {
-                qDebug() << "---";
-                qDebug() << "[INFO] Parsed new packet. Type: " << mType;
+//                qDebug() << "---";
+//                qDebug() << "[INFO] Parsed new packet. Type: " << mType;
                 QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
                 dispatch(packetH, pClient);
             } else {
@@ -169,7 +169,7 @@ void SslEchoClient::packetParse(QByteArray rcvd_packet) {
 
 void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
     //qDebug() << rcvd_packet.get();  // print packet as hex
-    qDebug() << "New packet type= " << rcvd_packet->getType();
+//    qDebug() << "New packet type= " << rcvd_packet->getType();
     switch (rcvd_packet->getType()) {
         // Remeber to add {} scope to avoid jump from switch compilation error
         case (PACK_TYPE_PING): {
@@ -247,7 +247,7 @@ void SslEchoClient::sendInsert(std::vector<QSymbol> symbols, int siteId) {
     for (QSymbol symbol : symbols) {
         Message msg = Message(MSG_INSERT_SYM, symbol, siteId);
         msg.send(*pServer);
-//        qDebug() << "sent" << ((symbol.getC() == '\n') ? "LF" : QString(symbol.getC())) << "(" << type << ")";
+        qDebug() << "sent add " << ((symbol.isNewLine()) ? "LF" : QString(symbol.getC()));
     }
 }
 
@@ -255,7 +255,7 @@ void SslEchoClient::sendErase(std::vector<QSymbol> symbols, int siteId) {
     for (QSymbol symbol : symbols) {
         Message msg = Message(MSG_ERASE_SYM, symbol, siteId);
         msg.send(*pServer);
-//        qDebug() << "sent" << ((symbol.getC() == '\n') ? "LF" : QString(symbol.getC())) << "(" << type << ")";
+        qDebug() << "sent del " << ((symbol.isNewLine()) ? "LF" : QString(symbol.getC()));
     }
 }
 
@@ -271,11 +271,6 @@ void SslEchoClient::sendDocOpen(QString docName, qint32 userId) {
     dop.send(*pServer);
 }
 
-void SslEchoClient::sendSelection(int userId, QTextCursor cursor) {
-    // todo
-
-}
-
 void SslEchoClient::connectToEditor(TextEditor* te) {
 
     connect(this, &SslEchoClient::insertReceived, te, &TextEditor::remoteInsert);
@@ -283,11 +278,9 @@ void SslEchoClient::connectToEditor(TextEditor* te) {
     connect(this, &SslEchoClient::insertBlockReceived, te, &TextEditor::remoteInsertBlock);
     connect(this, &SslEchoClient::eraseBlockReceived, te, &TextEditor::remoteEraseBlock);
     connect(this, &SslEchoClient::updateCursorReceived, te, &TextEditor::updateCursor);
-    connect(this, &SslEchoClient::updateSelectionReceived, te, &TextEditor::updateSelection);
     connect(te, &TextEditor::symbolsInserted, this, &SslEchoClient::sendInsert);
     connect(te, &TextEditor::symbolsErased, this, &SslEchoClient::sendErase);
     connect(te, &TextEditor::cursorPositionChanged, this, &SslEchoClient::sendCursor);
-    connect(te, &TextEditor::selectionChanged, this, &SslEchoClient::sendSelection);
 }
 
 void SslEchoClient::connectToMainWindow(MainWindow* mw) {

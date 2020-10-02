@@ -273,23 +273,6 @@ QSymbol SharedEditor::localInsert(int line, int index, QChar value, QTextCharFor
         sym.setPosition(sym_position);
         insertSymbol(line, index, sym);
 
-        /*std::cout << "original char: " << sym.getC() << std::endl;
-
-        QSymbol qSymbol = sym.toSerializable();
-        qDebug() << "char" << qSymbol.getC().toLatin1() << "id" << qSymbol.getId();
-        qDebug() << "position";
-        for (auto pos : qSymbol.getPosition()) {
-            qDebug() << "[" << pos.getDigit() << "," << pos.getSiteId() << "]";
-        }
-
-        Symbol oSymbol = qSymbol.toOriginal();
-        std::cout << "char " << oSymbol.getC() << " id " << oSymbol.getId() << std::endl;
-        std::cout << "position " << std::endl;
-        for (auto pos : oSymbol.getPosition()) {
-            std::cout << "[ " << pos.getDigit() << ", " << pos.getSiteId() << " ]";
-        }
-        std::cout << std::endl;*/
-
     } catch (std::exception& e) {
         std::cerr << "line " << line << ", index " << index << ", value " << QString(sym.getC()).toStdString() << ", siteId " << siteId << std::endl;
         std::cerr << e.what() << std::endl;
@@ -332,9 +315,15 @@ std::vector<QSymbol> SharedEditor::eraseMultipleLines(int startLine, int startIn
     erasedSymbols.insert(erasedSymbols.end(), symbols[endLine].begin(), symbols[endLine].begin() + endIndex+1);
     symbols[startLine].erase(symbols[startLine].begin() + startIndex, symbols[startLine].end());
     symbols[endLine].erase(symbols[endLine].begin(), symbols[endLine].begin() + endIndex + 1);
+
     if (endLine-startLine != 1) {
         symbols.erase(symbols.begin() + startLine + 1, symbols.begin() + endLine);
     }
+
+    if (erasedSymbols.back().isNewLine()) {
+        symbols.erase(symbols.begin() + endLine);
+    }
+
     counter -= erasedSymbols.size();
 
     return erasedSymbols;
@@ -369,24 +358,17 @@ std::vector<QSymbol> SharedEditor::localErase(int startLine, int startIndex, int
         return {};
     } else if (startLine != endLine) {
         erasedSymbols = eraseMultipleLines(startLine, startIndex, endLine, endIndex);
-        if (symbols[startLine + 1].empty()) {
-            symbols.erase(symbols.begin() + startLine + 1);
-        }
         mergeLines = true;
     } else {
         erasedSymbols = eraseSingleLine(startLine, startIndex, endLine, endIndex);
         if (erasedSymbols.back().isNewLine()) {
-            if (symbols[startLine + 1].empty()) {
-                symbols.erase(symbols.begin() + startLine + 1);
-            } else {
-                mergeLines = true;
-            }
+            mergeLines = true;
         }
     }
 
     if (mergeLines && !(symbols[0].empty() && symbols.size() == 1)) {
         symbols[startLine].insert(symbols[startLine].end(), symbols[startLine+1].begin(), symbols[startLine+1].end());
-        symbols.erase(symbols.begin() + startLine+1);
+        symbols.erase(symbols.begin() + startLine + 1);
     }
 
     return erasedSymbols;
@@ -571,5 +553,5 @@ void SharedEditor::setSymbols(std::vector<std::vector<QSymbol>> symbols) {
 }
 
 bool SharedEditor::isNewLine(QChar &c) {
-    return c == QChar::LineFeed || c == QChar::ParagraphSeparator || c == QChar::LineSeparator;;
+    return c == QChar::LineFeed || c == QChar::ParagraphSeparator || c == QChar::LineSeparator;
 }

@@ -18,7 +18,7 @@ class UserHighlighter : public QSyntaxHighlighter {
     Q_OBJECT
 
 public:
-    UserHighlighter(const TextEditor &editor, QTextDocument *parent = 0);
+    UserHighlighter(TextEditor &editor, QTextDocument *parent = 0);
 
     void enable();
     void disable();
@@ -29,7 +29,7 @@ protected:
 private:
 
     QTextDocument &document;
-    const TextEditor &editor;
+    TextEditor &editor;
 
 };
 

@@ -7,7 +7,7 @@
 #include "TextEditor.h"
 
 
-UserHighlighter::UserHighlighter(const TextEditor &editor, QTextDocument *parent) : QSyntaxHighlighter(parent), document(*parent), editor(editor) {
+UserHighlighter::UserHighlighter(TextEditor &editor, QTextDocument *parent) : QSyntaxHighlighter(parent), document(*parent), editor(editor) {
     setDocument(nullptr);
 }
 
@@ -15,6 +15,7 @@ void UserHighlighter::highlightBlock(const QString &text) {
 
     try {
         for (int i = currentBlock().position(), j = 0; i < currentBlock().position() + text.length(); i++, j++) {
+            editor.isFromRemote = true;
             QTextCharFormat format;
             format.setFontWeight(QFont::Bold);
             const int &row = editor.getRow(i);

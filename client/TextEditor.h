@@ -8,9 +8,8 @@
 
 #include <QDebug>
 #include <iostream>
-#include <QtWidgets/QPlainTextEdit>
 #include <QtGui/QPainter>
-#include <User.h>
+#include <QtWidgets/QTextEdit>
 #include "../common/SharedEditor.h"
 #include "../common/QSymbol.h"
 #include "UserHighlighter.h"
@@ -31,6 +30,8 @@ public:
     QColor getUserColor(int userId) const;
     int getUserId(int row, int col) const;
 
+    std::atomic<bool> isFromRemote;
+
 private:
 
     QWidget *parent;
@@ -46,19 +47,14 @@ private:
     int currentSelectedChars;
     UserHighlighter highlighter;
 
-    void fontChanged(const QFont &f);
-    void colorChanged(const QColor &c);
-
     void insertRow(int pos, int n);
     void deleteRow(int pos, int n);
     void incrementIndex(int pos, int n);
     void decrementIndex(int pos, int n);
 
-    std::atomic<bool> isFromRemote;
     int getPosition(int row, int col);
 
     std::map<int, int> cursors;
-    std::map<int, QTextEdit::ExtraSelection> selections;
     std::map<int, QColor> userColors;
 
     std::atomic<bool> isUserColorsToggled;
@@ -76,14 +72,12 @@ public slots:
     void remoteEraseBlock(std::vector<QSymbol> symbols);
 
     void updateCursor(int userId, int position);
-    void updateSelection(int userId, QTextCursor cursor);
     void updateAlignment(Qt::Alignment alignment, int position);
 
     void openDocument(std::vector<std::vector<QSymbol>> symbols);
 
 private slots:
 
-    void mergeFormat(const QTextCharFormat &format);
     void selectFont();
     void setFontBold(bool bold);
     void setFontItalic(bool italic);
@@ -91,7 +85,7 @@ private slots:
     void setFontColor();
     void setTextAlignment(QAction *action);
     void alignmentChanged(Qt::Alignment a);
-    void updateToolbar(const QTextCharFormat &format);
+    void currentCharFormatChanged(const QTextCharFormat &f);
 
     void contentsChange(int position, int charsRemoved, int charsAdded);
     void cursorPositionChange();
@@ -107,7 +101,6 @@ signals:
     void symbolsInserted(std::vector<QSymbol> symbols, int siteId);
     void symbolsErased(std::vector<QSymbol> symbols, int siteId);
     void cursorPositionChanged(int userId, int position);
-    void selectionChanged(int userId, QTextCursor cursor);
     void textAlignmentChanged(Qt::Alignment alignment, int position);
 
 };
