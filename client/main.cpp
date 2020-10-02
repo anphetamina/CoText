@@ -11,7 +11,7 @@
 bool closed = false;
 
 int main(int argc, char *argv[]) {
-	
+
     QApplication a(argc, argv);
 	//exe icon for mac/linux
     QIcon icon(":/appIcon/CoText.ico");
@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
         client->set_username(quser);
         client->set_password(qpass);
     }
-	
+
     /** Login Phase */
 	client = new SslEchoClient(QUrl(QStringLiteral("wss://localhost:12345")));
 	Q_UNUSED(*client);
@@ -54,6 +54,12 @@ int main(int argc, char *argv[]) {
     TextEditor editor(0, *w->getUi()); // todo get site id from server
     //editor.setDisabled(true);
     // place the QTextEditor object in the central position of the main window
+
+    w->connectToTextEditor(&editor);
+
+    /**
+     * place the QTextEditor object in the central position of the main window
+     */
     w->setCentralWidget(&editor);
 
     // Perform connection (signal/slot)
