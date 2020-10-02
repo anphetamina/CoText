@@ -5,9 +5,9 @@
 #include "sslechoclient.h"
 #include "../common/PingPacket.h"
 #include "../common/LoginPacket.h"
+#include "Login.h"
 #include <QtWebSockets/QWebSocket>
 #include <QCoreApplication>
-
 
 
 QT_USE_NAMESPACE
@@ -39,9 +39,7 @@ void SslEchoClient::onConnected()
     connect(&m_webSocket, &QWebSocket::disconnected, this, &SslEchoClient::socketDisconnected);
 
     this->sendPing();
-    this->sendTest();
-
-    //m_webSocket.sendTextMessage(QStringLiteral("Hello, world!"));
+    //this->sendTest();
 }
 //! [onConnected]
 
@@ -49,7 +47,6 @@ void SslEchoClient::onConnected()
 void SslEchoClient::onTextMessageReceived(QString message)
 {
     qDebug() << "Message received:" << message;
-    //qApp->quit();
 }
 
 //! [onTextMessageReceived]
@@ -57,17 +54,13 @@ void SslEchoClient::onBinaryMessageReceived(QByteArray message)
 {
     //qDebug() << "Message received:" << message;
     this->packetParse(message);
-    //qApp->quit();
 }
 
 void SslEchoClient::onSslErrors(const QList<QSslError> &errors)
 {
     Q_UNUSED(errors);
-
     // WARNING: Never ignore SSL errors in production code.
-    // The proper way to handle self-signed certificates is to add a custom root
-    // to the CA store.
-
+    // The proper way to handle self-signed certificates is to add a custom root to the CA store.
     m_webSocket.ignoreSslErrors();
 }
 //! [onTextMessageReceived]
@@ -76,7 +69,6 @@ void SslEchoClient::onSslErrors(const QList<QSslError> &errors)
 void SslEchoClient::socketDisconnected()
 {
     qDebug() << "Server closed the connection.\n[HINT]Duplicated instance with the same user?";
-
     qApp->exit(-2);
 }
 
@@ -86,12 +78,11 @@ void SslEchoClient::sendPing() {
 
     pp.send(m_webSocket);
     qDebug() << "Ping sent";
-
 }
 
 void SslEchoClient::sendTest() {
     qDebug() << "[NETWORK] ** Network Test Start ** ";
-    //this->sendLogin();
+    this->sendLogin();
     qDebug() << "[NETWORK] ** Sending Message packet ** ";
     std::vector<Identifier> sym_position;
     QString test("test_qstring");
@@ -101,7 +92,6 @@ void SslEchoClient::sendTest() {
     Message msg = Message(MSG_INSERT_SYM, qs, 3);
     //msg.send(m_webSocket);
     qDebug() << "[NETWORK] ** Network Test Packet were all sent ** ";
-
 }
 
 void SslEchoClient::set_username(QString username){
@@ -173,6 +163,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
     //qDebug() << rcvd_packet.get();  // print packet as hex
     qDebug() << "New packet type= " << rcvd_packet->getType();
     switch (rcvd_packet->getType()) {
+
         // Remeber to add {} scope to avoid jump from switch compilation error
         case (PACK_TYPE_PING): {
             PingPacket *ping = dynamic_cast<PingPacket *>(rcvd_packet.get());
@@ -185,10 +176,11 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             User loggedUser = loginOk->getUser();
             if ( loggedUser.isLogged() ){
                 qDebug() << "[AUTH] Logged in as: " << loggedUser.getEmail();
-
+                emit loginSuccessful();
             }
             else {
                 qDebug() << "[AUTH] FAILED. See the server for the log.";
+                emit loginFailed();
             }
             pServer = qobject_cast<QWebSocket *>(sender());
             // .... DEBUG TODO: REMOVE when opendoc GUI is implemented and linked here
@@ -301,5 +293,21 @@ void SslEchoClient::connectToMainWindow(MainWindow* mw) {
     connect(this, &SslEchoClient::updateUserListReceived, mw, &MainWindow::updateUserList);
 }
 
+/*
+ * Dont delete pls. Possible enhancement
+void SslEchoClient::connectToLoginWindow(Login* login, MainWindow* mw) {//Qdialog as of now
+    // This would both close the login window and open the main one
+    connect(this, &SslEchoClient::loginSuccessful, login, &Login::close);
+    connect(this, &SslEchoClient::loginSuccessful, mw, &MainWindow::show);
 
+    // If login failed, just close the login window
+    connect(this, &SslEchoClient::loginFailed, login, &MainWindow::close);
+
+    // If login failed, or the main window was closed, quit the application
+    // This is needed, because we explicitly set the QGuiApplication::quitOnLastWindowClosed property to false.
+    //QObject::connect(w, MainWindow::closed, &a, &QCoreApplication::quit);
+    //QObject::connect(&login, &Login::loginFailed, &a, &QCoreApplication::quit);
+}
+
+*/
 //    // Save the secret key that will be used

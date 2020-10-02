@@ -16,6 +16,7 @@
 #include "../common/DocumentPacket.h"
 #include "TextEditor.h"
 #include "MainWindow.h"
+#include "Login.h"
 
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
 
@@ -36,6 +37,9 @@ signals:
     void updateUserListReceived(QVector<User> userlist);
     void auth(User loggedUser);
 
+signals:
+    void loginSuccessful();
+    void loginFailed();
 public slots:
 
     void sendInsert(std::vector<QSymbol> symbols, int siteId);
@@ -79,5 +83,7 @@ public:
     void sendLogin();
 
     void socketDisconnected();
+
+    void connectToLoginWindow(Login *login, MainWindow *mw);
 };
 
