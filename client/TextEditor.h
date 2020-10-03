@@ -55,6 +55,7 @@ private:
 
     std::map<int, int> cursors;
     std::map<int, QColor> userColors;
+    QMap<int, QColor> colorMap;  //TODO: remove userColors after refactoring  std::map->QMap
 
     std::atomic<bool> isUserColorsToggled;
 

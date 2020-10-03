@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 3.15)
 
 project(CoText-client)
 
@@ -24,7 +24,6 @@ endif()
 IF(WIN32)
     SET(OS_SPECIFIC_LIBS netapi32 wsock32)
 ENDIF(WIN32)
-
 
 find_package(Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
