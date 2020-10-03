@@ -15,7 +15,7 @@ Join::~Join()
 
 void Join::on_pushButton_join_clicked()
 {
-    emit(sendJoin(2, 12, ui->invitationCode->text()));   //todo change userId and docId
-    qDebug() << "[JOIN] sendJoin userId = "<< user->getId() << " invCode = "<< ui->invitationCode->text();
+    emit(sendJoin(user.getId(), 12, ui->invitationCode->text()));   //todo change userId and docId
+    //qDebug() << "[JOIN] sendJoin userId = "<< user.getId() << " invCode = "<< ui->invitationCode->text();
     this->close();
 }

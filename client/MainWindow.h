@@ -27,7 +27,7 @@
  */
 class SslEchoClient;
 
-inline User *user = nullptr;
+inline User user;
 inline SslEchoClient *client = nullptr;
 
 
@@ -45,16 +45,15 @@ public:
     ~MainWindow();
 
     static void setUser(User* usr){
-        user = new User();
-        user->setName(usr->getName());
-        user->setSurname(usr->getSurname());
-        user->setNick(usr->getNick());
-        user->setEmail(usr->getNick());
-        user->setProfilePic(usr->getProfilePic());
-        user->setUserState(20); //ACTIVE USER
+        user.setName(usr->getName());
+        user.setSurname(usr->getSurname());
+        user.setNick(usr->getNick());
+        user.setEmail(usr->getNick());
+        user.setProfilePic(usr->getProfilePic());
+        user.setUserState(20); //ACTIVE USER
     }
 
-    static User* getUser() {
+    static User getUser() {
     	return user;
     }
 

@@ -186,8 +186,8 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             this->sendDocOpen("AAA", loggedUser.getId());
 
 	        //emit auth(loggedUser);
-	        user = &loggedUser;
-	        qDebug() << "USER LOGGED " << user->getId() << " " << user->getEmail();
+	        user = loggedUser;
+	        //qDebug() << "USER LOGGED " << user.getId() << " " << user.getEmail();
 
 	        break;
         }
@@ -236,20 +236,19 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
         }
         case (PACK_TYPE_DOC_LIST): {
             DocumentListPacket *docList = dynamic_cast<DocumentListPacket *>(rcvd_packet.get());
-            qDebug() << "[DOC_LIST] Received";
+            //qDebug() << "[DOC_LIST] Received";
             break;
         }
         case (PACK_TYPE_DOC_ASKSURI): {
             // When a client receive this it means it was a response to an invite for ANOTHER CLIENT (that will SEND **NOT receive** a similar packet
             DocumentAskSharableURIPacket *docInvite = dynamic_cast<DocumentAskSharableURIPacket *>(rcvd_packet.get());
             emit(askUriReceived(docInvite->getURI()));
-            qDebug() << "[SSL ECHO CLIENT] askUriReceived";
             break;
         }
         case (PACK_TYPE_DOC_USERLIST): {
             // When a client receive this it means that some user just went online/offline
             DocumentBeaconOnlineUsers *bou = dynamic_cast<DocumentBeaconOnlineUsers *>(rcvd_packet.get());
-            qDebug() << "[DOC] Online userlist updated for DocId: " << bou->getdocId();
+            //qDebug() << "[DOC] Online userlist updated for DocId: " << bou->getdocId();
             emit updateUserListReceived(bou->getuserList());
             break;
         }
@@ -285,7 +284,7 @@ void SslEchoClient::sendDocOpen(QString docName, qint32 userId) {
 }
 
 void SslEchoClient::sendAskUri(qint32 userId, int docId, QString invCode) {
-    qDebug() << "[SSL ECHO CLIENT] sendAskUri userID = "<< userId << " invCode = " << invCode;
+    //qDebug() << "[SSL ECHO CLIENT] sendAskUri userID = "<< userId << " invCode = " << invCode;
     DocumentAskSharableURIPacket sup = DocumentAskSharableURIPacket(docId, userId,invCode);
     sup.send(*pServer);
 }
