@@ -21,13 +21,9 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     testSymbols({{}}),
     cursors({}),
     currentSelectedChars(0),
-    selectedBlockStartLines({}),
-    userColors({}),
     highlighter(*this, document()),
     isUserColorsToggled(false) {
 
-
-    userColors[editor.getSiteId()] = QColor::fromRgb(QRandomGenerator::global()->generate()); // todo get from connected user list
     qDebug() << "Current sID: "<< editor.getSiteId();
 
     /**
@@ -70,7 +66,6 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
 
     connect(this, &QTextEdit::cursorPositionChanged, this, &TextEditor::cursorPositionChange);
     connect(this, &QTextEdit::selectionChanged, this, &TextEditor::selectionChange);
-    connect(document(), &QTextDocument::blockCountChanged, this, &TextEditor::blockStartLinesChange);
 
     connect(ui.actionToggle_user_colors, &QAction::triggered, this, &TextEditor::toggleUserColors);
 
@@ -143,8 +138,12 @@ void TextEditor::setTextAlignment(QAction *action) {
     }
 
     if (hasChanged) {
-        for (int line : selectedBlockStartLines) {
-            emit textAlignmentChanged(flag, line, editor.getSiteId());
+        QTextBlock block = document()->findBlock(textCursor().selectionStart());
+        int pos = 0;
+        while (block.isValid() && block.position() <= textCursor().selectionEnd()) {
+            block.position() != -1 ? pos = block.position() : pos = textCursor().selectionEnd();
+            emit textAlignmentChanged(flag, pos, editor.getSiteId());
+            block = block.next();
         }
     }
 
@@ -412,9 +411,9 @@ int TextEditor::getRow(int position) const {
  */
 void TextEditor::remoteInsert(QSymbol symbol) {
 
-    //qDebug() << "received add " << symbol.getC();
-    try {
+    qDebug() << "received add " << symbol.getC();
 
+    try {
         isFromRemote = true;
         std::pair<int, int> pos = editor.remoteInsert(symbol);
         if (pos.first != -1 || pos.second != -1) {
@@ -507,7 +506,9 @@ void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
 
 void TextEditor::paintEvent(QPaintEvent *e) {
 
-    try {
+    QTextEdit::paintEvent(e);
+
+    /*try {
         QTextEdit::paintEvent(e);
         QPainter painter(viewport());
         QTextCursor cursor(document());
@@ -521,12 +522,12 @@ void TextEditor::paintEvent(QPaintEvent *e) {
                 QRect cRect = cursorRect(cursor);
                 painter.drawRect(cRect);
 
-                /*QRect lRect(cRect.left(), cRect.top(), 50, 10);
+                QRect lRect(cRect.left(), cRect.top(), 50, 10);
                 painter.fillRect(lRect, color);
                 painter.drawRect(lRect);
                 painter.setPen(Qt::white);
                 QRect boundingRect;
-                painter.drawText(lRect, 0, tr("TEST"), &boundingRect);*/
+                painter.drawText(lRect, 0, tr("TEST"), &boundingRect);
 
                 update();
             } else if (position == count) {
@@ -539,7 +540,7 @@ void TextEditor::paintEvent(QPaintEvent *e) {
         }
     } catch (const std::exception &e) {
         qDebug() << e.what();
-    }
+    }*/
 }
 
 void TextEditor::cursorPositionChange() {
@@ -557,9 +558,6 @@ void TextEditor::cursorPositionChange() {
  */
 void TextEditor::updateCursor(int userId, int position) {
     cursors[userId] = position;
-    if(!userColors[userId].isValid()) {
-        userColors[userId] = QColor::fromRgb(QRandomGenerator::global()->generate()); // todo change with different colors
-    }
 }
 
 void TextEditor::selectionChange() {
@@ -587,11 +585,11 @@ void TextEditor::toggleUserColors() {
 
 QColor TextEditor::getUserColor(int userId) const {
 
-    if (userColors.find(userId) == userColors.end()) {
+    /*if (userColors.find(userId) == userColors.end()) {
         throw std::runtime_error(std::string{} + __PRETTY_FUNCTION__ + ": color for user id not found");
     }
 
-    return userColors.at(userId);
+    return userColors.at(userId);*/
 }
 
 int TextEditor::getUserId(int row, int col) const {
@@ -640,17 +638,6 @@ void TextEditor::printSymbols() {
 void TextEditor::updateAlignment(Qt::Alignment alignment, int position) {
     isFromRemote = true;
     document()->findBlock(position).blockFormat().setAlignment(alignment);
-}
-
-void TextEditor::blockStartLinesChange(int blockCount) {
-
-    selectedBlockStartLines.clear();
-    QTextBlock block = document()->findBlock(textCursor().selectionStart());
-    for (int i = 0; i < blockCount; i++) {
-        selectedBlockStartLines.push_back(block.firstLineNumber());
-        block = block.next();
-    }
-
 }
 
 bool TextEditor::isNewLine(QChar c) {
