@@ -187,6 +187,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
 
 	        //emit auth(loggedUser);
 	        user = &loggedUser;
+	        qDebug() << "USER LOGGED " << user->getId() << " " << user->getEmail();
 
 	        break;
         }
@@ -237,6 +238,8 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
         case (PACK_TYPE_DOC_ASKSURI): {
             // When a client receive this it means it was a response to an invite for ANOTHER CLIENT (that will SEND **NOT receive** a similar packet
             DocumentAskSharableURIPacket *docInvite = dynamic_cast<DocumentAskSharableURIPacket *>(rcvd_packet.get());
+            emit(askUriReceived(docInvite->getURI()));
+            qDebug() << "[SSL ECHO CLIENT] askUriReceived";
             break;
         }
         case (PACK_TYPE_DOC_USERLIST): {
@@ -277,6 +280,12 @@ void SslEchoClient::sendDocOpen(QString docName, qint32 userId) {
     dop.send(*pServer);
 }
 
+void SslEchoClient::sendAskUri(qint32 userId, int docId) {
+    qDebug() << "[SSL ECHO CLIENT] sendAskUri userID = "<< userId;
+    DocumentAskSharableURIPacket sup = DocumentAskSharableURIPacket(docId, userId,"");
+    sup.send(*pServer);
+}
+
 void SslEchoClient::connectToEditor(TextEditor* te) {
 
     connect(this, &SslEchoClient::insertReceived, te, &TextEditor::remoteInsert);
@@ -292,6 +301,8 @@ void SslEchoClient::connectToEditor(TextEditor* te) {
 
 void SslEchoClient::connectToMainWindow(MainWindow* mw) {
     connect(this, &SslEchoClient::updateUserListReceived, mw, &MainWindow::updateUserList);
+    connect(mw, &MainWindow::sendAskUriMainWindow, this, &SslEchoClient::sendAskUri);
+    connect(this, &SslEchoClient::askUriReceived, mw, &MainWindow::askUriReceivedMainWindow);
 }
 
 /*

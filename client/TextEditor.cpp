@@ -633,7 +633,7 @@ bool TextEditor::isNewLine(QChar c) {
 
 //the key (int) is the usarId
 void TextEditor:: updateColorMap(QMap<int, QColor> colorMapReceived){
-    colorMap = colorMapReceived;
+    //colorMap = colorMapReceived;
 }
 
 

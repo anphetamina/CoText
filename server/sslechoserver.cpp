@@ -415,19 +415,23 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
                 break;
             }
             DocumentAskSharableURIPacket* msg = dynamic_cast<DocumentAskSharableURIPacket*>(rcvd_packet.get());
+            qDebug() << "ASK URI PACKET received userId: "<< msg->getuserId() << " docId: "<<msg->getdocId() << " URI : "<< msg->getURI();
             int docId = msg->getdocId();
             qint32 userId = msg->getuserId();
             QString invCode = msg->getURI();
             // Check permission of the user for that doc
             if(!checkDocPermission(docId, userId)){
+                qDebug() << "ASK URI PACKET permission denied";
                 break;
             }
             // Check if this is a request invite (URI is empty) or an invitation accept
             if(invCode.size() > 0){
                 // Invitation accept
+                qDebug() << "ASK URI PACKET invete aaccepted";
                 acceptInvite(invCode, userId);
             }
             else {
+                qDebug() << "ASK URI PACKET generate invitation code";
                 // Generate invitation code for a given document and insert to db
                 QString invCode = createInvite(docId);
                 // Send the code
