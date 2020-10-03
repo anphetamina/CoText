@@ -32,6 +32,7 @@ signals:
     void insertBlockReceived(std::vector<QSymbol> symbols);
     void eraseBlockReceived(std::vector<QSymbol> symbols);
     void updateCursorReceived(int userId, int position);
+    void updateAlignmentReceived(Qt::Alignment alignment, int position);
 
     void updateUserListReceived(QVector<User> userlist);
     void auth(User loggedUser);
@@ -45,6 +46,7 @@ public slots:
     void sendInsert(std::vector<QSymbol> symbols, int siteId);
     void sendErase(std::vector<QSymbol> symbols, int siteId);
     void sendCursor(int userId, int position);
+    void sendAlignment(Qt::Alignment alignment, int position, int siteId);
 
 private Q_SLOTS:
     void onConnected();
