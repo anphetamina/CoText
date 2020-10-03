@@ -196,11 +196,11 @@
    <addaction name="actionBold"/>
    <addaction name="actionItalic"/>
    <addaction name="actionUnderline"/>
-   <addaction name="actionToggle_user_colors"/>
    <addaction name="actionAlign_left"/>
    <addaction name="actionAlign_center"/>
    <addaction name="actionAlign_right"/>
    <addaction name="actionJustify"/>
+   <addaction name="actionToggle_user_colors"/>
   </widget>
   <widget class="QToolBar" name="rightToolBar">
    <property name="windowTitle">
@@ -530,7 +530,13 @@
      <normaloff>:/imgs/icons/noun_color_3170276.svg</normaloff>:/imgs/icons/noun_color_3170276.svg</iconset>
    </property>
    <property name="text">
-    <string/>
+    <string>actionColor</string>
+   </property>
+   <property name="iconText">
+    <string>actionColor</string>
+   </property>
+   <property name="toolTip">
+    <string>Pick a color</string>
    </property>
   </action>
   <action name="actionToggle_user_colors">
@@ -539,7 +545,7 @@
    </property>
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/imgs/icons/noun_color_3170276.svg</normaloff>:/imgs/icons/noun_color_3170276.svg</iconset>
+     <normaloff>:/imgs/icons/noun_Light_1841928.svg</normaloff>:/imgs/icons/noun_Light_1841928.svg</iconset>
    </property>
    <property name="text">
     <string>Toggle user colors</string>
@@ -551,7 +557,7 @@
    </property>
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/imgs/icons/textjustify.png</normaloff>:/imgs/icons/textjustify.png</iconset>
+     <normaloff>:/imgs/icons/textjustify.svg</normaloff>:/imgs/icons/textjustify.svg</iconset>
    </property>
    <property name="text">
     <string>Justify</string>
@@ -563,7 +569,7 @@
    </property>
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/imgs/icons/textleft.png</normaloff>:/imgs/icons/textleft.png</iconset>
+     <normaloff>:/imgs/icons/textleft.svg</normaloff>:/imgs/icons/textleft.svg</iconset>
    </property>
    <property name="text">
     <string>Align left</string>
@@ -575,7 +581,7 @@
    </property>
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/imgs/icons/textright.png</normaloff>:/imgs/icons/textright.png</iconset>
+     <normaloff>:/imgs/icons/textright.svg</normaloff>:/imgs/icons/textright.svg</iconset>
    </property>
    <property name="text">
     <string>Align right</string>
@@ -587,7 +593,7 @@
    </property>
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/imgs/icons/textcenter.png</normaloff>:/imgs/icons/textcenter.png</iconset>
+     <normaloff>:/imgs/icons/textcenter.svg</normaloff>:/imgs/icons/textcenter.svg</iconset>
    </property>
    <property name="text">
     <string>Align center</string>
