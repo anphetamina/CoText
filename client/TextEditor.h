@@ -44,7 +44,6 @@ private:
     std::vector<int> index;
     std::vector<std::vector<QSymbol>> testSymbols;
     int currentSelectedChars;
-    std::vector<int> selectedBlockStartLines;
     UserHighlighter highlighter;
 
     void insertRow(int pos, int n);
@@ -91,7 +90,6 @@ private slots:
     void contentsChange(int position, int charsRemoved, int charsAdded);
     void cursorPositionChange();
     void selectionChange();
-    void blockStartLinesChange(int blockCount);
 
     void toggleUserColors();
 
