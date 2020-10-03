@@ -16,6 +16,7 @@
 #include <QtNetwork/QSslCertificate>
 #include <QtNetwork/QSslKey>
 #include <random>
+#include <AccountPacket.h>
 
 QT_USE_NAMESPACE
 
@@ -243,6 +244,13 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
         case(PACK_TYPE_PING): {
             PingPacket *ping = dynamic_cast<PingPacket *>(rcvd_packet.get());
             qDebug() << "[PING] Debug text: " << ping->getDebugMsg();
+            break;
+        }
+        case(PACK_TYPE_ACC_CREATE): {
+            AccountCreationPacket * accReq = dynamic_cast<AccountCreationPacket*>(rcvd_packet.get());
+            User loggedUser = addUser(accReq->getUsername(), accReq->getHashedPassword(), accReq->getName(), accReq->getSurname(), accReq->getProfilePic());
+            AccountOkPacket aop = AccountOkPacket(loggedUser);
+            aop.send(*pClient);
             break;
         }
         case(PACK_TYPE_LOGIN_REQ): {
