@@ -347,6 +347,21 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             }
             break;
         }
+        case(PACK_TYPE_ALIGN): {
+            AlignMessage *am = dynamic_cast<AlignMessage*>(rcvd_packet.get());
+            //qDebug() << msg->getData();
+            qDebug() << "[ALIGN] New alignment  received." << endl ;
+            // Broadcast to all the connected client of a document
+            QList<QSharedPointer<Client>> onlineClientPerDoc = documentMapping[getDocIdOpenedByUserId(client->getUserId())]; //TODO: deccoment and delete for
+            for (QSharedPointer<Client> onlineClient : onlineClientPerDoc) {
+                if(onlineClient != client && client->isLogged()) {
+                    am->send(*onlineClient->getSocket());
+                    //qDebug() << "\tBroadcasted to from: " << pClient->peerPort() << "sent to " << onlineClient->getSocket()->peerPort() ;
+                }
+            }
+            break;
+        }
+
         case(PACK_TYPE_DOC_CREATE): {
             DocumentCreatePacket *dcp = dynamic_cast<DocumentCreatePacket*>(rcvd_packet.get());
 
