@@ -11,7 +11,6 @@
 #include "../common/Shuffler.h"
 #include "TextEditor.h"
 
-
 TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     parent(parent),
     ui(ui),
@@ -399,8 +398,7 @@ int TextEditor::getRow(int position) const {
  */
 void TextEditor::remoteInsert(QSymbol symbol) {
 
-    qDebug() << "received add " << symbol.getC();
-
+    //qDebug() << "received add " << symbol.getC();
     try {
 
         isFromRemote = true;
@@ -597,21 +595,18 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
     index.clear();
     index.push_back(0);
     int pos = 0;
+    // Prepared code for remoteInsertBlock optimization. As of now its the same as below  code
+    /*for (int i = 0; i < symbols.size(); i++) {
+        this->remoteInsertBlock(symbols[i]);
+    }*/
+    
     for (int i = 0; i < symbols.size(); i++) {
         for (int j = 0; j < symbols[i].size(); j++, ++pos) {
             QSymbol symbol = symbols[i][j];
             this->remoteInsert(symbol);
-            /*
-            isFromRemote = true;
-            textCursor().insertText(symbol.getC());
-            setCurrentCharFormat(symbol.getCF());
-            textCursor().movePosition(QTextCursor::Right);*/
-        }
-        //index.push_back(pos);
-    }
-    //editor.setSymbols(symbols);
 
-    //position, cursor.setPosition(position);
+        }
+    }
 
 }
 

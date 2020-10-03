@@ -160,7 +160,7 @@ void SslEchoClient::packetParse(QByteArray rcvd_packet) {
 
 void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
     //qDebug() << rcvd_packet.get();  // print packet as hex
-//    qDebug() << "New packet type= " << rcvd_packet->getType();
+    //qDebug() << "New packet type= " << rcvd_packet->getType();
     switch (rcvd_packet->getType()) {
 
         // Remeber to add {} scope to avoid jump from switch compilation error
