@@ -8,8 +8,13 @@
 #include <QThread>
 #include <QRandomGenerator>
 #include <QtWidgets/QLabel>
+#include <threaded_for.h>
 #include "../common/Shuffler.h"
 #include "TextEditor.h"
+#include <thread>
+#include <mutex>
+
+std::mutex ins_mutex;  // protects insert
 
 TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     parent(parent),
@@ -261,7 +266,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
     }
 
-    printSymbols();
+    //printSymbols();
 }
 
 /**
@@ -437,6 +442,48 @@ void TextEditor::remoteInsert(QSymbol symbol) {
     }
 
 }
+
+/**
+ * insert symbol received from the server
+ * @param symbol
+ */
+void TextEditor::remoteInsertB(QSymbol symbol) {
+
+    //qDebug() << "received add " << symbol.getC();
+    try {
+        isFromRemote = true;
+        std::pair<int, int> pos = editor.remoteInsert(symbol);
+        const std::lock_guard<std::mutex> lock(ins_mutex);
+
+        if (pos.first != -1 || pos.second != -1) {
+
+            incrementIndex(pos.first, 1);
+
+            if (symbol.isNewLine()) {
+                insertRow(pos.first, 1);
+            }
+
+            int position = getPosition(pos.first, pos.second);
+            /*
+            if (position < 0 || position > document()->characterCount()) {
+                throw std::runtime_error(std::string{} + __PRETTY_FUNCTION__ + ": invalid cursor position");
+            }
+            //QTextBlockFormat format;
+
+            QTextCursor cursor(textCursor());
+            cursor.setPosition(position);
+
+            cursor.insertText(symbol.getC(), symbol.getCF());
+
+            setTextCursor(cursor);
+             */
+
+        }
+    } catch (const std::exception &e) {
+        qDebug() << e.what();
+    }
+
+}
 /**
  * erase symbol received from the server
  * @param symbol
@@ -484,7 +531,48 @@ int TextEditor::getPosition(int row, int col) {
 }
 
 void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
-    std::for_each(symbols.begin(), symbols.end(), [this](const QSymbol &it){ remoteInsert(it); });
+    int last_position = 0;
+    QVector<QString> blocks;
+    QString buffer_block;
+    QTextCharFormat last_cf = QTextCharFormat();
+    for (int j = 0; j < symbols.size(); j++) {
+        QSymbol symbol = symbols[j];
+        //qDebug() << "received add " << symbol.getC();
+        try {
+            isFromRemote = true;
+            std::pair<int, int> pos = editor.remoteInsert(symbol);
+
+            if (pos.first != -1 || pos.second != -1) {
+
+                incrementIndex(pos.first, 1);
+
+                if (symbol.isNewLine()) {
+                    insertRow(pos.first, 1);
+                }
+
+                // If a new format is found, insert the biffered content
+                if(j!=0 && last_cf != symbol.getCF()){
+                    QTextCursor cursor(textCursor());
+                    cursor.insertText(buffer_block, last_cf);
+                    cursor.setPosition(last_position);
+                    setTextCursor(cursor);
+                    buffer_block = "";
+                }
+                last_cf = symbol.getCF();
+                last_position = getPosition(pos.first, pos.second);
+                buffer_block.push_back(symbol.getC()) ;
+            }
+        } catch (const std::exception &e) {
+            qDebug() << e.what();
+        }
+    }
+    // Check if the last buffer_block (last_cf didnt changed almost for sure in the last char)
+    if(!buffer_block.isEmpty()){
+        QTextCursor cursor(textCursor());
+        cursor.insertText(buffer_block, last_cf);
+        cursor.setPosition(last_position);
+        setTextCursor(cursor);
+    }
 }
 
 void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
@@ -596,17 +684,35 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
     index.push_back(0);
     int pos = 0;
     // Prepared code for remoteInsertBlock optimization. As of now its the same as below  code
-    /*for (int i = 0; i < symbols.size(); i++) {
+    for (int i = 0; i < symbols.size(); i++) {
         this->remoteInsertBlock(symbols[i]);
-    }*/
-    
+    }
+/*
+    parallel_for(symbols.size(), [&](int start, int end){
+        for(int i = start; i < end; ++i) {
+            this->remoteInsertBlock(symbols[i]);
+            /*for (int j = 0; j < symbols[i].size(); j++, ++pos) {
+                QSymbol symbol = symbols[i][j];
+                this->remoteInsertB(symbol);
+            }*/
+//        }
+//    } );
+/*
     for (int i = 0; i < symbols.size(); i++) {
         for (int j = 0; j < symbols[i].size(); j++, ++pos) {
             QSymbol symbol = symbols[i][j];
             this->remoteInsert(symbol);
 
         }
-    }
+    }*/
+    /*
+    for (int i = 0; i < symbols.size(); i++) {
+        for (int j = 0; j < symbols[i].size(); j++, ++pos) {
+            QSymbol symbol = symbols[i][j];
+            this->remoteInsert(symbol);
+
+        }
+    }*/
 
 }
 
