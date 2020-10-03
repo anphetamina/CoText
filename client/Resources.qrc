@@ -34,11 +34,12 @@
         <file>icons/noun_underline_1384032.svg</file>
         <file>icons/user-group.svg</file>
         <file>icons/user-group_white.svg</file>
-        <!-- todo change icons -->
         <file>icons/textjustify.png</file>
         <file>icons/textcenter.png</file>
         <file>icons/textright.png</file>
         <file>icons/textleft.png</file>
+        <file>icons/join_grey.svg</file>
+        <file>icons/join_white.svg</file>
     </qresource>
     <qresource prefix="/appIcon">
         <file>icons/CoText_landing.png</file>

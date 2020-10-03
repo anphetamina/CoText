@@ -174,7 +174,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
     }
 
     //Join to a shared document (invite)
-    /*if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionJoin)) && event->type() == QEvent::Enter) {
+    if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionJoin)) && event->type() == QEvent::Enter) {
         setCursor(Qt::PointingHandCursor);
         ui->actionJoin->setIcon(QIcon(":/imgs/icons/join_white.svg"));
         return true;
@@ -183,7 +183,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         setCursor(Qt::ArrowCursor);
         ui->actionJoin->setIcon(QIcon(":/imgs/icons/join_grey.svg"));
         return true;
-    }*/
+    }
 
     return false;
 }

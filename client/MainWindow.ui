@@ -55,7 +55,7 @@
      <x>0</x>
      <y>0</y>
      <width>946</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="palette">
@@ -991,9 +991,12 @@
    </property>
   </action>
   <action name="actionJoin">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="icon">
-    <iconset>
-     <normaloff>icons/join_grey.svg</normaloff>icons/join_grey.svg</iconset>
+    <iconset resource="Resources.qrc">
+     <normaloff>:/imgs/icons/join_grey.svg</normaloff>:/imgs/icons/join_grey.svg</iconset>
    </property>
    <property name="text">
     <string>Join</string>

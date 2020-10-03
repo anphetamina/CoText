@@ -8,7 +8,6 @@
 #include <QThread>
 #include <QRandomGenerator>
 #include <QtWidgets/QLabel>
-#include <threaded_for.h>
 #include "../common/Shuffler.h"
 #include "TextEditor.h"
 #include <thread>
@@ -34,7 +33,6 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     /**
      * document default styling
      */
-
     setAcceptRichText(false);
     alignmentChanged(alignment());
 
