@@ -27,7 +27,7 @@
  */
 class SslEchoClient;
 
-inline User *user = nullptr;
+inline User user;
 inline SslEchoClient *client = nullptr;
 
 
@@ -45,16 +45,15 @@ public:
     ~MainWindow();
 
     static void setUser(User* usr){
-        user = new User();
-        user->setName(usr->getName());
-        user->setSurname(usr->getSurname());
-        user->setNick(usr->getNick());
-        user->setEmail(usr->getNick());
-        user->setProfilePic(usr->getProfilePic());
-        user->setUserState(20); //ACTIVE USER
+        user.setName(usr->getName());
+        user.setSurname(usr->getSurname());
+        user.setNick(usr->getNick());
+        user.setEmail(usr->getNick());
+        user.setProfilePic(usr->getProfilePic());
+        user.setUserState(20); //ACTIVE USER
     }
 
-    static User* getUser() {
+    static User getUser() {
     	return user;
     }
 
@@ -77,14 +76,16 @@ private slots:
     void on_actionSave_triggered();
     void on_actionShare_Uri_triggered();
     void on_actionSettings_triggered();
+    void on_actionJoin_triggered();
 
 public slots:
     void updateUserList(QVector<User> newUserList);
     void askUriReceivedMainWindow(QString URI);
+    void sendJoinMainWindow(qint32 userId, int docId, QString invCode);
 
 signals:
     void newColorMapReceived(QMap<int, QColor> colorMap);
-    void sendAskUriMainWindow(qint32 userId, int docId);
+    void sendAskUriMainWindow(qint32 userId, int docId, QString invCode);
 
 private:
     Ui::MainWindow *ui;

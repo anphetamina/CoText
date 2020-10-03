@@ -16,6 +16,7 @@
 
 std::mutex ins_mutex;  // protects insert
 
+
 TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     parent(parent),
     ui(ui),
@@ -25,6 +26,7 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     testSymbols({{}}),
     cursors({}),
     currentSelectedChars(0),
+    selectedBlockStartLines({}),
     userColors({}),
     highlighter(*this, document()),
     isUserColorsToggled(false) {
@@ -73,6 +75,7 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
 
     connect(this, &QTextEdit::cursorPositionChanged, this, &TextEditor::cursorPositionChange);
     connect(this, &QTextEdit::selectionChanged, this, &TextEditor::selectionChange);
+    connect(document(), &QTextDocument::blockCountChanged, this, &TextEditor::blockStartLinesChange);
 
     connect(ui.actionToggle_user_colors, &QAction::triggered, this, &TextEditor::toggleUserColors);
 
@@ -125,18 +128,29 @@ void TextEditor::setFontColor() {
 
 void TextEditor::setTextAlignment(QAction *action) {
 
+    Qt::Alignment flag;
+    bool hasChanged = true;
+
     if (action == ui.actionAlign_left) {
         setAlignment(Qt::AlignLeft);
-        emit textAlignmentChanged(Qt::AlignLeft, textCursor().position());
+        flag = Qt::AlignLeft;
     } else if (action == ui.actionAlign_right) {
         setAlignment(Qt::AlignRight);
-        emit textAlignmentChanged(Qt::AlignRight, textCursor().position());
+        flag = Qt::AlignRight;
     } else if (action == ui.actionAlign_center) {
         setAlignment(Qt::AlignHCenter);
-        emit textAlignmentChanged(Qt::AlignHCenter, textCursor().position());
+        flag = Qt::AlignHCenter;
     } else if (action == ui.actionJustify) {
         setAlignment(Qt::AlignJustify);
-        emit textAlignmentChanged(Qt::AlignJustify, textCursor().position());
+        flag = Qt::AlignJustify;
+    } else {
+        hasChanged = false;
+    }
+
+    if (hasChanged) {
+        for (int line : selectedBlockStartLines) {
+            emit textAlignmentChanged(flag, line, editor.getSiteId());
+        }
     }
 
 }
@@ -643,6 +657,7 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
     index.push_back(0);
     int pos = 0;
     // Prepared code for remoteInsertBlock optimization. As of now its the same as below  code
+
     for (int i = 0; i < symbols.size(); i++) {
         this->remoteInsertBlock(symbols[i]);
     }
@@ -670,14 +685,26 @@ void TextEditor::printSymbols() {
 }
 
 void TextEditor::updateAlignment(Qt::Alignment alignment, int position) {
+    isFromRemote = true;
     document()->findBlock(position).blockFormat().setAlignment(alignment);
+}
+
+void TextEditor::blockStartLinesChange(int blockCount) {
+
+    selectedBlockStartLines.clear();
+    QTextBlock block = document()->findBlock(textCursor().selectionStart());
+    for (int i = 0; i < blockCount; i++) {
+        selectedBlockStartLines.push_back(block.firstLineNumber());
+        block = block.next();
+    }
+
 }
 
 bool TextEditor::isNewLine(QChar c) {
     return c == QChar::LineFeed || c == QChar::ParagraphSeparator || c == QChar::LineSeparator;
 }
 
-//the key (int) is the usarId
+//the key (int) is the userId
 void TextEditor:: updateColorMap(QMap<int, QColor> colorMapReceived){
     //colorMap = colorMapReceived;
 }

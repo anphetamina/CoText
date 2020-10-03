@@ -159,6 +159,7 @@
    <addaction name="actionOpen"/>
    <addaction name="actionNew"/>
    <addaction name="actionShare_Uri"/>
+   <addaction name="actionJoin"/>
    <addaction name="actionExit"/>
    <addaction name="actionSettings"/>
   </widget>
@@ -987,6 +988,21 @@
    </property>
    <property name="visible">
     <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionJoin">
+   <property name="icon">
+    <iconset>
+     <normaloff>icons/join_grey.svg</normaloff>icons/join_grey.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Join</string>
+   </property>
+   <property name="toolTip">
+    <string>Join</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+S</string>
    </property>
   </action>
  </widget>

@@ -186,8 +186,8 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             this->sendDocOpen("AAA", loggedUser.getId());
 
 	        //emit auth(loggedUser);
-	        user = &loggedUser;
-	        qDebug() << "USER LOGGED " << user->getId() << " " << user->getEmail();
+	        user = loggedUser;
+	        //qDebug() << "USER LOGGED " << user.getId() << " " << user.getEmail();
 
 	        break;
         }
@@ -208,9 +208,13 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             break;
         }
         case (PACK_TYPE_BIGMSG): {
+            /*emit insertBlockReceived(std::vector<QSymbol> symbols);
+            emit eraseBlockReceived(std::vector<QSymbol> symbols);*/
             break;
         }
         case (PACK_TYPE_ALIGN): {
+            AlignMessage *am = dynamic_cast<AlignMessage *>(rcvd_packet.get());
+            emit updateAlignmentReceived(am->getAlignment(), am->getPositionStart());
             break;
         }
         case (PACK_TYPE_CURSOR_POS): {
@@ -232,20 +236,19 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
         }
         case (PACK_TYPE_DOC_LIST): {
             DocumentListPacket *docList = dynamic_cast<DocumentListPacket *>(rcvd_packet.get());
-            qDebug() << "[DOC_LIST] Received";
+            //qDebug() << "[DOC_LIST] Received";
             break;
         }
         case (PACK_TYPE_DOC_ASKSURI): {
             // When a client receive this it means it was a response to an invite for ANOTHER CLIENT (that will SEND **NOT receive** a similar packet
             DocumentAskSharableURIPacket *docInvite = dynamic_cast<DocumentAskSharableURIPacket *>(rcvd_packet.get());
             emit(askUriReceived(docInvite->getURI()));
-            qDebug() << "[SSL ECHO CLIENT] askUriReceived";
             break;
         }
         case (PACK_TYPE_DOC_USERLIST): {
             // When a client receive this it means that some user just went online/offline
             DocumentBeaconOnlineUsers *bou = dynamic_cast<DocumentBeaconOnlineUsers *>(rcvd_packet.get());
-            qDebug() << "[DOC] Online userlist updated for DocId: " << bou->getdocId();
+            //qDebug() << "[DOC] Online userlist updated for DocId: " << bou->getdocId();
             emit updateUserListReceived(bou->getuserList());
             break;
         }
@@ -280,10 +283,15 @@ void SslEchoClient::sendDocOpen(QString docName, qint32 userId) {
     dop.send(*pServer);
 }
 
-void SslEchoClient::sendAskUri(qint32 userId, int docId) {
-    qDebug() << "[SSL ECHO CLIENT] sendAskUri userID = "<< userId;
-    DocumentAskSharableURIPacket sup = DocumentAskSharableURIPacket(docId, userId,"");
+void SslEchoClient::sendAskUri(qint32 userId, int docId, QString invCode) {
+    //qDebug() << "[SSL ECHO CLIENT] sendAskUri userID = "<< userId << " invCode = " << invCode;
+    DocumentAskSharableURIPacket sup = DocumentAskSharableURIPacket(docId, userId,invCode);
     sup.send(*pServer);
+}
+
+void SslEchoClient::sendAlignment(Qt::Alignment alignment, int position, int siteId) {
+    AlignMessage am = AlignMessage(position, 0, alignment, siteId);
+    am.send(*pServer);
 }
 
 void SslEchoClient::connectToEditor(TextEditor* te) {
@@ -294,9 +302,11 @@ void SslEchoClient::connectToEditor(TextEditor* te) {
     connect(this, &SslEchoClient::eraseBlockReceived, te, &TextEditor::remoteEraseBlock);
     connect(this, &SslEchoClient::updateCursorReceived, te, &TextEditor::updateCursor);
     connect(this, &SslEchoClient::documentReceived, te, &TextEditor::openDocument);
+    connect(this, &SslEchoClient::updateAlignmentReceived, te, &TextEditor::updateAlignment);
     connect(te, &TextEditor::symbolsInserted, this, &SslEchoClient::sendInsert);
     connect(te, &TextEditor::symbolsErased, this, &SslEchoClient::sendErase);
     connect(te, &TextEditor::cursorPositionChanged, this, &SslEchoClient::sendCursor);
+    connect(te, &TextEditor::textAlignmentChanged, this, &SslEchoClient::sendAlignment);
 }
 
 void SslEchoClient::connectToMainWindow(MainWindow* mw) {
@@ -304,6 +314,7 @@ void SslEchoClient::connectToMainWindow(MainWindow* mw) {
     connect(mw, &MainWindow::sendAskUriMainWindow, this, &SslEchoClient::sendAskUri);
     connect(this, &SslEchoClient::askUriReceived, mw, &MainWindow::askUriReceivedMainWindow);
 }
+
 
 /*
  * Dont delete pls. Possible enhancement

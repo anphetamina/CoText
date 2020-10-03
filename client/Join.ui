@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ShareUri</class>
- <widget class="QDialog" name="ShareUri">
+ <class>Join</class>
+ <widget class="QDialog" name="Join">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QPushButton" name="pushButton_copyLink">
+  <widget class="QPushButton" name="pushButton_join">
    <property name="geometry">
     <rect>
      <x>150</x>
@@ -23,17 +23,30 @@
     </rect>
    </property>
    <property name="text">
-    <string>Copy link</string>
+    <string>Join</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_URI">
+  <widget class="QLineEdit" name="invitationCode">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>40</y>
+     <y>60</y>
      <width>381</width>
      <height>22</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>30</y>
+     <width>91</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Invitation code: </string>
    </property>
   </widget>
  </widget>

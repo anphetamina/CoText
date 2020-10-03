@@ -68,7 +68,11 @@ int main(int argc, char *argv[]) {
     client->connectToEditor(&editor);
     //client->connectToLoginWindow(login, w); //TODO: use signal/slot for creating/closing diffent windows.tonote: login is a QDialog not QWindow
 
-    while(user == nullptr || !user->isLogged()) {
+    /*while(user == nullptr || !user->isLogged()) {
+        QCoreApplication::processEvents();
+    }*/
+
+    while(!user.isLogged()) {   //todo understand if it's correct
         QCoreApplication::processEvents();
     }
 
