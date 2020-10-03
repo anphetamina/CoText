@@ -294,17 +294,17 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             //qDebug() << msg->getData();
             qDebug() << "[MSG] New symbol received." << endl << "Char: " << msg->getQS().getC() << " SiteId: " <<  msg->getSiteId();
             // Broadcast to all the connected client of a document
-            for (auto it = documentMapping.begin(); it != documentMapping.end();) { // iterate over documents and find what is openened by current user #TONOTE this works since 1 file only can be openend by a user
-                //onlineClientPerDoc = documentMapping[getDocIdOpenedByUserId(client->getUserId)] TODO: deccoment and delete for
-                QList<QSharedPointer<Client>> onlineClientPerDoc = it.value();
+            //for (auto it = documentMapping.begin(); it != documentMapping.end();) { // iterate over documents and find what is openened by current user #TONOTE this works since 1 file only can be openend by a user
+                //QList<QSharedPointer<Client>> onlineClientPerDoc = it.value();
+            QList<QSharedPointer<Client>> onlineClientPerDoc = documentMapping[getDocIdOpenedByUserId(client->getUserId())]; //TODO: deccoment and delete for
                     for (QSharedPointer<Client> onlineClient : onlineClientPerDoc) {
                         if(onlineClient != client && client->isLogged()) {
                             msg->send(*onlineClient->getSocket());
                             qDebug() << "from: " << pClient->peerPort() << "sent to " << onlineClient->getSocket()->peerPort() ;
                         }
                     }
-                it++;
-            }
+                //it++;
+            //}
             // Run actions on the CRDT instances of the server (one for each document)
             int docId = getDocIdOpenedByUserId(client->getUserId());
             switch (msg->getType()) {
@@ -397,6 +397,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             } else // Altrimenti prendo lo stato soltanto
             {
                 std::vector<std::vector<QSymbol>> symbols = editorMapping[docId]->getSymbols();
+                qsymbols = toQVector(symbols);
                 editorMapping[docId]->connectedUsersIncrease();
             }
 
