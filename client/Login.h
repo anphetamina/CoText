@@ -14,6 +14,9 @@ class Login : public QDialog
 public:
     explicit Login(QWidget *parent = nullptr);
     ~Login();
+    
+    void clearInput();
+    bool checkInput(QString username, QString psw);
 
 
 private slots:
