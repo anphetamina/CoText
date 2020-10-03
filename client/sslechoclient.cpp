@@ -280,9 +280,9 @@ void SslEchoClient::sendDocOpen(QString docName, qint32 userId) {
     dop.send(*pServer);
 }
 
-void SslEchoClient::sendAskUri(qint32 userId, int docId) {
-    qDebug() << "[SSL ECHO CLIENT] sendAskUri userID = "<< userId;
-    DocumentAskSharableURIPacket sup = DocumentAskSharableURIPacket(docId, userId,"");
+void SslEchoClient::sendAskUri(qint32 userId, int docId, QString invCode) {
+    qDebug() << "[SSL ECHO CLIENT] sendAskUri userID = "<< userId << " invCode = " << invCode;
+    DocumentAskSharableURIPacket sup = DocumentAskSharableURIPacket(docId, userId,invCode);
     sup.send(*pServer);
 }
 
@@ -304,6 +304,7 @@ void SslEchoClient::connectToMainWindow(MainWindow* mw) {
     connect(mw, &MainWindow::sendAskUriMainWindow, this, &SslEchoClient::sendAskUri);
     connect(this, &SslEchoClient::askUriReceived, mw, &MainWindow::askUriReceivedMainWindow);
 }
+
 
 /*
  * Dont delete pls. Possible enhancement

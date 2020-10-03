@@ -77,14 +77,16 @@ private slots:
     void on_actionSave_triggered();
     void on_actionShare_Uri_triggered();
     void on_actionSettings_triggered();
+    void on_actionJoin_triggered();
 
 public slots:
     void updateUserList(QVector<User> newUserList);
     void askUriReceivedMainWindow(QString URI);
+    void sendJoinMainWindow(qint32 userId, int docId, QString invCode);
 
 signals:
     void newColorMapReceived(QMap<int, QColor> colorMap);
-    void sendAskUriMainWindow(qint32 userId, int docId);
+    void sendAskUriMainWindow(qint32 userId, int docId, QString invCode);
 
 private:
     Ui::MainWindow *ui;

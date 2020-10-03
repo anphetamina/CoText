@@ -3,6 +3,7 @@
 #include "Login.h"
 #include "TextEditor.h"
 #include "ShareUri.h"
+#include "Join.h"
 #include <QPixmap> //allows to create a qpixmap onj which takes 1 arg
 #include <QPrinter>
 #include <QColorDialog>
@@ -24,8 +25,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionShare_Uri))->installEventFilter(this);
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionExit))->installEventFilter(this);
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionSettings))->installEventFilter(this);
-
-    //dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUserList))->installEventFilter(this);
+    dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionJoin))->installEventFilter(this);
 
     //this->setCentralWidget(ui->textEdit);
     QPixmap icon(":/appIcon/CoText.ico");
@@ -172,6 +172,18 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         ui->actionSettings->setIcon(QIcon(":/imgs/icons/noun_Settings_2324598.svg"));
         return true;
     }
+
+    //Join to a shared document (invite)
+    /*if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionJoin)) && event->type() == QEvent::Enter) {
+        setCursor(Qt::PointingHandCursor);
+        ui->actionJoin->setIcon(QIcon(":/imgs/icons/join_white.svg"));
+        return true;
+    }
+    if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionJoin)) && event->type() == QEvent::Leave) {
+        setCursor(Qt::ArrowCursor);
+        ui->actionJoin->setIcon(QIcon(":/imgs/icons/join_grey.svg"));
+        return true;
+    }*/
 
     return false;
 }
@@ -385,12 +397,11 @@ void MainWindow::updateUserList(QVector<User> newUserList){
 
 
 void MainWindow::on_actionShare_Uri_triggered() {
-    emit(sendAskUriMainWindow(1, 12));   //todo change userId and docId
+    emit(sendAskUriMainWindow(1, 12, ""));   //todo change userId and docId
     qDebug() << "[MAIN WINDOW] sendAskUriMainWindow userId = "<< user->getId();
 }
 
 void MainWindow::askUriReceivedMainWindow(QString URI) {
-    qDebug() << "[MAIN WINDOW] askUriReceivedMainWindow";
     ShareUri shareUri(URI);
     shareUri.setWindowTitle("Share with other people");
     shareUri.setModal(true);
@@ -404,6 +415,15 @@ void MainWindow::on_actionSettings_triggered() {
     uw.exec();
 }
 
+void MainWindow::on_actionJoin_triggered() {
+    Join join;
+    join.setWindowTitle("Join a shared document");
+    connect(&join, &Join::sendJoin, this, &MainWindow::sendJoinMainWindow);
+    join.setModal(true);
+    join.exec();
+}
+
+
 Ui::MainWindow *MainWindow::getUi() const {
     return ui;
 }
@@ -411,4 +431,8 @@ Ui::MainWindow *MainWindow::getUi() const {
 void MainWindow::connectToTextEditor(TextEditor* te) {
     connect(this, &MainWindow::newColorMapReceived, te, &TextEditor::updateColorMap);
 }
+
+void MainWindow::sendJoinMainWindow(qint32 userId, int docId, QString invCode){
+    emit(sendAskUriMainWindow(userId,docId,invCode));
+};
 
