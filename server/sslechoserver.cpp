@@ -291,20 +291,15 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
 
         case(PACK_TYPE_MSG): {
             Message* msg = dynamic_cast<Message*>(rcvd_packet.get());
-            //qDebug() << msg->getData();
-            qDebug() << "[MSG] New symbol received." << endl << "Char: " << msg->getQS().getC() << " SiteId: " <<  msg->getSiteId();
+            qDebug() << "[MSG] New symbol received." << endl << "\tChar: " << msg->getQS().getC() << " SiteId: " <<  msg->getSiteId();
             // Broadcast to all the connected client of a document
-            //for (auto it = documentMapping.begin(); it != documentMapping.end();) { // iterate over documents and find what is openened by current user #TONOTE this works since 1 file only can be openend by a user
-                //QList<QSharedPointer<Client>> onlineClientPerDoc = it.value();
             QList<QSharedPointer<Client>> onlineClientPerDoc = documentMapping[getDocIdOpenedByUserId(client->getUserId())]; //TODO: deccoment and delete for
                     for (QSharedPointer<Client> onlineClient : onlineClientPerDoc) {
                         if(onlineClient != client && client->isLogged()) {
                             msg->send(*onlineClient->getSocket());
-                            qDebug() << "from: " << pClient->peerPort() << "sent to " << onlineClient->getSocket()->peerPort() ;
+                            qDebug() << "\tfrom: " << pClient->peerPort() << "sent to " << onlineClient->getSocket()->peerPort() ;
                         }
                     }
-                //it++;
-            //}
             // Run actions on the CRDT instances of the server (one for each document)
             int docId = getDocIdOpenedByUserId(client->getUserId());
             switch (msg->getType()) {
@@ -319,7 +314,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
                 }
             }
 
-            // Full broadcast (no per document behaviour) follows. *Debug only usage*
+            // Full broadcast (no per document behaviour) follows. *For quick and dirty Debug only usage*
             /*for (QWebSocket* onlineClient : clientMapping.keys()) {
                 if(onlineClient != pClient) {
                     msg->send(*(onlineClient));
@@ -335,10 +330,11 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             //qDebug() << msg->getData();
             qDebug() << "[CP] New cursor position received." << endl << "Pos: " << cp->getnewPosition() << " User id: " <<  cp->getuserId();
             // Broadcast to all the connected client of a document
-            for (QWebSocket* onlineClient : clientMapping.keys()) {
-                if(onlineClient != pClient) {
-                    cp->send(*(onlineClient));
-                    qDebug() << "from: " << pClient->peerPort() << "sent to " << onlineClient->peerPort() ;
+            QList<QSharedPointer<Client>> onlineClientPerDoc = documentMapping[getDocIdOpenedByUserId(client->getUserId())]; //TODO: deccoment and delete for
+            for (QSharedPointer<Client> onlineClient : onlineClientPerDoc) {
+                if(onlineClient != client && client->isLogged()) {
+                    cp->send(*onlineClient->getSocket());
+                    //qDebug() << "\tBroadcasted to from: " << pClient->peerPort() << "sent to " << onlineClient->getSocket()->peerPort() ;
                 }
             }
             break;
@@ -419,19 +415,23 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
                 break;
             }
             DocumentAskSharableURIPacket* msg = dynamic_cast<DocumentAskSharableURIPacket*>(rcvd_packet.get());
+            qDebug() << "ASK URI PACKET received userId: "<< msg->getuserId() << " docId: "<<msg->getdocId() << " URI : "<< msg->getURI();
             int docId = msg->getdocId();
             qint32 userId = msg->getuserId();
             QString invCode = msg->getURI();
             // Check permission of the user for that doc
             if(!checkDocPermission(docId, userId)){
+                qDebug() << "ASK URI PACKET permission denied";
                 break;
             }
             // Check if this is a request invite (URI is empty) or an invitation accept
             if(invCode.size() > 0){
                 // Invitation accept
+                qDebug() << "ASK URI PACKET invete aaccepted";
                 acceptInvite(invCode, userId);
             }
             else {
+                qDebug() << "ASK URI PACKET generate invitation code";
                 // Generate invitation code for a given document and insert to db
                 QString invCode = createInvite(docId);
                 // Send the code

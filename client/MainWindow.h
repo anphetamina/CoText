@@ -80,9 +80,11 @@ private slots:
 
 public slots:
     void updateUserList(QVector<User> newUserList);
+    void askUriReceivedMainWindow(QString URI);
 
 signals:
     void newColorMapReceived(QMap<int, QColor> colorMap);
+    void sendAskUriMainWindow(qint32 userId, int docId);
 
 private:
     Ui::MainWindow *ui;
