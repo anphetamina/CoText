@@ -44,6 +44,7 @@ private:
     std::vector<int> index;
     std::vector<std::vector<QSymbol>> testSymbols;
     int currentSelectedChars;
+    std::vector<int> selectedBlockStartLines;
     UserHighlighter highlighter;
 
     void insertRow(int pos, int n);
@@ -90,6 +91,7 @@ private slots:
     void contentsChange(int position, int charsRemoved, int charsAdded);
     void cursorPositionChange();
     void selectionChange();
+    void blockStartLinesChange(int blockCount);
 
     void toggleUserColors();
 
@@ -101,7 +103,7 @@ signals:
     void symbolsInserted(std::vector<QSymbol> symbols, int siteId);
     void symbolsErased(std::vector<QSymbol> symbols, int siteId);
     void cursorPositionChanged(int userId, int position);
-    void textAlignmentChanged(Qt::Alignment alignment, int position);
+    void textAlignmentChanged(Qt::Alignment alignment, int position, int siteId);
 
 };
 
