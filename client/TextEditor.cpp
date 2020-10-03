@@ -23,6 +23,7 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     index({0}),
     editor(SharedEditor(Shuffler::getInstance()->getRandomInt())), // todo get site id from server
     isFromRemote(false),
+    isFromRemoteCursor(false),
     testSymbols({{}}),
     cursors({}),
     currentSelectedChars(0),
@@ -512,6 +513,7 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
         //qDebug() << "received add " << symbol.getC();
         try {
             isFromRemote = true;
+            isFromRemoteCursor = true;
             std::pair<int, int> pos = editor.remoteInsert(symbol);
 
             if (pos.first != -1 || pos.second != -1) {
@@ -595,7 +597,9 @@ void TextEditor::cursorPositionChange() {
     alignmentChanged(alignment());
 
     // todo change with user id
-    emit cursorPositionChanged(editor.getSiteId(), textCursor().position());
+    if(!isFromRemoteCursor)
+        emit cursorPositionChanged(editor.getSiteId(), textCursor().position());
+    isFromRemoteCursor = false;
 }
 
 /**
