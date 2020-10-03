@@ -23,8 +23,9 @@ void Login::on_pushButton_Login_clicked()
 	bool checkDone = false;
     QString username = ui->lineEdit_User->text();
     QString password = ui->lineEdit_Pass->text();
-	
-    while(!checkInput(username, password) && !checkDone) {
+    
+	//// Do we need a while?
+    while(checkInput(username, password) && !checkDone) {
 	    //Do login
 	    checkDone = true;
 	    client->set_username(username);
