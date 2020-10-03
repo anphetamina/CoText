@@ -12,6 +12,7 @@
 #include "TextEditor.h"
 #include <thread>
 #include <mutex>
+#include "Benchmark.h"
 
 std::mutex ins_mutex;  // protects insert
 
@@ -502,6 +503,7 @@ int TextEditor::getPosition(int row, int col) {
 }
 
 void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
+
     int last_position = 0;
     QVector<QString> blocks;
     QString buffer_block;
@@ -526,7 +528,7 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
                     QTextCursor cursor(textCursor());
                     cursor.insertText(buffer_block, last_cf);
                     //cursor.setPosition(last_position);
-                    setTextCursor(cursor);
+                    //setTextCursor(cursor);
                     buffer_block = "";
                 }
                 last_cf = symbol.getCF();
@@ -542,7 +544,7 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
         QTextCursor cursor(textCursor());
         cursor.insertText(buffer_block, last_cf);
         //cursor.setPosition(last_position);
-        setTextCursor(cursor);
+        //setTextCursor(cursor);
     }
 }
 
@@ -650,6 +652,8 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
         throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": document is invalid");
     }
 
+    Benchmark b = Benchmark("TextEditor::openDocument");
+    b.startTimer();
     index.clear();
     index.push_back(0);
     int pos = 0;
@@ -665,7 +669,8 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
         }
     } );
     */
-    
+    b.stopTimer();
+
 }
 
 void TextEditor::printSymbols() {
