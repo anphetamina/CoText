@@ -16,6 +16,7 @@
 #include <QtNetwork/QSslCertificate>
 #include <QtNetwork/QSslKey>
 #include <random>
+#include <AccountPacket.h>
 
 QT_USE_NAMESPACE
 
@@ -245,6 +246,13 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             qDebug() << "[PING] Debug text: " << ping->getDebugMsg();
             break;
         }
+        case(PACK_TYPE_ACC_CREATE): {
+            AccountCreationPacket * accReq = dynamic_cast<AccountCreationPacket*>(rcvd_packet.get());
+            User loggedUser = addUser(accReq->getUsername(), accReq->getHashedPassword(), accReq->getName(), accReq->getSurname(), accReq->getProfilePic());
+            AccountOkPacket aop = AccountOkPacket(loggedUser);
+            aop.send(*pClient);
+            break;
+        }
         case(PACK_TYPE_LOGIN_REQ): {
             LoginReqPacket* loginReq = dynamic_cast<LoginReqPacket*>(rcvd_packet.get());
             QString username = loginReq->getUsername();
@@ -339,6 +347,21 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             }
             break;
         }
+        case(PACK_TYPE_ALIGN): {
+            AlignMessage *am = dynamic_cast<AlignMessage*>(rcvd_packet.get());
+            //qDebug() << msg->getData();
+            qDebug() << "[ALIGN] New alignment  received." << endl ;
+            // Broadcast to all the connected client of a document
+            QList<QSharedPointer<Client>> onlineClientPerDoc = documentMapping[getDocIdOpenedByUserId(client->getUserId())]; //TODO: deccoment and delete for
+            for (QSharedPointer<Client> onlineClient : onlineClientPerDoc) {
+                if(onlineClient != client && client->isLogged()) {
+                    am->send(*onlineClient->getSocket());
+                    //qDebug() << "\tBroadcasted to from: " << pClient->peerPort() << "sent to " << onlineClient->getSocket()->peerPort() ;
+                }
+            }
+            break;
+        }
+
         case(PACK_TYPE_DOC_CREATE): {
             DocumentCreatePacket *dcp = dynamic_cast<DocumentCreatePacket*>(rcvd_packet.get());
 

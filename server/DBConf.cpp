@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <filesystem>
 
 #include "DBAuthData.h"
 
@@ -71,6 +72,43 @@ User checkLoginData(QString email, QString password){
     }
 }
 
+User addUser(QString username,QString password, QString name, QString surname, QIcon profilePic){
+    QSqlQuery query, query2, query3;
+    QString email = username;
+    QString hashedpassword = password;//perform hashing for sec. reason in production
+
+    bool success = true;
+
+    if(!query.exec("INSERT INTO User(username,email, name, surname, password) VALUES ('"+username+"','"+email+"','"+name+"',"+surname+"',"+hashedpassword+")")){
+        success =  false;
+    }
+
+    // Check if it was  added (it should if here) and get ID
+    query2.exec("SELECT username, id, email, name, surname FROM User WHERE email='"+email+"' AND password='" + hashedpassword + "'");
+
+    if (query2.next() && success) {
+        QString username = query.value(0).toString();
+        int id = query.value(1).toInt();
+        QString email = query.value(2).toString();
+        QString name = query.value(3).toString();
+        QString surname = query.value(4).toString();
+
+        if(!saveProfilePic(id, profilePic)){
+            success = false;
+        }
+
+        User loggedUser = User(id, email, name, surname);
+        qDebug() << "[AUTH] New user registered with success." << endl << "\tRetrieved info = [Email: " << loggedUser.getEmail() << "; Name:" << loggedUser.getName() << "]";
+        return loggedUser;
+    }
+    User failedUser = User();
+    failedUser.setEmail(email);
+    failedUser.setId(-1);
+    qDebug() << "[AUTH] A user failed the auth. Email tried: " << email;
+    return failedUser;
+
+}
+
 User* checkUserLoginData(QString email, QString password){
     /* Check login data and return a user istance. Check with the isLogged method the result of the performed auth*/
     QSqlQuery query;
@@ -103,14 +141,30 @@ User* checkUserLoginData(QString email, QString password){
 
 QIcon loadProfilePic(int id){
     QString pictureFileName = QString::number(id)+".png";
-    QIcon myicon = QIcon("./profilePictures/"+pictureFileName);
+    namespace fs = std::filesystem;
+    const auto current_path = fs::current_path();
+    const auto profilepic_path = (current_path / "profilePictures") /pictureFileName.toStdString();
+    QIcon myicon = QIcon();
+    if(fs::exists(profilepic_path)) {
+        myicon = QIcon("./profilePictures/" + pictureFileName);
+    }
     return myicon;
 }
 
 bool saveProfilePic(int id, QIcon newIcon){
     QString pictureFileName = QString::number(id)+".png";
     QPixmap pixmap = newIcon.pixmap(64);
+    createFolderIfNotExist("profilePictures");
     return pixmap.save("./profilePictures/"+pictureFileName);
+}
+
+bool createFolderIfNotExist(std::string fname){
+    namespace fs = std::filesystem;
+    const auto current_path = fs::current_path();
+    const auto target_path = (current_path / fname);
+    if (!fs::is_directory(fname) || !fs::exists(fname)) { // Check if src folder exists
+        fs::create_directory(fname); // create src folder
+    }
 }
 
 QVector<QString> getDocuments(int userId){
