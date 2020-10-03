@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "Login.h"
 #include "TextEditor.h"
+#include "ShareUri.h"
 #include <QPixmap> //allows to create a qpixmap onj which takes 1 arg
 #include <QPrinter>
 #include <QColorDialog>
@@ -172,20 +173,6 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         return true;
     }
 
-    //UserList
-    /*TODO: fix? USed or not?
-    if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUserList)) && event->type() == QEvent::Enter) {
-        setCursor(Qt::PointingHandCursor);
-        ui->actionUserList->setIcon(QIcon(":/imgs/icons/user-group_white.svg"));
-        return true;
-    }
-
-    if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUserList)) && event->type() == QEvent::Leave) {
-        setCursor(Qt::ArrowCursor);
-        ui->actionUserList->setIcon(QIcon(":/imgs/icons/user-group.svg"));
-        return true;
-    }
-    */
     return false;
 }
 
@@ -333,15 +320,8 @@ void MainWindow::on_actionLogin_triggered()
     //lf = new loginform(this); //giving also the parent class
     //lf->show();
 }
-/*
-//TODO: fix? #on_actionUserList_triggered
-void MainWindow::on_actionUserList_triggered() {
-    UserList uList(this, userList);
-    uList.setModal(true);
-    uList.exec();
-    return;
-}
-*/
+
+
 void MainWindow::updateUserList(QVector<User> newUserList){
     for(int j=0; j<20; j++){
         actionUserList[j]->setVisible(false);
@@ -405,8 +385,16 @@ void MainWindow::updateUserList(QVector<User> newUserList){
 
 
 void MainWindow::on_actionShare_Uri_triggered() {
+    emit(sendAskUriMainWindow(1, 12));   //todo change userId and docId
+    qDebug() << "[MAIN WINDOW] sendAskUriMainWindow userId = "<< user->getId();
+}
 
-    QMessageBox::StandardButton reply = QMessageBox::warning(this, "ciao", "uri");
+void MainWindow::askUriReceivedMainWindow(QString URI) {
+    qDebug() << "[MAIN WINDOW] askUriReceivedMainWindow";
+    ShareUri shareUri(URI);
+    shareUri.setWindowTitle("Share with other people");
+    shareUri.setModal(true);
+    shareUri.exec();
 }
 
 void MainWindow::on_actionSettings_triggered() {

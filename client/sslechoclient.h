@@ -40,17 +40,18 @@ signals:
 signals:
     void loginSuccessful();
     void loginFailed();
-public slots:
+    void askUriReceived(QString URI);
 
+public slots:
     void sendInsert(std::vector<QSymbol> symbols, int siteId);
     void sendErase(std::vector<QSymbol> symbols, int siteId);
     void sendCursor(int userId, int position);
+    void sendAskUri(qint32 userId, int docId);
 
 private Q_SLOTS:
     void onConnected();
     void onTextMessageReceived(QString message);
     void onBinaryMessageReceived(QByteArray message);
-
     void onSslErrors(const QList<QSslError> &errors);
 
 private:
@@ -70,18 +71,12 @@ private:
 public:
     void connectToEditor(TextEditor* te);
     void connectToMainWindow(MainWindow* mw);
-
     void sendDocOpen(QString docName, qint32 userId);
     void authenticate(QString username, QString password);
-
     void set_username(QString username);
-
     void set_password(QString password);
-
     void sendLogin();
-
     void socketDisconnected();
-
     void connectToLoginWindow(Login *login, MainWindow *mw);
 };
 
