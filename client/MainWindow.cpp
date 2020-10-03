@@ -345,7 +345,11 @@ void MainWindow::updateUserList(QVector<User> newUserList){
     for(int i=0; i<newUserList.size();i++){
         colorMap.insert(newUserList[i].getId(),colorList.at(i%19));
         actionUserList[i]->setVisible(true);
-        actionUserList[i]->setText(newUserList[i].getEmail());
+        if(newUserList[i].getId() == user.getId()) {
+            actionUserList[i]->setText(newUserList[i].getEmail() + " (YOU)");
+        }else {
+            actionUserList[i]->setText(newUserList[i].getEmail());
+        }
         ui->rightToolBar->widgetForAction(actionUserList[i])->setStyleSheet("color:"+colorList.at(i).name());
     }
 
