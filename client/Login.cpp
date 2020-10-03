@@ -50,7 +50,7 @@ void Login::on_pushButton_Reg_clicked()
 }
 
 
-bool Login::checkInput(QString username, QString psw) {
+bool Login::checkInput(const QString& username, const QString& psw) {
 	bool isNull = false;
 	bool isEmpty = false;
 	

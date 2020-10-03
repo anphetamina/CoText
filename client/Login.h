@@ -16,7 +16,7 @@ public:
     ~Login();
     
     void clearInput();
-    bool checkInput(QString username, QString psw);
+    bool checkInput(const QString& username, const QString& psw);
 
 
 private slots:
