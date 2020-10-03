@@ -34,7 +34,6 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     /**
      * document default styling
      */
-
     setAcceptRichText(false);
     alignmentChanged(alignment());
 
