@@ -63,8 +63,6 @@ private:
 
     bool isNewLine(QChar c);
 
-    void remoteInsertB(QSymbol symbol);
-
 
 public slots:
 

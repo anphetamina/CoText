@@ -444,47 +444,6 @@ void TextEditor::remoteInsert(QSymbol symbol) {
 }
 
 /**
- * insert symbol received from the server
- * @param symbol
- */
-void TextEditor::remoteInsertB(QSymbol symbol) {
-
-    //qDebug() << "received add " << symbol.getC();
-    try {
-        isFromRemote = true;
-        std::pair<int, int> pos = editor.remoteInsert(symbol);
-        const std::lock_guard<std::mutex> lock(ins_mutex);
-
-        if (pos.first != -1 || pos.second != -1) {
-
-            incrementIndex(pos.first, 1);
-
-            if (symbol.isNewLine()) {
-                insertRow(pos.first, 1);
-            }
-
-            int position = getPosition(pos.first, pos.second);
-            /*
-            if (position < 0 || position > document()->characterCount()) {
-                throw std::runtime_error(std::string{} + __PRETTY_FUNCTION__ + ": invalid cursor position");
-            }
-            //QTextBlockFormat format;
-
-            QTextCursor cursor(textCursor());
-            cursor.setPosition(position);
-
-            cursor.insertText(symbol.getC(), symbol.getCF());
-
-            setTextCursor(cursor);
-             */
-
-        }
-    } catch (const std::exception &e) {
-        qDebug() << e.what();
-    }
-
-}
-/**
  * erase symbol received from the server
  * @param symbol
  */
@@ -687,33 +646,14 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
     for (int i = 0; i < symbols.size(); i++) {
         this->remoteInsertBlock(symbols[i]);
     }
-/*
+    /*
     parallel_for(symbols.size(), [&](int start, int end){
         for(int i = start; i < end; ++i) {
             this->remoteInsertBlock(symbols[i]);
-            /*for (int j = 0; j < symbols[i].size(); j++, ++pos) {
-                QSymbol symbol = symbols[i][j];
-                this->remoteInsertB(symbol);
-            }*/
-//        }
-//    } );
-/*
-    for (int i = 0; i < symbols.size(); i++) {
-        for (int j = 0; j < symbols[i].size(); j++, ++pos) {
-            QSymbol symbol = symbols[i][j];
-            this->remoteInsert(symbol);
-
         }
-    }*/
-    /*
-    for (int i = 0; i < symbols.size(); i++) {
-        for (int j = 0; j < symbols[i].size(); j++, ++pos) {
-            QSymbol symbol = symbols[i][j];
-            this->remoteInsert(symbol);
-
-        }
-    }*/
-
+    } );
+    */
+    
 }
 
 void TextEditor::printSymbols() {
