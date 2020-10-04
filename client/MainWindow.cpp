@@ -31,8 +31,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     QPixmap icon(":/appIcon/CoText.ico");
     //ui->iconLabel->setPixmap(icon);
     // ui->statusbar->addPermanentWidget();
-
-    ui->actionCut->setShortcut(QKeySequence::Cut);
+    
+	
+	ui->actionCut->setShortcut(QKeySequence::Cut);
     ui->actionCopy->setShortcut(QKeySequence::Copy);
     ui->actionPaste->setShortcut(QKeySequence::Paste);
     //ui->actionRemove->setShortcut(QKeySequence::Delete);
@@ -58,6 +59,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     actionUserList.insert(17,ui->actionUser17);
     actionUserList.insert(18,ui->actionUser18);
     actionUserList.insert(19,ui->actionUser19);
+    
+    setupStatusBar();
 
 
     /*actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser0));
@@ -438,5 +441,63 @@ void MainWindow::connectToTextEditor(TextEditor* te) {
 
 void MainWindow::sendJoinMainWindow(qint32 userId, int docId, QString invCode){
     emit(sendAskUriMainWindow(userId,docId,invCode));
-};
+}
 
+
+void MainWindow::setupStatusBar() {
+	QStatusBar *qSB = ui->statusbar;
+	QProgressBar *qPB = new QProgressBar();
+	
+	/** Defining Separator */
+	QLabel *vSeparator = new QLabel(tr("verticalSeparator"));
+	vSeparator->setAlignment(Qt::AlignCenter);
+	QPixmap vSepPM(QPixmap(":imgs/icons/verticalSeparator.svg").scaledToHeight(qSB->height()));
+	vSeparator->setPixmap(vSepPM);
+	/** end separator */
+	
+	QLabel *fixedLabel = new QLabel(tr("©Co-Text"));
+	QLabel *userListToggle = new QLabel(tr("userList"));
+	QLabel *size = new QLabel(tr("ciaone"));
+	
+	fixedLabel->setMinimumSize(fixedLabel->sizeHint());
+	fixedLabel->setAlignment(Qt::AlignCenter);
+	fixedLabel->setText(tr("©Co-Text"));
+	fixedLabel->setToolTip("Name of the application");
+	fixedLabel->setCursor(Qt::PointingHandCursor);
+	
+
+	
+	
+	
+	userListToggle->setMinimumSize(userListToggle->sizeHint());
+	userListToggle->setAlignment(Qt::AlignCenter);
+	userListToggle->setText("activeUsers");
+	userListToggle->setToolTip("List of active users on this Document");
+	userListToggle->setCursor(Qt::PointingHandCursor);
+	QPixmap userListPM(QPixmap(":imgs/icons/user-group_whiteSB.svg").scaledToHeight(qSB->height()));
+	userListToggle->setPixmap(userListPM);
+	userListToggle->setFixedWidth(20);
+	
+	qSB->addPermanentWidget(userListToggle);
+	qSB->addPermanentWidget(vSeparator);
+	qSB->addPermanentWidget(fixedLabel);
+	// TODO handling click on the widget to show up the list of users
+	
+	size->setMinimumSize(size->sizeHint());
+	size->setAlignment((Qt::AlignRight | Qt::AlignVCenter));
+	size->setText(tr("size of the document").arg(0));
+	size->setToolTip(tr("The memory used for the current document."));
+	size->setCursor(Qt::PointingHandCursor);
+	
+	/*
+	qPB->setTextVisible(false);
+	qPB->setRange(0, 0);
+	qSB->addWidget(qPB, 1);
+	 */
+	qSB->addWidget(size);
+	
+	qSB->showMessage(tr("Ready"), 2000);
+	
+	
+	
+}

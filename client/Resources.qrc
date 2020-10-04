@@ -45,6 +45,8 @@
         <file>icons/textleft.svg</file>
         <file>icons/textright.svg</file>
         <file>icons/noun_Light_1841928.svg</file>
+        <file>icons/user-group_whiteSB.svg</file>
+        <file>icons/verticalSeparator.svg</file>
     </qresource>
     <qresource prefix="/appIcon">
         <file>icons/CoText_landing.png</file>
