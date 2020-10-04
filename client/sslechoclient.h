@@ -25,8 +25,8 @@ class SslEchoClient : public QObject
 Q_OBJECT
 public:
     explicit SslEchoClient(const QUrl &url, QObject *parent = nullptr);
-signals:
 
+signals:
     void insertReceived(QSymbol qsymbol);
     void eraseReceived(QSymbol symbol);
     void insertBlockReceived(std::vector<QSymbol> symbols);
@@ -39,6 +39,7 @@ signals:
     void loginSuccessful();
     void loginFailed();
     void askUriReceived(QString URI);
+    void documentListReceived(QVector<QString> documentList);
 
 public slots:
     void sendInsert(std::vector<QSymbol> symbols, int siteId);
@@ -46,6 +47,9 @@ public slots:
     void sendCursor(int userId, int position);
     void sendAskUri(qint32 userId, int docId, QString invCode);
     void sendAlignment(Qt::Alignment alignment, int position, int siteId);
+    void sendDocCreate(QString docName, qint32 userId);
+    void sendAskDocList(qint32 userId);
+    void sendDocOpen(QString docName, qint32 userId);
 
 private Q_SLOTS:
     void onConnected();
@@ -56,21 +60,16 @@ private Q_SLOTS:
 private:
     QString username, password;
     QWebSocket m_webSocket;
-
-    void sendPing();
-
     QWebSocket *pServer;
 
+    void sendPing();
     void packetParse(QByteArray rcvd_packet);
-
     void sendTest();
-
     void dispatch(PacketHandler rcvd_packet, QWebSocket *pClient);
 
 public:
     void connectToEditor(TextEditor* te);
     void connectToMainWindow(MainWindow* mw);
-    void sendDocOpen(QString docName, qint32 userId);
     void authenticate(QString username, QString password);
     void set_username(QString username);
     void set_password(QString password);

@@ -28,12 +28,10 @@ void SslEchoClient::onConnected()
 {
     qDebug() << "WebSocket connected";
     // Set callback for text message
-    connect(&m_webSocket, &QWebSocket::textMessageReceived,
-            this, &SslEchoClient::onTextMessageReceived);
+    connect(&m_webSocket, &QWebSocket::textMessageReceived,this, &SslEchoClient::onTextMessageReceived);
 
     // And set callback for binary msg
-    connect(&m_webSocket, &QWebSocket::binaryMessageReceived,
-            this, &SslEchoClient::onBinaryMessageReceived);
+    connect(&m_webSocket, &QWebSocket::binaryMessageReceived, this, &SslEchoClient::onBinaryMessageReceived);
 
     connect(&m_webSocket, &QWebSocket::disconnected, this, &SslEchoClient::socketDisconnected);
 
@@ -183,7 +181,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             }
             pServer = qobject_cast<QWebSocket *>(sender());
             // .... DEBUG TODO: REMOVE when opendoc GUI is implemented and linked here
-            this->sendDocOpen("AAA", loggedUser.getId());
+            //this->sendDocOpen("AAA", loggedUser.getId());
 
 	        //emit auth(loggedUser);
 	        user = loggedUser;
@@ -236,7 +234,8 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
         }
         case (PACK_TYPE_DOC_LIST): {
             DocumentListPacket *docList = dynamic_cast<DocumentListPacket *>(rcvd_packet.get());
-            //qDebug() << "[DOC_LIST] Received";
+            emit(documentListReceived(docList->getdocList()));
+            qDebug() << "[DOC_LIST] Received "<< docList->getdocList();
             break;
         }
         case (PACK_TYPE_DOC_ASKSURI): {
@@ -283,6 +282,20 @@ void SslEchoClient::sendDocOpen(QString docName, qint32 userId) {
     dop.send(*pServer);
 }
 
+void SslEchoClient::sendDocCreate(QString docName, qint32 userId) {
+    if(!pServer->isValid()) // if u call this and login wasnt performed
+        return;
+    DocumentCreatePacket dcp = DocumentCreatePacket(docName, userId );
+    dcp.send(*pServer);
+}
+
+void SslEchoClient::sendAskDocList(qint32 userId) {
+    if(!pServer->isValid()) // if u call this and login wasnt performed
+        return;
+    DocumentAskListPacket dalp = DocumentAskListPacket(userId );
+    dalp.send(*pServer);
+}
+
 void SslEchoClient::sendAskUri(qint32 userId, int docId, QString invCode) {
     //qDebug() << "[SSL ECHO CLIENT] sendAskUri userID = "<< userId << " invCode = " << invCode;
     DocumentAskSharableURIPacket sup = DocumentAskSharableURIPacket(docId, userId,invCode);
@@ -301,7 +314,6 @@ void SslEchoClient::connectToEditor(TextEditor* te) {
     connect(this, &SslEchoClient::insertBlockReceived, te, &TextEditor::remoteInsertBlock);
     connect(this, &SslEchoClient::eraseBlockReceived, te, &TextEditor::remoteEraseBlock);
     connect(this, &SslEchoClient::updateCursorReceived, te, &TextEditor::updateCursor);
-    connect(this, &SslEchoClient::documentReceived, te, &TextEditor::openDocument);
     connect(this, &SslEchoClient::updateAlignmentReceived, te, &TextEditor::updateAlignment);
     connect(te, &TextEditor::symbolsInserted, this, &SslEchoClient::sendInsert);
     connect(te, &TextEditor::symbolsErased, this, &SslEchoClient::sendErase);
@@ -313,6 +325,11 @@ void SslEchoClient::connectToMainWindow(MainWindow* mw) {
     connect(this, &SslEchoClient::updateUserListReceived, mw, &MainWindow::updateUserList);
     connect(mw, &MainWindow::sendAskUriMainWindow, this, &SslEchoClient::sendAskUri);
     connect(this, &SslEchoClient::askUriReceived, mw, &MainWindow::askUriReceivedMainWindow);
+    connect(mw, &MainWindow::sendDocCreateMainWindow, this, &SslEchoClient::sendDocCreate);
+    connect(mw, &MainWindow::sendAskDocListMainWindow, this, &SslEchoClient::sendAskDocList);
+    connect(this, &SslEchoClient::documentListReceived, mw, &MainWindow::documentListReceivedMainWindow);
+    connect(mw, &MainWindow::sendOpenDocumentSignal, this, &SslEchoClient::sendDocOpen);
+    connect(this, &SslEchoClient::documentReceived, mw, &MainWindow::openDocumentMainWindow);
 }
 
 

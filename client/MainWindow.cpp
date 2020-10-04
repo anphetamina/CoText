@@ -4,6 +4,8 @@
 #include "TextEditor.h"
 #include "ShareUri.h"
 #include "Join.h"
+#include "TabDocument.h"
+#include "OpenDocument.h"
 #include <QPixmap> //allows to create a qpixmap onj which takes 1 arg
 #include <QPrinter>
 #include <QColorDialog>
@@ -11,6 +13,7 @@
 #include <QCloseEvent>
 #include <QtSvg>
 #include <QEvent>
+#include "sslechoclient.h"
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
 
@@ -58,7 +61,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     actionUserList.insert(17,ui->actionUser17);
     actionUserList.insert(18,ui->actionUser18);
     actionUserList.insert(19,ui->actionUser19);
-
 
     /*actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser0));
     actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser1));
@@ -190,38 +192,24 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
 
 
 void MainWindow::on_actionNew_triggered() {
-    currentFileName.clear();
-    setWindowTitle("untitled");
-//    ui->textEdit->setText(QString());
 
+    TextEditor* te = new TextEditor(0, *ui);
+    QString docName("Untitled");
+    this->connectToTextEditor(te);
+    client->connectToEditor(te);
+    ui->tabWidget->addTab(te, docName); //todo servono sia addTab che setCurrentWidget?
+    ui->tabWidget->setCurrentWidget(te);
+    emit(sendDocCreateMainWindow(docName, user.getId()));
 }
 
 void MainWindow::on_actionOpen_triggered() {
-    QString filename = QFileDialog::getOpenFileName(this, "Choose file to open", "/home", "All files .*");
-    if(!filename.isNull()) {
 
-        QFile file(filename);
-        QString filePath = filename.toUtf8();
-
-        currentFileName = filename;
-
-        //checks
-        if(!file.open(QIODevice::ReadOnly | QFile::Text)) {
-            QMessageBox::warning(this, "Warning", "Can not open file:  "+ file.errorString());
-            return;
-        }
-
-        setWindowTitle((filename));
-        QTextStream in(&file);
-        QString text = in.readAll();
-//        ui->textEdit->setText(text);
-        file.close();
-
-    } else {
-        //QMessageBox::warning(this, "Warning - filename Null", "The file selected is invalid");
-        return;
-    }
-
+    emit(sendAskDocListMainWindow(user.getId()));
+    OpenDocument openDocument(docList);
+    connect(&openDocument, &OpenDocument::sendOpenDocument, this, &MainWindow::sendOpenDocumentMainWindow);
+    openDocument.setWindowTitle("Select a document");
+    openDocument.setModal(true);
+    openDocument.exec();
 }
 
 void MainWindow::Save_as() {
@@ -401,6 +389,7 @@ void MainWindow::updateUserList(QVector<User> newUserList){
 
 
 void MainWindow::on_actionShare_Uri_triggered() {
+    ui->tabWidget->tabText(ui->tabWidget->currentIndex());
     emit(sendAskUriMainWindow(user.getId(), 12, ""));   //todo change userId and docId
     //qDebug() << "[MAIN WINDOW] sendAskUriMainWindow userId = "<< user.getId();
 }
@@ -440,3 +429,23 @@ void MainWindow::sendJoinMainWindow(qint32 userId, int docId, QString invCode){
     emit(sendAskUriMainWindow(userId,docId,invCode));
 };
 
+void MainWindow::on_tabWidget_tabCloseRequested(int index){
+    ui->tabWidget->removeTab(index);
+}
+
+void MainWindow::documentListReceivedMainWindow(QVector<QString> documentList){
+    docList = documentList;
+}
+
+void MainWindow::sendOpenDocumentMainWindow(QString docName){
+    emit(sendOpenDocumentSignal(docName, user.getId()));
+}
+
+void MainWindow::openDocumentMainWindow(int docId, QString docName, std::vector<std::vector<QSymbol>> qsymbols){
+    TextEditor* te = new TextEditor(0, *ui);
+    this->connectToTextEditor(te);
+    client->connectToEditor(te);
+    ui->tabWidget->addTab(te, docName); //todo servono sia addTab che setCurrentWidget?
+    ui->tabWidget->setCurrentWidget(te);
+    te->openDocument(docId, docName, qsymbols);
+}

@@ -8,7 +8,7 @@
 #include <QThread>
 #include <QRandomGenerator>
 #include <QtWidgets/QLabel>
-#include <threaded_for.h>
+//#include <threaded_for.h>
 #include "../common/Shuffler.h"
 #include "TextEditor.h"
 #include <thread>
@@ -34,12 +34,9 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     /**
      * document default styling
      */
-
     setAcceptRichText(false);
     alignmentChanged(alignment());
-
-    setStyleSheet("QTextEdit {margin-left: 40px; margin-right: 40px; margin-top: 10px; margin-bottom: 10px; color: white; font-size: 16px; border: hidden}");
-
+    setStyleSheet("QTextEdit {margin-left: 40px; margin-right: 40px; margin-top: 10px; margin-bottom: 10px; color: black; font-size: 16px; border: hidden}");
     /**
      * each alignment option is mutual exclusive
      */
@@ -48,37 +45,29 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     alignGroup->addAction(ui.actionAlign_right);
     alignGroup->addAction(ui.actionAlign_center);
     alignGroup->addAction(ui.actionJustify);
-
     connect(alignGroup, &QActionGroup::triggered, this, &TextEditor::setTextAlignment);
 
     /**
     * font styling connections
     */
-    
-    connect(ui.actionFont, &QAction::triggered, this, &TextEditor::selectFont);
-    connect(ui.actionBold, &QAction::triggered, this, &TextEditor::setFontBold);
-    connect(ui.actionItalic, &QAction::triggered, this, &TextEditor::setFontItalic);
-    connect(ui.actionUnderline, &QAction::triggered, this, &TextEditor::setFontUnderline);
-    connect(ui.actionTextColor, &QAction::triggered, this, &TextEditor::setFontColor);
+   connect(ui.actionFont, &QAction::triggered, this, &TextEditor::selectFont);
+   connect(ui.actionBold, &QAction::triggered, this, &TextEditor::setFontBold);
+   connect(ui.actionItalic, &QAction::triggered, this, &TextEditor::setFontItalic);
+   connect(ui.actionUnderline, &QAction::triggered, this, &TextEditor::setFontUnderline);
+   connect(ui.actionTextColor, &QAction::triggered, this, &TextEditor::setFontColor);
+   connect(this, &QTextEdit::currentCharFormatChanged, this, &TextEditor::currentCharFormatChanged);
 
-    connect(this, &QTextEdit::currentCharFormatChanged, this, &TextEditor::currentCharFormatChanged);
-
-    /**
-     * document content connections
-     */
-
+   /**
+    * document content connections
+    */
     connect(document(), &QTextDocument::contentsChange, this, &TextEditor::contentsChange);
-
     connect(this, &QTextEdit::cursorPositionChanged, this, &TextEditor::cursorPositionChange);
     connect(this, &QTextEdit::selectionChanged, this, &TextEditor::selectionChange);
-
     connect(ui.actionToggle_user_colors, &QAction::triggered, this, &TextEditor::toggleUserColors);
 
-
-    /**
-     * testing code
-     */
-
+   /**
+    * testing code
+    */
     /*QTextCharFormat f;
     f.setFontWeight(QFont::Bold);
     for (int i = 0; i < 200; i++) {
@@ -155,7 +144,7 @@ void TextEditor::setTextAlignment(QAction *action) {
 }
 
 void TextEditor::alignmentChanged(Qt::Alignment alignment) {
-    if (alignment & Qt::AlignLeft) {
+     if (alignment & Qt::AlignLeft) {
         ui.actionAlign_left->setChecked(true);
     } else if (alignment & Qt::AlignCenter) {
         ui.actionAlign_center->setChecked(true);
