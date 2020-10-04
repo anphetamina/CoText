@@ -451,53 +451,79 @@ void MainWindow::setupStatusBar() {
 	/** Defining Separator */
 	QLabel *vSeparator = new QLabel(tr("verticalSeparator"));
 	vSeparator->setAlignment(Qt::AlignCenter);
-	QPixmap vSepPM(QPixmap(":imgs/icons/verticalSeparator.svg").scaledToHeight(qSB->height()));
+	QPixmap vSepPM(QPixmap(":imgs/icons/verticalSeparator.svg"));
 	vSeparator->setPixmap(vSepPM);
 	/** end separator */
 	
+	/** Defining other info */
 	QLabel *fixedLabel = new QLabel(tr("©Co-Text"));
 	QLabel *userListToggle = new QLabel(tr("userList"));
-	QLabel *size = new QLabel(tr("ciaone"));
+	QLabel *nActiveUsers = new QLabel(tr("nActiveUsers"));
+	QLabel *docTitle = new QLabel(tr("docTitle"));
+	QLabel *docSize = new QLabel(tr("docSize"));
+	QLabel *nChars = new QLabel(tr("Number of chars"));
+	/** end definitions */
 	
+	/**Setup */
+	//1.
 	fixedLabel->setMinimumSize(fixedLabel->sizeHint());
 	fixedLabel->setAlignment(Qt::AlignCenter);
 	fixedLabel->setText(tr("©Co-Text"));
 	fixedLabel->setToolTip("Name of the application");
 	fixedLabel->setCursor(Qt::PointingHandCursor);
 	
-
-	
-	
-	
+	//2.
 	userListToggle->setMinimumSize(userListToggle->sizeHint());
 	userListToggle->setAlignment(Qt::AlignCenter);
 	userListToggle->setText("activeUsers");
 	userListToggle->setToolTip("List of active users on this Document");
 	userListToggle->setCursor(Qt::PointingHandCursor);
-	QPixmap userListPM(QPixmap(":imgs/icons/user-group_whiteSB.svg").scaledToHeight(qSB->height()));
+	QPixmap userListPM(QPixmap(":imgs/icons/user-group_whiteSB.svg"));
 	userListToggle->setPixmap(userListPM);
 	userListToggle->setFixedWidth(20);
 	
+	//3.
+	nActiveUsers->setMinimumSize(fixedLabel->sizeHint());
+	nActiveUsers->setAlignment(Qt::AlignCenter);
+	nActiveUsers->setText(tr("nActiveUsers"));
+	nActiveUsers->setToolTip("#activeUsers");
+	
+	//4.
+	docSize->setMinimumSize(docSize->sizeHint());
+	docSize->setAlignment((Qt::AlignRight | Qt::AlignVCenter));
+	docSize->setText(tr("size of the document").arg(0));
+	docSize->setToolTip(tr("The memory used for the current document."));
+	docSize->setCursor(Qt::PointingHandCursor);
+	
+	//5. TODO error messages with icon
+	/** end setup */
+	
+
+
+	/** Display */
+	
+	//this function append starting from the right
 	qSB->addPermanentWidget(userListToggle);
+	qSB->addPermanentWidget(nActiveUsers);
 	qSB->addPermanentWidget(vSeparator);
 	qSB->addPermanentWidget(fixedLabel);
 	// TODO handling click on the widget to show up the list of users
 	
-	size->setMinimumSize(size->sizeHint());
-	size->setAlignment((Qt::AlignRight | Qt::AlignVCenter));
-	size->setText(tr("size of the document").arg(0));
-	size->setToolTip(tr("The memory used for the current document."));
-	size->setCursor(Qt::PointingHandCursor);
+	//starting from left
+	qSB->addWidget(docTitle);
+	qSB->addWidget(docSize);
+	qSB->addWidget(nChars);
+	/**end display */
+	
+	
+	
+	//qSB->showMessage(tr("Ready"), 2000);
 	
 	/*
 	qPB->setTextVisible(false);
 	qPB->setRange(0, 0);
 	qSB->addWidget(qPB, 1);
-	 */
-	qSB->addWidget(size);
-	
-	qSB->showMessage(tr("Ready"), 2000);
-	
+    */
 	
 	
 }
