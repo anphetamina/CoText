@@ -4,7 +4,7 @@
 #include <QDebug>
 #include <QSqlDatabase>
 #include <QSqlQuery>
-#include <filesystem>
+//#include <filesystem>
 
 #include "DBAuthData.h"
 
@@ -138,7 +138,7 @@ User* checkUserLoginData(QString email, QString password){
     }
 }
 
-
+/*
 QIcon loadProfilePic(int id){
     QString pictureFileName = QString::number(id)+".png";
     namespace fs = std::filesystem;
@@ -150,7 +150,7 @@ QIcon loadProfilePic(int id){
     }
     return myicon;
 }
-
+*/
 bool saveProfilePic(int id, QIcon newIcon){
     QString pictureFileName = QString::number(id)+".png";
     QPixmap pixmap = newIcon.pixmap(64);
@@ -159,12 +159,14 @@ bool saveProfilePic(int id, QIcon newIcon){
 }
 
 bool createFolderIfNotExist(std::string fname){
+    /*
     namespace fs = std::filesystem;
     const auto current_path = fs::current_path();
     const auto target_path = (current_path / fname);
     if (!fs::is_directory(fname) || !fs::exists(fname)) { // Check if src folder exists
         fs::create_directory(fname); // create src folder
     }
+     */
 }
 
 QVector<QString> getDocuments(int userId){
