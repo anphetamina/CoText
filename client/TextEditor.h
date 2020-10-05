@@ -32,6 +32,7 @@ public:
     int getUserId(int row, int col) const;
 
     std::atomic<bool> isFromRemote;
+    std::atomic<bool> isFromRemoteCursor;
 
 private:
 

@@ -13,6 +13,7 @@
 #include <thread>
 #include <mutex>
 #include "MainWindow.h"
+#include "Benchmark.h"
 
 std::mutex ins_mutex;  // protects insert
 
@@ -23,6 +24,7 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     index({0}),
     editor(SharedEditor(Shuffler::getInstance()->getRandomInt())), // todo get site id from server
     isFromRemote(false),
+    isFromRemoteCursor(false),
     testSymbols({{}}),
     cursorMap({}),
     currentSelectedChars(0),
@@ -34,7 +36,6 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     /**
      * document default styling
      */
-
     setAcceptRichText(false);
     alignmentChanged(alignment());
 
@@ -499,6 +500,7 @@ int TextEditor::getPosition(int row, int col) {
 }
 
 void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
+
     int last_position = 0;
     QVector<QString> blocks;
     QString buffer_block;
@@ -508,6 +510,7 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
         //qDebug() << "received add " << symbol.getC();
         try {
             isFromRemote = true;
+            isFromRemoteCursor = true;
             std::pair<int, int> pos = editor.remoteInsert(symbol);
 
             if (pos.first != -1 || pos.second != -1) {
@@ -519,15 +522,15 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
                 }
 
                 // If a new format is found, insert the biffered content
-                if(j!=0 && last_cf != symbol.getCF()){
+                if(j!=0 && (last_cf != symbol.getCF()) ){
                     QTextCursor cursor(textCursor());
                     cursor.insertText(buffer_block, last_cf);
-                    cursor.setPosition(last_position);
-                    setTextCursor(cursor);
+                    //cursor.setPosition(last_position);
+                    //setTextCursor(cursor);
                     buffer_block = "";
                 }
                 last_cf = symbol.getCF();
-                last_position = getPosition(pos.first, pos.second);
+                //last_position = getPosition(pos.first, pos.second);
                 buffer_block.push_back(symbol.getC()) ;
             }
         } catch (const std::exception &e) {
@@ -538,8 +541,8 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
     if(!buffer_block.isEmpty()){
         QTextCursor cursor(textCursor());
         cursor.insertText(buffer_block, last_cf);
-        cursor.setPosition(last_position);
-        setTextCursor(cursor);
+        //cursor.setPosition(last_position);
+        //setTextCursor(cursor);
     }
 }
 
@@ -594,9 +597,10 @@ void TextEditor::cursorPositionChange() {
      */
     if (MainWindow *mw = dynamic_cast<MainWindow*>(parent)) {
         int userId = mw->getUser().getId();
-
+    if(!isFromRemoteCursor) {
         emit cursorPositionChanged(userId, textCursor().position());
     }
+        isFromRemoteCursor = false;
 
 
 }
@@ -661,6 +665,8 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
         throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": document is invalid");
     }
 
+    Benchmark b = Benchmark("TextEditor::openDocument");
+    b.startTimer();
     index.clear();
     index.push_back(0);
     int pos = 0;
@@ -676,7 +682,8 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
         }
     } );
     */
-    
+    b.stopTimer();
+
 }
 
 void TextEditor::printSymbols() {

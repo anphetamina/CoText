@@ -56,6 +56,9 @@ public:
     static User getUser() {
     	return user;
     }
+    
+    void setupStatusBar();
+    void setStatusBar(QStatusBar *qSb);
 
     Ui::MainWindow *getUi() const;
 
@@ -91,6 +94,7 @@ signals:
 
 private:
     Ui::MainWindow *ui;
+    QStatusBar *statusBar;
     TextEditor *editor;
     QString currentFileName = "";
     QVector<User> userList = {};
