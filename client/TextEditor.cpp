@@ -596,13 +596,16 @@ void TextEditor::cursorPositionChange() {
      * parent contains a subobject of type MainWindow that is derived from QWidget
      */
     if (MainWindow *mw = dynamic_cast<MainWindow*>(parent)) {
+
         int userId = mw->getUser().getId();
-    if(!isFromRemoteCursor) {
-        emit cursorPositionChanged(userId, textCursor().position());
-    }
+
+        if (!isFromRemoteCursor) {
+            emit cursorPositionChanged(userId, textCursor().position());
+        }
+
         isFromRemoteCursor = false;
 
-
+    }
 }
 
 /**
