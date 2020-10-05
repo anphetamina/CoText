@@ -566,12 +566,12 @@ void TextEditor::paintEvent(QPaintEvent *e) {
                 QRect cRect = cursorRect(cursor);
                 painter.drawRect(cRect);
 
-                QRect lRect(cRect.left(), cRect.top(), 50, 10);
+                /*QRect lRect(cRect.left(), cRect.top(), 50, 10);
                 painter.fillRect(lRect, color);
                 painter.drawRect(lRect);
                 painter.setPen(Qt::white);
                 QRect boundingRect;
-                painter.drawText(lRect, 0, tr("TEST"), &boundingRect);
+                painter.drawText(lRect, 0, tr("TEST"), &boundingRect);*/
 
                 update();
             } else if (position == count) {
@@ -619,6 +619,10 @@ void TextEditor::updateCursor(int userId, int position) {
 
         cursorMap[userId] = position;
 
+    } else {
+
+        qDebug() << userId << "not found";
+
     }
 }
 
@@ -653,6 +657,7 @@ QColor TextEditor::getUserColor(int userId) const {
 
     }
 
+    qDebug() << "invalid color for" << userId;
     return QColor::Invalid;
 }
 
@@ -712,14 +717,41 @@ bool TextEditor::isNewLine(QChar c) {
 }
 
 void TextEditor::updateCursorMap(QVector<User> onlineUserList) {
-    for (const User &u : onlineUserList) {
-        int userId = u.getId();
-        if (cursorMap.find(userId) == cursorMap.end()) {
-            cursorMap.erase(userId);
-        } else {
-            cursorMap[userId] = document()->characterCount()+1;
-        }
+
+    std::vector<int> onlineUserIds{};
+    std::for_each(onlineUserList.begin(), onlineUserList.end(), [&](const User &u) { onlineUserIds.push_back(u.getId()); });
+    std::sort(onlineUserIds.begin(), onlineUserIds.end());
+
+    std::vector<int> currentUserList{};
+    std::for_each(cursorMap.begin(), cursorMap.end(), [&](const std::pair<int, int> &u) { currentUserList.push_back(u.first); });
+
+    std::vector<int> offlineUserIds{};
+    std::set_difference(currentUserList.begin(), currentUserList.end(), onlineUserIds.begin(), onlineUserIds.end(), std::inserter(offlineUserIds, offlineUserIds.begin()), [](const int &id1, const int &id2){
+        return id1 < id2;
+    });
+
+    std::vector<int> newOnlineUserIds{};
+    std::set_difference(onlineUserIds.begin(), onlineUserIds.end(), currentUserList.begin(), currentUserList.end(), std::inserter(newOnlineUserIds, newOnlineUserIds.begin()), [](const int &id1, const int &id2){
+        return id1 < id2;
+    });
+
+    for (auto it : offlineUserIds) {
+        cursorMap.erase(it);
     }
+
+    for (auto it : newOnlineUserIds) {
+
+        /**
+         * it will not print the new cursor instead wait for the updated valid position
+         */
+        cursorMap[it] = document()->characterCount()+1;
+    }
+
+    /**
+     * step necessary to avoid printing multiple cursor for the local user
+     */
+    cursorMap.erase(user.getId());
+
 }
 
 
