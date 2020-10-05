@@ -12,6 +12,7 @@
 #include "TextEditor.h"
 #include <thread>
 #include <mutex>
+#include "MainWindow.h"
 
 std::mutex ins_mutex;  // protects insert
 
@@ -23,7 +24,7 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     editor(SharedEditor(Shuffler::getInstance()->getRandomInt())), // todo get site id from server
     isFromRemote(false),
     testSymbols({{}}),
-    cursors({}),
+    cursorMap({}),
     currentSelectedChars(0),
     highlighter(*this, document()),
     isUserColorsToggled(false) {
@@ -181,10 +182,6 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
     /**
      * https://github.com/anphetamina/CoText/issues/32 workaround
      */
-    /*if (charsAdded >= 1 && charsRemoved >= 1 && position+charsRemoved > index.back()+static_cast<int>(editor.getSymbols()[index.size()-1].size()-1)) {
-        charsRemoved--;
-        charsAdded--;
-    }*/
 
     if (document()->characterAt(position+charsAdded) == '\0') {
         charsRemoved--;
@@ -552,16 +549,14 @@ void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
 
 void TextEditor::paintEvent(QPaintEvent *e) {
 
-    QTextEdit::paintEvent(e);
-
-    /*try {
+    try {
         QTextEdit::paintEvent(e);
         QPainter painter(viewport());
         QTextCursor cursor(document());
-        for (const std::pair<int, int> &c : cursors) {
+        for (const std::pair<int, int> &c : cursorMap) {
             int position = c.second;
             int count = document()->characterCount();
-            QColor color = userColors[c.first];
+            QColor color = getUserColor(c.first);
             painter.setPen(color);
             if (position < count) {
                 cursor.setPosition(position);
@@ -586,15 +581,24 @@ void TextEditor::paintEvent(QPaintEvent *e) {
         }
     } catch (const std::exception &e) {
         qDebug() << e.what();
-    }*/
+    }
 }
 
 void TextEditor::cursorPositionChange() {
 
     alignmentChanged(alignment());
 
-    // todo change with user id
-    emit cursorPositionChanged(editor.getSiteId(), textCursor().position());
+    /**
+     * this works because in the constructor of TextEditor
+     * parent contains a subobject of type MainWindow that is derived from QWidget
+     */
+    if (MainWindow *mw = dynamic_cast<MainWindow*>(parent)) {
+        int userId = mw->getUser().getId();
+
+        emit cursorPositionChanged(userId, textCursor().position());
+    }
+
+
 }
 
 /**
@@ -603,7 +607,12 @@ void TextEditor::cursorPositionChange() {
  * @param position
  */
 void TextEditor::updateCursor(int userId, int position) {
-    cursors[userId] = position;
+
+    if (cursorMap.find(userId) != cursorMap.end()) {
+
+        cursorMap[userId] = position;
+
+    }
 }
 
 void TextEditor::selectionChange() {
@@ -631,11 +640,13 @@ void TextEditor::toggleUserColors() {
 
 QColor TextEditor::getUserColor(int userId) const {
 
-    /*if (userColors.find(userId) == userColors.end()) {
-        throw std::runtime_error(std::string{} + __PRETTY_FUNCTION__ + ": color for user id not found");
+    if (MainWindow *mw = dynamic_cast<MainWindow*>(parent)) {
+
+        return mw->getUserColor(userId);
+
     }
 
-    return userColors.at(userId);*/
+    return QColor::Invalid;
 }
 
 int TextEditor::getUserId(int row, int col) const {
@@ -690,9 +701,15 @@ bool TextEditor::isNewLine(QChar c) {
     return c == QChar::LineFeed || c == QChar::ParagraphSeparator || c == QChar::LineSeparator;
 }
 
-//the key (int) is the userId
-void TextEditor:: updateColorMap(QMap<int, QColor> colorMapReceived){
-    //colorMap = colorMapReceived;
+void TextEditor::updateCursorMap(QVector<User> onlineUserList) {
+    for (const User &u : onlineUserList) {
+        int userId = u.getId();
+        if (cursorMap.find(userId) == cursorMap.end()) {
+            cursorMap.erase(userId);
+        } else {
+            cursorMap[userId] = document()->characterCount()+1;
+        }
+    }
 }
 
 

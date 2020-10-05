@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles, true);
     w->setWindowTitle("Welcome");
     w->setWindowIconText("Co-Text");
-    TextEditor editor(0, *w->getUi()); // todo get site id from server
+    TextEditor editor(0, *w->getUi(), w); // todo get site id from server
     //editor.setDisabled(true);
     // place the QTextEditor object in the central position of the main window
 

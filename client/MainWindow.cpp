@@ -432,8 +432,16 @@ Ui::MainWindow *MainWindow::getUi() const {
     return ui;
 }
 
+QColor MainWindow::getUserColor(int userId) const {
+    if (colorMap.find(userId) == colorMap.end()) {
+        throw std::runtime_error(std::string{} + __PRETTY_FUNCTION__ + ": color for user id not found");
+    }
+
+    return colorMap[userId];
+}
+
 void MainWindow::connectToTextEditor(TextEditor* te) {
-    connect(this, &MainWindow::newColorMapReceived, te, &TextEditor::updateColorMap);
+    // connect(this, &MainWindow::newColorMapReceived, te, &TextEditor::updateColorMap);
 }
 
 void MainWindow::sendJoinMainWindow(qint32 userId, int docId, QString invCode){

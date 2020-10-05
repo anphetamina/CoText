@@ -13,6 +13,7 @@
 #include "../common/SharedEditor.h"
 #include "../common/QSymbol.h"
 #include "UserHighlighter.h"
+#include "../common/User.h"
 
 class UserHighlighter;
 
@@ -53,9 +54,7 @@ private:
 
     int getPosition(int row, int col);
 
-    std::map<int, int> cursors;
-    std::map<int, QColor> userColors;
-    QMap<int, QColor> colorMap;  //TODO: remove userColors after refactoring  std::map->QMap
+    std::map<int, int> cursorMap;
 
     std::atomic<bool> isUserColorsToggled;
 
@@ -74,7 +73,7 @@ public slots:
     void updateCursor(int userId, int position);
     void updateAlignment(Qt::Alignment alignment, int position);
     void openDocument(int docId, QString docName, std::vector<std::vector<QSymbol>> symbols);
-    void updateColorMap(QMap<int, QColor> colorMapReceived);
+    void updateCursorMap(QVector<User> onlineUserList);
 
 private slots:
 

@@ -17,7 +17,7 @@ QString User::getSurname() { return this->surname; }
 
 QString User::getEmail() { return this->email; }
 
-int User::getId() { return this->id; }
+int User::getId() const { return this->id; }
 
 QString User::getNick() { return this->nickname; }
 

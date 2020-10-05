@@ -59,6 +59,8 @@ public:
 
     Ui::MainWindow *getUi() const;
 
+    QColor getUserColor(int userId) const;
+
     void connectToTextEditor(TextEditor* te);
 
 private slots:

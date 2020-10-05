@@ -23,7 +23,7 @@ public:
     QString getName();
     QString getSurname();
     QString getEmail();
-    int getId();
+    int getId() const;
     QString getNick();
     QIcon getProfilePic();
 
