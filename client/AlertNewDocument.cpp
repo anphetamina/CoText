@@ -1,12 +1,19 @@
 #include "AlertNewDocument.h"
 #include "ui_AlertNewDocument.h"
 
-AlertNewDocument::AlertNewDocument(QString currentDocument, QWidget *parent) :
+#include <QDebug.h>
+
+AlertNewDocument::AlertNewDocument(QString currentDocument, QString newDoc, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::AlertNewDocument)
 {
     ui->setupUi(this);
-    ui->label->setText("Do you want to close "+ currentDocument+" and open a new document?");
+    newDocument = newDoc;
+    if(!newDocument.isEmpty()){ //open an existing document
+        ui->label->setText("Do you want to close "+ currentDocument+" and open "+ newDocument +" ?");
+    }else{  //create new document
+        ui->label->setText("Do you want to close "+ currentDocument+" and open a new document ?");
+    }
 }
 
 AlertNewDocument::~AlertNewDocument()
@@ -16,7 +23,13 @@ AlertNewDocument::~AlertNewDocument()
 
 void AlertNewDocument::on_pushButton_ok_clicked()
 {
-    emit(openNewDocument("Untitled"));
+    if(!newDocument.isEmpty()){ //open an existing document
+        qDebug()<<"[ALERT] open an existing document newDocument = "<<newDocument;
+        emit(openNewDocument(newDocument));
+    }else{  //create new document
+        qDebug()<<"[ALERT] create new document";
+        emit(openNewDocument("Untitled"));
+    }
     this->close();
 }
 

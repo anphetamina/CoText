@@ -195,13 +195,13 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
 
 
 void MainWindow::on_actionNew_triggered() {
-    if(editor->isEnabled()){
-        AlertNewDocument alert(this->windowTitle());
+    if(editor->isEnabled()){    //c'è già un documento aperto
+        AlertNewDocument alert(this->windowTitle(), "");
         connect(&alert, &AlertNewDocument::openNewDocument, this, &MainWindow::openNewDocumentMainWindow);
         alert.setWindowTitle("Alert");
         alert.setModal(true);
         alert.exec();
-    }else {
+    }else { //non c'è nessun documento aperto
         QString docName("Untitled");
         QString name(docName);
         int i = 0;
@@ -227,11 +227,16 @@ void MainWindow::openNewDocumentMainWindow(QString docName){
 
 void MainWindow::on_actionOpen_triggered() {
     //emit(sendAskDocListMainWindow(user.getId()));
-    OpenDocument openDocument(docList);
+    OpenDocument openDocument(docList, this);
     connect(&openDocument, &OpenDocument::sendOpenDocument, this, &MainWindow::sendOpenDocumentMainWindow);
     openDocument.setWindowTitle("Select a document");
     openDocument.setModal(true);
     openDocument.exec();
+}
+
+void MainWindow::sendOpenDocumentMainWindow(QString docName){
+    qDebug()<<"[MAIN WINDOW] sendOpenDocumentMainWindow docName = "<<docName;
+    emit(sendOpenDocumentSignal(docName, user.getId()));
 }
 
 void MainWindow::Save_as() {
@@ -349,7 +354,7 @@ void MainWindow::updateUserList(QVector<User> newUserList){
         actionUserList[j]->setVisible(false);
     }
 
-    qDebug() << "User list updated";
+    qDebug() << "[MAIN WINDOW] User list updated";
     userList = newUserList;
     colorMap.clear();
     for(int i=0; i<newUserList.size();i++){
@@ -545,14 +550,14 @@ void MainWindow::setupStatusBar() {
     */
 }
 
-void MainWindow::sendOpenDocumentMainWindow(QString docName){
-    emit(sendOpenDocumentSignal(docName, user.getId()));
-}
-
 void MainWindow::documentListReceivedMainWindow(QVector<QString> documentList){
     docList = documentList;
 }
 
 void MainWindow::setTextEditor(TextEditor* te){
     editor = te;
+}
+
+TextEditor* MainWindow::getTextEditor() const{
+    return editor;
 }

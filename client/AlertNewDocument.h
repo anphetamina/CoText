@@ -12,7 +12,7 @@ class AlertNewDocument : public QDialog
     Q_OBJECT
 
 public:
-    explicit AlertNewDocument(QString currentDocument, QWidget *parent = nullptr);
+    explicit AlertNewDocument(QString currentDocument, QString newDocument, QWidget *parent = nullptr);
     ~AlertNewDocument();
 
 signals:
@@ -24,6 +24,7 @@ private slots:
 
 private:
     Ui::AlertNewDocument *ui;
+    QString newDocument;
 };
 
 #endif // ALERTNEWDOCUMENT_H

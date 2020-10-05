@@ -58,7 +58,7 @@ public:
     }
 
     Ui::MainWindow *getUi() const;
-
+    TextEditor* getTextEditor() const;
     void setupStatusBar();
     void setStatusBar(QStatusBar *qSb);
     QColor getUserColor(int userId) const;

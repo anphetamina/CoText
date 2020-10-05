@@ -288,6 +288,7 @@ void SslEchoClient::sendCursor(qint32 userId, qint32 position) {
 }
 
 void SslEchoClient::sendDocOpen(QString docName, qint32 userId) {
+    qDebug()<<"[CLIENT] sendDocOpen docName = "<<docName <<" userId = "<<userId;
     if(!pServer->isValid()) // if u call this and login wasnt performed
         return;
     DocumentOpenPacket dop = DocumentOpenPacket(docName, userId );
