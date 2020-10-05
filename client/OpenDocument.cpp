@@ -20,6 +20,6 @@ OpenDocument::~OpenDocument()
 
 void OpenDocument::on_pushButton_clicked()
 {
-    emit(sendOpenDocument(ui->listWidget->currentItem()->text()));  //todo if 2 items have the same name?
+    emit(sendOpenDocument(ui->listWidget->currentItem()->text()));
     this->close();
 }

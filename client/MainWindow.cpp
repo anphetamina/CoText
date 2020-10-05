@@ -5,6 +5,7 @@
 #include "ShareUri.h"
 #include "Join.h"
 #include "OpenDocument.h"
+#include "AlertNewDocument.h"
 #include <QPixmap> //allows to create a qpixmap onj which takes 1 arg
 #include <QPrinter>
 #include <QColorDialog>
@@ -194,10 +195,34 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
 
 
 void MainWindow::on_actionNew_triggered() {
-    currentFileName.clear();
-    setWindowTitle("untitled");
-//    ui->textEdit->setText(QString());
+    if(editor->isEnabled()){
+        AlertNewDocument alert(this->windowTitle());
+        connect(&alert, &AlertNewDocument::openNewDocument, this, &MainWindow::openNewDocumentMainWindow);
+        alert.setWindowTitle("Alert");
+        alert.setModal(true);
+        alert.exec();
+    }else {
+        QString docName("Untitled");
+        QString name(docName);
+        int i = 0;
+        while (docList.contains(name)) {
+            i++;
+            name = docName + "" + QString::number(i);
+        }
+        emit(sendDocCreateMainWindow(name, user.getId()));   //il server poi risponde con DocumentOkPacket e il client nella slot apre il nuovo documento
+        docList.append(name);
+    }
+}
 
+void MainWindow::openNewDocumentMainWindow(QString docName){
+    QString name(docName);
+    int i = 0;
+    while (docList.contains(name)) {
+        i++;
+        name = docName + "" + QString::number(i);
+    }
+    emit(sendDocCreateMainWindow(name, user.getId()));   //il server poi risponde con DocumentOkPacket e il client nella slot apre il nuovo documento
+    docList.append(name);
 }
 
 void MainWindow::on_actionOpen_triggered() {
@@ -430,6 +455,7 @@ void MainWindow::connectToTextEditor(TextEditor* te) {
     connect(te, &TextEditor::setMainWindowTitle, this, &MainWindow::setMainWindowTitleSlot);
 }
 
+
 void MainWindow::setMainWindowTitleSlot(QString title){
     this->setWindowTitle(title);
 }
@@ -525,4 +551,8 @@ void MainWindow::sendOpenDocumentMainWindow(QString docName){
 
 void MainWindow::documentListReceivedMainWindow(QVector<QString> documentList){
     docList = documentList;
+}
+
+void MainWindow::setTextEditor(TextEditor* te){
+    editor = te;
 }

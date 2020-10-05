@@ -388,6 +388,11 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             }
 
             createDoc(dcp->getdocName(), dcp->getuserId());
+
+            int docId = docIdByName(dcp->getdocName(), dcp->getuserId());
+            QVector<QVector<QSymbol>> qsymbols = loadFromDisk(docId);   //ovviamente sarà vuoto (siccome lo abbiamo appena creato)
+            DocumentOkPacket dokp = DocumentOkPacket(docId, dcp->getdocName(), qsymbols);
+            dokp.send(*pClient);
             break;
         }
 

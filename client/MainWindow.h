@@ -63,6 +63,7 @@ public:
     void setStatusBar(QStatusBar *qSb);
     QColor getUserColor(int userId) const;
     void connectToTextEditor(TextEditor* te);
+    void setTextEditor(TextEditor* te);
 
 private slots:
     void on_actionNew_triggered();
@@ -88,20 +89,22 @@ public slots:
     void sendOpenDocumentMainWindow(QString docName);
     void documentListReceivedMainWindow(QVector<QString> documentList);
     void setMainWindowTitleSlot(QString title);
+    void openNewDocumentMainWindow(QString docName);
 
 signals:
     void newColorMapReceived(QMap<int, QColor> colorMap);
     void sendAskUriMainWindow(qint32 userId, int docId, QString invCode);
     void sendAskDocListMainWindow(qint32 user);
     void sendOpenDocumentSignal(QString docName, qint32 user);
+    void sendDocCreateMainWindow(QString docName, qint32 userId);
 
 private:
     Ui::MainWindow *ui;
     QStatusBar *statusBar;
-    TextEditor *editor;
     QString currentFileName = "";
     QVector<QString> docList;
     QVector<User> userList = {};
+    TextEditor* editor;
     //std::vector<User> userList = {};
     QMap<int, QColor> colorMap = {};
     QVector<QColor> colorList = {QColor(255,0,0),   //red

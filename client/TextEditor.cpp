@@ -760,7 +760,6 @@ void TextEditor::updateCursorMap(QVector<User> onlineUserList) {
      * step necessary to avoid printing multiple cursor for the local user
      */
     cursorMap.erase(user.getId());
-
 }
 
 // todo handle offline case
