@@ -25,8 +25,8 @@ class SslEchoClient : public QObject
 Q_OBJECT
 public:
     explicit SslEchoClient(const QUrl &url, QObject *parent = nullptr);
-signals:
 
+signals:
     void insertReceived(QSymbol qsymbol);
     void eraseReceived(QSymbol symbol);
     void insertBlockReceived(std::vector<QSymbol> symbols);
@@ -39,6 +39,7 @@ signals:
     void loginSuccessful();
     void loginFailed();
     void askUriReceived(QString URI);
+    void documentListReceived(QVector<QString> documentList);
 
 public slots:
     void sendInsert(std::vector<QSymbol> symbols, int siteId);
@@ -46,6 +47,7 @@ public slots:
     void sendCursor(int userId, int position);
     void sendAskUri(qint32 userId, int docId, QString invCode);
     void sendAlignment(Qt::Alignment alignment, int position, int siteId);
+    void sendAskDocList(qint32 userId);
 
 private Q_SLOTS:
     void onConnected();

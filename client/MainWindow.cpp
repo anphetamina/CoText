@@ -4,6 +4,7 @@
 #include "TextEditor.h"
 #include "ShareUri.h"
 #include "Join.h"
+#include "OpenDocument.h"
 #include <QPixmap> //allows to create a qpixmap onj which takes 1 arg
 #include <QPrinter>
 #include <QColorDialog>
@@ -200,31 +201,12 @@ void MainWindow::on_actionNew_triggered() {
 }
 
 void MainWindow::on_actionOpen_triggered() {
-    QString filename = QFileDialog::getOpenFileName(this, "Choose file to open", "/home", "All files .*");
-    if(!filename.isNull()) {
-
-        QFile file(filename);
-        QString filePath = filename.toUtf8();
-
-        currentFileName = filename;
-
-        //checks
-        if(!file.open(QIODevice::ReadOnly | QFile::Text)) {
-            QMessageBox::warning(this, "Warning", "Can not open file:  "+ file.errorString());
-            return;
-        }
-
-        setWindowTitle((filename));
-        QTextStream in(&file);
-        QString text = in.readAll();
-//        ui->textEdit->setText(text);
-        file.close();
-
-    } else {
-        //QMessageBox::warning(this, "Warning - filename Null", "The file selected is invalid");
-        return;
-    }
-
+    //emit(sendAskDocListMainWindow(user.getId()));
+    OpenDocument openDocument(docList);
+    connect(&openDocument, &OpenDocument::sendOpenDocument, this, &MainWindow::sendOpenDocumentMainWindow);
+    openDocument.setWindowTitle("Select a document");
+    openDocument.setModal(true);
+    openDocument.exec();
 }
 
 void MainWindow::Save_as() {
@@ -445,6 +427,11 @@ QColor MainWindow::getUserColor(int userId) const {
 
 void MainWindow::connectToTextEditor(TextEditor* te) {
     // connect(this, &MainWindow::newColorMapReceived, te, &TextEditor::updateColorMap);
+    connect(te, &TextEditor::setMainWindowTitle, this, &MainWindow::setMainWindowTitleSlot);
+}
+
+void MainWindow::setMainWindowTitleSlot(QString title){
+    this->setWindowTitle(title);
 }
 
 void MainWindow::sendJoinMainWindow(qint32 userId, int docId, QString invCode){
@@ -522,9 +509,7 @@ void MainWindow::setupStatusBar() {
 	qSB->addWidget(docSize);
 	qSB->addWidget(nChars);
 	/**end display */
-	
-	
-	
+
 	//qSB->showMessage(tr("Ready"), 2000);
 	
 	/*
@@ -532,6 +517,12 @@ void MainWindow::setupStatusBar() {
 	qPB->setRange(0, 0);
 	qSB->addWidget(qPB, 1);
     */
-	
-	
+}
+
+void MainWindow::sendOpenDocumentMainWindow(QString docName){
+    emit(sendOpenDocumentSignal(docName, user.getId()));
+}
+
+void MainWindow::documentListReceivedMainWindow(QVector<QString> documentList){
+    docList = documentList;
 }
