@@ -670,6 +670,10 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
         throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": document is invalid");
     }
 
+    emit(setMainWindowTitle(docName));
+    this->clear();
+    this->setDisabled(false);
+
     Benchmark b = Benchmark("TextEditor::openDocument");
     b.startTimer();
     index.clear();
@@ -758,7 +762,6 @@ void TextEditor::updateCursorMap(QVector<User> onlineUserList) {
     cursorMap.erase(user.getId());
 
 }
-
 
 // todo handle offline case
 

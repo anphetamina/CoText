@@ -183,7 +183,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             }
             pServer = qobject_cast<QWebSocket *>(sender());
             // .... DEBUG TODO: REMOVE when opendoc GUI is implemented and linked here
-            this->sendDocOpen("AAA", loggedUser.getId());
+            //this->sendDocOpen("AAA", loggedUser.getId());
 
 	        //emit auth(loggedUser);
 	        user = loggedUser;
@@ -236,7 +236,8 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
         }
         case (PACK_TYPE_DOC_LIST): {
             DocumentListPacket *docList = dynamic_cast<DocumentListPacket *>(rcvd_packet.get());
-            //qDebug() << "[DOC_LIST] Received";
+            qDebug() << "[DOC_LIST] Received : " << docList->getdocList();
+            emit(documentListReceived(docList->getdocList()));
             break;
         }
         case (PACK_TYPE_DOC_ASKSURI): {
@@ -314,8 +315,18 @@ void SslEchoClient::connectToMainWindow(MainWindow* mw) {
     connect(this, &SslEchoClient::updateUserListReceived, mw, &MainWindow::updateUserList);
     connect(mw, &MainWindow::sendAskUriMainWindow, this, &SslEchoClient::sendAskUri);
     connect(this, &SslEchoClient::askUriReceived, mw, &MainWindow::askUriReceivedMainWindow);
+    //connect(mw, &MainWindow::sendDocCreateMainWindow, this, &SslEchoClient::sendDocCreate);
+    connect(mw, &MainWindow::sendAskDocListMainWindow, this, &SslEchoClient::sendAskDocList);
+    connect(this, &SslEchoClient::documentListReceived, mw, &MainWindow::documentListReceivedMainWindow);
+    connect(mw, &MainWindow::sendOpenDocumentSignal, this, &SslEchoClient::sendDocOpen);
 }
 
+void SslEchoClient::sendAskDocList(qint32 userId) {
+    if(!pServer->isValid()) // if u call this and login wasnt performed
+        return;
+    DocumentAskListPacket dalp = DocumentAskListPacket(userId );
+    dalp.send(*pServer);
+}
 
 /*
  * Dont delete pls. Possible enhancement
@@ -335,3 +346,4 @@ void SslEchoClient::connectToLoginWindow(Login* login, MainWindow* mw) {//Qdialo
 
 */
 //    // Save the secret key that will be used
+
