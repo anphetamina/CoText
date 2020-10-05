@@ -22,7 +22,7 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     parent(parent),
     ui(ui),
     index({0}),
-    editor(SharedEditor(Shuffler::getInstance()->getRandomInt())), // todo get site id from server
+    editor(SharedEditor(siteId)),
     isFromRemote(false),
     isFromRemoteCursor(false),
     testSymbols({{}}),
@@ -413,10 +413,11 @@ int TextEditor::getRow(int position) const {
  */
 void TextEditor::remoteInsert(QSymbol symbol) {
 
-    qDebug() << "received add " << symbol.getC();
+    // qDebug() << "received add " << symbol.getC();
 
     try {
         isFromRemote = true;
+        isFromRemoteCursor = true;
         std::pair<int, int> pos = editor.remoteInsert(symbol);
         if (pos.first != -1 || pos.second != -1) {
 
@@ -459,7 +460,7 @@ void TextEditor::remoteInsert(QSymbol symbol) {
  */
 void TextEditor::remoteErase(QSymbol symbol) {
 
-    qDebug() << "received del " << symbol.getC();
+    // qDebug() << "received del " << symbol.getC();
 
     try {
         isFromRemote = true;
@@ -631,12 +632,8 @@ void TextEditor::selectionChange() {
     int selectionStart = textCursor().selectionStart();
     if (selectionStart != selectionEnd) {
         currentSelectedChars = selectionEnd - selectionStart;
-//        QTextCursor selection = cursorForPosition(QPoint(selectionStart, selectionStart));
-//        selection.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, currentSelectedChars);
-//        emit selectionChanged(editor.getSiteId(), selection);
     } else {
         currentSelectedChars = 0;
-//        emit selectionChanged(editor.getSiteId(), QTextCursor());
     }
 }
 
@@ -709,7 +706,15 @@ void TextEditor::printSymbols() {
 
 void TextEditor::updateAlignment(Qt::Alignment alignment, int position) {
     isFromRemote = true;
-    document()->findBlock(position).blockFormat().setAlignment(alignment);
+    isFromRemoteCursor = true;
+
+    QTextBlockFormat f;
+    f.setAlignment(alignment);
+
+    QTextCursor c(textCursor());
+    c.setPosition(position);
+    c.setBlockFormat(f);
+
 }
 
 bool TextEditor::isNewLine(QChar c) {

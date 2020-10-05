@@ -444,7 +444,9 @@ QColor MainWindow::getUserColor(int userId) const {
 }
 
 void MainWindow::connectToTextEditor(TextEditor* te) {
-    // connect(this, &MainWindow::newColorMapReceived, te, &TextEditor::updateColorMap);
+    /**
+     *
+     */
 }
 
 void MainWindow::sendJoinMainWindow(qint32 userId, int docId, QString invCode){
