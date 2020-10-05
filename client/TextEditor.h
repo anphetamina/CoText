@@ -13,6 +13,7 @@
 #include "../common/SharedEditor.h"
 #include "../common/QSymbol.h"
 #include "UserHighlighter.h"
+#include "../common/User.h"
 
 class UserHighlighter;
 
@@ -34,51 +35,35 @@ public:
     std::atomic<bool> isFromRemoteCursor;
 
 private:
-
     QWidget *parent;
-
-    /**
-     * to access to the toolbar icons
-     */
     Ui::MainWindow &ui;
     SharedEditor editor;
     std::vector<int> index;
     std::vector<std::vector<QSymbol>> testSymbols;
     int currentSelectedChars;
     UserHighlighter highlighter;
+    std::map<int, int> cursorMap;
+    std::atomic<bool> isUserColorsToggled;
 
     void insertRow(int pos, int n);
     void deleteRow(int pos, int n);
     void incrementIndex(int pos, int n);
     void decrementIndex(int pos, int n);
-
     int getPosition(int row, int col);
-
-    std::map<int, int> cursors;
-    std::map<int, QColor> userColors;
-    QMap<int, QColor> colorMap;  //TODO: remove userColors after refactoring  std::map->QMap
-
-    std::atomic<bool> isUserColorsToggled;
-
     void printSymbols();
-
     bool isNewLine(QChar c);
 
-
 public slots:
-
     void remoteInsert(QSymbol symbol);
     void remoteInsertBlock(std::vector<QSymbol> symbols);
     void remoteErase(QSymbol symbol);
     void remoteEraseBlock(std::vector<QSymbol> symbols);
-
     void updateCursor(int userId, int position);
     void updateAlignment(Qt::Alignment alignment, int position);
     void openDocument(int docId, QString docName, std::vector<std::vector<QSymbol>> symbols);
-    void updateColorMap(QMap<int, QColor> colorMapReceived);
+    void updateCursorMap(QVector<User> onlineUserList);
 
 private slots:
-
     void selectFont();
     void setFontBold(bool bold);
     void setFontItalic(bool italic);
@@ -87,22 +72,20 @@ private slots:
     void setTextAlignment(QAction *action);
     void alignmentChanged(Qt::Alignment a);
     void currentCharFormatChanged(const QTextCharFormat &f);
-
     void contentsChange(int position, int charsRemoved, int charsAdded);
     void cursorPositionChange();
     void selectionChange();
-
     void toggleUserColors();
 
 protected:
     void paintEvent(QPaintEvent *e) override;
 
 signals:
-
     void symbolsInserted(std::vector<QSymbol> symbols, int siteId);
     void symbolsErased(std::vector<QSymbol> symbols, int siteId);
     void cursorPositionChanged(int userId, int position);
     void textAlignmentChanged(Qt::Alignment alignment, int position, int siteId);
+    void setMainWindowTitle(QString title);
 
 };
 

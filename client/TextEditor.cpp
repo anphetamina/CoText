@@ -12,6 +12,7 @@
 #include "TextEditor.h"
 #include <thread>
 #include <mutex>
+#include "MainWindow.h"
 #include "Benchmark.h"
 
 std::mutex ins_mutex;  // protects insert
@@ -21,11 +22,11 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     parent(parent),
     ui(ui),
     index({0}),
-    editor(SharedEditor(Shuffler::getInstance()->getRandomInt())), // todo get site id from server
+    editor(SharedEditor(siteId)),
     isFromRemote(false),
     isFromRemoteCursor(false),
     testSymbols({{}}),
-    cursors({}),
+    cursorMap({}),
     currentSelectedChars(0),
     highlighter(*this, document()),
     isUserColorsToggled(false) {
@@ -182,10 +183,6 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
     /**
      * https://github.com/anphetamina/CoText/issues/32 workaround
      */
-    /*if (charsAdded >= 1 && charsRemoved >= 1 && position+charsRemoved > index.back()+static_cast<int>(editor.getSymbols()[index.size()-1].size()-1)) {
-        charsRemoved--;
-        charsAdded--;
-    }*/
 
     if (document()->characterAt(position+charsAdded) == '\0') {
         charsRemoved--;
@@ -416,10 +413,11 @@ int TextEditor::getRow(int position) const {
  */
 void TextEditor::remoteInsert(QSymbol symbol) {
 
-    qDebug() << "received add " << symbol.getC();
+    // qDebug() << "received add " << symbol.getC();
 
     try {
         isFromRemote = true;
+        isFromRemoteCursor = true;
         std::pair<int, int> pos = editor.remoteInsert(symbol);
         if (pos.first != -1 || pos.second != -1) {
 
@@ -462,7 +460,7 @@ void TextEditor::remoteInsert(QSymbol symbol) {
  */
 void TextEditor::remoteErase(QSymbol symbol) {
 
-    qDebug() << "received del " << symbol.getC();
+    // qDebug() << "received del " << symbol.getC();
 
     try {
         isFromRemote = true;
@@ -555,28 +553,26 @@ void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
 
 void TextEditor::paintEvent(QPaintEvent *e) {
 
-    QTextEdit::paintEvent(e);
-
-    /*try {
+    try {
         QTextEdit::paintEvent(e);
         QPainter painter(viewport());
         QTextCursor cursor(document());
-        for (const std::pair<int, int> &c : cursors) {
+        for (const std::pair<int, int> &c : cursorMap) {
             int position = c.second;
             int count = document()->characterCount();
-            QColor color = userColors[c.first];
+            QColor color = getUserColor(c.first);
             painter.setPen(color);
             if (position < count) {
                 cursor.setPosition(position);
                 QRect cRect = cursorRect(cursor);
                 painter.drawRect(cRect);
 
-                QRect lRect(cRect.left(), cRect.top(), 50, 10);
+                /*QRect lRect(cRect.left(), cRect.top(), 50, 10);
                 painter.fillRect(lRect, color);
                 painter.drawRect(lRect);
                 painter.setPen(Qt::white);
                 QRect boundingRect;
-                painter.drawText(lRect, 0, tr("TEST"), &boundingRect);
+                painter.drawText(lRect, 0, tr("TEST"), &boundingRect);*/
 
                 update();
             } else if (position == count) {
@@ -589,17 +585,28 @@ void TextEditor::paintEvent(QPaintEvent *e) {
         }
     } catch (const std::exception &e) {
         qDebug() << e.what();
-    }*/
+    }
 }
 
 void TextEditor::cursorPositionChange() {
 
     alignmentChanged(alignment());
 
-    // todo change with user id
-    if(!isFromRemoteCursor)
-        emit cursorPositionChanged(editor.getSiteId(), textCursor().position());
-    isFromRemoteCursor = false;
+    /**
+     * this works because in the constructor of TextEditor
+     * parent contains a subobject of type MainWindow that is derived from QWidget
+     */
+    if (MainWindow *mw = dynamic_cast<MainWindow*>(parent)) {
+
+        int userId = mw->getUser().getId();
+
+        if (!isFromRemoteCursor) {
+            emit cursorPositionChanged(userId, textCursor().position());
+        }
+
+        isFromRemoteCursor = false;
+
+    }
 }
 
 /**
@@ -608,7 +615,16 @@ void TextEditor::cursorPositionChange() {
  * @param position
  */
 void TextEditor::updateCursor(int userId, int position) {
-    cursors[userId] = position;
+
+    if (cursorMap.find(userId) != cursorMap.end()) {
+
+        cursorMap[userId] = position;
+
+    } else {
+
+        qDebug() << userId << "not found";
+
+    }
 }
 
 void TextEditor::selectionChange() {
@@ -616,12 +632,8 @@ void TextEditor::selectionChange() {
     int selectionStart = textCursor().selectionStart();
     if (selectionStart != selectionEnd) {
         currentSelectedChars = selectionEnd - selectionStart;
-//        QTextCursor selection = cursorForPosition(QPoint(selectionStart, selectionStart));
-//        selection.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, currentSelectedChars);
-//        emit selectionChanged(editor.getSiteId(), selection);
     } else {
         currentSelectedChars = 0;
-//        emit selectionChanged(editor.getSiteId(), QTextCursor());
     }
 }
 
@@ -636,11 +648,14 @@ void TextEditor::toggleUserColors() {
 
 QColor TextEditor::getUserColor(int userId) const {
 
-    /*if (userColors.find(userId) == userColors.end()) {
-        throw std::runtime_error(std::string{} + __PRETTY_FUNCTION__ + ": color for user id not found");
+    if (MainWindow *mw = dynamic_cast<MainWindow*>(parent)) {
+
+        return mw->getUserColor(userId);
+
     }
 
-    return userColors.at(userId);*/
+    qDebug() << "invalid color for" << userId;
+    return QColor::Invalid;
 }
 
 int TextEditor::getUserId(int row, int col) const {
@@ -654,6 +669,10 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
     })) {
         throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": document is invalid");
     }
+
+    emit(setMainWindowTitle(docName));
+    this->clear();
+    this->setDisabled(false);
 
     Benchmark b = Benchmark("TextEditor::openDocument");
     b.startTimer();
@@ -691,18 +710,58 @@ void TextEditor::printSymbols() {
 
 void TextEditor::updateAlignment(Qt::Alignment alignment, int position) {
     isFromRemote = true;
-    document()->findBlock(position).blockFormat().setAlignment(alignment);
+    isFromRemoteCursor = true;
+
+    QTextBlockFormat f;
+    f.setAlignment(alignment);
+
+    QTextCursor c(textCursor());
+    c.setPosition(position);
+    c.setBlockFormat(f);
+
 }
 
 bool TextEditor::isNewLine(QChar c) {
     return c == QChar::LineFeed || c == QChar::ParagraphSeparator || c == QChar::LineSeparator;
 }
 
-//the key (int) is the userId
-void TextEditor:: updateColorMap(QMap<int, QColor> colorMapReceived){
-    //colorMap = colorMapReceived;
-}
+void TextEditor::updateCursorMap(QVector<User> onlineUserList) {
 
+    std::vector<int> onlineUserIds{};
+    std::for_each(onlineUserList.begin(), onlineUserList.end(), [&](const User &u) { onlineUserIds.push_back(u.getId()); });
+    std::sort(onlineUserIds.begin(), onlineUserIds.end());
+
+    std::vector<int> currentUserList{};
+    std::for_each(cursorMap.begin(), cursorMap.end(), [&](const std::pair<int, int> &u) { currentUserList.push_back(u.first); });
+
+    std::vector<int> offlineUserIds{};
+    std::set_difference(currentUserList.begin(), currentUserList.end(), onlineUserIds.begin(), onlineUserIds.end(), std::inserter(offlineUserIds, offlineUserIds.begin()), [](const int &id1, const int &id2){
+        return id1 < id2;
+    });
+
+    std::vector<int> newOnlineUserIds{};
+    std::set_difference(onlineUserIds.begin(), onlineUserIds.end(), currentUserList.begin(), currentUserList.end(), std::inserter(newOnlineUserIds, newOnlineUserIds.begin()), [](const int &id1, const int &id2){
+        return id1 < id2;
+    });
+
+    for (auto it : offlineUserIds) {
+        cursorMap.erase(it);
+    }
+
+    for (auto it : newOnlineUserIds) {
+
+        /**
+         * it will not print the new cursor instead wait for the updated valid position
+         */
+        cursorMap[it] = document()->characterCount()+1;
+    }
+
+    /**
+     * step necessary to avoid printing multiple cursor for the local user
+     */
+    cursorMap.erase(user.getId());
+
+}
 
 // todo handle offline case
 

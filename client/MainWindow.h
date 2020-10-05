@@ -56,12 +56,12 @@ public:
     static User getUser() {
     	return user;
     }
-    
-    void setupStatusBar();
-    void setStatusBar(QStatusBar *qSb);
 
     Ui::MainWindow *getUi() const;
 
+    void setupStatusBar();
+    void setStatusBar(QStatusBar *qSb);
+    QColor getUserColor(int userId) const;
     void connectToTextEditor(TextEditor* te);
 
 private slots:
@@ -85,16 +85,22 @@ public slots:
     void updateUserList(QVector<User> newUserList);
     void askUriReceivedMainWindow(QString URI);
     void sendJoinMainWindow(qint32 userId, int docId, QString invCode);
+    void sendOpenDocumentMainWindow(QString docName);
+    void documentListReceivedMainWindow(QVector<QString> documentList);
+    void setMainWindowTitleSlot(QString title);
 
 signals:
     void newColorMapReceived(QMap<int, QColor> colorMap);
     void sendAskUriMainWindow(qint32 userId, int docId, QString invCode);
+    void sendAskDocListMainWindow(qint32 user);
+    void sendOpenDocumentSignal(QString docName, qint32 user);
 
 private:
     Ui::MainWindow *ui;
     QStatusBar *statusBar;
     TextEditor *editor;
     QString currentFileName = "";
+    QVector<QString> docList;
     QVector<User> userList = {};
     //std::vector<User> userList = {};
     QMap<int, QColor> colorMap = {};

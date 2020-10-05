@@ -51,20 +51,13 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles, true);
     w->setWindowTitle("Welcome");
     w->setWindowIconText("Co-Text");
-    TextEditor editor(0, *w->getUi()); // todo get site id from server
-    //editor.setDisabled(true);
-    // place the QTextEditor object in the central position of the main window
 
-    w->connectToTextEditor(&editor);
+    TextEditor editor(user.getId(), *w->getUi(), w); // todo get site id from server
+    editor.setDisabled(true);
 
-    /**
-     * place the QTextEditor object in the central position of the main window
-     */
     w->setCentralWidget(&editor);
-
-    // Perform connection (signal/slot)
+    w->connectToTextEditor(&editor);
     client->connectToMainWindow(w);
-    //connect the echo client to enable remote operations on the editor
     client->connectToEditor(&editor);
     //client->connectToLoginWindow(login, w); //TODO: use signal/slot for creating/closing diffent windows.tonote: login is a QDialog not QWindow
 
