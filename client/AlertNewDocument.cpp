@@ -24,10 +24,10 @@ AlertNewDocument::~AlertNewDocument()
 void AlertNewDocument::on_pushButton_ok_clicked()
 {
     if(!newDocument.isEmpty()){ //open an existing document
-        qDebug()<<"[ALERT] open an existing document newDocument = "<<newDocument;
+        //qDebug()<<"[ALERT] open an existing document newDocument = "<<newDocument;
         emit(openNewDocument(newDocument));
     }else{  //create new document
-        qDebug()<<"[ALERT] create new document";
+        //qDebug()<<"[ALERT] create new document";
         emit(openNewDocument("Untitled"));
     }
     this->close();

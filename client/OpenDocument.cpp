@@ -23,7 +23,7 @@ OpenDocument::~OpenDocument()
 void OpenDocument::on_pushButton_clicked()
 {
     if(mainWindow->getTextEditor()->isEnabled()){    //c'è già un documento aperto
-        qDebug()<<"[OPEN DOCUMENT] c'è già un documento aperto = "<<mainWindow->windowTitle();
+        //qDebug()<<"[OPEN DOCUMENT] c'è già un documento aperto = "<<mainWindow->windowTitle();
         AlertNewDocument alert(mainWindow->windowTitle(), ui->listWidget->currentItem()->text());
         connect(&alert, &AlertNewDocument::openNewDocument, this, &OpenDocument::forwardOpenNewDocument);
         alert.setWindowTitle("Alert");
@@ -36,6 +36,6 @@ void OpenDocument::on_pushButton_clicked()
 }
 
 void OpenDocument::forwardOpenNewDocument(QString docName){
-    qDebug()<<"[OPEN DOCUMENT] forwardOpenNewDocument docName = "<<docName;
+    //qDebug()<<"[OPEN DOCUMENT] forwardOpenNewDocument docName = "<<docName;
     emit(sendOpenDocument(docName));
 }

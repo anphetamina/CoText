@@ -235,7 +235,7 @@ void MainWindow::on_actionOpen_triggered() {
 }
 
 void MainWindow::sendOpenDocumentMainWindow(QString docName){
-    qDebug()<<"[MAIN WINDOW] sendOpenDocumentMainWindow docName = "<<docName;
+    //qDebug()<<"[MAIN WINDOW] sendOpenDocumentMainWindow docName = "<<docName;
     emit(sendOpenDocumentSignal(docName, user.getId()));
 }
 
