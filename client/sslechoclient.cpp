@@ -208,8 +208,18 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             break;
         }
         case (PACK_TYPE_BIGMSG): {
-            /*emit insertBlockReceived(std::vector<QSymbol> symbols);
-            emit eraseBlockReceived(std::vector<QSymbol> symbols);*/
+            BigMessage *msg = dynamic_cast<BigMessage *>(rcvd_packet.get());
+            switch (msg->getType()) {
+                case(MSG_INSERT_SYM): {
+                    std::vector<QSymbol> symbols(msg->getQSS().begin(), msg->getQSS().end());
+                    emit insertBlockReceived(symbols);
+                }
+
+                case(MSG_ERASE_SYM): {
+                    std::vector<QSymbol> symbols(msg->getQSS().begin(), msg->getQSS().end());
+                    emit eraseBlockReceived(symbols);
+                }
+            }
             break;
         }
         case (PACK_TYPE_ALIGN): {
