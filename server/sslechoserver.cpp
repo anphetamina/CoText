@@ -332,7 +332,25 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
 
             break;
         }
+        case(PACK_TYPE_BIGMSG): {
+            BigMessage *bmsg = dynamic_cast<BigMessage *>(rcvd_packet.get());
 
+            // Broadcast to all the connected client of a document
+            QList<QSharedPointer<Client>> onlineClientPerDoc = documentMapping[getDocIdOpenedByUserId(
+                    client->getUserId())]; //TODO: deccoment and delete for
+            for (QSharedPointer<Client> onlineClient : onlineClientPerDoc) {
+                if (onlineClient != client && client->isLogged()) {
+                    bmsg->send(*onlineClient->getSocket());
+                    qDebug() << "\tfrom: " << pClient->peerPort() << "sent to "
+                             << onlineClient->getSocket()->peerPort();
+                }
+            }
+            // Run actions on the CRDT instances of the server (one for each document)
+            int docId = getDocIdOpenedByUserId(client->getUserId());
+            //Call remoteInsertBlock for server
+            //remoteInsertBlock(docId, bmsg->getQSS());
+            break;
+        }
         case(PACK_TYPE_CURSOR_POS): {
             CursorPacket *cp = dynamic_cast<CursorPacket*>(rcvd_packet.get());
             //qDebug() << msg->getData();
