@@ -224,6 +224,7 @@ void MainWindow::nameChoosenMainWindow(QString name){
     }
 }
 
+
 void MainWindow::openNewDocumentMainWindow(QString docName){
     QString name(docName);
     int i = 0;
