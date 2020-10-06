@@ -271,8 +271,20 @@ bool acceptInvite(QString invURI, int userId){
     return true;
 }
 
-/*Add the document permission for a given set user, document */
+
+QVector<QString> docByInvURI(QString invURI){
+    QVector<QString> doc({"",""});
+    QSqlQuery query;
+    query.exec("SELECT documentid, documentname, documentpath FROM Permission WHERE URI='"+invURI+"'");
+    if (query.next()) {
+        doc[0] = query.value(0).toString();
+        doc[1] = query.value(1).toString();
+    }
+    return doc;
+}
+
 bool addDocPermission(int docId, int userId){
+    /*Add the document permission for a given set user, document */
     QSqlQuery query, query2, query3;
     QString quserId = QString::number(userId);
     QString qdocId = QString::number(docId);

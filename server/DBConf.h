@@ -32,3 +32,4 @@ QString GetRandomString(int randomStringLength);
 void saveToDisk(QVector<QVector<QSymbol>> qdoc, int docId);
 QVector<QVector<QSymbol>> loadFromDisk(int docId);
 int docIdByName(QString docName, int userId);
+QVector<QString> docByInvURI(QString invURI);
