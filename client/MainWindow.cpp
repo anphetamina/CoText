@@ -416,7 +416,7 @@ void MainWindow::updateUserList(QVector<User> newUserList){
 
 
 void MainWindow::on_actionShare_Uri_triggered() {
-    emit(sendAskUriMainWindow(user.getId(), 12, ""));   //todo change userId and docId
+    emit(sendAskUriMainWindow(user.getId(), editor->getDocId(), ""));   //todo change userId and docId
     //qDebug() << "[MAIN WINDOW] sendAskUriMainWindow userId = "<< user.getId();
 }
 

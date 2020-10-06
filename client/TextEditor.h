@@ -30,6 +30,7 @@ public:
     int getCol(int row, int position) const;
     QColor getUserColor(int userId) const;
     int getUserId(int row, int col) const;
+    int getDocId() const;
 
     std::atomic<bool> isFromRemote;
     std::atomic<bool> isFromRemoteCursor;
@@ -45,6 +46,7 @@ private:
     UserHighlighter highlighter;
     std::map<int, int> cursorMap;
     std::atomic<bool> isUserColorsToggled;
+    int documentId;
 
     void insertRow(int pos, int n);
     void deleteRow(int pos, int n);

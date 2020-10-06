@@ -432,7 +432,6 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             QVector<QVector<QSymbol>> qsymbols;
             //Se non ancora aperto da nessun utente online carico da disco e inizializzo sharedEditor (istanza CRDT)
             if(!isOpenedEditorForGivenDoc(docId)){
-                qDebug()<<"[SERVER] if";
                 qsymbols = loadFromDisk(docId);
                 QSharedPointer<SharedEditor> se(new SharedEditor(9999));
                 std::vector<std::vector<QSymbol>> symbols  = toVector(qsymbols);
@@ -440,7 +439,6 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
                 editorMapping.insert(docId, se);
             } else // Altrimenti prendo lo stato soltanto
             {
-                qDebug()<<"[SERVER] else";
                 std::vector<std::vector<QSymbol>> symbols = editorMapping[docId]->getSymbols();
                 qsymbols = toQVector(symbols);
                 editorMapping[docId]->connectedUsersIncrease();
@@ -481,17 +479,58 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             }
             DocumentAskSharableURIPacket* msg = dynamic_cast<DocumentAskSharableURIPacket*>(rcvd_packet.get());
             qDebug() << "ASK URI PACKET received userId: "<< msg->getuserId() << " docId: "<<msg->getdocId() << " URI : "<< msg->getURI();
-            int docId = msg->getdocId();
             qint32 userId = msg->getuserId();
             QString invCode = msg->getURI();
 
             // Check if this is a request invite (URI is empty) or an invitation accept
             if(invCode.size() > 0){
-                // Invitation accept
-                qDebug() << "ASK URI PACKET invete aaccepted";
-                acceptInvite(invCode, userId);
+                // Invitation accept (in this case we receive docId=0)
+                qDebug() << "ASK URI PACKET invite accepted";
+
+                QVector<QString> doc = docByInvURI(invCode);
+                int docId = doc[0].toInt();
+                QString docName = doc[1];
+                if(acceptInvite(invCode, userId)){
+                    int closedDocId = getDocIdOpenedByUserId(client->getUserId());
+                    closeDocumentById(closedDocId, client);
+
+                    //checkDocPermission(docId, dop->getuserId());
+                    if(docId < 0 ){ // doesnt have permission (no document was found with that name associated to that user)
+                        DocumentOkPacket dokp = DocumentOkPacket(-1, docName, QVector<QVector<QSymbol>>());
+                        dokp.send(*pClient);
+                        break;
+                    }
+                    // Set the document in the packet as the current opened doc
+                    documentMapping[docId].append(client);
+
+                    //** Send the content of the document
+                    QVector<QVector<QSymbol>> qsymbols;
+                    //Se non ancora aperto da nessun utente online carico da disco e inizializzo sharedEditor (istanza CRDT)
+                    if(!isOpenedEditorForGivenDoc(docId)){
+                        qsymbols = loadFromDisk(docId);
+                        QSharedPointer<SharedEditor> se(new SharedEditor(9999));
+                        std::vector<std::vector<QSymbol>> symbols  = toVector(qsymbols);
+                        se->setSymbols(symbols);
+                        editorMapping.insert(docId, se);
+                    } else // Altrimenti prendo lo stato soltanto
+                    {
+                        std::vector<std::vector<QSymbol>> symbols = editorMapping[docId]->getSymbols();
+                        qsymbols = toQVector(symbols);
+                        editorMapping[docId]->connectedUsersIncrease();
+                    }
+
+                    DocumentOkPacket dokp = DocumentOkPacket(docId, docName, qsymbols);
+                    dokp.send(*pClient);
+                    // Send current online userlist for the given document
+                    sendUpdatedOnlineUserByDocId(docId);
+                }
+                else{
+                    qDebug() << "INVITATION NOT ACCEPTED";
+                }
+
             }
             else {
+                int docId = msg->getdocId();
                 // Check permission of the user for that doc
                 if(!checkDocPermission(docId, userId)){
                     qDebug() << "ASK URI PACKET permission denied";

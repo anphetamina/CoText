@@ -264,12 +264,24 @@ bool acceptInvite(QString invURI, int userId) {
     return true;
 }
 
+QVector<QString> docByInvURI(QString invURI){
+    QVector<QString> doc({"",""});
+    QSqlQuery query;
+    query.exec("SELECT documentid, documentname, documentpath FROM Permission WHERE URI='"+invURI+"'");
+    if (query.next()) {
+        doc[0] = query.value(0).toString();
+        doc[1] = query.value(1).toString();
+    }
+    return doc;
+}
+
 /*
  * Add the document permission for a given documentId and userId.
  * Return false in case of failure.
  * Note: returns true also if the document already exist.
  */
-bool addDocPermission(int docId, int userId) {
+
+bool addDocPermission(int docId, int userId){
     QSqlQuery query, query2, query3;
     QString quserId = QString::number(userId);
     QString qdocId = QString::number(docId);

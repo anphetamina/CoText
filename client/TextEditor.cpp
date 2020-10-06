@@ -675,9 +675,11 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
 
     emit(setMainWindowTitle(docName));
 
-    if(this->toPlainText().length() > 0)
-        this->clear();
+    documentId = docId;
+    if(this->editor.getSymbols()[0].size() != 0){
         editor.clear();
+        this->clear();
+    }
 
     this->setDisabled(false);
     Benchmark b = Benchmark("TextEditor::openDocument");
@@ -776,6 +778,10 @@ int TextEditor::getSiteId(){
 }
 
 
+
+int TextEditor::getDocId() const{
+    return documentId;
+}
 
 // todo handle offline case
 
