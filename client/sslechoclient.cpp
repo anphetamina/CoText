@@ -344,6 +344,9 @@ void SslEchoClient::sendDocCreate(QString docName, qint32 userId) {
         return;
     DocumentCreatePacket dcp = DocumentCreatePacket(docName, userId );
     dcp.send(*pServer);
+    // For now auto send also a document open (for UX pourpose?)
+    DocumentOpenPacket dop = DocumentOpenPacket(docName, userId );
+    dop.send(*pServer);
 }
 
 /*
