@@ -43,11 +43,13 @@ In addition there are 2 empty document already loaded:
 
 ### :file_folder: Filesystem
 You need some space to store the document that are saved in the current working directory in which the server is run.
-In addition the profile pictures of the user are saved in the server/profilePictures.This folder *should not* be deleted. If you need space and you will to loose all the pictures to gain space, you can delete all its content.
+In addition the profile pictures of the user are saved in the server/profilePictures.
+
+This folder *should not* be deleted. If you need space and you will to loose all the pictures to gain space, you can delete all its content.
 
 ### :closed_lock_with_key: Security requirements
 To use the software you need a valid SSL certificate. 
-In the repo an example certificate and its private key are given for localhost (dev) usage. 
+In the repo an example (self-signed) certificate and its private key are given for localhost (dev) usage. 
 
 ### :computer: Platforms 
 The current tested platform are:
@@ -91,9 +93,9 @@ Some other features that could be worth are:
 - Improve documentation
 
 ### :unlock: Security concerns
-The security was not our first priority in this stage.
-A non exhaustive list of issues is the following:
+The security was not our first priority in this project.
+A non exhaustive list of known issues is the following:
 - SQLInjection protection in many parametric queries based on user given values
 - Use an hash function to avoid storing the password in clear
 - Use safer random generator functions and algorithm
-- Some kind of DoS attack could represent an issue
+- Some kind of particular attacks can cause DoS on the server. This represents a scalability/security issue
