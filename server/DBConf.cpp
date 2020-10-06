@@ -163,17 +163,6 @@ bool saveProfilePic(int id, QIcon newIcon){
     return pixmap.save("./profilePictures/"+pictureFileName);
 }
 
-bool createFolderIfNotExist(std::string fname){
-    /*
-    namespace fs = std::filesystem;
-    const auto current_path = fs::current_path();
-    const auto target_path = (current_path / fname);
-    if (!fs::is_directory(fname) || !fs::exists(fname)) { // Check if src folder exists
-        fs::create_directory(fname); // create src folder
-    }
-     */
-}
-
 QVector<QString> getDocuments(int userId){
     QVector<QString> docList = QVector<QString>();
     QSqlQuery query;
@@ -244,7 +233,7 @@ QString createInvite(int docId){
     }
 
     bool unique = false;
-    while(!unique){
+    while(!unique){//TODO: A better logic could be implemented for sure here, but collision rate is *really* low (and every time the invite is accepted the entry is deleted)
         QSqlQuery uquery;
         invURI = GetRandomString(20);
         uquery.exec("SELECT documentid FROM Permission WHERE URI="+invURI);
@@ -282,8 +271,8 @@ bool acceptInvite(QString invURI, int userId){
     return true;
 }
 
+/*Add the document permission for a given set user, document */
 bool addDocPermission(int docId, int userId){
-    /*Add the document permission for a given set user, document */
     QSqlQuery query, query2, query3;
     QString quserId = QString::number(userId);
     QString qdocId = QString::number(docId);
@@ -321,10 +310,6 @@ QVector<QVector<QSymbol>> loadFromDisk(int docId){
     QVector<QVector<QSymbol>> qdoc;
     if(!file.open(QIODevice::ReadOnly)){
         qdoc = {{}};  // if no file is found, maybe it's an empty document for now.
-        //qdoc = QVector<QVector<QSymbol>>()
-        //QVector<QSymbol> temp;
-        //qdoc.push_back(temp);
-
     } else {
         QDataStream out(&file);   // we will serialize the data into the file
         out >> qdoc;
