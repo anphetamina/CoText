@@ -33,7 +33,8 @@ public:
 
     std::atomic<bool> isFromRemote;
     std::atomic<bool> isFromRemoteCursor;
-
+    void setSiteId(int siteId);
+    int getSiteId();
 private:
     QWidget *parent;
     Ui::MainWindow &ui;
@@ -62,6 +63,7 @@ public slots:
     void updateAlignment(Qt::Alignment alignment, int position);
     void openDocument(int docId, QString docName, std::vector<std::vector<QSymbol>> symbols);
     void updateCursorMap(QVector<User> onlineUserList);
+    //void loginSuccessful();
 
 private slots:
     void selectFont();

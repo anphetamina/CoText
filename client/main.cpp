@@ -39,7 +39,6 @@ int main(int argc, char *argv[]) {
 
     TextEditor* editor = new TextEditor(user.getId(), *w->getUi(), w); // todo get site id from server
     editor->setDisabled(true);
-
     w->setCentralWidget(editor);
     w->setTextEditor(editor);
     w->connectToTextEditor(editor);
@@ -75,7 +74,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    // After login show main window
+    // After a successful login show main window
     w->show();
 
     //delete client;
