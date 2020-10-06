@@ -674,9 +674,11 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
     qDebug() << "[DOC_OPENED] : updating siteId "<< this->getSiteId();
 
     emit(setMainWindowTitle(docName));
-    editor.clear();
+
     if(this->toPlainText().length() > 0)
         this->clear();
+        editor.clear();
+
     this->setDisabled(false);
     Benchmark b = Benchmark("TextEditor::openDocument");
     b.startTimer();
