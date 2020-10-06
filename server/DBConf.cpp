@@ -139,22 +139,27 @@ User* checkUserLoginData(QString email, QString password){
 }
 
 /*
+ * Load a profile picture from disk as QICon given the userId
+ */
 QIcon loadProfilePic(int id){
     QString pictureFileName = QString::number(id)+".png";
-    namespace fs = std::filesystem;
-    const auto current_path = fs::current_path();
-    const auto profilepic_path = (current_path / "profilePictures") /pictureFileName.toStdString();
     QIcon myicon = QIcon();
-    if(fs::exists(profilepic_path)) {
-        myicon = QIcon("./profilePictures/" + pictureFileName);
+    QString filePath ="./profilePictures/"+pictureFileName;
+    QFile file(filePath);
+    QVector<QVector<QSymbol>> qdoc;
+    if(!file.open(QIODevice::ReadOnly)){
+        myicon = QIcon(filePath);
     }
+
     return myicon;
 }
-*/
+
+/*
+ * Load a profile picture to disk as QICon given the userId and the icon
+ */
 bool saveProfilePic(int id, QIcon newIcon){
     QString pictureFileName = QString::number(id)+".png";
     QPixmap pixmap = newIcon.pixmap(64);
-    createFolderIfNotExist("profilePictures");
     return pixmap.save("./profilePictures/"+pictureFileName);
 }
 
