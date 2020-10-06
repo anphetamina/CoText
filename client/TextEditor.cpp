@@ -671,9 +671,9 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
     }
 
     emit(setMainWindowTitle(docName));
+    editor.clear();
     this->clear();
     this->setDisabled(false);
-
     Benchmark b = Benchmark("TextEditor::openDocument");
     b.startTimer();
     index.clear();
@@ -684,6 +684,7 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
     for (int i = 0; i < symbols.size(); i++) {
         this->remoteInsertBlock(symbols[i]);
     }
+
     /*
     parallel_for(symbols.size(), [&](int start, int end){
         for(int i = start; i < end; ++i) {
@@ -692,7 +693,6 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
     } );
     */
     b.stopTimer();
-
 }
 
 void TextEditor::printSymbols() {
