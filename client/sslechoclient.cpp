@@ -180,11 +180,11 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             User loggedUser = loginOk->getUser();
             if ( loggedUser.isLogged() ){
                 qDebug() << "[AUTH] Logged in as: " << loggedUser.getEmail();
-                emit loginSuccessful();
+                emit loginSuccessfulReceived();
             }
             else {
                 qDebug() << "[AUTH] FAILED. See the server for the log.";
-                emit loginFailed();
+                emit loginFailedReceived();
             }
             pServer = qobject_cast<QWebSocket *>(sender());
             // .... DEBUG TODO: REMOVE when opendoc GUI is implemented and linked here
@@ -192,6 +192,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
 
 	        //emit auth(loggedUser);
 	        user = loggedUser;
+
 	        //qDebug() << "USER LOGGED " << user.getId() << " " << user.getEmail();
 
 	        break;
@@ -333,10 +334,13 @@ void SslEchoClient::connectToEditor(TextEditor* te) {
     connect(this, &SslEchoClient::documentReceived, te, &TextEditor::openDocument);
     connect(this, &SslEchoClient::updateAlignmentReceived, te, &TextEditor::updateAlignment);
     connect(this, &SslEchoClient::updateUserListReceived, te, &TextEditor::updateCursorMap);
+    //connect(this, &SslEchoClient::loginSuccessfulReceived, te, &TextEditor::loginSuccessful);
+
     connect(te, &TextEditor::symbolsInserted, this, &SslEchoClient::sendInsert);
     connect(te, &TextEditor::symbolsErased, this, &SslEchoClient::sendErase);
     connect(te, &TextEditor::cursorPositionChanged, this, &SslEchoClient::sendCursor);
     connect(te, &TextEditor::textAlignmentChanged, this, &SslEchoClient::sendAlignment);
+
 }
 
 void SslEchoClient::connectToMainWindow(MainWindow* mw) {
