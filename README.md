@@ -1,7 +1,23 @@
 # CoText
+## What is?
+Cotext is an implementation of a text enriched collaborative editor.
+With CoText the users are able to perform operation on the same document at the same time.
+
+In particular, any user will be able to:
+- Create an account/login
+- Create a document
+- Invite an other user by sharing an invitation code OOB
+- Use different text enrichment features like bold, italics, size, ..
+- Use actions enrichment
+- See which users are current working on the document and where their cursor is 
+
+Additional features are:
+- Persistency (auto-saving performed by server)
+- Multi-platform compatibility
+- Low footprint on bandwith, memory and CPU.
 
 ## Setup
-CoText has some requirements that need to be met to run it.
+CoText has some requirements and some setup steps needed to run it.
 
 ### Database 
 A MySQL server running on the server side is required.
@@ -56,11 +72,19 @@ Cotext use persistency just on the server side. Here there is the list showing i
 - User pictures are stored on filesystem
 - Document content (and its metainformation) are also stored on disk
 
+###  Conflict-Free Replicated Data Type (CRDT)
+When users make concurrent edits to a shared document, the insert and delete operations must commute and the delete operations must be idempotent.
+Commutativity: Concurrent insert and delete operations converge to the same result regardless of the order in which they are applied.
+Idempotency: Repeated delete operations produce the same result.
+
+Such properties can be implemented by using a CRDT algorithm.
+Our implementation was based on [conclaveApp implementation](https://conclave-team.github.io/conclave-site/#what-is-a-real-time-collaborative-)
 
 ## TODO-s
-- Store authentication data on client to avoid repeating the login every time
-- Use compression in the DocumentOk packet to improve bandwidth usage and trasfer time for large document
-- Improve UX
+Some other features that could be worth are:
+[] Store authentication data on client to avoid repeating the login every time
+[] Use compression in the DocumentOk packet to improve bandwidth usage and trasfer time for large document
+[] Improve UX
 
 ### Security concerns
 The security was not our first priority in this stage.
