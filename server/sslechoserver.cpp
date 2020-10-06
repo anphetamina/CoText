@@ -125,28 +125,31 @@ void SslEchoServer::socketDisconnected()
         client->logout();
         // Get opened document id so that i can send to all the user connected to the same document a new online user lst
         int closedDocId = getDocIdOpenedByUserId(client->getUserId());
-        if(closedDocId > 0) {
-            // Remove from documentopen map
-            this->findAndDeleteFromDoclist(client);
-
-            // Decrease the counter of current online user per document
-            editorMapping[closedDocId]->connectedUsersDecrease();
-            qDebug() << "Remaining online user in the same document: " << editorMapping[closedDocId]->getConnectedUsers();
-            // Every time a user disconnect itself the server save a copy
-            saveToDisk(toQVector(editorMapping[closedDocId]->getSymbols()), closedDocId);
-
-            // if last user online is disconnecting,  delete the editorMapping entry
-            if(editorMapping[closedDocId]->getConnectedUsers() == 0)
-                editorMapping.remove(closedDocId);
-
-            // Send to all the the user connected to the document that was just closed by the client the new userlist
-            sendUpdatedOnlineUserByDocId(closedDocId);
-        }
+        closeDocumentById(closedDocId, client);
         // Remove client element from map and close the socket
         clientMapping.remove(pClient);
 
         pClient->close();
         pClient->deleteLater();
+    }
+}
+
+bool SslEchoServer::closeDocumentById(int closedDocId, QSharedPointer<Client> client){
+    // Check if there was any document open
+    if(closedDocId > 0) {
+        // Remove from document open map
+        this->findAndDeleteFromDoclist(client);
+
+        // Decrease the counter of current online user per document
+        editorMapping[closedDocId]->connectedUsersDecrease();
+        qDebug() << "[DOC_CLOSE] Remaining online user in the same document: " << editorMapping[closedDocId]->getConnectedUsers();
+        // Every time a user disconnect itself the server save a copy
+        saveToDisk(toQVector(editorMapping[closedDocId]->getSymbols()), closedDocId);
+        // if last user online is disconnecting,  delete the editorMapping entry
+        if(editorMapping[closedDocId]->getConnectedUsers() == 0)
+            editorMapping.remove(closedDocId);
+        // Send to all the the user connected to the document that was just closed by the client the new userlist
+        sendUpdatedOnlineUserByDocId(closedDocId);
     }
 }
 
@@ -409,10 +412,13 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             }
 
             DocumentOpenPacket* dop = dynamic_cast<DocumentOpenPacket*>(rcvd_packet.get());
-            // Check if user already had an open document and delete that entry eventually #TONOTE: 1 document opened for user as of now
-            this->findAndDeleteFromDoclist(client);
-            // Check permission of the user for that doc
+
+            int closedDocId = getDocIdOpenedByUserId(client->getUserId());
+            closeDocumentById(closedDocId, client);
+
+            // Get DocID and check permission of the user for that doc
             int docId = docIdByName(dop->getdocName(), dop->getuserId());
+            qDebug()<<"[SERVER] DocumentOpenPacket received docId = "<<docId<<" docName = "<<dop->getdocName() <<" userId = "<<dop->getuserId();
             //checkDocPermission(docId, dop->getuserId());
             if(docId < 0 ){ // doesnt have permission (no document was found with that name associated to that user)
                 DocumentOkPacket dokp = DocumentOkPacket(-1, dop->getdocName(), QVector<QVector<QSymbol>>());
@@ -426,6 +432,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             QVector<QVector<QSymbol>> qsymbols;
             //Se non ancora aperto da nessun utente online carico da disco e inizializzo sharedEditor (istanza CRDT)
             if(!isOpenedEditorForGivenDoc(docId)){
+                qDebug()<<"[SERVER] if";
                 qsymbols = loadFromDisk(docId);
                 QSharedPointer<SharedEditor> se(new SharedEditor(9999));
                 std::vector<std::vector<QSymbol>> symbols  = toVector(qsymbols);
@@ -433,6 +440,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
                 editorMapping.insert(docId, se);
             } else // Altrimenti prendo lo stato soltanto
             {
+                qDebug()<<"[SERVER] else";
                 std::vector<std::vector<QSymbol>> symbols = editorMapping[docId]->getSymbols();
                 qsymbols = toQVector(symbols);
                 editorMapping[docId]->connectedUsersIncrease();
@@ -444,6 +452,22 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             sendUpdatedOnlineUserByDocId(docId);
             break;
         }
+        /*
+        case(PACK_TYPE_DOC_CLOSE): {
+            if (!client->isLogged()) {
+                break;
+            }
+            DocumentClosePacket* dcp = dynamic_cast<DocumentClosePacket*>(rcvd_packet.get());
+            int docId = docIdByName(dcp->getdocName(), dcp->getuserId());
+            //checkDocPermission(docId, dcp->getuserId());
+            if(docId < 0 ){ // doesnt have permission (no document was found with that name associated to that user)
+                DocumentOkPacket dokp = DocumentOkPacket(-1, dop->getdocName(), QVector<QVector<QSymbol>>());
+                dokp.send(*pClient);
+                break;
+            }
+
+            break;
+        }*/
         case(PACK_TYPE_DOC_DEL): {
             if (!client->isLogged()) {
                 break;

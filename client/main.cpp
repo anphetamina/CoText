@@ -52,13 +52,14 @@ int main(int argc, char *argv[]) {
     w->setWindowTitle("Welcome");
     w->setWindowIconText("Co-Text");
 
-    TextEditor editor(user.getId(), *w->getUi(), w); // todo get site id from server
-    editor.setDisabled(true);
+    TextEditor* editor = new TextEditor(user.getId(), *w->getUi(), w); // todo get site id from server
+    editor->setDisabled(true);
 
-    w->setCentralWidget(&editor);
-    w->connectToTextEditor(&editor);
+    w->setCentralWidget(editor);
+    w->setTextEditor(editor);
+    w->connectToTextEditor(editor);
     client->connectToMainWindow(w);
-    client->connectToEditor(&editor);
+    client->connectToEditor(editor);
     //client->connectToLoginWindow(login, w); //TODO: use signal/slot for creating/closing diffent windows.tonote: login is a QDialog not QWindow
 
     /*while(user == nullptr || !user->isLogged()) {
