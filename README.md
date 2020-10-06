@@ -82,9 +82,9 @@ Our implementation was based on [conclaveApp implementation](https://conclave-te
 
 ## TODO-s
 Some other features that could be worth are:
-[] Store authentication data on client to avoid repeating the login every time
-[] Use compression in the DocumentOk packet to improve bandwidth usage and trasfer time for large document
-[] Improve UX
+- Store authentication data on client to avoid repeating the login every time
+- Use compression in the DocumentOk packet to improve bandwidth usage and trasfer time for large document
+- Improve UX
 
 ### Security concerns
 The security was not our first priority in this stage.
