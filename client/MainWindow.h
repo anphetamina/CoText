@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <cstdlib>
 #include <QPointingDeviceUniqueId>
-#include <QMainWindow>
+//#include <QMainWindow>
 #include <QFile>
 #include <QFileDialog>
 #include <QTextStream>
@@ -15,6 +15,7 @@
 
 #include "UserWidget.h"
 #include "TextEditor.h"
+#include "StatusBar.h"
 
 
 //#include <QSqlDatabase>
@@ -43,6 +44,7 @@ public:
 
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+	
 
     static void setUser(User* usr){
         user.setName(usr->getName());
@@ -59,8 +61,6 @@ public:
 
     Ui::MainWindow *getUi() const;
     TextEditor* getTextEditor() const;
-    void setupStatusBar();
-    void setStatusBar(QStatusBar *qSb);
     QColor getUserColor(int userId) const;
     void connectToTextEditor(TextEditor* te);
     void setTextEditor(TextEditor* te);
@@ -100,11 +100,12 @@ signals:
 
 private:
     Ui::MainWindow *ui;
-    QStatusBar *statusBar;
+    StatusBar *qSB;
+
+    TextEditor *editor;
     QString currentFileName = "";
     QVector<QString> docList;
     QVector<User> userList = {};
-    TextEditor* editor;
     //std::vector<User> userList = {};
     QMap<int, QColor> colorMap = {};
     QVector<QColor> colorList = {QColor(255,0,0),   //red

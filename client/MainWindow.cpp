@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     QApplication::instance()->setAttribute(Qt::AA_DontShowIconsInMenus, true);
 
     ui->setupUi(this);
-
+    ui->rightToolBar->setVisible(false);
     //installing EventFilter for QToolButtons on the qToolBar
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionLogin))->installEventFilter(this);
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionOpen))->installEventFilter(this);
@@ -62,9 +62,16 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     actionUserList.insert(18,ui->actionUser18);
     actionUserList.insert(19,ui->actionUser19);
     
-    setupStatusBar();
-
-
+    setStatusBar(new StatusBar(*ui, this));
+    this->qSB = dynamic_cast<StatusBar *>(statusBar());
+    qSB->setupSB();
+    qSB->displaySB();
+    
+    
+	
+	
+	
+	
     /*actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser0));
     actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser1));
     actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser2));
@@ -104,7 +111,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
 
 bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
-    // qDebug()<<"Sono entrato nella evetFilter" << event->type() << watched;
+    // qDebug()<<"Sono entrato nella eventFilter" << event->type() << watched;
 
     //Login
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionLogin)) && event->type() == QEvent::Enter) {
@@ -470,85 +477,7 @@ void MainWindow::sendJoinMainWindow(qint32 userId, int docId, QString invCode){
 }
 
 
-void MainWindow::setupStatusBar() {
-	QStatusBar *qSB = ui->statusbar;
-	QProgressBar *qPB = new QProgressBar();
-	
-	/** Defining Separator */
-	QLabel *vSeparator = new QLabel(tr("verticalSeparator"));
-	vSeparator->setAlignment(Qt::AlignCenter);
-	QPixmap vSepPM(QPixmap(":imgs/icons/verticalSeparator.svg"));
-	vSeparator->setPixmap(vSepPM);
-	/** end separator */
-	
-	/** Defining other info */
-	QLabel *fixedLabel = new QLabel(tr("©Co-Text"));
-	QLabel *userListToggle = new QLabel(tr("userList"));
-	QLabel *nActiveUsers = new QLabel(tr("nActiveUsers"));
-	QLabel *docTitle = new QLabel(tr("docTitle"));
-	QLabel *docSize = new QLabel(tr("docSize"));
-	QLabel *nChars = new QLabel(tr("Number of chars"));
-	/** end definitions */
-	
-	/**Setup */
-	//1.
-	fixedLabel->setMinimumSize(fixedLabel->sizeHint());
-	fixedLabel->setAlignment(Qt::AlignCenter);
-	fixedLabel->setText(tr("©Co-Text"));
-	fixedLabel->setToolTip("Name of the application");
-	fixedLabel->setCursor(Qt::PointingHandCursor);
-	
-	//2.
-	userListToggle->setMinimumSize(userListToggle->sizeHint());
-	userListToggle->setAlignment(Qt::AlignCenter);
-	userListToggle->setText("activeUsers");
-	userListToggle->setToolTip("List of active users on this Document");
-	userListToggle->setCursor(Qt::PointingHandCursor);
-	QPixmap userListPM(QPixmap(":imgs/icons/user-group_whiteSB.svg"));
-	userListToggle->setPixmap(userListPM);
-	userListToggle->setFixedWidth(20);
-	
-	//3.
-	nActiveUsers->setMinimumSize(fixedLabel->sizeHint());
-	nActiveUsers->setAlignment(Qt::AlignCenter);
-	nActiveUsers->setText(tr("nActiveUsers"));
-	nActiveUsers->setToolTip("#activeUsers");
-	
-	//4.
-	docSize->setMinimumSize(docSize->sizeHint());
-	docSize->setAlignment((Qt::AlignRight | Qt::AlignVCenter));
-	docSize->setText(tr("size of the document").arg(0));
-	docSize->setToolTip(tr("The memory used for the current document."));
-	docSize->setCursor(Qt::PointingHandCursor);
-	
-	//5. TODO error messages with icon
-	/** end setup */
-	
 
-
-	/** Display */
-	
-	//this function append starting from the right
-	qSB->addPermanentWidget(userListToggle);
-	qSB->addPermanentWidget(nActiveUsers);
-	qSB->addPermanentWidget(vSeparator);
-	qSB->addPermanentWidget(fixedLabel);
-	// TODO handling click on the widget to show up the list of users
-	
-	//starting from left
-	qSB->addWidget(docTitle);
-	qSB->addWidget(docSize);
-	qSB->addWidget(nChars);
-	/**end display */
-
-	//qSB->showMessage(tr("Ready"), 2000);
-	
-	/*
-	qPB->setTextVisible(false);
-	qPB->setRange(0, 0);
-	qSB->addWidget(qPB, 1);
-    */
-}
 
 void MainWindow::documentListReceivedMainWindow(QVector<QString> documentList){
     docList = documentList;
