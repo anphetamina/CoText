@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <cstdlib>
 #include <QPointingDeviceUniqueId>
-#include <QMainWindow>
+//#include <QMainWindow>
 #include <QFile>
 #include <QFileDialog>
 #include <QTextStream>
@@ -15,6 +15,7 @@
 
 #include "UserWidget.h"
 #include "TextEditor.h"
+#include "StatusBar.h"
 
 
 //#include <QSqlDatabase>
@@ -43,6 +44,7 @@ public:
 
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+	
 
     static void setUser(User* usr){
         user.setName(usr->getName());
@@ -57,8 +59,8 @@ public:
     	return user;
     }
     
-    void setupStatusBar();
-    void setStatusBar(QStatusBar *qSb);
+
+    
 
     Ui::MainWindow *getUi() const;
 
@@ -92,9 +94,17 @@ signals:
 
 private:
     Ui::MainWindow *ui;
-    QStatusBar *statusBar;
+    StatusBar *qSB;
+
     TextEditor *editor;
     QString currentFileName = "";
+	//std::multimap<int, QAction*> actionUserMap;
+	QVector<QAction*> actionUserList;
+	//QAction* actionUserList;
+	//SslEchoClient *client;
+	void Save_as();
+	void closeEvent(QCloseEvent *event) override;
+	bool eventFilter(QObject *watched, QEvent *event) override;
     QVector<User> userList = {};
     //std::vector<User> userList = {};
     QMap<int, QColor> colorMap = {};
@@ -167,13 +177,6 @@ private:
             {-1,QColor(128, 0, 128)} //purple
     };*/
 
-    //std::multimap<int, QAction*> actionUserMap;
-    QVector<QAction*> actionUserList;
-    //QAction* actionUserList;
-    //SslEchoClient *client;
-    void Save_as();
-    void closeEvent(QCloseEvent *event) override;
-    bool eventFilter(QObject *watched, QEvent *event) override;
 
 };
 #endif // MAINWINDOW_H
