@@ -180,15 +180,30 @@ bool checkDocPermission(int docId, int userId) {
  * Create a document given a name and the userId of the creator
  */
 bool createDoc(QString docName, int userId) {
-    QSqlQuery query, query2, query3;
+    QSqlQuery query0, query, query2, query3;
     QString quserId = QString::number(userId);
     QString docPath = QString();
-    query.exec(
-            "INSERT INTO Permission(documentname, documentpath, userid) VALUES ('" + docName + "','" + docPath + "'," +
-            quserId + ")");
-    // Check if it was already added (userid, docID) should be UNIQUE
-    query2.exec("SELECT id, documentname FROM Permission WHERE userid=" + quserId + " ORDER BY ID DESC");
+    QString available_docName = docName;
+    bool available_name = false;
 
+    while(!available_name){//TODO: improve logic, but good PoC
+        // Check if it was already added (userid, docID) should be UNIQUE
+        query0.exec("SELECT id FROM Permission WHERE userid=" + quserId +"AND documentname=" + available_docName + ";");
+
+        if (!query0.next()) {
+            break;
+        } else {
+            available_docName.append("_copy");
+        }
+    }
+    //docPath = available_docName+".dat";
+
+    query.exec(
+            "INSERT INTO Permission(documentname, documentpath, userid) VALUES ('" + available_docName + "','" + docPath + "'," +
+            quserId + ")");
+    // Check if it was added ; (userid, docID) should be declared as UNIQUE
+    // and get docId (dirty way)
+    query2.exec("SELECT id, documentname FROM Permission WHERE userid=" + quserId + " ORDER BY ID DESC");
     if (query2.next()) {
         int id = query2.value(0).toInt();
         QString qdocId = QString::number(id);
@@ -335,7 +350,7 @@ QVector<QVector<QSymbol>> loadFromDisk(int docId) {
 }
 
 /*
- * Generate an alphanumerical string for the given lenght.
+ * Generate an alphanumerical string for the given length.
  */
 QString GetRandomString(int randomStringLength = 100) {
     const QString possibleCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
