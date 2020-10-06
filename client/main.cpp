@@ -23,17 +23,17 @@ int main(int argc, char *argv[]) {
 	QString stylesheetString = QLatin1String(styleFile.readAll());
 	a.setStyleSheet(stylesheetString);
 
-	/*
+
 	// user/pass test authentication for now
-    QString quser, qpass;
-	if (argc > 1) {
+    /*QString quser, qpass;
+	if (argc > 2) {
         std::string username = argv[1];
         std::string password = argv[2];
         quser = QString::fromStdString(username);
         qpass = QString::fromStdString(password);
         client->set_username(quser);
         client->set_password(qpass);
-    }
+    }*/
 
     /** Login Phase */
 	client = new SslEchoClient(QUrl(QStringLiteral("wss://localhost:12345")));
@@ -66,8 +66,13 @@ int main(int argc, char *argv[]) {
         QCoreApplication::processEvents();
     }*/
 
-    while(!user.isLogged()) {   //todo understand if it's correct
+    while(!user.isLogged() && login->isVisible()) {   //todo understand if it's correct
         QCoreApplication::processEvents();
+    }
+    // Check if the while was broken by the login or the closing of the window
+    if(!user.isLogged()){
+        qApp->quit();
+        return -1;
     }
 
     // After login show main window
