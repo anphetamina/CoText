@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     SslEchoServer server(12345);
     dbConfigure();
-
+    qsrand(QTime::currentTime().msec());
     getUserlist();
     //qDebug() <<  createDoc("AAA", 1);
     //addDocPermission(1,2);
