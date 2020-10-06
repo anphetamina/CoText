@@ -4,9 +4,10 @@
 
 
 #include "StatusBar.h"
+#include "MainWindow.h"
 
 //! [Constructor]
-StatusBar::StatusBar(Ui::MainWindow &ui, QWidget *parent): parent(parent), ui(ui), isUserListToggled(false) {
+StatusBar::StatusBar(Ui::MainWindow &ui, MainWindow* mw, QWidget *parent): mw(mw), parent(parent), ui(ui), isUserListToggled(false) {
 	
 	//this->setupSB();
 	//this->displaySB();
@@ -17,8 +18,9 @@ StatusBar::~StatusBar() {
 }
 
 void StatusBar::setupSB() {
-	/**Setup */
 	
+	/**Setup */
+	this->setFixedHeight(22);
 	//0. Define separator to use multiple times (matter of graphics)
 	vSeparator = new QLabel(tr("verticalSeparator"));
 	vSeparator->setAlignment(Qt::AlignCenter);
@@ -45,30 +47,55 @@ void StatusBar::setupSB() {
 	//3.
 	nActiveUsers = new QLabel(tr("#activeUsers"));
 	nActiveUsers->setMinimumSize(nActiveUsers->sizeHint());
+	nActiveUsers->setFixedWidth(22);
+	
 	nActiveUsers->setAlignment(Qt::AlignCenter);
-	nActiveUsers->setText(tr("nActiveUsers")); //TODO it has to be the number
+	/* CONTROLS MAY BE IMPOSSIBLE BECAUSE EDITOR HAS NOT BEEN CREATED YET
+	if(mw->getUserList().isEmpty())
+		nActiveUsers->setText(QString(mw->getUserList().size())); //TODO it has to be the number
+	else
+		nActiveUsers->setText("1");
+	 */
+	nActiveUsers->setText("1");
 	nActiveUsers->setToolTip("#activeUsers");
 	
 	//4.
 	docTitle = new QLabel("Document Title");
 	docTitle->setMinimumSize(docTitle->sizeHint());
 	docTitle->setAlignment(Qt::AlignCenter);
-	docTitle->setText(tr("docTitle"));
+	/*
+	if(mw->getTextEditor()->getDocName().isNull() || mw->getTextEditor()->getDocName().isEmpty())
+		docTitle->setText(mw->getTextEditor()->getDocName());
+	else
+		docTitle->setText("Untitled");
+	 */
+	docTitle->setText("Untitled");
+	docTitle->setFixedWidth(66);
 	docTitle->setToolTip("This is the current document title");
 	
 	//5.
 	docSize = new QLabel(tr("Document Size"));
 	docSize->setMinimumSize(docSize->sizeHint());
+	docSize->setFixedWidth(22);
 	docSize->setAlignment((Qt::AlignRight | Qt::AlignVCenter));
-	docSize->setText(tr("size of the document").arg(0));
+	/*
+	if(mw->getTextEditor()->getNumChars() == 0)
+		docSize->setText("0 B");
+	else
+		docSize->setText(this->calculateDocSize());
+	 */
+	docSize->setText("0");
+	//docSize->setText(this->calculateDocSize());
 	docSize->setToolTip(tr("The memory used for the current document.")); //TODO implement the count in KB -> MB
 	docSize->setCursor(Qt::PointingHandCursor);
 	
 	//6.
 	nChars = new QLabel("#nChars");
 	nChars->setMinimumSize(nChars->sizeHint());
+	nChars->setFixedWidth(22);
 	nChars->setAlignment(Qt::AlignCenter);
-	nChars->setText(tr("#chars"));
+	//nChars->setText(QString(mw->getTextEditor()->getNumChars()));
+	nChars->setText("0");
 	nChars->setToolTip("Total amount of chars of the document");
 	
 	
@@ -96,6 +123,29 @@ void StatusBar::displaySB() {
 	addWidget(nChars);
 	/**end display */
 	
+}
+
+QString StatusBar::calculateDocSize() {
+	//Assuming each char is 8 bit = 1 Byte
+	float size = 0;
+	QString newSize = "";
+	int nCh = mw->getTextEditor()->getNumChars();
+	
+	if(nCh < 1000) {
+		newSize = QString(nCh)+" Bytes";
+		return newSize;
+	} else {
+		if(nCh < 1000*1000) { //use KB
+			size = (float) nCh / 1000;
+			newSize = QString::number(size)+" KB";
+		} else { // use MB
+			size = (float) nCh / (1000*1000);
+			newSize = QString::number(size)+" MB";
+		}
+	
+	}
+	
+	return newSize;
 }
 
 void StatusBar::updateDocInfo() {}

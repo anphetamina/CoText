@@ -773,15 +773,23 @@ void TextEditor::updateCursorMap(QVector<User> onlineUserList) {
 void TextEditor::setSiteId(int siteId){
     this->editor.setSiteId(siteId);
 }
+
 int TextEditor::getSiteId(){
     return this->editor.getSiteId();
 }
 
-
-
 int TextEditor::getDocId() const{
     return documentId;
 }
+
+QString TextEditor::getDocName() const {
+	return documentName;
+}
+
+int TextEditor::getNumChars() const {
+	return nChars;
+}
+
 
 // todo handle offline case
 

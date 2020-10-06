@@ -44,26 +44,33 @@ public:
 
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    
+	//! [Setters]
+	static void setUser(User* usr){
+		user.setName(usr->getName());
+		user.setSurname(usr->getSurname());
+		user.setNick(usr->getNick());
+		user.setEmail(usr->getNick());
+		user.setProfilePic(usr->getProfilePic());
+		user.setUserState(20); //ACTIVE USER
+	}
 	
-
-    static void setUser(User* usr){
-        user.setName(usr->getName());
-        user.setSurname(usr->getSurname());
-        user.setNick(usr->getNick());
-        user.setEmail(usr->getNick());
-        user.setProfilePic(usr->getProfilePic());
-        user.setUserState(20); //ACTIVE USER
-    }
-
+	void setTextEditor(TextEditor* te);
+	
+	
+	//! [Getters]
+	Ui::MainWindow *getUi() const;
+	TextEditor* getTextEditor() const;
+	QColor getUserColor(int userId) const;
     static User getUser() {
     	return user;
     }
+    
+    QVector<User> getUserList() const;
 
-    Ui::MainWindow *getUi() const;
-    TextEditor* getTextEditor() const;
-    QColor getUserColor(int userId) const;
+    //! [other member functions]
     void connectToTextEditor(TextEditor* te);
-    void setTextEditor(TextEditor* te);
+    
 
 private slots:
     void on_actionNew_triggered();

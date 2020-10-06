@@ -13,23 +13,26 @@
 #include <QMainWindow>
 
 namespace Ui { class MainWindow; }
+class MainWindow;
 
 class StatusBar : public QStatusBar {
 	Q_OBJECT
 	
 public:
-	explicit StatusBar(Ui::MainWindow &ui, QWidget *parent = nullptr);
+	explicit StatusBar(Ui::MainWindow &ui, MainWindow* mw, QWidget *parent = nullptr);
 	~StatusBar();
 	void setupSB();
 	void displaySB();
 	void updateDocInfo();
 	void updateUsersInfo();
+	QString calculateDocSize();
 	
 private:
 	QWidget *parent; //pointer to MainWindow
 	Ui::MainWindow &ui;
 	QLabel *appName = new QLabel(tr("©Co-Text"));
 	QLabel *vSeparator;
+	MainWindow* mw;
 	
 	/** Users Info */
 	QLabel *userListToggle = new QLabel(tr("userList"));

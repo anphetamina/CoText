@@ -494,3 +494,7 @@ void MainWindow::setTextEditor(TextEditor* te){
 TextEditor* MainWindow::getTextEditor() const{
     return editor;
 }
+
+QVector<User> MainWindow::getUserList() const {
+	return userList;
+}
