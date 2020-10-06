@@ -63,7 +63,7 @@ private:
     void sendPing();
 
     QWebSocket *pServer;
-
+    int loginAttemptCount=0;
     void packetParse(QByteArray rcvd_packet);
 
     void sendTest();
@@ -80,5 +80,7 @@ public:
     void sendLogin();
     void socketDisconnected();
     void connectToLoginWindow(Login *login, MainWindow *mw);
+    bool isConnected();
+    int getLoginAttemptCount();
 };
 

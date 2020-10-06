@@ -100,6 +100,7 @@ void SslEchoClient::set_password(QString password){
     this->password = password;
 }
 void SslEchoClient::authenticate(QString username, QString password) {
+    loginAttemptCount++;
     qDebug() << "[NETWORK] ** Sending login req packet ** ";
     QString hashedPassword = password;
     LoginReqPacket lrp = LoginReqPacket(username, hashedPassword);
@@ -107,6 +108,10 @@ void SslEchoClient::authenticate(QString username, QString password) {
 }
 void SslEchoClient::sendLogin(){
     this->authenticate(username, password);
+}
+
+int SslEchoClient::getLoginAttemptCount(){
+    return this->loginAttemptCount;
 }
 
 
@@ -349,6 +354,9 @@ void SslEchoClient::sendDocCreate(QString docName, qint32 userId) {
     dop.send(*pServer);
 }
 
+bool SslEchoClient::isConnected(){
+    return m_webSocket.state() == QAbstractSocket::ConnectedState;
+}
 /*
  * Dont delete pls. Possible enhancement
 void SslEchoClient::connectToLoginWindow(Login* login, MainWindow* mw) {//Qdialog as of now

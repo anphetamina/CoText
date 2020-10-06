@@ -23,29 +23,14 @@ int main(int argc, char *argv[]) {
 	QString stylesheetString = QLatin1String(styleFile.readAll());
 	a.setStyleSheet(stylesheetString);
 
-
-	// user/pass test authentication for now
-    /*QString quser, qpass;
-	if (argc > 2) {
-        std::string username = argv[1];
-        std::string password = argv[2];
-        quser = QString::fromStdString(username);
-        qpass = QString::fromStdString(password);
-        client->set_username(quser);
-        client->set_password(qpass);
-    }*/
-
     /** Login Phase */
 	client = new SslEchoClient(QUrl(QStringLiteral("wss://localhost:12345")));
 	Q_UNUSED(*client);
 
-	Login* login = new Login();
     MainWindow *w = new MainWindow();
+    Login *login = new Login();
 
-    // Set login GUI options
-    login->setWindowTitle("Welcome to CoText!");
-    login->setModal(true);
-    login->exec();
+
 
     // Set MainWindow (Editor) GUI options
     QCoreApplication::setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles, true);
@@ -62,15 +47,30 @@ int main(int argc, char *argv[]) {
     client->connectToEditor(editor);
     //client->connectToLoginWindow(login, w); //TODO: use signal/slot for creating/closing diffent windows.tonote: login is a QDialog not QWindow
 
-    /*while(user == nullptr || !user->isLogged()) {
-        QCoreApplication::processEvents();
-    }*/
+    QString quser, qpass;
+    if (argc > 1) {
+        std::string username = argv[1];
+        std::string password = argv[2];
+        quser = QString::fromStdString(username);
+        qpass = QString::fromStdString(password);
+        while(!client->isConnected()){//TODO: timeout? BTW not so important, argv should be used just to debug, not a requirement
+            QCoreApplication::processEvents();
+        }
+        client->set_username(quser);
+        client->set_password(qpass);
+        client->sendLogin();
+    }else {
+        // Set login GUI options
+        login->setWindowTitle("Welcome to CoText!");
+        login->setModal(true);
+        login->exec();
+    }
 
-    while(!user.isLogged() && login->isVisible()) {   //todo understand if it's correct
+    while(!user.isLogged() && login->isVisible()) {
         QCoreApplication::processEvents();
     }
     // Check if the while was broken by the login or the closing of the window
-    if(!user.isLogged()){
+    if(client->getLoginAttemptCount() == 0){
         qApp->quit();
         return -1;
     }
