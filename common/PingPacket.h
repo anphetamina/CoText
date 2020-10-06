@@ -16,12 +16,15 @@ protected:
 
     // Costruct LoginRequest message with the username of the account that is trying to login
 
-    void writePayload(QDataStream& stream) const override;
-    void readPayload(QDataStream& stream) override;
+    void writePayload(QDataStream &stream) const override;
+
+    void readPayload(QDataStream &stream) override;
 
 public:
     PingPacket(QString m_debug_msg);
+
     ~PingPacket() {};
+
     QString getDebugMsg() const;
 };
 

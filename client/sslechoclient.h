@@ -25,8 +25,8 @@ class SslEchoClient : public QObject
 Q_OBJECT
 public:
     explicit SslEchoClient(const QUrl &url, QObject *parent = nullptr);
-signals:
 
+signals:
     void insertReceived(QSymbol qsymbol);
     void eraseReceived(QSymbol symbol);
     void insertBlockReceived(std::vector<QSymbol> symbols);
@@ -36,9 +36,10 @@ signals:
     void updateUserListReceived(QVector<User> userlist);
     void auth(User loggedUser);
     void documentReceived(int docId, QString docName, std::vector<std::vector<QSymbol>> qsymbols);
-    void loginSuccessful();
-    void loginFailed();
+    void loginSuccessfulReceived();
+    void loginFailedReceived();
     void askUriReceived(QString URI);
+    void documentListReceived(QVector<QString> documentList);
 
 public slots:
     void sendInsert(std::vector<QSymbol> symbols, int siteId);
@@ -46,6 +47,8 @@ public slots:
     void sendCursor(int userId, int position);
     void sendAskUri(qint32 userId, int docId, QString invCode);
     void sendAlignment(Qt::Alignment alignment, int position, int siteId);
+    void sendAskDocList(qint32 userId);
+    void sendDocCreate(QString docName, qint32 userId);
 
 private Q_SLOTS:
     void onConnected();
@@ -60,7 +63,7 @@ private:
     void sendPing();
 
     QWebSocket *pServer;
-
+    int loginAttemptCount=0;
     void packetParse(QByteArray rcvd_packet);
 
     void sendTest();
@@ -77,5 +80,7 @@ public:
     void sendLogin();
     void socketDisconnected();
     void connectToLoginWindow(Login *login, MainWindow *mw);
+    bool isConnected();
+    int getLoginAttemptCount();
 };
 

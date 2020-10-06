@@ -58,6 +58,8 @@ private:
     int getDocIdOpenedByUserId(int userId);
 
     bool isOpenedEditorForGivenDoc(int docId);
+
+    bool closeDocumentById(int closedDocId, QSharedPointer<Client> client);
 };
 
 #endif //SSLECHOSERVER_H

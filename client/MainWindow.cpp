@@ -4,6 +4,8 @@
 #include "TextEditor.h"
 #include "ShareUri.h"
 #include "Join.h"
+#include "OpenDocument.h"
+#include "AlertNewDocument.h"
 #include <QPixmap> //allows to create a qpixmap onj which takes 1 arg
 #include <QPrinter>
 #include <QColorDialog>
@@ -30,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     //this->setCentralWidget(ui->textEdit);
     QPixmap icon(":/appIcon/CoText.ico");
     //ui->iconLabel->setPixmap(icon);
-
+    // ui->statusbar->addPermanentWidget();
     
 	
 	ui->actionCut->setShortcut(QKeySequence::Cut);
@@ -200,37 +202,48 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
 
 
 void MainWindow::on_actionNew_triggered() {
-    currentFileName.clear();
-    setWindowTitle("untitled");
+    if(editor->isEnabled()){    //c'è già un documento aperto
+        AlertNewDocument alert(this->windowTitle(), "");
+        connect(&alert, &AlertNewDocument::openNewDocument, this, &MainWindow::openNewDocumentMainWindow);
+        alert.setWindowTitle("Alert");
+        alert.setModal(true);
+        alert.exec();
+    }else { //non c'è nessun documento aperto
+        QString docName("Untitled");
+        QString name(docName);
+        int i = 0;
+        while (docList.contains(name)) {
+            i++;
+            name = docName + "" + QString::number(i);
+        }
+        emit(sendDocCreateMainWindow(name, user.getId()));   //il server poi risponde con DocumentOkPacket e il client nella slot apre il nuovo documento
+        docList.append(name);
+    }
+}
 
+void MainWindow::openNewDocumentMainWindow(QString docName){
+    QString name(docName);
+    int i = 0;
+    while (docList.contains(name)) {
+        i++;
+        name = docName + "" + QString::number(i);
+    }
+    emit(sendDocCreateMainWindow(name, user.getId()));   //il server poi risponde con DocumentOkPacket e il client nella slot apre il nuovo documento
+    docList.append(name);
 }
 
 void MainWindow::on_actionOpen_triggered() {
-    QString filename = QFileDialog::getOpenFileName(this, "Choose file to open", "/home", "All files .*");
-    if(!filename.isNull()) {
+    //emit(sendAskDocListMainWindow(user.getId()));
+    OpenDocument openDocument(docList, this);
+    connect(&openDocument, &OpenDocument::sendOpenDocument, this, &MainWindow::sendOpenDocumentMainWindow);
+    openDocument.setWindowTitle("Select a document");
+    openDocument.setModal(true);
+    openDocument.exec();
+}
 
-        QFile file(filename);
-        QString filePath = filename.toUtf8();
-
-        currentFileName = filename;
-
-        //checks
-        if(!file.open(QIODevice::ReadOnly | QFile::Text)) {
-            QMessageBox::warning(this, "Warning", "Can not open file:  "+ file.errorString());
-            return;
-        }
-
-        setWindowTitle((filename));
-        QTextStream in(&file);
-        QString text = in.readAll();
-//        ui->textEdit->setText(text);
-        file.close();
-
-    } else {
-        //QMessageBox::warning(this, "Warning - filename Null", "The file selected is invalid");
-        return;
-    }
-
+void MainWindow::sendOpenDocumentMainWindow(QString docName){
+    //qDebug()<<"[MAIN WINDOW] sendOpenDocumentMainWindow docName = "<<docName;
+    emit(sendOpenDocumentSignal(docName, user.getId()));
 }
 
 void MainWindow::Save_as() {
@@ -348,7 +361,7 @@ void MainWindow::updateUserList(QVector<User> newUserList){
         actionUserList[j]->setVisible(false);
     }
 
-    qDebug() << "User list updated";
+    qDebug() << "[MAIN WINDOW] User list updated";
     userList = newUserList;
     colorMap.clear();
     for(int i=0; i<newUserList.size();i++){
@@ -410,7 +423,7 @@ void MainWindow::updateUserList(QVector<User> newUserList){
 
 
 void MainWindow::on_actionShare_Uri_triggered() {
-    emit(sendAskUriMainWindow(user.getId(), 12, ""));   //todo change userId and docId
+    emit(sendAskUriMainWindow(user.getId(), editor->getDocId(), ""));   //todo change userId and docId
     //qDebug() << "[MAIN WINDOW] sendAskUriMainWindow userId = "<< user.getId();
 }
 
@@ -441,10 +454,39 @@ Ui::MainWindow *MainWindow::getUi() const {
     return ui;
 }
 
+QColor MainWindow::getUserColor(int userId) const {
+    if (colorMap.find(userId) == colorMap.end()) {
+        throw std::runtime_error(std::string{} + __PRETTY_FUNCTION__ + ": color for user id not found");
+    }
+
+    return colorMap[userId];
+}
+
 void MainWindow::connectToTextEditor(TextEditor* te) {
-    connect(this, &MainWindow::newColorMapReceived, te, &TextEditor::updateColorMap);
+    // connect(this, &MainWindow::newColorMapReceived, te, &TextEditor::updateColorMap);
+    connect(te, &TextEditor::setMainWindowTitle, this, &MainWindow::setMainWindowTitleSlot);
+}
+
+
+void MainWindow::setMainWindowTitleSlot(QString title){
+    this->setWindowTitle(title);
 }
 
 void MainWindow::sendJoinMainWindow(qint32 userId, int docId, QString invCode){
     emit(sendAskUriMainWindow(userId,docId,invCode));
+}
+
+
+
+
+void MainWindow::documentListReceivedMainWindow(QVector<QString> documentList){
+    docList = documentList;
+}
+
+void MainWindow::setTextEditor(TextEditor* te){
+    editor = te;
+}
+
+TextEditor* MainWindow::getTextEditor() const{
+    return editor;
 }

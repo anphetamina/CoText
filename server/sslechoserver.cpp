@@ -125,28 +125,31 @@ void SslEchoServer::socketDisconnected()
         client->logout();
         // Get opened document id so that i can send to all the user connected to the same document a new online user lst
         int closedDocId = getDocIdOpenedByUserId(client->getUserId());
-        if(closedDocId > 0) {
-            // Remove from documentopen map
-            this->findAndDeleteFromDoclist(client);
-
-            // Decrease the counter of current online user per document
-            editorMapping[closedDocId]->connectedUsersDecrease();
-            qDebug() << "Remaining online user in the same document: " << editorMapping[closedDocId]->getConnectedUsers();
-            // Every time a user disconnect itself the server save a copy
-            saveToDisk(toQVector(editorMapping[closedDocId]->getSymbols()), closedDocId);
-
-            // if last user online is disconnecting,  delete the editorMapping entry
-            if(editorMapping[closedDocId]->getConnectedUsers() == 0)
-                editorMapping.remove(closedDocId);
-
-            // Send to all the the user connected to the document that was just closed by the client the new userlist
-            sendUpdatedOnlineUserByDocId(closedDocId);
-        }
+        closeDocumentById(closedDocId, client);
         // Remove client element from map and close the socket
         clientMapping.remove(pClient);
 
         pClient->close();
         pClient->deleteLater();
+    }
+}
+
+bool SslEchoServer::closeDocumentById(int closedDocId, QSharedPointer<Client> client){
+    // Check if there was any document open
+    if(closedDocId > 0) {
+        // Remove from document open map
+        this->findAndDeleteFromDoclist(client);
+
+        // Decrease the counter of current online user per document
+        editorMapping[closedDocId]->connectedUsersDecrease();
+        qDebug() << "[DOC_CLOSE] Remaining online user in the same document: " << editorMapping[closedDocId]->getConnectedUsers();
+        // Every time a user disconnect itself the server save a copy
+        saveToDisk(toQVector(editorMapping[closedDocId]->getSymbols()), closedDocId);
+        // if last user online is disconnecting,  delete the editorMapping entry
+        if(editorMapping[closedDocId]->getConnectedUsers() == 0)
+            editorMapping.remove(closedDocId);
+        // Send to all the the user connected to the document that was just closed by the client the new userlist
+        sendUpdatedOnlineUserByDocId(closedDocId);
     }
 }
 
@@ -332,7 +335,25 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
 
             break;
         }
+        case(PACK_TYPE_BIGMSG): {
+            BigMessage *bmsg = dynamic_cast<BigMessage *>(rcvd_packet.get());
 
+            // Broadcast to all the connected client of a document
+            QList<QSharedPointer<Client>> onlineClientPerDoc = documentMapping[getDocIdOpenedByUserId(
+                    client->getUserId())]; //TODO: deccoment and delete for
+            for (QSharedPointer<Client> onlineClient : onlineClientPerDoc) {
+                if (onlineClient != client && client->isLogged()) {
+                    bmsg->send(*onlineClient->getSocket());
+                    qDebug() << "\tfrom: " << pClient->peerPort() << "sent to "
+                             << onlineClient->getSocket()->peerPort();
+                }
+            }
+            // Run actions on the CRDT instances of the server (one for each document)
+            int docId = getDocIdOpenedByUserId(client->getUserId());
+            //Call remoteInsertBlock for server
+            //remoteInsertBlock(docId, bmsg->getQSS());
+            break;
+        }
         case(PACK_TYPE_CURSOR_POS): {
             CursorPacket *cp = dynamic_cast<CursorPacket*>(rcvd_packet.get());
             //qDebug() << msg->getData();
@@ -391,10 +412,13 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             }
 
             DocumentOpenPacket* dop = dynamic_cast<DocumentOpenPacket*>(rcvd_packet.get());
-            // Check if user already had an open document and delete that entry eventually #TONOTE: 1 document opened for user as of now
-            this->findAndDeleteFromDoclist(client);
-            // Check permission of the user for that doc
+
+            int closedDocId = getDocIdOpenedByUserId(client->getUserId());
+            closeDocumentById(closedDocId, client);
+
+            // Get DocID and check permission of the user for that doc
             int docId = docIdByName(dop->getdocName(), dop->getuserId());
+            qDebug()<<"[SERVER] DocumentOpenPacket received docId = "<<docId<<" docName = "<<dop->getdocName() <<" userId = "<<dop->getuserId();
             //checkDocPermission(docId, dop->getuserId());
             if(docId < 0 ){ // doesnt have permission (no document was found with that name associated to that user)
                 DocumentOkPacket dokp = DocumentOkPacket(-1, dop->getdocName(), QVector<QVector<QSymbol>>());
@@ -426,6 +450,22 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             sendUpdatedOnlineUserByDocId(docId);
             break;
         }
+        /*
+        case(PACK_TYPE_DOC_CLOSE): {
+            if (!client->isLogged()) {
+                break;
+            }
+            DocumentClosePacket* dcp = dynamic_cast<DocumentClosePacket*>(rcvd_packet.get());
+            int docId = docIdByName(dcp->getdocName(), dcp->getuserId());
+            //checkDocPermission(docId, dcp->getuserId());
+            if(docId < 0 ){ // doesnt have permission (no document was found with that name associated to that user)
+                DocumentOkPacket dokp = DocumentOkPacket(-1, dop->getdocName(), QVector<QVector<QSymbol>>());
+                dokp.send(*pClient);
+                break;
+            }
+
+            break;
+        }*/
         case(PACK_TYPE_DOC_DEL): {
             if (!client->isLogged()) {
                 break;
@@ -439,21 +479,63 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient){
             }
             DocumentAskSharableURIPacket* msg = dynamic_cast<DocumentAskSharableURIPacket*>(rcvd_packet.get());
             qDebug() << "ASK URI PACKET received userId: "<< msg->getuserId() << " docId: "<<msg->getdocId() << " URI : "<< msg->getURI();
-            int docId = msg->getdocId();
             qint32 userId = msg->getuserId();
             QString invCode = msg->getURI();
-            // Check permission of the user for that doc
-            if(!checkDocPermission(docId, userId)){
-                qDebug() << "ASK URI PACKET permission denied";
-                break;
-            }
+
             // Check if this is a request invite (URI is empty) or an invitation accept
             if(invCode.size() > 0){
-                // Invitation accept
-                qDebug() << "ASK URI PACKET invete aaccepted";
-                acceptInvite(invCode, userId);
+                // Invitation accept (in this case we receive docId=0)
+                qDebug() << "ASK URI PACKET invite accepted";
+
+                QVector<QString> doc = docByInvURI(invCode);
+                int docId = doc[0].toInt();
+                QString docName = doc[1];
+                if(acceptInvite(invCode, userId)){
+                    int closedDocId = getDocIdOpenedByUserId(client->getUserId());
+                    closeDocumentById(closedDocId, client);
+
+                    //checkDocPermission(docId, dop->getuserId());
+                    if(docId < 0 ){ // doesnt have permission (no document was found with that name associated to that user)
+                        DocumentOkPacket dokp = DocumentOkPacket(-1, docName, QVector<QVector<QSymbol>>());
+                        dokp.send(*pClient);
+                        break;
+                    }
+                    // Set the document in the packet as the current opened doc
+                    documentMapping[docId].append(client);
+
+                    //** Send the content of the document
+                    QVector<QVector<QSymbol>> qsymbols;
+                    //Se non ancora aperto da nessun utente online carico da disco e inizializzo sharedEditor (istanza CRDT)
+                    if(!isOpenedEditorForGivenDoc(docId)){
+                        qsymbols = loadFromDisk(docId);
+                        QSharedPointer<SharedEditor> se(new SharedEditor(9999));
+                        std::vector<std::vector<QSymbol>> symbols  = toVector(qsymbols);
+                        se->setSymbols(symbols);
+                        editorMapping.insert(docId, se);
+                    } else // Altrimenti prendo lo stato soltanto
+                    {
+                        std::vector<std::vector<QSymbol>> symbols = editorMapping[docId]->getSymbols();
+                        qsymbols = toQVector(symbols);
+                        editorMapping[docId]->connectedUsersIncrease();
+                    }
+
+                    DocumentOkPacket dokp = DocumentOkPacket(docId, docName, qsymbols);
+                    dokp.send(*pClient);
+                    // Send current online userlist for the given document
+                    sendUpdatedOnlineUserByDocId(docId);
+                }
+                else{
+                    qDebug() << "INVITATION NOT ACCEPTED";
+                }
+
             }
             else {
+                int docId = msg->getdocId();
+                // Check permission of the user for that doc
+                if(!checkDocPermission(docId, userId)){
+                    qDebug() << "ASK URI PACKET permission denied";
+                    break;
+                }
                 qDebug() << "ASK URI PACKET generate invitation code";
                 // Generate invitation code for a given document and insert to db
                 QString invCode = createInvite(docId);

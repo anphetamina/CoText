@@ -570,3 +570,6 @@ int SharedEditor::getConnectedUsers(){
 void SharedEditor::setConnectedUsers(int connectedUsers){
     this->connectedUsers = connectedUsers;
 }
+void SharedEditor::setSiteId(int siteId){
+    this->siteId = siteId;
+}

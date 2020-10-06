@@ -23,60 +23,58 @@ int main(int argc, char *argv[]) {
 	QString stylesheetString = QLatin1String(styleFile.readAll());
 	a.setStyleSheet(stylesheetString);
 
-	/*
-	// user/pass test authentication for now
-    QString quser, qpass;
-	if (argc > 1) {
-        std::string username = argv[1];
-        std::string password = argv[2];
-        quser = QString::fromStdString(username);
-        qpass = QString::fromStdString(password);
-        client->set_username(quser);
-        client->set_password(qpass);
-    }
-
     /** Login Phase */
 	client = new SslEchoClient(QUrl(QStringLiteral("wss://localhost:12345")));
 	Q_UNUSED(*client);
 
-	Login* login = new Login();
     MainWindow *w = new MainWindow();
+    Login *login = new Login();
 
-    // Set login GUI options
-    login->setWindowTitle("Welcome to CoText!");
-    login->setModal(true);
-    login->exec();
+
 
     // Set MainWindow (Editor) GUI options
     QCoreApplication::setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles, true);
     w->setWindowTitle("Welcome");
     w->setWindowIconText("Co-Text");
-    TextEditor editor(0, *w->getUi()); // todo get site id from server
-    //editor.setDisabled(true);
-    // place the QTextEditor object in the central position of the main window
 
-    w->connectToTextEditor(&editor);
-
-    /**
-     * place the QTextEditor object in the central position of the main window
-     */
-    w->setCentralWidget(&editor);
-
-    // Perform connection (signal/slot)
+    TextEditor* editor = new TextEditor(user.getId(), *w->getUi(), w); // todo get site id from server
+    editor->setDisabled(true);
+    w->setCentralWidget(editor);
+    w->setTextEditor(editor);
+    w->connectToTextEditor(editor);
     client->connectToMainWindow(w);
-    //connect the echo client to enable remote operations on the editor
-    client->connectToEditor(&editor);
+    client->connectToEditor(editor);
     //client->connectToLoginWindow(login, w); //TODO: use signal/slot for creating/closing diffent windows.tonote: login is a QDialog not QWindow
 
-    /*while(user == nullptr || !user->isLogged()) {
-        QCoreApplication::processEvents();
-    }*/
-
-    while(!user.isLogged()) {   //todo understand if it's correct
-        QCoreApplication::processEvents();
+    QString quser, qpass;
+    if (argc > 1) {
+        std::string username = argv[1];
+        std::string password = argv[2];
+        quser = QString::fromStdString(username);
+        qpass = QString::fromStdString(password);
+        while(!client->isConnected()){//TODO: timeout? BTW not so important, argv should be used just to debug, not a requirement
+            QCoreApplication::processEvents();
+        }
+        client->set_username(quser);
+        client->set_password(qpass);
+        client->sendLogin();
+    }else {
+        // Set login GUI options
+        login->setWindowTitle("Welcome to CoText!");
+        login->setModal(true);
+        login->exec();
     }
 
-    // After login show main window
+    while(!user.isLogged() && login->isVisible()) {
+        QCoreApplication::processEvents();
+    }
+    // Check if the while was broken by the login or the closing of the window
+    if(client->getLoginAttemptCount() == 0){
+        qApp->quit();
+        return -1;
+    }
+
+    // After a successful login show main window
     w->show();
 
     //delete client;

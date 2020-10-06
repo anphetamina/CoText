@@ -3,10 +3,10 @@
 //
 #ifdef _WIN32
 /* See http://stackoverflow.com/questions/12765743/getaddrinfo-on-win32 */
-  #ifndef _WIN32_WINNT
-    #define _WIN32_WINNT 0x0501  /* Windows XP. */
-  #endif
-  #include <winsock2.h>
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0501  /* Windows XP. */
+#endif
+#include <winsock2.h>
 #endif
 
 
@@ -20,16 +20,13 @@
 #include "DocumentPacket.h"
 
 /** Packet **/
-Packet::Packet(uint16_t type) : header(0xAF), type(type), flags(0x00)
-{}
+Packet::Packet(uint16_t type) : header(0xAF), type(type), flags(0x00) {}
 
-Packet::~Packet()
-{}
+Packet::~Packet() {}
 
 // Serialize the content of the packet
 // Could use QDataStream
-void Packet::serialize(QByteArray buf, QDataStream& stream)
-{
+void Packet::serialize(QByteArray buf, QDataStream &stream) {
     // Header|FLAGS|type|size|payload
 
     stream << header << flags << type << quint32(0);
@@ -41,7 +38,7 @@ void Packet::serialize(QByteArray buf, QDataStream& stream)
 
 }
 
-void Packet::send(QWebSocket& m_webSocket) {
+void Packet::send(QWebSocket &m_webSocket) {
     if (!m_webSocket.isValid())
         return;
     // Other check if missing fields? TODO:check later
@@ -63,11 +60,11 @@ void Packet::send(QWebSocket& m_webSocket) {
 
 }
 
-quint32 Packet::getPayloadLen(){
+quint32 Packet::getPayloadLen() {
     return getSize();
 }
 
-void Packet::read(QDataStream& stream){
+void Packet::read(QDataStream &stream) {
 
     readPayload(stream);
     if (stream.status() != QDataStream::Ok || !stream.atEnd()) {
@@ -98,11 +95,12 @@ quint32 Packet::getSize() const {
 void Packet::setSize(quint32 size) {
     Packet::size = size;
 }
-void Packet::writeSize(QDataStream& stream) {
+
+void Packet::writeSize(QDataStream &stream) {
     // Write at the right position
     stream.device()->seek(4);//
     //stream << (quint32)(size - 4 - sizeof(quint32));//Set just payload size
-    stream << (quint32)(size - 4 - sizeof(quint32));// Set full size
+    stream << (quint32) (size - 4 - sizeof(quint32));// Set full size
 }
 
 const QByteArray &Packet::getData() const {
@@ -124,74 +122,60 @@ void Packet::setSignature(quint8 signature) {
 
 /** Packet handler**/
 PacketHandler::PacketHandler()
-        : ptr(nullptr), ref(nullptr)
-{
+        : ptr(nullptr), ref(nullptr) {
 }
 
 PacketHandler::PacketHandler(std::nullptr_t)
-        : ptr(nullptr), ref(nullptr)
-{
+        : ptr(nullptr), ref(nullptr) {
 }
 
-PacketHandler::PacketHandler(Packet* p)
+PacketHandler::PacketHandler(Packet *p)
 try
-        : ptr(p), ref(new int(1))
-{
+        : ptr(p), ref(new int(1)) {
 }
-catch (...)
-{
+catch (...) {
     delete p;
     throw;
 }
 
-PacketHandler::PacketHandler(const PacketHandler& other)
-        : ptr(other.ptr), ref(other.ref)
-{
+PacketHandler::PacketHandler(const PacketHandler &other)
+        : ptr(other.ptr), ref(other.ref) {
     if (ptr != nullptr)
         ++(*ref);
 }
 
-PacketHandler::PacketHandler(PacketHandler&& other) noexcept
-        : ptr(other.ptr), ref(other.ref)
-{
+PacketHandler::PacketHandler(PacketHandler &&other) noexcept
+        : ptr(other.ptr), ref(other.ref) {
     other.ptr = nullptr;
 }
 
-PacketHandler& PacketHandler::operator=(PacketHandler other)
-{
+PacketHandler &PacketHandler::operator=(PacketHandler other) {
     // Copy & Swap assignment operator implementation
     std::swap(this->ptr, other.ptr);
     std::swap(this->ref, other.ref);
     return *this;
 }
 
-Packet& PacketHandler::operator*() const
-{
+Packet &PacketHandler::operator*() const {
     return *ptr;
 }
 
-Packet* PacketHandler::operator->() const
-{
+Packet *PacketHandler::operator->() const {
     return ptr;
 }
 
-PacketHandler::operator bool() const
-{
+PacketHandler::operator bool() const {
     return ptr != nullptr;
 }
 
-Packet* PacketHandler::get() const
-{
+Packet *PacketHandler::get() const {
     return ptr;
 }
 
-void PacketHandler::reset()
-{
-    if (ptr != nullptr)
-    {
+void PacketHandler::reset() {
+    if (ptr != nullptr) {
         --(*ref);
-        if (*ref == 0)
-        {
+        if (*ref == 0) {
             delete ptr;
             delete ref;
         }
@@ -201,13 +185,10 @@ void PacketHandler::reset()
     ref = nullptr;
 }
 
-PacketHandler::~PacketHandler()
-{
-    if (ptr != nullptr)
-    {
+PacketHandler::~PacketHandler() {
+    if (ptr != nullptr) {
         --(*ref);
-        if (*ref == 0)
-        {
+        if (*ref == 0) {
             delete ptr;
             delete ref;
         }
@@ -217,94 +198,99 @@ PacketHandler::~PacketHandler()
 
 /*** Packet buffer ***/
 PacketBuffer::PacketBuffer()
-        : mType(0), mSize(0)
-{
+        : mType(0), mSize(0) {
 };
 
-PacketBuffer::~PacketBuffer()
-{
+PacketBuffer::~PacketBuffer() {
 };
 
-void PacketBuffer::setType(quint16 t)
-{
+void PacketBuffer::setType(quint16 t) {
     mType = t;
 };
 
-void PacketBuffer::setDataSize(quint32 s)
-{
+void PacketBuffer::setDataSize(quint32 s) {
     mSize = s;
 };
 
-quint16 PacketBuffer::getType() const
-{
+quint16 PacketBuffer::getType() const {
     return mType;
 };
 
-quint32 PacketBuffer::getDataSize() const
-{
+quint32 PacketBuffer::getDataSize() const {
     return mSize;
 };
 
-quint32 PacketBuffer::getReceivedSize() const
-{
-    return (quint32)buffer.size();
+quint32 PacketBuffer::getReceivedSize() const {
+    return (quint32) buffer.size();
 }
 
-void PacketBuffer::append(QByteArray array)
-{
+void PacketBuffer::append(QByteArray array) {
     buffer.append(array);
 };
 
-void PacketBuffer::clearBuffer()
-{
-    mSize = 0; buffer.clear();
+void PacketBuffer::clearBuffer() {
+    mSize = 0;
+    buffer.clear();
 };
 
-bool PacketBuffer::isComplete()
-{
+bool PacketBuffer::isComplete() {
 //    qDebug() << mSize << getReceivedSize();
     return mSize == getReceivedSize();
 };
 
-QByteArray* PacketBuffer::bufferPtr()
-{
+QByteArray *PacketBuffer::bufferPtr() {
     return &buffer;
 };
 
-QDataStream& operator>>(QDataStream& in, PacketBuffer& PacketBuffer)
-{
-    in >>PacketBuffer.mHeader  >>PacketBuffer.mFlags >> PacketBuffer.mType >> PacketBuffer.mSize;
+QDataStream &operator>>(QDataStream &in, PacketBuffer &PacketBuffer) {
+    in >> PacketBuffer.mHeader >> PacketBuffer.mFlags >> PacketBuffer.mType >> PacketBuffer.mSize;
     return in;
 }
 
 /*** Packet forger **/
 
-PacketHandler PacketBuilder::Container(quint8 type)
-{
-    switch (type)
-    {
-        case PACK_TYPE_PING:			    return new PingPacket();
-        case PACK_TYPE_LOGIN_REQ:			return new class LoginReqPacket();
-        case PACK_TYPE_LOGIN_OK:			return new LoginOkPacket();
-        case PACK_TYPE_LOGOUT_REQ:			return new class LogoutReqPacket();
+PacketHandler PacketBuilder::Container(quint8 type) {
+    switch (type) {
+        case PACK_TYPE_PING:
+            return new PingPacket();
+        case PACK_TYPE_LOGIN_REQ:
+            return new class LoginReqPacket();
+        case PACK_TYPE_LOGIN_OK:
+            return new LoginOkPacket();
+        case PACK_TYPE_LOGOUT_REQ:
+            return new class LogoutReqPacket();
 
-        case PACK_TYPE_ACC_CREATE:			return new class AccountCreationPacket();
-        case PACK_TYPE_ACC_OK:			    return new AccountOkPacket();
-        case PACK_TYPE_ACC_UPDATE:			return new class AccountUpdatePacket();
+        case PACK_TYPE_ACC_CREATE:
+            return new class AccountCreationPacket();
+        case PACK_TYPE_ACC_OK:
+            return new AccountOkPacket();
+        case PACK_TYPE_ACC_UPDATE:
+            return new class AccountUpdatePacket();
 
-        case PACK_TYPE_MSG:			        return new class Message();
-        case PACK_TYPE_BIGMSG:			    return new class BigMessage();
-        case PACK_TYPE_ALIGN:			    return new class AlignMessage();
+        case PACK_TYPE_MSG:
+            return new class Message();
+        case PACK_TYPE_BIGMSG:
+            return new class BigMessage();
+        case PACK_TYPE_ALIGN:
+            return new class AlignMessage();
 
-        case PACK_TYPE_CURSOR_POS:			return new class CursorPacket();
+        case PACK_TYPE_CURSOR_POS:
+            return new class CursorPacket();
 
-        case PACK_TYPE_DOC_CREATE:			return new class DocumentCreatePacket();
-        case PACK_TYPE_DOC_OPEN:			return new class DocumentOpenPacket();
-        case PACK_TYPE_DOC_DEL:			    return new class DocumentDelPacket();
-        case PACK_TYPE_DOC_OK:			    return new class DocumentOkPacket();
-        case PACK_TYPE_DOC_ASKSURI:			return new class DocumentAskSharableURIPacket();
-        case PACK_TYPE_DOC_LIST:			return new class DocumentListPacket();
-        case PACK_TYPE_DOC_USERLIST:		return new class DocumentBeaconOnlineUsers();
+        case PACK_TYPE_DOC_CREATE:
+            return new class DocumentCreatePacket();
+        case PACK_TYPE_DOC_OPEN:
+            return new class DocumentOpenPacket();
+        case PACK_TYPE_DOC_DEL:
+            return new class DocumentDelPacket();
+        case PACK_TYPE_DOC_OK:
+            return new class DocumentOkPacket();
+        case PACK_TYPE_DOC_ASKSURI:
+            return new class DocumentAskSharableURIPacket();
+        case PACK_TYPE_DOC_LIST:
+            return new class DocumentListPacket();
+        case PACK_TYPE_DOC_USERLIST:
+            return new class DocumentBeaconOnlineUsers();
 
         default:
             throw std::exception();//TODO: create custom exception
@@ -312,85 +298,73 @@ PacketHandler PacketBuilder::Container(quint8 type)
     }
 }
 
-PacketHandler PacketBuilder::Ping(QString msg)
-{
+PacketHandler PacketBuilder::Ping(QString msg) {
     return new PingPacket(msg);
 }
 
-PacketHandler PacketBuilder::LoginReqPacket(QString username, QString hashedPassword)
-{
+PacketHandler PacketBuilder::LoginReqPacket(QString username, QString hashedPassword) {
     return new class LoginReqPacket(username, hashedPassword);
 }
 
-PacketHandler PacketBuilder::LoginOk(User user)
-{
+PacketHandler PacketBuilder::LoginOk(User user) {
     return new class LoginOkPacket(user);
 }
-PacketHandler PacketBuilder::AccountCreationPacket(QString username,QString password, QString name, QString surname, QIcon profilePic)
-{
+
+PacketHandler PacketBuilder::AccountCreationPacket(QString username, QString password, QString name, QString surname,
+                                                   QIcon profilePic) {
     return new class AccountCreationPacket(username, password, name, surname, profilePic);
 }
-PacketHandler PacketBuilder::AccountOk(User user)
-{
+
+PacketHandler PacketBuilder::AccountOk(User user) {
     return new class AccountOkPacket(user);
 }
 
-PacketHandler PacketBuilder::AccountUpdatePacket(QString username,QString password, QString name, QString surname, QIcon profilePic)
-{
+PacketHandler PacketBuilder::AccountUpdatePacket(QString username, QString password, QString name, QString surname,
+                                                 QIcon profilePic) {
     return new class AccountUpdatePacket(username, password, name, surname, profilePic);
 }
 
-PacketHandler PacketBuilder::Message(int type, QSymbol qs, int siteId)
-{
+PacketHandler PacketBuilder::Message(int type, QSymbol qs, int siteId) {
     return new class Message(type, qs, siteId);
 }
 
-PacketHandler PacketBuilder::BigMessage(int type, QVector<QSymbol> qss, int siteId)
-{
+PacketHandler PacketBuilder::BigMessage(int type, QVector<QSymbol> qss, int siteId) {
     return new class BigMessage(type, qss, siteId);
 }
 
-PacketHandler PacketBuilder::AlignMessage(int positionStart, int delta, Qt::Alignment alignment, int siteId)
-{
+PacketHandler PacketBuilder::AlignMessage(int positionStart, int delta, Qt::Alignment alignment, int siteId) {
     return new class AlignMessage(positionStart, delta, alignment, siteId);
 }
 
-PacketHandler PacketBuilder::CursorPacket(qint32 userId, qint32 newPosition)
-{
+PacketHandler PacketBuilder::CursorPacket(qint32 userId, qint32 newPosition) {
     return new class CursorPacket(userId, newPosition);
 }
 
 
-PacketHandler PacketBuilder::DocumentCreatePacket(QString docName, qint32 userId)
-{
+PacketHandler PacketBuilder::DocumentCreatePacket(QString docName, qint32 userId) {
     return new class DocumentCreatePacket(docName, userId);
 }
 
- PacketHandler PacketBuilder::DocumentOpenPacket(QString docName, qint32 userId)
-{
+PacketHandler PacketBuilder::DocumentOpenPacket(QString docName, qint32 userId) {
     return new class DocumentOpenPacket(docName, userId);
 }
 
- PacketHandler PacketBuilder::DocumentDelPacket(QString docName, qint32 userId)
-{
+PacketHandler PacketBuilder::DocumentDelPacket(QString docName, qint32 userId) {
     return new class DocumentDelPacket(docName, userId);
 }
 
-PacketHandler PacketBuilder::DocumentOkPacket(QString docName, qint32 userId, QVector<QVector<QSymbol>> qsymbols)
-{
+PacketHandler PacketBuilder::DocumentOkPacket(QString docName, qint32 userId, QVector<QVector<QSymbol>> qsymbols) {
     return new class DocumentOkPacket(userId, docName, qsymbols);
 }
 
-PacketHandler PacketBuilder::DocumentAskSharableURIPacket(int docId, qint32 userId, QString sharableURI)
-{
+PacketHandler PacketBuilder::DocumentAskSharableURIPacket(int docId, qint32 userId, QString sharableURI) {
     return new class DocumentAskSharableURIPacket(docId, userId, sharableURI);
 }
 
-PacketHandler PacketBuilder::DocumentListPacket(qint32 userId, QVector<QString> docList)
-{
-    return new class DocumentListPacket( userId,  docList);
+PacketHandler PacketBuilder::DocumentListPacket(qint32 userId, QVector<QString> docList) {
+    return new class DocumentListPacket(userId, docList);
 }
-PacketHandler PacketBuilder::DocumentBeaconOnlineUsers(QVector<User> userList, qint32 docId)
-{
-    return new class DocumentBeaconOnlineUsers( userList,  docId);
+
+PacketHandler PacketBuilder::DocumentBeaconOnlineUsers(QVector<User> userList, qint32 docId) {
+    return new class DocumentBeaconOnlineUsers(userList, docId);
 }

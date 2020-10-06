@@ -9,29 +9,24 @@
 /*************** LOGIN REQUEST MESSAGE ***************/
 
 PingPacket::PingPacket()
-        : Packet(PACK_TYPE_PING)
-{
+        : Packet(PACK_TYPE_PING) {
 }
 
 PingPacket::PingPacket(QString m_debug_msg)
-        : Packet(PACK_TYPE_PING), m_debug_msg(m_debug_msg)
-{
+        : Packet(PACK_TYPE_PING), m_debug_msg(m_debug_msg) {
 }
 
-void PingPacket::writePayload(QDataStream& stream) const
-{
+void PingPacket::writePayload(QDataStream &stream) const {
     stream << m_debug_msg;
     // Compute payload length
 
 }
 
-void PingPacket::readPayload(QDataStream& stream)
-{
+void PingPacket::readPayload(QDataStream &stream) {
     stream >> m_debug_msg;
 }
 
-QString PingPacket::getDebugMsg() const
-{
+QString PingPacket::getDebugMsg() const {
     return m_debug_msg;
 }
 // TODO: add a setter for m_debug_msg

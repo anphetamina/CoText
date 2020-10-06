@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Packet.h"
 #include "QSymbol.h"
 
@@ -22,8 +23,10 @@ public:
 
 protected:
     Message();
-    void writePayload(QDataStream& stream) const override;
-    void readPayload(QDataStream& stream) override;
+
+    void writePayload(QDataStream &stream) const override;
+
+    void readPayload(QDataStream &stream) override;
 
 };
 
@@ -45,8 +48,10 @@ public:
 
 protected:
     BigMessage();
-    void writePayload(QDataStream& stream) const override;
-    void readPayload(QDataStream& stream) override;
+
+    void writePayload(QDataStream &stream) const override;
+
+    void readPayload(QDataStream &stream) override;
 
 };
 
@@ -63,6 +68,7 @@ public:
     AlignMessage(int positionStart, int delta, Qt::Alignment alignment, int siteId);
 
     int getPositionStart() const;
+
     int getDelta() const;
 
     Qt::Alignment getAlignment() const;
@@ -71,7 +77,9 @@ public:
 
 protected:
     AlignMessage();
-    void writePayload(QDataStream& stream) const override;
-    void readPayload(QDataStream& stream) override;
+
+    void writePayload(QDataStream &stream) const override;
+
+    void readPayload(QDataStream &stream) override;
 
 };

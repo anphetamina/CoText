@@ -58,13 +58,12 @@ public:
     static User getUser() {
     	return user;
     }
-    
-
-    
 
     Ui::MainWindow *getUi() const;
-
+    TextEditor* getTextEditor() const;
+    QColor getUserColor(int userId) const;
     void connectToTextEditor(TextEditor* te);
+    void setTextEditor(TextEditor* te);
 
 private slots:
     void on_actionNew_triggered();
@@ -87,10 +86,17 @@ public slots:
     void updateUserList(QVector<User> newUserList);
     void askUriReceivedMainWindow(QString URI);
     void sendJoinMainWindow(qint32 userId, int docId, QString invCode);
+    void sendOpenDocumentMainWindow(QString docName);
+    void documentListReceivedMainWindow(QVector<QString> documentList);
+    void setMainWindowTitleSlot(QString title);
+    void openNewDocumentMainWindow(QString docName);
 
 signals:
     void newColorMapReceived(QMap<int, QColor> colorMap);
     void sendAskUriMainWindow(qint32 userId, int docId, QString invCode);
+    void sendAskDocListMainWindow(qint32 user);
+    void sendOpenDocumentSignal(QString docName, qint32 user);
+    void sendDocCreateMainWindow(QString docName, qint32 userId);
 
 private:
     Ui::MainWindow *ui;
@@ -98,13 +104,7 @@ private:
 
     TextEditor *editor;
     QString currentFileName = "";
-	//std::multimap<int, QAction*> actionUserMap;
-	QVector<QAction*> actionUserList;
-	//QAction* actionUserList;
-	//SslEchoClient *client;
-	void Save_as();
-	void closeEvent(QCloseEvent *event) override;
-	bool eventFilter(QObject *watched, QEvent *event) override;
+    QVector<QString> docList;
     QVector<User> userList = {};
     //std::vector<User> userList = {};
     QMap<int, QColor> colorMap = {};
@@ -177,6 +177,13 @@ private:
             {-1,QColor(128, 0, 128)} //purple
     };*/
 
+    //std::multimap<int, QAction*> actionUserMap;
+    QVector<QAction*> actionUserList;
+    //QAction* actionUserList;
+    //SslEchoClient *client;
+    void Save_as();
+    void closeEvent(QCloseEvent *event) override;
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 };
 #endif // MAINWINDOW_H

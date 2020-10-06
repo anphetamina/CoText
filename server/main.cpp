@@ -8,13 +8,11 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     SslEchoServer server(12345);
     dbConfigure();
-
+    qsrand(QTime::currentTime().msec());
     getUserlist();
-    //checkLoginData("test@test.test", "test");
     //qDebug() <<  createDoc("AAA", 1);
     //addDocPermission(1,2);
     //qDebug() <<  checkDocPermission(1,1);
-    //
     // Create invitation code (invURI)
     //QString invURI = createInvite(1);
     //qDebug() <<invURI;

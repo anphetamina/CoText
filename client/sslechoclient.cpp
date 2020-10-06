@@ -100,6 +100,7 @@ void SslEchoClient::set_password(QString password){
     this->password = password;
 }
 void SslEchoClient::authenticate(QString username, QString password) {
+    loginAttemptCount++;
     qDebug() << "[NETWORK] ** Sending login req packet ** ";
     QString hashedPassword = password;
     LoginReqPacket lrp = LoginReqPacket(username, hashedPassword);
@@ -107,6 +108,10 @@ void SslEchoClient::authenticate(QString username, QString password) {
 }
 void SslEchoClient::sendLogin(){
     this->authenticate(username, password);
+}
+
+int SslEchoClient::getLoginAttemptCount(){
+    return this->loginAttemptCount;
 }
 
 
@@ -175,18 +180,19 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             User loggedUser = loginOk->getUser();
             if ( loggedUser.isLogged() ){
                 qDebug() << "[AUTH] Logged in as: " << loggedUser.getEmail();
-                emit loginSuccessful();
+                emit loginSuccessfulReceived();
             }
             else {
                 qDebug() << "[AUTH] FAILED. See the server for the log.";
-                emit loginFailed();
+                emit loginFailedReceived();
             }
             pServer = qobject_cast<QWebSocket *>(sender());
             // .... DEBUG TODO: REMOVE when opendoc GUI is implemented and linked here
-            this->sendDocOpen("AAA", loggedUser.getId());
+            //this->sendDocOpen("AAA", loggedUser.getId());
 
 	        //emit auth(loggedUser);
 	        user = loggedUser;
+
 	        //qDebug() << "USER LOGGED " << user.getId() << " " << user.getEmail();
 
 	        break;
@@ -208,8 +214,18 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             break;
         }
         case (PACK_TYPE_BIGMSG): {
-            /*emit insertBlockReceived(std::vector<QSymbol> symbols);
-            emit eraseBlockReceived(std::vector<QSymbol> symbols);*/
+            BigMessage *msg = dynamic_cast<BigMessage *>(rcvd_packet.get());
+            switch (msg->getType()) {
+                case(MSG_INSERT_SYM): {
+                    std::vector<QSymbol> symbols(msg->getQSS().begin(), msg->getQSS().end());
+                    emit insertBlockReceived(symbols);
+                }
+
+                case(MSG_ERASE_SYM): {
+                    std::vector<QSymbol> symbols(msg->getQSS().begin(), msg->getQSS().end());
+                    emit eraseBlockReceived(symbols);
+                }
+            }
             break;
         }
         case (PACK_TYPE_ALIGN): {
@@ -236,7 +252,8 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
         }
         case (PACK_TYPE_DOC_LIST): {
             DocumentListPacket *docList = dynamic_cast<DocumentListPacket *>(rcvd_packet.get());
-            //qDebug() << "[DOC_LIST] Received";
+            qDebug() << "[DOC_LIST] Received : " << docList->getdocList();
+            emit(documentListReceived(docList->getdocList()));
             break;
         }
         case (PACK_TYPE_DOC_ASKSURI): {
@@ -256,18 +273,30 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
 }
 
 void SslEchoClient::sendInsert(std::vector<QSymbol> symbols, int siteId) {
-    for (QSymbol symbol : symbols) {
+    if (symbols.size() > 1) {
+        QVector syms(symbols.begin(), symbols.end());
+        BigMessage msg = BigMessage(MSG_INSERT_SYM, syms, siteId);
+        msg.send(*pServer);
+        // qDebug() << "sent add block";
+    } else {
+        QSymbol symbol = symbols.front();
         Message msg = Message(MSG_INSERT_SYM, symbol, siteId);
         msg.send(*pServer);
-        qDebug() << "sent add " << ((symbol.isNewLine()) ? "LF" : QString(symbol.getC()));
+        // qDebug() << "sent add " << ((symbol.isNewLine()) ? "LF" : QString(symbol.getC()));
     }
 }
 
 void SslEchoClient::sendErase(std::vector<QSymbol> symbols, int siteId) {
-    for (QSymbol symbol : symbols) {
+    if (symbols.size() > 1) {
+        QVector syms(symbols.begin(), symbols.end());
+        BigMessage msg = BigMessage(MSG_ERASE_SYM, syms, siteId);
+        msg.send(*pServer);
+        // qDebug() << "sent del block";
+    } else {
+        QSymbol symbol = symbols.front();
         Message msg = Message(MSG_ERASE_SYM, symbol, siteId);
         msg.send(*pServer);
-        qDebug() << "sent del " << ((symbol.isNewLine()) ? "LF" : QString(symbol.getC()));
+        // qDebug() << "sent del " << ((symbol.isNewLine()) ? "LF" : QString(symbol.getC()));
     }
 }
 
@@ -277,6 +306,7 @@ void SslEchoClient::sendCursor(qint32 userId, qint32 position) {
 }
 
 void SslEchoClient::sendDocOpen(QString docName, qint32 userId) {
+    //qDebug()<<"[CLIENT] sendDocOpen docName = "<<docName <<" userId = "<<userId;
     if(!pServer->isValid()) // if u call this and login wasnt performed
         return;
     DocumentOpenPacket dop = DocumentOpenPacket(docName, userId );
@@ -303,19 +333,46 @@ void SslEchoClient::connectToEditor(TextEditor* te) {
     connect(this, &SslEchoClient::updateCursorReceived, te, &TextEditor::updateCursor);
     connect(this, &SslEchoClient::documentReceived, te, &TextEditor::openDocument);
     connect(this, &SslEchoClient::updateAlignmentReceived, te, &TextEditor::updateAlignment);
+    connect(this, &SslEchoClient::updateUserListReceived, te, &TextEditor::updateCursorMap);
+    //connect(this, &SslEchoClient::loginSuccessfulReceived, te, &TextEditor::loginSuccessful);
+
     connect(te, &TextEditor::symbolsInserted, this, &SslEchoClient::sendInsert);
     connect(te, &TextEditor::symbolsErased, this, &SslEchoClient::sendErase);
     connect(te, &TextEditor::cursorPositionChanged, this, &SslEchoClient::sendCursor);
     connect(te, &TextEditor::textAlignmentChanged, this, &SslEchoClient::sendAlignment);
+
 }
 
 void SslEchoClient::connectToMainWindow(MainWindow* mw) {
     connect(this, &SslEchoClient::updateUserListReceived, mw, &MainWindow::updateUserList);
     connect(mw, &MainWindow::sendAskUriMainWindow, this, &SslEchoClient::sendAskUri);
     connect(this, &SslEchoClient::askUriReceived, mw, &MainWindow::askUriReceivedMainWindow);
+    connect(mw, &MainWindow::sendDocCreateMainWindow, this, &SslEchoClient::sendDocCreate);
+    connect(mw, &MainWindow::sendAskDocListMainWindow, this, &SslEchoClient::sendAskDocList);
+    connect(this, &SslEchoClient::documentListReceived, mw, &MainWindow::documentListReceivedMainWindow);
+    connect(mw, &MainWindow::sendOpenDocumentSignal, this, &SslEchoClient::sendDocOpen);
 }
 
+void SslEchoClient::sendAskDocList(qint32 userId) {
+    if(!pServer->isValid()) // if u call this and login wasnt performed
+        return;
+    DocumentAskListPacket dalp = DocumentAskListPacket(userId );
+    dalp.send(*pServer);
+}
 
+void SslEchoClient::sendDocCreate(QString docName, qint32 userId) {
+    if(!pServer->isValid()) // if u call this and login wasnt performed
+        return;
+    DocumentCreatePacket dcp = DocumentCreatePacket(docName, userId );
+    dcp.send(*pServer);
+    // For now auto send also a document open (for UX pourpose?)
+    DocumentOpenPacket dop = DocumentOpenPacket(docName, userId );
+    dop.send(*pServer);
+}
+
+bool SslEchoClient::isConnected(){
+    return m_webSocket.state() == QAbstractSocket::ConnectedState;
+}
 /*
  * Dont delete pls. Possible enhancement
 void SslEchoClient::connectToLoginWindow(Login* login, MainWindow* mw) {//Qdialog as of now
@@ -334,3 +391,4 @@ void SslEchoClient::connectToLoginWindow(Login* login, MainWindow* mw) {//Qdialo
 
 */
 //    // Save the secret key that will be used
+
