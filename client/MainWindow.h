@@ -90,6 +90,7 @@ public slots:
     void documentListReceivedMainWindow(QVector<QString> documentList);
     void setMainWindowTitleSlot(QString title);
     void openNewDocumentMainWindow(QString docName);
+    void nameChoosenMainWindow(QString name);
 
 signals:
     void newColorMapReceived(QMap<int, QColor> colorMap);
