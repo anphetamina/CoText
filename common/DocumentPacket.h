@@ -17,13 +17,17 @@ private:
 protected:
     DocumentCreatePacket();
 
-    void writePayload(QDataStream& stream) const override;
-    void readPayload(QDataStream& stream) override;
+    void writePayload(QDataStream &stream) const override;
+
+    void readPayload(QDataStream &stream) override;
 
 public:
     DocumentCreatePacket(QString docName, qint32 userId);
+
     ~DocumentCreatePacket() {};
+
     int getuserId() const;
+
     QString getdocName() const;
 };
 
@@ -33,14 +37,17 @@ class DocumentAskListPacket : public Packet {
 private:
     qint32 userId;
 protected:
-DocumentAskListPacket();
+    DocumentAskListPacket();
 
-    void writePayload(QDataStream& stream) const override;
-    void readPayload(QDataStream& stream) override;
+    void writePayload(QDataStream &stream) const override;
+
+    void readPayload(QDataStream &stream) override;
 
 public:
     DocumentAskListPacket(qint32 userId);
+
     ~DocumentAskListPacket() {};
+
     int getuserId() const;
 };
 
@@ -53,13 +60,17 @@ private:
 protected:
     DocumentListPacket();
 
-    void writePayload(QDataStream& stream) const override;
-    void readPayload(QDataStream& stream) override;
+    void writePayload(QDataStream &stream) const override;
+
+    void readPayload(QDataStream &stream) override;
 
 public:
     DocumentListPacket(qint32 userId, QVector<QString> docList);
+
     ~DocumentListPacket() {};
+
     int getuserId() const;
+
     QVector<QString> getdocList() const;
 };
 
@@ -73,13 +84,17 @@ private:
 protected:
     DocumentOpenPacket();
 
-    void writePayload(QDataStream& stream) const override;
-    void readPayload(QDataStream& stream) override;
+    void writePayload(QDataStream &stream) const override;
+
+    void readPayload(QDataStream &stream) override;
 
 public:
     DocumentOpenPacket(QString docName, qint32 userId);
+
     ~DocumentOpenPacket() {};
+
     int getuserId() const;
+
     QString getdocName() const;
 };
 
@@ -93,13 +108,17 @@ private:
 protected:
     DocumentDelPacket();
 
-    void writePayload(QDataStream& stream) const override;
-    void readPayload(QDataStream& stream) override;
+    void writePayload(QDataStream &stream) const override;
+
+    void readPayload(QDataStream &stream) override;
 
 public:
     DocumentDelPacket(QString docName, qint32 userId);
+
     ~DocumentDelPacket() {};
+
     int getuserId() const;
+
     QString getdocName() const;
 };
 
@@ -117,14 +136,18 @@ private:
 protected:
     DocumentOkPacket();
 
-    void writePayload(QDataStream& stream) const override;
-    void readPayload(QDataStream& stream) override;
+    void writePayload(QDataStream &stream) const override;
+
+    void readPayload(QDataStream &stream) override;
 
 public:
     DocumentOkPacket(int docId, QString docName, QVector<QVector<QSymbol>> qsymbols);
+
     ~DocumentOkPacket() {};
+
     //int getsiteId() const;
     int getdocId() const;
+
     QString getdocName() const;
 
     QVector<QVector<QSymbol>> getqsymbols() const;
@@ -144,14 +167,19 @@ private:
 protected:
     DocumentAskSharableURIPacket();
 
-    void writePayload(QDataStream& stream) const override;
-    void readPayload(QDataStream& stream) override;
+    void writePayload(QDataStream &stream) const override;
+
+    void readPayload(QDataStream &stream) override;
 
 public:
     DocumentAskSharableURIPacket(int docId, qint32 userId, QString sharableURI);
+
     ~DocumentAskSharableURIPacket() {};
+
     int getuserId() const;
+
     int getdocId() const;
+
     QString getURI() const;
 };
 
@@ -163,12 +191,18 @@ private:
 
 protected:
     DocumentBeaconOnlineUsers();
-    void writePayload(QDataStream& stream) const override;
-    void readPayload(QDataStream& stream) override;
+
+    void writePayload(QDataStream &stream) const override;
+
+    void readPayload(QDataStream &stream) override;
+
 public:
     DocumentBeaconOnlineUsers(QVector<User> userList, qint32 docId);
+
     ~DocumentBeaconOnlineUsers() {};
+
     int getdocId() const;
+
     QVector<User> getuserList() const;
 
 };

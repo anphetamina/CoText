@@ -6,9 +6,12 @@
 #include "PacketDef.h"
 
 /** Account Creation Request packet **/
-AccountCreationPacket::AccountCreationPacket(): Packet(PACK_TYPE_ACC_CREATE){}
-AccountCreationPacket::AccountCreationPacket(QString username,QString password, QString name, QString surname, QIcon profilePic): Packet(PACK_TYPE_ACC_CREATE), username(username),hashedPassword(hashedPassword), name(name), surname(surname), profilePic(profilePic){};
+AccountCreationPacket::AccountCreationPacket() : Packet(PACK_TYPE_ACC_CREATE) {}
 
+AccountCreationPacket::AccountCreationPacket(QString username, QString password, QString name, QString surname,
+                                             QIcon profilePic) : Packet(PACK_TYPE_ACC_CREATE), username(username),
+                                                                 hashedPassword(hashedPassword), name(name),
+                                                                 surname(surname), profilePic(profilePic) {};
 
 
 QString AccountCreationPacket::getUsername() const {
@@ -31,20 +34,22 @@ QIcon AccountCreationPacket::getProfilePic() const {
     return profilePic;
 };
 
-void AccountCreationPacket::writePayload(QDataStream& stream) const
-{
+void AccountCreationPacket::writePayload(QDataStream &stream) const {
     stream << username << hashedPassword << name << surname << profilePic;
 }
 
-void AccountCreationPacket::readPayload(QDataStream& stream)
-{
+void AccountCreationPacket::readPayload(QDataStream &stream) {
     stream >> username >> hashedPassword >> name >> surname >> profilePic;
 }
 
 /** Account Update Request packet **/
 // TOIMPROVE: Maybe an aCCount packet and child class AccountUpdate and AccountCreate?
-AccountUpdatePacket::AccountUpdatePacket(): Packet(PACK_TYPE_ACC_UPDATE){};
-AccountUpdatePacket::AccountUpdatePacket(QString username,QString password, QString name, QString surname, QIcon profilePic): Packet(PACK_TYPE_ACC_UPDATE), username(username),hashedPassword(hashedPassword), name(name), surname(surname), profilePic(profilePic){};
+AccountUpdatePacket::AccountUpdatePacket() : Packet(PACK_TYPE_ACC_UPDATE) {};
+
+AccountUpdatePacket::AccountUpdatePacket(QString username, QString password, QString name, QString surname,
+                                         QIcon profilePic) : Packet(PACK_TYPE_ACC_UPDATE), username(username),
+                                                             hashedPassword(hashedPassword), name(name),
+                                                             surname(surname), profilePic(profilePic) {};
 
 QString AccountUpdatePacket::getUsername() const {
     return username;
@@ -66,31 +71,27 @@ QIcon AccountUpdatePacket::getProfilePic() const {
     return profilePic;
 };
 
-void AccountUpdatePacket::writePayload(QDataStream& stream) const
-{
+void AccountUpdatePacket::writePayload(QDataStream &stream) const {
     stream << username << hashedPassword << name << surname << profilePic;
 }
 
-void AccountUpdatePacket::readPayload(QDataStream& stream)
-{
+void AccountUpdatePacket::readPayload(QDataStream &stream) {
     stream >> username >> hashedPassword >> name >> surname >> profilePic;
 }
 
 /** Account Creation/Update Success packet **/
-AccountOkPacket::AccountOkPacket(): Packet(PACK_TYPE_ACC_OK){};
-AccountOkPacket::AccountOkPacket(User user): Packet(PACK_TYPE_ACC_OK), user(user){};
+AccountOkPacket::AccountOkPacket() : Packet(PACK_TYPE_ACC_OK) {};
 
-void AccountOkPacket::writePayload(QDataStream& stream) const
-{
+AccountOkPacket::AccountOkPacket(User user) : Packet(PACK_TYPE_ACC_OK), user(user) {};
+
+void AccountOkPacket::writePayload(QDataStream &stream) const {
     stream << user;
 }
 
-void AccountOkPacket::readPayload(QDataStream& stream)
-{
+void AccountOkPacket::readPayload(QDataStream &stream) {
     stream >> user;
 }
 
-User AccountOkPacket::getUser() const
-{
+User AccountOkPacket::getUser() const {
     return user;
 }

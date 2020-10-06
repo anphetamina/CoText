@@ -19,13 +19,17 @@ protected:
     LoginReqPacket();
 
     // Costruct LoginRequest message with the username of the account that is trying to setAsLogged
-    void writePayload(QDataStream& stream) const override;
-    void readPayload(QDataStream& stream) override;
+    void writePayload(QDataStream &stream) const override;
+
+    void readPayload(QDataStream &stream) override;
 
 public:
     LoginReqPacket(QString username, QString hashedPassword);
+
     ~LoginReqPacket() {};
+
     QString getUsername() const;
+
     QString gethashedPassword() const;
 };
 
@@ -39,12 +43,15 @@ protected:
     LoginOkPacket();
 
     // Costruct LoginOk message with all the correct info retrieved from DB
-    void writePayload(QDataStream& stream) const override;
-    void readPayload(QDataStream& stream) override;
+    void writePayload(QDataStream &stream) const override;
+
+    void readPayload(QDataStream &stream) override;
 
 public:
     LoginOkPacket(User user);
+
     ~LoginOkPacket() {};
+
     User getUser() const;
     //TODO: add getter for list of document accessible by that user
 
@@ -56,12 +63,16 @@ class LogoutReqPacket : public Packet {
 
 protected:
     LogoutReqPacket();
+
     // Costruct LogoutRequest (no message is needed, maybe add some security field to avoid replay/ipspoofing?)
-    void writePayload(QDataStream& stream) const override;
-    void readPayload(QDataStream& stream) override;
+    void writePayload(QDataStream &stream) const override;
+
+    void readPayload(QDataStream &stream) override;
 
 public:
     ~LogoutReqPacket() {};
+
     QString getUsername() const;
+
     QString gethashedPassword() const;
 };

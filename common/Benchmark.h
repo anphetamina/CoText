@@ -11,11 +11,14 @@ class Benchmark {
 
 private:
     clock_t start, end;
-    std::string name="";
+    std::string name = "";
 public:
     Benchmark();
+
     Benchmark(std::string name);
+
     void startTimer();
+
     void stopTimer();
 };
 
