@@ -208,8 +208,18 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             break;
         }
         case (PACK_TYPE_BIGMSG): {
-            /*emit insertBlockReceived(std::vector<QSymbol> symbols);
-            emit eraseBlockReceived(std::vector<QSymbol> symbols);*/
+            BigMessage *msg = dynamic_cast<BigMessage *>(rcvd_packet.get());
+            switch (msg->getType()) {
+                case(MSG_INSERT_SYM): {
+                    std::vector<QSymbol> symbols(msg->getQSS().begin(), msg->getQSS().end());
+                    emit insertBlockReceived(symbols);
+                }
+
+                case(MSG_ERASE_SYM): {
+                    std::vector<QSymbol> symbols(msg->getQSS().begin(), msg->getQSS().end());
+                    emit eraseBlockReceived(symbols);
+                }
+            }
             break;
         }
         case (PACK_TYPE_ALIGN): {
@@ -278,6 +288,7 @@ void SslEchoClient::sendCursor(qint32 userId, qint32 position) {
 }
 
 void SslEchoClient::sendDocOpen(QString docName, qint32 userId) {
+    //qDebug()<<"[CLIENT] sendDocOpen docName = "<<docName <<" userId = "<<userId;
     if(!pServer->isValid()) // if u call this and login wasnt performed
         return;
     DocumentOpenPacket dop = DocumentOpenPacket(docName, userId );
@@ -315,7 +326,7 @@ void SslEchoClient::connectToMainWindow(MainWindow* mw) {
     connect(this, &SslEchoClient::updateUserListReceived, mw, &MainWindow::updateUserList);
     connect(mw, &MainWindow::sendAskUriMainWindow, this, &SslEchoClient::sendAskUri);
     connect(this, &SslEchoClient::askUriReceived, mw, &MainWindow::askUriReceivedMainWindow);
-    //connect(mw, &MainWindow::sendDocCreateMainWindow, this, &SslEchoClient::sendDocCreate);
+    connect(mw, &MainWindow::sendDocCreateMainWindow, this, &SslEchoClient::sendDocCreate);
     connect(mw, &MainWindow::sendAskDocListMainWindow, this, &SslEchoClient::sendAskDocList);
     connect(this, &SslEchoClient::documentListReceived, mw, &MainWindow::documentListReceivedMainWindow);
     connect(mw, &MainWindow::sendOpenDocumentSignal, this, &SslEchoClient::sendDocOpen);
@@ -326,6 +337,13 @@ void SslEchoClient::sendAskDocList(qint32 userId) {
         return;
     DocumentAskListPacket dalp = DocumentAskListPacket(userId );
     dalp.send(*pServer);
+}
+
+void SslEchoClient::sendDocCreate(QString docName, qint32 userId) {
+    if(!pServer->isValid()) // if u call this and login wasnt performed
+        return;
+    DocumentCreatePacket dcp = DocumentCreatePacket(docName, userId );
+    dcp.send(*pServer);
 }
 
 /*

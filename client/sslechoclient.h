@@ -48,6 +48,7 @@ public slots:
     void sendAskUri(qint32 userId, int docId, QString invCode);
     void sendAlignment(Qt::Alignment alignment, int position, int siteId);
     void sendAskDocList(qint32 userId);
+    void sendDocCreate(QString docName, qint32 userId);
 
 private Q_SLOTS:
     void onConnected();
