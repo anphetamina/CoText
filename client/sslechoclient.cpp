@@ -267,7 +267,13 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
 }
 
 void SslEchoClient::sendInsert(std::vector<QSymbol> symbols, int siteId) {
-    for (QSymbol symbol : symbols) {
+    if (symbols.size() > 1) {
+        QVector syms(symbols.begin(), symbols.end());
+        BigMessage msg = BigMessage(MSG_INSERT_SYM, syms, siteId);
+        msg.send(*pServer);
+        // qDebug() << "sent add block";
+    } else {
+        QSymbol symbol = symbols.front();
         Message msg = Message(MSG_INSERT_SYM, symbol, siteId);
         msg.send(*pServer);
         // qDebug() << "sent add " << ((symbol.isNewLine()) ? "LF" : QString(symbol.getC()));
@@ -275,7 +281,13 @@ void SslEchoClient::sendInsert(std::vector<QSymbol> symbols, int siteId) {
 }
 
 void SslEchoClient::sendErase(std::vector<QSymbol> symbols, int siteId) {
-    for (QSymbol symbol : symbols) {
+    if (symbols.size() > 1) {
+        QVector syms(symbols.begin(), symbols.end());
+        BigMessage msg = BigMessage(MSG_ERASE_SYM, syms, siteId);
+        msg.send(*pServer);
+        // qDebug() << "sent del block";
+    } else {
+        QSymbol symbol = symbols.front();
         Message msg = Message(MSG_ERASE_SYM, symbol, siteId);
         msg.send(*pServer);
         // qDebug() << "sent del " << ((symbol.isNewLine()) ? "LF" : QString(symbol.getC()));
