@@ -227,9 +227,10 @@ QString createInvite(int docId){
     QString qdocId = QString::number(docId);
     QString docName, docPath;
     QString invURI;
+    int id;
     query.exec("SELECT documentid, documentname, documentpath FROM Permission WHERE documentid="+qdocId);
     if (query.next()) {
-        int id = query.value(0).toInt();
+        id = query.value(0).toInt();
         docName = query.value(1).toString();
         docPath = query.value(2).toString();
     }
@@ -255,14 +256,26 @@ bool acceptInvite(QString invURI, int userId){
     /* Take the invitation uri and the userId that wants to validate the invite. Add the permission to the user*/
     QSqlQuery query, query2;
     QString quserId = QString::number(userId);
+    int docId;
+
+    // Execute the first query to check if the invURI is valid and to parse document info
     query.exec("SELECT documentid, documentname, documentpath FROM Permission WHERE URI='"+invURI+"'");
     if (!query.next()) {
         return false;
+    }else{
+        docId = query.value(0).toInt();
+        //docName = query.value(1).toString();
     }
+
+    // If the user already has right to that document, just delete the entry
+    if(checkDocPermission(docId, userId)){
+        query2.exec("DELETE Permission WHERE URI='"+invURI+"'");
+        return true;
+    }
+    // Else update with the userId of that user who redeemed the invCode
     query2.exec("UPDATE Permission SET userid="+quserId+", URI=NULL WHERE URI='"+invURI+"'");
-
+    return true;
 }
-
 
 bool addDocPermission(int docId, int userId){
     /*Add the document permission for a given set user, document */
