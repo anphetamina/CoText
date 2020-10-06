@@ -671,8 +671,11 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
     }
 
     emit(setMainWindowTitle(docName));
-    editor.clear();
-    this->clear();
+    qDebug() << " size = "<<editor.getSymbols().size() << " size2 = "<<editor.getSymbols()[0].size();
+    if(this->editor.getSymbols()[0].size() != 0){
+        editor.clear();
+        this->clear();
+    }
     this->setDisabled(false);
     Benchmark b = Benchmark("TextEditor::openDocument");
     b.startTimer();
