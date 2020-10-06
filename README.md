@@ -1,25 +1,25 @@
 # CoText
-## What is?
+## :question: What is?
 Cotext is an implementation of a text enriched collaborative editor.
 With CoText the users are able to perform operation on the same document at the same time.
 
 In particular, any user will be able to:
-- Create an account/login
-- Create a document
-- Invite an other user by sharing an invitation code OOB
-- Use different text enrichment features like bold, italics, size, ..
-- Use actions enrichment
-- See which users are current working on the document and where their cursor is 
+- :white_check_mark: Create an account/login
+- :white_check_mark: Create a document
+- :white_check_mark: Invite an other user by sharing an invitation code OOB
+- :white_check_mark: Use different text enrichment features like bold, italics, size, ..
+- :white_check_mark: Use actions enrichment
+- :white_check_mark: See which users are current working on the document and where their cursor is 
 
 Additional features are:
-- Persistency (auto-saving performed by server)
-- Multi-platform compatibility
-- Low footprint on bandwith, memory and CPU.
+- :white_check_mark: Persistency (auto-saving performed by server)
+- :white_check_mark: Multi-platform compatibility
+- :white_check_mark: Low footprint on bandwith, memory and CPU.
 
-## Setup
+## :grey_exclamation: Setup
 CoText has some requirements and some setup steps needed to run it.
 
-### Database 
+### :floppy_disk: Database 
 A MySQL server running on the server side is required.
 The schema and some testing entry are given in the example file named: [DBSample.sql](https://github.com/anphetamina/CoText/blob/master/DBSample.sql).
 
@@ -41,24 +41,24 @@ In addition there are 2 empty document already loaded:
 |TestDocument1  |test                      |
 |AAA            |test, test2               |
 
-### Filesystem
+### :file_folder: Filesystem
 You need some space to store the document that are saved in the current working directory in which the server is run.
 In addition the profile pictures of the user are saved in the server/profilePictures.This folder *should not* be deleted. If you need space and you will to loose all the pictures to gain space, you can delete all its content.
 
-### Security requirements
+### :closed_lock_with_key: Security requirements
 To use the software you need a valid SSL certificate. 
 In the repo an example certificate and its private key are given for localhost (dev) usage. 
 
-### Platforms
+### :computer: Platforms 
 The current tested platform are:
 - OSX (Catalina 10.15.6)
 - Windows 10
 
-### Toolchain
+### :hammer: Toolchain
 CMake > 3.14 and a working version of Qt5 is required.
 You will also need the QtMysql driver library on your system.
 
-## Other Information
+## :information_source: Other Information 
 
 ### Network stack
 By default CoText use a websocket server running on port 12345.
@@ -80,13 +80,13 @@ Idempotency: Repeated delete operations produce the same result.
 Such properties can be implemented by using a CRDT algorithm.
 Our implementation was based on [conclaveApp implementation](https://conclave-team.github.io/conclave-site/#what-is-a-real-time-collaborative-)
 
-## TODO-s
+## :pushpin: TODO-s
 Some other features that could be worth are:
 - Store authentication data on client to avoid repeating the login every time
 - Use compression in the DocumentOk packet to improve bandwidth usage and trasfer time for large document
 - Improve UX
 
-### Security concerns
+### :unlock: Security concerns
 The security was not our first priority in this stage.
 A non exhaustive list of issues is the following:
 - SQLInjection protection in many parametric queries based on user given values
