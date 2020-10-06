@@ -36,6 +36,7 @@ public:
     SharedEditor(int siteId = 0);
 
     int getSiteId() const;
+    void setSiteId(int siteId);
 
     const std::vector<std::vector<QSymbol>>& getSymbols() const;
 
