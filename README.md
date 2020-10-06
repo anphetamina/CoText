@@ -40,7 +40,7 @@ The current tested platform are:
 
 ### Toolchain
 CMake > 3.14 and a working version of Qt5 is required.
-You will also need the QtMysql library on your system.
+You will also need the QtMysql driver library on your system.
 
 ## Other Information
 
