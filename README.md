@@ -80,11 +80,15 @@ Idempotency: Repeated delete operations produce the same result.
 Such properties can be implemented by using a CRDT algorithm.
 Our implementation was based on [conclaveApp implementation](https://conclave-team.github.io/conclave-site/#what-is-a-real-time-collaborative-)
 
+### Documentation
+Doxygen generated documentation is available [here](https://emmunaf.dev/projects/CoText/Documentation/html/)
+
 ## :pushpin: TODO-s
 Some other features that could be worth are:
 - Store authentication data on client to avoid repeating the login every time
 - Use compression in the DocumentOk packet to improve bandwidth usage and trasfer time for large document
 - Improve UX
+- Improve documentation
 
 ### :unlock: Security concerns
 The security was not our first priority in this stage.
