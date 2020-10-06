@@ -1,9 +1,25 @@
 # CoText
+## :question: What is?
+Cotext is an implementation of a text enriched collaborative editor.
+With CoText the users are able to perform operation on the same document at the same time.
 
-## Setup
-CoText has some requirements that need to be met to run it.
+In particular, any user will be able to:
+- :white_check_mark: Create an account/login
+- :white_check_mark: Create a document
+- :white_check_mark: Invite an other user by sharing an invitation code OOB
+- :white_check_mark: Use different text enrichment features like bold, italics, size, ..
+- :white_check_mark: Use actions enrichment
+- :white_check_mark: See which users are current working on the document and where their cursor is 
 
-### Database 
+Additional features are:
+- :white_check_mark: Persistency (auto-saving performed by server)
+- :white_check_mark: Multi-platform compatibility
+- :white_check_mark: Low footprint on bandwith, memory and CPU.
+
+## :grey_exclamation: Setup
+CoText has some requirements and some setup steps needed to run it.
+
+### :floppy_disk: Database 
 A MySQL server running on the server side is required.
 The schema and some testing entry are given in the example file named: [DBSample.sql](https://github.com/anphetamina/CoText/blob/master/DBSample.sql).
 
@@ -25,24 +41,26 @@ In addition there are 2 empty document already loaded:
 |TestDocument1  |test                      |
 |AAA            |test, test2               |
 
-### Filesystem
+### :file_folder: Filesystem
 You need some space to store the document that are saved in the current working directory in which the server is run.
-In addition the profile pictures of the user are saved in the server/profilePictures.This folder *should not* be deleted. If you need space and you will to loose all the pictures to gain space, you can delete all its content.
+In addition the profile pictures of the user are saved in the server/profilePictures.
 
-### Security requirements
+This folder *should not* be deleted. If you need space and you will to loose all the pictures to gain space, you can delete all its content.
+
+### :closed_lock_with_key: Security requirements
 To use the software you need a valid SSL certificate. 
-In the repo an example certificate and its private key are given for localhost (dev) usage. 
+In the repo an example (self-signed) certificate and its private key are given for localhost (dev) usage. 
 
-### Platforms
+### :computer: Platforms 
 The current tested platform are:
 - OSX (Catalina 10.15.6)
 - Windows 10
 
-### Toolchain
+### :hammer: Toolchain
 CMake > 3.14 and a working version of Qt5 is required.
-You will also need the QtMysql library on your system.
+You will also need the QtMysql driver library on your system.
 
-## Other Information
+## :information_source: Other Information 
 
 ### Network stack
 By default CoText use a websocket server running on port 12345.
@@ -56,16 +74,28 @@ Cotext use persistency just on the server side. Here there is the list showing i
 - User pictures are stored on filesystem
 - Document content (and its metainformation) are also stored on disk
 
+###  Conflict-Free Replicated Data Type (CRDT)
+When users make concurrent edits to a shared document, the insert and delete operations must commute and the delete operations must be idempotent.
+Commutativity: Concurrent insert and delete operations converge to the same result regardless of the order in which they are applied.
+Idempotency: Repeated delete operations produce the same result.
 
-## TODO-s
+Such properties can be implemented by using a CRDT algorithm.
+Our implementation was based on [conclaveApp implementation](https://conclave-team.github.io/conclave-site/#what-is-a-real-time-collaborative-)
+
+### Documentation
+Doxygen generated documentation is available [here](https://emmunaf.dev/projects/CoText/Documentation/html/)
+
+## :pushpin: TODO-s
+Some other features that could be worth are:
 - Store authentication data on client to avoid repeating the login every time
 - Use compression in the DocumentOk packet to improve bandwidth usage and trasfer time for large document
 - Improve UX
+- Improve documentation
 
-### Security concerns
-The security was not our first priority in this stage.
-A non exhaustive list of issues is the following:
+### :unlock: Security concerns
+The security was not our first priority in this project.
+A non exhaustive list of known issues is the following:
 - SQLInjection protection in many parametric queries based on user given values
 - Use an hash function to avoid storing the password in clear
 - Use safer random generator functions and algorithm
-- Some kind of DoS attack could represent an issue
+- Some kind of particular attacks can cause DoS on the server. This represents a scalability/security issue
