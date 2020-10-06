@@ -7,7 +7,9 @@
 
 #include "DBAuthData.h"
 
-// Perform connection to the DB
+/**
+ * Perform connection to the DB
+ */
 bool dbConfigure() {
 
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
@@ -30,6 +32,9 @@ bool dbConfigure() {
     }
 }
 
+/**
+ * Print the current user in the DB
+ */
 bool getUserlist() {
     QSqlQuery query;
     qDebug() << "[INFO] Getting user list.. (username, id)";
@@ -42,6 +47,9 @@ bool getUserlist() {
     // return qvector or some other data struct
 }
 
+/**
+ * Add a user to the DB and save the profile picture
+ */
 User addUser(QString username, QString password, QString name, QString surname, QIcon profilePic) {
     QSqlQuery query, query2, query3;
     QString email = username;
@@ -83,7 +91,7 @@ User addUser(QString username, QString password, QString name, QString surname, 
 
 }
 
-/*
+/**
  * Check login data and return a user instance.
  * You can check with the isLogged method the result of the performed auth
  * */
@@ -116,7 +124,7 @@ User *checkUserLoginData(QString email, QString password) {
     }
 }
 
-/*
+/**
  * Load a profile picture from disk as QICon given the userId
  */
 QIcon loadProfilePic(int id) {
@@ -132,7 +140,7 @@ QIcon loadProfilePic(int id) {
     return myicon;
 }
 
-/*
+/**
  * Save a profile picture to disk as QICon given the userId and the icon
  */
 bool saveProfilePic(int id, QIcon newIcon) {
@@ -155,7 +163,7 @@ QVector<QString> getDocuments(int userId) {
     return docList;
 }
 
-/*
+/**
  * Check if a given user has the right to open/edit a given document
  */
 bool checkDocPermission(int docId, int userId) {
@@ -176,7 +184,7 @@ bool checkDocPermission(int docId, int userId) {
     }
 }
 
-/*
+/**
  * Create a document given a name and the userId of the creator
  */
 bool createDoc(QString docName, int userId) {
@@ -186,9 +194,10 @@ bool createDoc(QString docName, int userId) {
     QString available_docName = docName;
     bool available_name = false;
 
-    while(!available_name){//TODO: improve logic, but good PoC
+    while (!available_name) {//TODO: improve logic, but good PoC
         // Check if it was already added (userid, docID) should be UNIQUE
-        query0.exec("SELECT id FROM Permission WHERE userid=" + quserId +"AND documentname=" + available_docName + ";");
+        query0.exec(
+                "SELECT id FROM Permission WHERE userid=" + quserId + "AND documentname=" + available_docName + ";");
 
         if (!query0.next()) {
             break;
@@ -199,7 +208,8 @@ bool createDoc(QString docName, int userId) {
     //docPath = available_docName+".dat";
 
     query.exec(
-            "INSERT INTO Permission(documentname, documentpath, userid) VALUES ('" + available_docName + "','" + docPath + "'," +
+            "INSERT INTO Permission(documentname, documentpath, userid) VALUES ('" + available_docName + "','" +
+            docPath + "'," +
             quserId + ")");
     // Check if it was added ; (userid, docID) should be declared as UNIQUE
     // and get docId (dirty way)
@@ -215,7 +225,7 @@ bool createDoc(QString docName, int userId) {
     }
 }
 
-/*
+/**
  * Generate and return a random inv code of 20 alphanumerical chars.
  * The code is related to one document and can be redeemed by whatever user will use it as first.
  */
@@ -251,7 +261,7 @@ QString createInvite(int docId) {
     return invURI;
 }
 
-/*
+/**
  * Take the invitation uri and the userId that wants to validate the invite.
  * Add the permission to the user so he can access the document linked to that code.
  * */
@@ -279,10 +289,10 @@ bool acceptInvite(QString invURI, int userId) {
     return true;
 }
 
-QVector<QString> docByInvURI(QString invURI){
-    QVector<QString> doc({"",""});
+QVector<QString> docByInvURI(QString invURI) {
+    QVector<QString> doc({"", ""});
     QSqlQuery query;
-    query.exec("SELECT documentid, documentname, documentpath FROM Permission WHERE URI='"+invURI+"'");
+    query.exec("SELECT documentid, documentname, documentpath FROM Permission WHERE URI='" + invURI + "'");
     if (query.next()) {
         doc[0] = query.value(0).toString();
         doc[1] = query.value(1).toString();
@@ -290,13 +300,13 @@ QVector<QString> docByInvURI(QString invURI){
     return doc;
 }
 
-/*
+/**
  * Add the document permission for a given documentId and userId.
  * Return false in case of failure.
  * Note: returns true also if the document already exist.
  */
 
-bool addDocPermission(int docId, int userId){
+bool addDocPermission(int docId, int userId) {
     QSqlQuery query, query2, query3;
     QString quserId = QString::number(userId);
     QString qdocId = QString::number(docId);
@@ -321,7 +331,7 @@ bool addDocPermission(int docId, int userId){
     return true;
 }
 
-/*
+/**
  * Save to disk the internal representation of the document for a given documentId and bidimensional QVec
  */
 void saveToDisk(QVector<QVector<QSymbol>> qdoc, int docId) {
@@ -333,7 +343,7 @@ void saveToDisk(QVector<QVector<QSymbol>> qdoc, int docId) {
     file.close();
 }
 
-/*
+/**
  * Load the internal structure that represents a document given the documentId
  */
 QVector<QVector<QSymbol>> loadFromDisk(int docId) {
@@ -349,7 +359,7 @@ QVector<QVector<QSymbol>> loadFromDisk(int docId) {
     return qdoc;
 }
 
-/*
+/**
  * Generate an alphanumerical string for the given length.
  */
 QString GetRandomString(int randomStringLength = 100) {

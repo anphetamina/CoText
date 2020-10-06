@@ -104,6 +104,16 @@ void SslEchoServer::processBinaryMessage(QByteArray message) {
 
 
 //! [socketDisconnected]
+
+/**
+ * When a client disconnect from the server many actions are perfomed
+ * He is removed from the clientMapping[pClient] internal structures associated to him.
+ * Client is logged out
+ * Its current opened document is closed
+ *
+ * @param closedDocId
+ * @param client
+ */
 void SslEchoServer::socketDisconnected() {
     qDebug() << "Client seems to be disconnected";
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
@@ -127,6 +137,13 @@ void SslEchoServer::socketDisconnected() {
     }
 }
 
+/**
+ * Close a document given its a id.
+ * Every time a document is closed it is also saved.
+ *
+ * @param closedDocId
+ * @param client
+ */
 bool SslEchoServer::closeDocumentById(int closedDocId, QSharedPointer<Client> client) {
     // Check if there was any document open
     if (closedDocId > 0) {
@@ -153,6 +170,12 @@ void SslEchoServer::onSslErrors(const QList<QSslError> &) {
 }
 //! [socketDisconnected]
 
+/**
+ * Get raw data from socket and wait to receive the full packet.
+ * If the type is the valid range call dispatch()
+ *
+ * @param rcvd_packet
+ */
 void SslEchoServer::packetParse(QByteArray rcvd_packet) {
 
     // Create a new packet buffer (used to w8 and receive for the full packet)
@@ -165,7 +188,7 @@ void SslEchoServer::packetParse(QByteArray rcvd_packet) {
     if (pBuffer->getDataSize() == 0) {
         streamRcv >> *pBuffer;
     }
-    QByteArray payload = rcvd_packet.mid(4 + sizeof(quint32));//header+Payoadlen skip
+    QByteArray payload = rcvd_packet.mid(4 + sizeof(quint32));//header+Payloadlen skip
     pBuffer->append(payload);
 
     if (pBuffer->isComplete()) {
@@ -196,7 +219,13 @@ void SslEchoServer::packetParse(QByteArray rcvd_packet) {
         }
     }
 }
-
+/**
+ * Elaborate a packet and perform actions based on its type.
+ * Look at PacketDef.h header file for their definition.
+ *
+ * @param rcvd_packet
+ * @param pClient
+ */
 void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
     QSharedPointer<Client> client = clientMapping[pClient];
     //qDebug() << rcvd_packet.get();  // print packet as hex
@@ -476,6 +505,11 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
      */
 }
 
+/**
+ * Delete  one user from the document internal structure documentMapping[docId][userId].
+ *
+ * @param client
+ */
 bool SslEchoServer::findAndDeleteFromDoclist(QSharedPointer<Client> client) {
     bool wasRemoved = false;
     for (auto it = documentMapping.begin(); it != documentMapping.end();) {
@@ -493,6 +527,12 @@ bool SslEchoServer::findAndDeleteFromDoclist(QSharedPointer<Client> client) {
     return wasRemoved;
 }
 
+/**
+ * Check if the user has already a connection associated to him (ie. connected on a second device)
+ *
+ * @param client
+ * @param pclient
+ */
 void SslEchoServer::pruneOldConnectionsIfAny(QSharedPointer<Client> client, QWebSocket *pClient) {
 
     //TODO: Check if user already exist in the map values, (i.e. connected from 1 device first and then an other)
@@ -515,6 +555,11 @@ void SslEchoServer::pruneOldConnectionsIfAny(QSharedPointer<Client> client, QWeb
 
 }
 
+/**
+ * Send to each user connected to a document the new list of online user
+ *
+ * @param docId
+ */
 void SslEchoServer::sendUpdatedOnlineUserByDocId(int docId) {
     if (docId < 0)
         return;
@@ -535,6 +580,13 @@ void SslEchoServer::sendUpdatedOnlineUserByDocId(int docId) {
     }
 }
 
+/**
+ * Return the documentId currently opened by the user.
+ * Return -1 if the user has no document opened
+ *
+ * @param userId
+ * @return docId
+ */
 int SslEchoServer::getDocIdOpenedByUserId(int userId) {
     for (auto it = documentMapping.begin(); it != documentMapping.end();) {
         QList<QSharedPointer<Client>> onlineClientPerDoc = it.value();
@@ -548,6 +600,13 @@ int SslEchoServer::getDocIdOpenedByUserId(int userId) {
     return -1;
 }
 
+/**
+ * Check if there is already an instance of crdt (SharedEditor) running for that document.
+ *
+ * Return true if there is an instance, false otherwise.
+ *
+ * @param docId
+ */
 bool SslEchoServer::isOpenedEditorForGivenDoc(int docId) {
     for (auto editorit = editorMapping.begin(); editorit != editorMapping.end();) {
         if (editorit.key() == docId) {
@@ -557,6 +616,17 @@ bool SslEchoServer::isOpenedEditorForGivenDoc(int docId) {
     return false;
 }
 
+/**
+ * Open a document given its id and the client shared pointer.
+ * Return a bidimensional qvector (empty on failure).
+ *
+ * It performs many operation under the hood:
+ * close already opened doc, check permission and finally load the document.
+ *
+ * @param docId
+ * @param client
+ * @return document
+ */
 QVector<QVector<QSymbol>> SslEchoServer::remoteOpenDocument(int docId, QSharedPointer<Client> client) {
 
     int closedDocId = getDocIdOpenedByUserId(client->getUserId());
