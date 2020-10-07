@@ -219,6 +219,7 @@ void SslEchoServer::packetParse(QByteArray rcvd_packet) {
         }
     }
 }
+
 /**
  * Elaborate a packet and perform actions based on its type.
  * Look at PacketDef.h header file for their definition.

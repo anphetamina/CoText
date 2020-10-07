@@ -20,6 +20,8 @@ public:
     void startTimer();
 
     void stopTimer();
+
+    double getTimer();
 };
 
 

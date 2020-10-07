@@ -29,3 +29,14 @@ void Benchmark::stopTimer() {
               << time_taken << std::setprecision(5);
     std::cout << " sec " << std::endl;
 }
+
+/**
+ * Get  the timer value (previously started) as double
+ *
+ * @return time_partial
+ */
+double Benchmark::getTimer() {
+    clock_t partial = clock();
+    double time_partial = double(partial - start) / double(CLOCKS_PER_SEC);
+    return time_partial;
+}
