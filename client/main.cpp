@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
     w->setWindowTitle("Welcome");
     w->setWindowIconText("Co-Text");
 
-    TextEditor* editor = new TextEditor(user.getId(), *w->getUi(), w); // todo get site id from server
+    TextEditor* editor = new TextEditor(user.getId(), *w->getUi(), w);
     editor->setDisabled(true);
     w->setCentralWidget(editor);
     w->setTextEditor(editor);

@@ -445,8 +445,8 @@ void TextEditor::remoteInsert(QSymbol symbol) {
              * as of the remote cursor
              */
 
-            cursor.setPosition(oldPosition);
-            setTextCursor(cursor);
+             cursor.setPosition(oldPosition);
+             setTextCursor(cursor);
         }
     } catch (const std::exception &e) {
         qDebug() << e.what();
@@ -522,16 +522,16 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
                     insertRow(pos.first, 1);
                 }
 
-                // If a new format is found, insert the biffered content
+                // If a new format is found, insert the buffered content
                 if(j!=0 && (last_cf != symbol.getCF()) ){
                     QTextCursor cursor(textCursor());
+                    cursor.setPosition(last_position);
                     cursor.insertText(buffer_block, last_cf);
-                    //cursor.setPosition(last_position);
                     //setTextCursor(cursor);
                     buffer_block = "";
                 }
                 last_cf = symbol.getCF();
-                //last_position = getPosition(pos.first, pos.second);
+                last_position = getPosition(pos.first, pos.second);
                 buffer_block.push_back(symbol.getC()) ;
             }
         } catch (const std::exception &e) {
@@ -541,8 +541,8 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
     // Check if the last buffer_block (last_cf didnt changed almost for sure in the last char)
     if(!buffer_block.isEmpty()){
         QTextCursor cursor(textCursor());
+        cursor.setPosition(last_position);
         cursor.insertText(buffer_block, last_cf);
-        //cursor.setPosition(last_position);
         //setTextCursor(cursor);
     }
 }
@@ -776,8 +776,6 @@ void TextEditor::setSiteId(int siteId){
 int TextEditor::getSiteId(){
     return this->editor.getSiteId();
 }
-
-
 
 int TextEditor::getDocId() const{
     return documentId;

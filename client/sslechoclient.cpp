@@ -217,12 +217,16 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             BigMessage *msg = dynamic_cast<BigMessage *>(rcvd_packet.get());
             switch (msg->getType()) {
                 case(MSG_INSERT_SYM): {
-                    std::vector<QSymbol> symbols(msg->getQSS().begin(), msg->getQSS().end());
+                    QVector<QSymbol> syms = msg->getQSS();
+                    std::vector<QSymbol> symbols(syms.begin(), syms.end());
+
                     emit insertBlockReceived(symbols);
                 }
 
                 case(MSG_ERASE_SYM): {
-                    std::vector<QSymbol> symbols(msg->getQSS().begin(), msg->getQSS().end());
+                    QVector<QSymbol> syms = msg->getQSS();
+                    std::vector<QSymbol> symbols(syms.begin(), syms.end());
+
                     emit eraseBlockReceived(symbols);
                 }
             }
