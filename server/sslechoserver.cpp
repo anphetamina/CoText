@@ -344,6 +344,22 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
             int docId = getDocIdOpenedByUserId(client->getUserId());
             //Call remoteInsertBlock for server
             //remoteInsertBlock(docId, bmsg->getQSS());
+
+            switch (bmsg->getType()) {
+                case (MSG_INSERT_SYM): {
+                    for (auto qsymbols : bmsg->getQSS()) {
+                        std::pair<int, int> pos = editorMapping[docId]->remoteInsert(qsymbols);
+                    }
+                    break;
+                }
+                case (MSG_ERASE_SYM): {
+                    for (auto qsymbols : bmsg->getQSS()) {
+                        std::pair<int, int> pos = editorMapping[docId]->remoteErase(qsymbols);
+                    }
+                    break;
+                }
+            }
+
             break;
         }
         case (PACK_TYPE_CURSOR_POS): {
