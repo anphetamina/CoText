@@ -18,11 +18,16 @@ public:
     void clearInput();
     bool checkInput(const QString& username, const QString& psw);
 
-
 private slots:
-
     void on_pushButton_Reg_clicked();
     void on_pushButton_Login_clicked();
+
+public slots:
+    void loginFailed();
+    void loginSuccessful();
+
+signals:
+    void setMainWindowTitle(QString title);
 
 private:
     Ui::Login *ui;

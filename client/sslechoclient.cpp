@@ -377,6 +377,12 @@ void SslEchoClient::sendDocCreate(QString docName, qint32 userId) {
 bool SslEchoClient::isConnected(){
     return m_webSocket.state() == QAbstractSocket::ConnectedState;
 }
+
+void SslEchoClient::connectToLogin(Login* login){
+    connect(this, &SslEchoClient::loginFailedReceived, login, &Login::loginFailed);
+    connect(this, &SslEchoClient::loginSuccessfulReceived, login, &Login::loginSuccessful);
+}
+
 /*
  * Dont delete pls. Possible enhancement
 void SslEchoClient::connectToLoginWindow(Login* login, MainWindow* mw) {//Qdialog as of now

@@ -69,6 +69,8 @@ int main(int argc, char *argv[]) {
         client->sendLogin();
     }else {
         // Set login GUI options
+        client->connectToLogin(login);
+        w->connectToLogin(login);
         login->setWindowTitle("Welcome to CoText!");
         login->setModal(true);
         login->exec();

@@ -676,7 +676,7 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
     emit(setMainWindowTitle(docName));
 
     documentId = docId;
-    if(this->editor.getSymbols()[0].size() != 0){
+    if(editor.getSymbols()[0].size() != 0){
         editor.clear();
         this->clear();
     }

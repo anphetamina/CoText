@@ -16,6 +16,7 @@
 #include "UserWidget.h"
 #include "TextEditor.h"
 #include "StatusBar.h"
+#include "Login.h"
 
 
 //#include <QSqlDatabase>
@@ -70,6 +71,7 @@ public:
 
     //! [other member functions]
     void connectToTextEditor(TextEditor* te);
+    void connectToLogin(Login* login);
     
 
 private slots:

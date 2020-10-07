@@ -471,6 +471,11 @@ void MainWindow::connectToTextEditor(TextEditor* te) {
     connect(te, &TextEditor::setMainWindowTitle, this, &MainWindow::setMainWindowTitleSlot);
 }
 
+void MainWindow::connectToLogin(Login* login) {
+    // connect(this, &MainWindow::newColorMapReceived, te, &TextEditor::updateColorMap);
+    connect(login, &Login::setMainWindowTitle, this, &MainWindow::setMainWindowTitleSlot);
+}
+
 
 void MainWindow::setMainWindowTitleSlot(QString title){
     this->setWindowTitle(title);
