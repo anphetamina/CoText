@@ -5,6 +5,7 @@
 #include <QThread>
 #include <iostream>
 #include "sslechoclient.h"
+#include <Benchmark.h>
 
 //#include <QtCore/QCoreApplication>
 
@@ -46,15 +47,23 @@ int main(int argc, char *argv[]) {
     client->connectToEditor(editor);
     //client->connectToLoginWindow(login, w); //TODO: use signal/slot for creating/closing diffent windows.tonote: login is a QDialog not QWindow
 
+    Benchmark b = Benchmark();
+    b.startTimer();
+    while(!client->isConnected()){
+        QCoreApplication::processEvents();
+        if(b.getTimer() > 6.0){
+            qDebug() << "Connection timeout: Server is unreachable.";
+            qApp->quit();
+            return -1;
+        }
+    }
+
     QString quser, qpass;
     if (argc > 1) {
         std::string username = argv[1];
         std::string password = argv[2];
         quser = QString::fromStdString(username);
         qpass = QString::fromStdString(password);
-        while(!client->isConnected()){//TODO: timeout? BTW not so important, argv should be used just to debug, not a requirement
-            QCoreApplication::processEvents();
-        }
         client->set_username(quser);
         client->set_password(qpass);
         client->sendLogin();

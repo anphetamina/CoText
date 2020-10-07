@@ -97,7 +97,12 @@ bool QSymbol::isNewLine() const {
     return c == QChar::LineFeed || c == QChar::ParagraphSeparator || c == QChar::LineSeparator;
 }
 
-// Convert a bidimensional qvector of qsymbolsto a  bidimensional std::vector of symbols to
+/**
+ * Convert a bidimensional qvector of qsymbolsto a  bidimensional std::vector of symbols to
+ *
+ * @param qsymbols
+ * @return symbols
+ */
 std::vector<std::vector<QSymbol>> toVector(QVector<QVector<QSymbol>> qsymbols){
     std::vector<std::vector<QSymbol>> symbols = {};
     for (auto symbolQArr : qsymbols) {
@@ -111,8 +116,13 @@ std::vector<std::vector<QSymbol>> toVector(QVector<QVector<QSymbol>> qsymbols){
     return symbols;
 }
 
-
-// Convert a bidimensional std::vector of symbols to a bidimensional qvector of qsymbols
+/**
+ * Convert a bidimensional std::vector of symbols to a bidimensional qvector of qsymbols
+ *
+ * @param symbols
+ * @return qsymbols
+ */
+//
 QVector<QVector<QSymbol>> toQVector(std::vector<std::vector<QSymbol>> symbols){
     QVector<QVector<QSymbol>> qsymbols = {};
     for (auto symbolArr : symbols) {

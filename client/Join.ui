@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QLineEdit{ background-color: white;} </string>
+  </property>
   <widget class="QPushButton" name="pushButton_join">
    <property name="geometry">
     <rect>

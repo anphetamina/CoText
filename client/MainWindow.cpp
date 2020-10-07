@@ -6,6 +6,7 @@
 #include "Join.h"
 #include "OpenDocument.h"
 #include "AlertNewDocument.h"
+#include "ChooseName.h"
 #include <QPixmap> //allows to create a qpixmap onj which takes 1 arg
 #include <QPrinter>
 #include <QColorDialog>
@@ -202,24 +203,27 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
 
 
 void MainWindow::on_actionNew_triggered() {
+
+    ChooseName chooseName(docList);
+    connect(&chooseName, &ChooseName::nameChoosen, this, &MainWindow::nameChoosenMainWindow);
+    chooseName.setWindowTitle("Choose document name");
+    chooseName.setModal(true);
+    chooseName.exec();
+}
+
+void MainWindow::nameChoosenMainWindow(QString name){
     if(editor->isEnabled()){    //c'è già un documento aperto
-        AlertNewDocument alert(this->windowTitle(), "");
+        AlertNewDocument alert(this->windowTitle(), name);
         connect(&alert, &AlertNewDocument::openNewDocument, this, &MainWindow::openNewDocumentMainWindow);
         alert.setWindowTitle("Alert");
         alert.setModal(true);
         alert.exec();
     }else { //non c'è nessun documento aperto
-        QString docName("Untitled");
-        QString name(docName);
-        int i = 0;
-        while (docList.contains(name)) {
-            i++;
-            name = docName + "" + QString::number(i);
-        }
         emit(sendDocCreateMainWindow(name, user.getId()));   //il server poi risponde con DocumentOkPacket e il client nella slot apre il nuovo documento
         docList.append(name);
     }
 }
+
 
 void MainWindow::openNewDocumentMainWindow(QString docName){
     QString name(docName);
@@ -489,4 +493,8 @@ void MainWindow::setTextEditor(TextEditor* te){
 
 TextEditor* MainWindow::getTextEditor() const{
     return editor;
+}
+
+QVector<User> MainWindow::getUserList() const {
+	return userList;
 }

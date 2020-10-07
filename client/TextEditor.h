@@ -25,28 +25,47 @@ class TextEditor : public QTextEdit {
 
 public:
     explicit TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent = nullptr);
-
-    int getRow(int position) const;
-    int getCol(int row, int position) const;
-    QColor getUserColor(int userId) const;
-    int getUserId(int row, int col) const;
-    int getDocId() const;
-
-    std::atomic<bool> isFromRemote;
+	
+	//! [Setters]
+	void setSiteId(int siteId);
+	
+	//! [Getters]
+	int getRow(int position) const;
+	int getCol(int row, int position) const;
+	
+	int getSiteId();
+	int getDocId() const;
+	QString getDocName() const;
+	int getNumChars() const;
+	
+	int getUserId(int row, int col) const;
+	QColor getUserColor(int userId) const;
+	
+	//![public attributes]
+	std::atomic<bool> isFromRemote;
     std::atomic<bool> isFromRemoteCursor;
-    void setSiteId(int siteId);
-    int getSiteId();
+
+    
+
+
 private:
     QWidget *parent;
     Ui::MainWindow &ui;
     SharedEditor editor;
+    
     std::vector<int> index;
     std::vector<std::vector<QSymbol>> testSymbols;
     int currentSelectedChars;
+    
     UserHighlighter highlighter;
     std::map<int, int> cursorMap;
     std::atomic<bool> isUserColorsToggled;
+    
+    //! [private Document attributes]
     int documentId;
+    QString documentName = "";
+    int nChars = 0;
+    //! [end Document attributes]
 
     void insertRow(int pos, int n);
     void deleteRow(int pos, int n);
