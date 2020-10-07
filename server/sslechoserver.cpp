@@ -427,14 +427,14 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
 
             // Get DocID and check permission of the user for that doc
             int docId = docIdByName(dop->getdocName(), dop->getuserId());
-            qDebug() << "[SERVER] DocumentOpenPacket received docId = " << docId << " docName = " << dop->getdocName()
-                     << " userId = " << dop->getuserId();
 
             // If the user has the privilege for opening, perform the whole loading operation
             QVector<QVector<QSymbol>> doc = remoteOpenDocument(docId, client);
+
             // And send the document content
             DocumentOkPacket dokp = DocumentOkPacket(docId, dop->getdocName(), doc);
             dokp.send(*pClient);
+
             // Send current online userlist for the given document
             sendUpdatedOnlineUserByDocId(docId);
             break;
@@ -624,7 +624,7 @@ int SslEchoServer::getDocIdOpenedByUserId(int userId) {
  * @param docId
  */
 bool SslEchoServer::isOpenedEditorForGivenDoc(int docId) {
-    for (auto editorit = editorMapping.begin(); editorit != editorMapping.end();) {
+    for (auto editorit = editorMapping.begin(); editorit != editorMapping.end(); editorit++) {
         if (editorit.key() == docId) {
             return true;
         }
@@ -652,6 +652,7 @@ QVector<QVector<QSymbol>> SslEchoServer::remoteOpenDocument(int docId, QSharedPo
     if (docId < 0) { // doesnt have permission (no document was found with that name associated to that user)
         return QVector<QVector<QSymbol>>();
     }
+
     // Set the document in the packet as the current opened doc
     documentMapping[docId].insert(0, client);
 
