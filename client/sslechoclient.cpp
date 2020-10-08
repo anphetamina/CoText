@@ -355,6 +355,7 @@ void SslEchoClient::connectToMainWindow(MainWindow* mw) {
     connect(mw, &MainWindow::sendAskDocListMainWindow, this, &SslEchoClient::sendAskDocList);
     connect(this, &SslEchoClient::documentListReceived, mw, &MainWindow::documentListReceivedMainWindow);
     connect(mw, &MainWindow::sendOpenDocumentSignal, this, &SslEchoClient::sendDocOpen);
+    connect(this, &SslEchoClient::documentReceived, mw, &MainWindow::openDocumentMainWindow);
 }
 
 void SslEchoClient::sendAskDocList(qint32 userId) {

@@ -546,3 +546,10 @@ TextEditor* MainWindow::getTextEditor() const{
 QVector<User> MainWindow::getUserList() const {
 	return userList;
 }
+
+void MainWindow::openDocumentMainWindow(int docId, QString docName, std::vector<std::vector<QSymbol>> qsymbols){
+    //add a document joined with an invite inside the doclist
+    if(!docList.contains(docName)){
+        docList.append(docName);
+    }
+}
