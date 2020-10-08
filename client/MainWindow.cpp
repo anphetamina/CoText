@@ -467,7 +467,6 @@ QColor MainWindow::getUserColor(int userId) const {
 }
 
 void MainWindow::connectToTextEditor(TextEditor* te) {
-    // connect(this, &MainWindow::newColorMapReceived, te, &TextEditor::updateColorMap);
     connect(te, &TextEditor::setMainWindowTitle, this, &MainWindow::setMainWindowTitleSlot);
 }
 
