@@ -15,8 +15,6 @@
 #include "MainWindow.h"
 #include "Benchmark.h"
 
-std::mutex ins_mutex;  // protects insert
-
 
 TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     parent(parent),
@@ -24,20 +22,16 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     index({0}),
     editor(SharedEditor(siteId)),
     isFromRemote(false),
-    isFromRemoteCursor(false),
     testSymbols({{}}),
     cursorMap({}),
     currentSelectedChars(0),
     highlighter(*this, document()),
     isUserColorsToggled(false) {
 
-    qDebug() << "Current sID: "<< editor.getSiteId();
-
     /**
      * document default styling
      */
     setAcceptRichText(false);
-    alignmentChanged(alignment());
 
     setStyleSheet("QTextEdit {margin-left: 40px; margin-right: 40px; margin-top: 10px; margin-bottom: 10px; color: white; font-size: 16px; border: hidden}");
 
@@ -62,7 +56,7 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     connect(ui.actionUnderline, &QAction::triggered, this, &TextEditor::setFontUnderline);
     connect(ui.actionTextColor, &QAction::triggered, this, &TextEditor::setFontColor);
 
-    connect(this, &QTextEdit::currentCharFormatChanged, this, &TextEditor::currentCharFormatChanged);
+    connect(this, &QTextEdit::currentCharFormatChanged, this, &TextEditor::currentCharFormatChange);
 
     /**
      * document content connections
@@ -99,8 +93,9 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
 void TextEditor::selectFont() {
     bool fontSelected;
     QFont font = QFontDialog::getFont(&fontSelected, parent);
-    if (fontSelected)
-        setFont(font);
+    if (fontSelected) {
+        setCurrentFont(font);
+    }
 }
 
 void TextEditor::setFontBold(bool bold) {
@@ -155,7 +150,7 @@ void TextEditor::setTextAlignment(QAction *action) {
 
 }
 
-void TextEditor::alignmentChanged(Qt::Alignment alignment) {
+void TextEditor::alignmentChange(Qt::Alignment alignment) {
     if (alignment & Qt::AlignLeft) {
         ui.actionAlign_left->setChecked(true);
     } else if (alignment & Qt::AlignCenter) {
@@ -167,7 +162,7 @@ void TextEditor::alignmentChanged(Qt::Alignment alignment) {
     }
 }
 
-void TextEditor::currentCharFormatChanged(const QTextCharFormat &f) {
+void TextEditor::currentCharFormatChange(const QTextCharFormat &f) {
     ui.actionBold->setChecked(f.font().bold());
     ui.actionItalic->setChecked(f.font().italic());
     ui.actionUnderline->setChecked(f.font().underline());
@@ -214,7 +209,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
             emit symbolsErased(erasedSymbols, editor.getSiteId());
         } catch (const std::exception &e) {
-            qDebug() << e.what();
+            qDebug() << "TextEditor::contentsChange charsRemoved" << e.what();
             undo();
         }
 
@@ -239,9 +234,11 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
             while (charsAdded > 0) {
                 try {
                     QChar addedChar = document()->characterAt(position);
-                    QTextCursor qTextCursor = textCursor();
-                    qTextCursor.setPosition(position);
-                    QSymbol symbol = editor.localInsert(row, col, addedChar, qTextCursor.charFormat());
+
+                    QTextCursor c(document());
+                    c.setPosition(position + 1);
+
+                    QSymbol symbol = editor.localInsert(row, col, addedChar, c.charFormat());
 
                     if (isNewLine(addedChar)) {
                         newRows++;
@@ -271,12 +268,12 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
             emit symbolsInserted(insertedSymbols, editor.getSiteId());
         } catch (const std::exception &e) {
-            qDebug() << e.what();
+            qDebug() << "TextEditor::contentsChange charsAdded" << e.what();
         }
 
     }
 
-    //printSymbols();
+    printSymbols();
 }
 
 /**
@@ -398,7 +395,7 @@ int TextEditor::getRow(int position) const {
 
     auto it = std::lower_bound(index.begin(), index.end(), position);
     if (it == index.end()) {
-        return index.size()-1;
+        return static_cast<int>(index.size())-1;
     }
     int row = it - index.begin();
     if (index[row] > position) {
@@ -415,9 +412,15 @@ void TextEditor::remoteInsert(QSymbol symbol) {
 
     // qDebug() << "received add " << symbol.getC();
 
+    /**
+     * block updates
+     */
+    document()->blockSignals(true);
+
+    textCursor().clearSelection();
+
     try {
-        isFromRemote = true;
-        isFromRemoteCursor = true;
+
         std::pair<int, int> pos = editor.remoteInsert(symbol);
         if (pos.first != -1 || pos.second != -1) {
 
@@ -430,27 +433,23 @@ void TextEditor::remoteInsert(QSymbol symbol) {
             int position = getPosition(pos.first, pos.second);
 
             if (position < 0 || position > document()->characterCount()) {
-                throw std::runtime_error(std::string{} + __PRETTY_FUNCTION__ + ": invalid cursor position");
+                throw std::runtime_error(": invalid cursor position");
             }
 
-            int oldPosition = textCursor().position();
-            QTextCursor cursor(textCursor());
+            QTextCursor cursor(document());
             cursor.setPosition(position);
 
             cursor.insertText(symbol.getC(), symbol.getCF());
 
-            /**
-             * this step is necessary due to the cursor changing position
-             * when an operation is done when the text cursor is in the same position
-             * as of the remote cursor
-             */
-
-             cursor.setPosition(oldPosition);
-             setTextCursor(cursor);
+            cursorPositionChange();
         }
     } catch (const std::exception &e) {
-        qDebug() << e.what();
+        qDebug() << __PRETTY_FUNCTION__ << e.what();
     }
+
+    printSymbols();
+
+    document()->blockSignals(false);
 
 }
 
@@ -462,29 +461,39 @@ void TextEditor::remoteErase(QSymbol symbol) {
 
     // qDebug() << "received del " << symbol.getC();
 
+    document()->blockSignals(true);
+    textCursor().clearSelection();
+
     try {
-        isFromRemote = true;
+
         std::pair<int, int> pos = editor.remoteErase(symbol);
         if (pos.first != -1 || pos.second != -1) {
 
             decrementIndex(pos.first, 1);
-            if (isNewLine(symbol.getC())) {
+
+            if (symbol.isNewLine()) {
                 deleteRow(pos.first, 1);
             }
 
             int position = getPosition(pos.first, pos.second);
 
             if (position < 0 || position > document()->characterCount()) {
-                throw std::runtime_error(std::string{} + __PRETTY_FUNCTION__ + ": invalid cursor position");
+                throw std::runtime_error(": invalid cursor position");
             }
 
-            QTextCursor cursor(textCursor());
+            QTextCursor cursor(document());
             cursor.setPosition(position);
             cursor.deleteChar();
+
+            cursorPositionChange();
         }
     } catch (const std::exception &e) {
-        qDebug() << e.what();
+        qDebug() << __PRETTY_FUNCTION__ << e.what();
     }
+
+    printSymbols();
+
+    document()->blockSignals(false);
 
 }
 
@@ -502,53 +511,72 @@ int TextEditor::getPosition(int row, int col) {
 
 void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
 
-    int last_position = 0;
-    QVector<QString> blocks;
+
+    textCursor().clearSelection();
+
     QString buffer_block;
     QTextCharFormat last_cf = QTextCharFormat();
+    int last_position = 0;
+    int line_count = 0;
+    int last_row = 0;
+    QTextCursor cursor(document());
     for (int j = 0; j < symbols.size(); j++) {
         QSymbol symbol = symbols[j];
+
         //qDebug() << "received add " << symbol.getC();
+
         try {
-            isFromRemote = true;
-            isFromRemoteCursor = true;
             std::pair<int, int> pos = editor.remoteInsert(symbol);
 
             if (pos.first != -1 || pos.second != -1) {
 
-                incrementIndex(pos.first, 1);
-
                 if (symbol.isNewLine()) {
-                    insertRow(pos.first, 1);
+                    line_count++;
                 }
 
-                // If a new format is found, insert the buffered content
-                if(j!=0 && (last_cf != symbol.getCF()) ){
-                    QTextCursor cursor(textCursor());
+                if (j == 0) {
+
+                    last_row = pos.first;
+                    last_position = getPosition(pos.first, pos.second);
+
+                } else if (last_cf != symbol.getCF()) {
+
+                    incrementIndex(last_row, buffer_block.size());
+
+                    insertRow(last_row, line_count);
+                    last_row = line_count;
+                    line_count = 0;
+
                     cursor.setPosition(last_position);
                     cursor.insertText(buffer_block, last_cf);
-                    //setTextCursor(cursor);
-                    buffer_block = "";
+                    last_position += buffer_block.size();
+                    buffer_block.clear();
+
                 }
+
+                buffer_block.push_back(symbol.getC());
                 last_cf = symbol.getCF();
-                last_position = getPosition(pos.first, pos.second);
-                buffer_block.push_back(symbol.getC()) ;
             }
         } catch (const std::exception &e) {
-            qDebug() << e.what();
+            qDebug() << "TextEditor::remoteInsertBlock" << __PRETTY_FUNCTION__ << e.what();
         }
     }
+
     // Check if the last buffer_block (last_cf didnt changed almost for sure in the last char)
-    if(!buffer_block.isEmpty()){
-        QTextCursor cursor(textCursor());
-        cursor.setPosition(last_position);
+    if (!buffer_block.isEmpty()) {
+
+        incrementIndex(last_row, buffer_block.size());
+        insertRow(last_row, line_count);
         cursor.insertText(buffer_block, last_cf);
-        //setTextCursor(cursor);
     }
+
+    printSymbols();
+
 }
 
 void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
     std::for_each(symbols.begin(), symbols.end(), [this](const QSymbol &it){ remoteErase(it); });
+    printSymbols();
 }
 
 void TextEditor::paintEvent(QPaintEvent *e) {
@@ -562,51 +590,42 @@ void TextEditor::paintEvent(QPaintEvent *e) {
             int count = document()->characterCount();
             QColor color = getUserColor(c.first);
             painter.setPen(color);
+
             if (position < count) {
                 cursor.setPosition(position);
-                QRect cRect = cursorRect(cursor);
-                painter.drawRect(cRect);
-
-                /*QRect lRect(cRect.left(), cRect.top(), 50, 10);
-                painter.fillRect(lRect, color);
-                painter.drawRect(lRect);
-                painter.setPen(Qt::white);
-                QRect boundingRect;
-                painter.drawText(lRect, 0, tr("TEST"), &boundingRect);*/
-
-                update();
             } else if (position == count) {
-                cursor.setPosition(position - 1);
-                QRect cRect = cursorRect(cursor);
-                painter.drawRect(cRect);
-
-                update();
+                int newPos = position - 1;
+                cursor.setPosition(newPos);
+            } else {
+                int newPos = count - 1;
+                cursor.setPosition(newPos);
             }
+
+            /*QRect lRect(cRect.left(), cRect.top(), 50, 10);
+            painter.fillRect(lRect, color);
+            painter.drawRect(lRect);
+            painter.setPen(Qt::white);
+            QRect boundingRect;
+            painter.drawText(lRect, 0, tr("TEST"), &boundingRect);*/
+
+            QRect cRect = cursorRect(cursor);
+            painter.drawRect(cRect);
+
+            update();
         }
     } catch (const std::exception &e) {
-        qDebug() << e.what();
+        qDebug() << "TextEditor::paintEvent" << __PRETTY_FUNCTION__ << e.what();
     }
 }
 
 void TextEditor::cursorPositionChange() {
 
-    alignmentChanged(alignment());
+    alignmentChange(alignment());
 
-    /**
-     * this works because in the constructor of TextEditor
-     * parent contains a subobject of type MainWindow that is derived from QWidget
-     */
-    if (MainWindow *mw = dynamic_cast<MainWindow*>(parent)) {
+    int userId = MainWindow::getUser().getId();
 
-        int userId = mw->getUser().getId();
+    emit cursorPositionChanged(userId, textCursor().position());
 
-        if (!isFromRemoteCursor) {
-            emit cursorPositionChanged(userId, textCursor().position());
-        }
-
-        isFromRemoteCursor = false;
-
-    }
 }
 
 /**
@@ -635,6 +654,11 @@ void TextEditor::selectionChange() {
     } else {
         currentSelectedChars = 0;
     }
+
+    QTextCursor cursor(document());
+    cursor.setPosition(selectionEnd);
+    QTextCharFormat currentFormat = cursor.charFormat();
+    currentCharFormatChange(currentFormat);
 }
 
 void TextEditor::toggleUserColors() {
@@ -654,8 +678,8 @@ QColor TextEditor::getUserColor(int userId) const {
 
     }
 
-    qDebug() << "invalid color for" << userId;
-    return QColor::Invalid;
+    qDebug() << "color for" << userId << "not found";
+    return QColorConstants::White;
 }
 
 int TextEditor::getUserId(int row, int col) const {
@@ -676,31 +700,34 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
     emit(setMainWindowTitle(docName));
 
     documentId = docId;
-    if(this->editor.getSymbols()[0].size() != 0){
+
+    if (document()->characterCount() > 1) {
         editor.clear();
         this->clear();
     }
 
     this->setDisabled(false);
+
     Benchmark b = Benchmark("TextEditor::openDocument");
     b.startTimer();
+
     index.clear();
     index.push_back(0);
-    int pos = 0;
-    // Prepared code for remoteInsertBlock optimization. As of now its the same as below  code
+
+    /*for (int i = 0; i < symbols.size(); i++) {
+        this->remoteInsertBlock(symbols[i]);
+    }*/
 
     for (int i = 0; i < symbols.size(); i++) {
-        this->remoteInsertBlock(symbols[i]);
+        for (int j = 0; j < symbols[i].size(); j++) {
+            this->remoteInsert(symbols[i][j]);
+        }
     }
 
-    /*
-    parallel_for(symbols.size(), [&](int start, int end){
-        for(int i = start; i < end; ++i) {
-            this->remoteInsertBlock(symbols[i]);
-        }
-    } );
-    */
     b.stopTimer();
+
+    alignmentChange(alignment());
+
 }
 
 void TextEditor::printSymbols() {
@@ -717,16 +744,22 @@ void TextEditor::printSymbols() {
 }
 
 void TextEditor::updateAlignment(Qt::Alignment alignment, int position) {
-    isFromRemote = true;
-    isFromRemoteCursor = true;
+    blockSignals(true);
+    document()->blockSignals(true);
 
     QTextBlockFormat f;
     f.setAlignment(alignment);
 
-    QTextCursor c(textCursor());
-    c.setPosition(position);
-    c.setBlockFormat(f);
+    try {
+        QTextCursor c(document());
+        c.setPosition(position);
+        c.setBlockFormat(f);
+    } catch (const std::exception &e) {
+        qDebug() << "TextEditor::updateAlignment" << __PRETTY_FUNCTION__ << e.what();
+    }
 
+    blockSignals(false);
+    document()->blockSignals(false);
 }
 
 bool TextEditor::isNewLine(QChar c) {
@@ -789,8 +822,3 @@ QString TextEditor::getDocName() const {
 int TextEditor::getNumChars() const {
 	return nChars;
 }
-
-
-// todo handle offline case
-
-// todo handle user disconnections
