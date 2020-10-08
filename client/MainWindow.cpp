@@ -203,7 +203,6 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
 
 
 void MainWindow::on_actionNew_triggered() {
-
     ChooseName chooseName(docList);
     connect(&chooseName, &ChooseName::nameChoosen, this, &MainWindow::nameChoosenMainWindow);
     chooseName.setWindowTitle("Choose document name");
@@ -224,6 +223,27 @@ void MainWindow::nameChoosenMainWindow(QString name){
     }
 }
 
+void MainWindow::connectToMainMenu(MainMenu* mainMenu) {
+    connect(mainMenu, &MainMenu::newDocumentClicked, this, &MainWindow::newDocumentFromMainMenu);
+    connect(mainMenu, &MainMenu::openDocumentClicked, this, &MainWindow::openDocumentFromMainMenu);
+    connect(mainMenu, &MainMenu::joinClicked, this, &MainWindow::joinFromMainMenu);
+    connect(this, &MainWindow::closeMainMenu, mainMenu, &MainMenu::closeMainMenuSlot);
+}
+
+void MainWindow::newDocumentFromMainMenu() {
+    ChooseName chooseName(docList);
+    connect(&chooseName, &ChooseName::nameChoosen, this, &MainWindow::nameChoosenFromMainMenu);
+    chooseName.setWindowTitle("Choose document name");
+    chooseName.setModal(true);
+    chooseName.exec();
+}
+
+void MainWindow::nameChoosenFromMainMenu(QString name){
+    emit closeMainMenu();
+    emit(sendDocCreateMainWindow(name, user.getId()));   //il server poi risponde con DocumentOkPacket e il client nella slot apre il nuovo documento
+    docList.append(name);
+    this->show();
+}
 
 void MainWindow::openNewDocumentMainWindow(QString docName){
     QString name(docName);
@@ -236,8 +256,22 @@ void MainWindow::openNewDocumentMainWindow(QString docName){
     docList.append(name);
 }
 
+void MainWindow::openDocumentFromMainMenu() {
+    //emit(sendAskDocListMainWindow(user.getId())); //todo understand if it's useful
+    OpenDocument openDocument(docList, this);
+    connect(&openDocument, &OpenDocument::sendOpenDocument, this, &MainWindow::sendOpenDocumentFromMainMenu);
+    openDocument.setWindowTitle("Select a document");
+    openDocument.setModal(true);
+    openDocument.exec();
+}
+
+void MainWindow::sendOpenDocumentFromMainMenu(QString docName){
+    emit closeMainMenu();
+    emit(sendOpenDocumentSignal(docName, user.getId()));
+    this->show();
+}
 void MainWindow::on_actionOpen_triggered() {
-    //emit(sendAskDocListMainWindow(user.getId()));
+    //emit(sendAskDocListMainWindow(user.getId())); //todo understand if it's useful
     OpenDocument openDocument(docList, this);
     connect(&openDocument, &OpenDocument::sendOpenDocument, this, &MainWindow::sendOpenDocumentMainWindow);
     openDocument.setWindowTitle("Select a document");
@@ -248,6 +282,20 @@ void MainWindow::on_actionOpen_triggered() {
 void MainWindow::sendOpenDocumentMainWindow(QString docName){
     //qDebug()<<"[MAIN WINDOW] sendOpenDocumentMainWindow docName = "<<docName;
     emit(sendOpenDocumentSignal(docName, user.getId()));
+}
+
+void MainWindow::joinFromMainMenu() {
+    Join join;
+    join.setWindowTitle("Join a shared document");
+    connect(&join, &Join::sendJoin, this, &MainWindow::sendJoinFromMainMenu);
+    join.setModal(true);
+    join.exec();
+}
+
+void MainWindow::sendJoinFromMainMenu(qint32 userId, int docId, QString invCode){
+    emit closeMainMenu();
+    emit(sendAskUriMainWindow(userId,docId,invCode));
+    this->show();
 }
 
 void MainWindow::Save_as() {
@@ -470,6 +518,10 @@ void MainWindow::connectToTextEditor(TextEditor* te) {
     connect(te, &TextEditor::setMainWindowTitle, this, &MainWindow::setMainWindowTitleSlot);
 }
 
+void MainWindow::connectToLogin(Login* login) {
+    // connect(this, &MainWindow::newColorMapReceived, te, &TextEditor::updateColorMap);
+    connect(login, &Login::setMainWindowTitle, this, &MainWindow::setMainWindowTitleSlot);
+}
 
 void MainWindow::setMainWindowTitleSlot(QString title){
     this->setWindowTitle(title);
@@ -478,9 +530,6 @@ void MainWindow::setMainWindowTitleSlot(QString title){
 void MainWindow::sendJoinMainWindow(qint32 userId, int docId, QString invCode){
     emit(sendAskUriMainWindow(userId,docId,invCode));
 }
-
-
-
 
 void MainWindow::documentListReceivedMainWindow(QVector<QString> documentList){
     docList = documentList;

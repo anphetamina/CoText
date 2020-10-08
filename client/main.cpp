@@ -1,6 +1,6 @@
 #include "MainWindow.h"
 #include "Login.h"
-
+#include "MainMenu.h"
 #include <QApplication> //manages: widgets, events, mouse movements, overall looking feel
 #include <QThread>
 #include <iostream>
@@ -69,6 +69,8 @@ int main(int argc, char *argv[]) {
         client->sendLogin();
     }else {
         // Set login GUI options
+        client->connectToLogin(login);
+        w->connectToLogin(login);
         login->setWindowTitle("Welcome to CoText!");
         login->setModal(true);
         login->exec();
@@ -83,8 +85,14 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
+    MainMenu* mainMenu = new MainMenu();
+    w->connectToMainMenu(mainMenu);
+    mainMenu->setWindowTitle("Main Menu");
+    mainMenu->setModal(true);
+    mainMenu->exec();
+
     // After a successful login show main window
-    w->show();
+    //w->show();
 
     //delete client;
     return a.exec();
