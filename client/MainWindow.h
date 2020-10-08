@@ -12,11 +12,11 @@
 #include <QWidget>
 #include <QEvent>
 #include <QtGui/QTextCharFormat>
-
 #include "UserWidget.h"
 #include "TextEditor.h"
 #include "StatusBar.h"
 #include "Login.h"
+#include "MainMenu.h"
 
 
 //#include <QSqlDatabase>
@@ -72,10 +72,10 @@ public:
     //! [other member functions]
     void connectToTextEditor(TextEditor* te);
     void connectToLogin(Login* login);
+    void connectToMainMenu(MainMenu* mainMenu);
     
 
 private slots:
-    void on_actionNew_triggered();
     void on_actionOpen_triggered();
     void on_actionSave_as_triggered();
     void on_actionExit_triggered();
@@ -90,6 +90,7 @@ private slots:
     void on_actionShare_Uri_triggered();
     void on_actionSettings_triggered();
     void on_actionJoin_triggered();
+    void on_actionNew_triggered();
 
 public slots:
     void updateUserList(QVector<User> newUserList);
@@ -100,6 +101,12 @@ public slots:
     void setMainWindowTitleSlot(QString title);
     void openNewDocumentMainWindow(QString docName);
     void nameChoosenMainWindow(QString name);
+    void newDocumentFromMainMenu();
+    void openDocumentFromMainMenu();
+    void joinFromMainMenu();
+    void nameChoosenFromMainMenu(QString name);
+    void sendOpenDocumentFromMainMenu(QString docName);
+    void sendJoinFromMainMenu(qint32 userId, int docId, QString invCode);
 
 signals:
     void newColorMapReceived(QMap<int, QColor> colorMap);
@@ -107,6 +114,7 @@ signals:
     void sendAskDocListMainWindow(qint32 user);
     void sendOpenDocumentSignal(QString docName, qint32 user);
     void sendDocCreateMainWindow(QString docName, qint32 userId);
+    void closeMainMenu();
 
 private:
     Ui::MainWindow *ui;

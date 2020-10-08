@@ -173,6 +173,7 @@ void TextEditor::currentCharFormatChanged(const QTextCharFormat &f) {
     ui.actionUnderline->setChecked(f.font().underline());
 }
 
+
 void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) {
 
     if (isFromRemote) {
