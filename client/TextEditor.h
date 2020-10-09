@@ -46,6 +46,7 @@ private:
     
     std::vector<int> index;
     std::atomic<bool> isFromRemote;
+    bool isOpenDocumentCursor;
     std::vector<std::vector<QSymbol>> testSymbols;
     int currentSelectedChars;
     
@@ -64,10 +65,12 @@ private:
     int getPosition(int row, int col);
     void printSymbols();
     bool isNewLine(QChar c);
+    void incrementIndexAtPos(int pos, int n);
 
 public slots:
     void remoteInsert(QSymbol symbol);
     void remoteInsertBlock(std::vector<QSymbol> symbols);
+    void remoteOpenBlock(std::vector<QSymbol> symbols);
     void remoteErase(QSymbol symbol);
     void remoteEraseBlock(std::vector<QSymbol> symbols);
     void updateCursor(int userId, int position);

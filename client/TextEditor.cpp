@@ -339,6 +339,21 @@ void TextEditor::incrementIndex(int pos, int n) {
     }
 }
 
+void TextEditor::incrementIndexAtPos(int pos, int n) {
+
+    if (pos < 0) {
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": pos is negative");
+    } else if (n < 0) {
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": n is negative");
+    }
+
+    if (pos+1 >= index.size()) {
+        return;
+    }
+    index[pos] += n;
+
+}
+
 /**
  * decrement n rows after pos
  * @param pos
@@ -523,8 +538,6 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
     for (int j = 0; j < symbols.size(); j++) {
         QSymbol symbol = symbols[j];
 
-        //qDebug() << "received add " << symbol.getC();
-
         try {
             std::pair<int, int> pos = editor.remoteInsert(symbol);
 
@@ -564,14 +577,91 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
 
     // Check if the last buffer_block (last_cf didnt changed almost for sure in the last char)
     if (!buffer_block.isEmpty()) {
-
         incrementIndex(last_row, buffer_block.size());
         insertRow(last_row, line_count);
         cursor.insertText(buffer_block, last_cf);
     }
-
     printSymbols();
+}
 
+void TextEditor::remoteOpenBlock(std::vector<QSymbol> symbols) {
+
+    textCursor().clearSelection();
+
+    QString buffer_block;
+    QTextCharFormat last_cf = QTextCharFormat();
+    int last_position = 0;
+    int line_count = 0;
+    int line_len = 0;
+    int last_row = 0;
+    bool last_symbol_was_new_line = false;
+
+    QTextCursor cursor(document());
+    for (int j = 0; j < symbols.size(); j++) {
+        QSymbol symbol = symbols[j];
+        isFromRemote = true;
+        isOpenDocumentCursor = true;
+        try {
+            std::pair<int, int> pos = editor.remoteInsert(symbol);
+
+            last_symbol_was_new_line = false;
+            if (pos.first != -1 || pos.second != -1) {
+
+                if (j == 0) {
+                    last_row = pos.first;
+                    last_position = getPosition(pos.first, pos.second);
+
+                } else if (last_cf != symbol.getCF() || last_symbol_was_new_line) {
+                    line_len += buffer_block.size();
+                    //incrementIndex(last_row, line_len);
+                    if(last_symbol_was_new_line) {
+                        insertRow(last_row, line_count);
+                        incrementIndexAtPos(last_row, line_len);
+                        last_row = line_count;
+                        line_count = 0;
+                        line_len = 0;
+                    }
+
+                    cursor.movePosition(QTextCursor::End);
+
+                    cursor.insertText(buffer_block, last_cf);
+                    last_position += buffer_block.size();
+                    buffer_block.clear();
+                    isFromRemote = true;
+                }
+                buffer_block.push_back(symbol.getC());
+                last_cf = symbol.getCF();
+
+
+                if (symbol.isNewLine()) {
+                    line_count++;
+                    last_symbol_was_new_line = true;
+                }
+
+            }
+
+        } catch (const std::exception &e) {
+            qDebug() << "TextEditor::remoteInsertBlock" << __PRETTY_FUNCTION__ << e.what();
+        }
+    }
+
+    // Check if the last buffer_block (last_cf didnt changed almost for sure in the last char)
+    if (!buffer_block.isEmpty()) {
+        isFromRemote = true;
+
+        if(last_symbol_was_new_line) {
+            //line_count++;
+            insertRow(last_row, line_count);
+            incrementIndexAtPos(last_row, line_len);
+            last_row = line_count;
+            line_count = 0;
+            line_len = 0;
+        }
+        cursor.movePosition(QTextCursor::End);
+        cursor.insertText(buffer_block, last_cf);
+    }
+    isOpenDocumentCursor = false;
+    //printSymbols();
 }
 
 void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
@@ -623,8 +713,9 @@ void TextEditor::cursorPositionChange() {
     alignmentChange(alignment());
 
     int userId = MainWindow::getUser().getId();
-
-    emit cursorPositionChanged(userId, textCursor().position());
+    if (!isOpenDocumentCursor) {
+        emit cursorPositionChanged(userId, textCursor().position());
+    }
 
 }
 
@@ -703,6 +794,7 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
 
     if (document()->characterCount() > 1) {
         editor.clear();
+        isFromRemote=true;//TO|NOTE
         this->clear();
     }
 
@@ -714,15 +806,16 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
     index.clear();
     index.push_back(0);
 
-    /*for (int i = 0; i < symbols.size(); i++) {
-        this->remoteInsertBlock(symbols[i]);
-    }*/
+    for (int i = 0; i < symbols.size(); i++) {
+        this->remoteOpenBlock(symbols[i]);
+    }
 
+    /*
     for (int i = 0; i < symbols.size(); i++) {
         for (int j = 0; j < symbols[i].size(); j++) {
             this->remoteInsert(symbols[i][j]);
         }
-    }
+    }*/
 
     b.stopTimer();
 
