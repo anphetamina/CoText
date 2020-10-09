@@ -231,6 +231,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
                     std::vector<QSymbol> symbols(syms.begin(), syms.end());
 
                     emit insertBlockReceived(symbols);
+                    break;
                 }
 
                 case(MSG_ERASE_SYM): {
@@ -238,6 +239,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
                     std::vector<QSymbol> symbols(syms.begin(), syms.end());
 
                     emit eraseBlockReceived(symbols);
+                    break;
                 }
             }
             break;

@@ -170,6 +170,8 @@ void TextEditor::currentCharFormatChange(const QTextCharFormat &f) {
 
 void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) {
 
+    // todo check highlighter
+
     /**
      * https://github.com/anphetamina/CoText/issues/32 workaround
      */
@@ -557,7 +559,7 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
                     incrementIndex(last_row, buffer_block.size());
 
                     insertRow(last_row, line_count);
-                    last_row = line_count;
+                    last_row += line_count;
                     line_count = 0;
 
                     cursor.setPosition(last_position);
@@ -580,6 +582,7 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
 
         incrementIndex(last_row, buffer_block.size());
         insertRow(last_row, line_count);
+        cursor.setPosition(last_position);
         cursor.insertText(buffer_block, last_cf);
     }
 
