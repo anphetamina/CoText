@@ -170,11 +170,6 @@ void TextEditor::currentCharFormatChange(const QTextCharFormat &f) {
 
 void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) {
 
-    if (isFromRemote) {
-        isFromRemote = false;
-        return;
-    }
-
     /**
      * https://github.com/anphetamina/CoText/issues/32 workaround
      */
@@ -512,6 +507,8 @@ int TextEditor::getPosition(int row, int col) {
 void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
 
 
+    document()->blockSignals(true);
+
     textCursor().clearSelection();
 
     QString buffer_block;
@@ -520,6 +517,7 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
     int line_count = 0;
     int last_row = 0;
     QTextCursor cursor(document());
+    cursor.setPosition(last_position);
     for (int j = 0; j < symbols.size(); j++) {
         QSymbol symbol = symbols[j];
 
@@ -570,7 +568,11 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
         cursor.insertText(buffer_block, last_cf);
     }
 
+    cursorPositionChange();
+
     printSymbols();
+
+    document()->blockSignals(false);
 
 }
 
@@ -714,15 +716,15 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
     index.clear();
     index.push_back(0);
 
-    /*for (int i = 0; i < symbols.size(); i++) {
-        this->remoteInsertBlock(symbols[i]);
-    }*/
-
     for (int i = 0; i < symbols.size(); i++) {
+        this->remoteInsertBlock(symbols[i]);
+    }
+
+    /*for (int i = 0; i < symbols.size(); i++) {
         for (int j = 0; j < symbols[i].size(); j++) {
             this->remoteInsert(symbols[i][j]);
         }
-    }
+    }*/
 
     b.stopTimer();
 
