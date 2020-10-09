@@ -311,7 +311,7 @@ PacketHandler PacketBuilder::LoginOk(User user) {
 }
 
 PacketHandler PacketBuilder::AccountCreationPacket(QString username, QString password, QString name, QString surname,
-                                                   QIcon profilePic) {
+                                                   QImage profilePic) {
     return new class AccountCreationPacket(username, password, name, surname, profilePic);
 }
 
@@ -320,7 +320,7 @@ PacketHandler PacketBuilder::AccountOk(User user) {
 }
 
 PacketHandler PacketBuilder::AccountUpdatePacket(QString username, QString password, QString name, QString surname,
-                                                 QIcon profilePic) {
+                                                 QImage profilePic) {
     return new class AccountUpdatePacket(username, password, name, surname, profilePic);
 }
 

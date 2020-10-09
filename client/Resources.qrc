@@ -47,6 +47,9 @@
         <file>icons/noun_Light_1841928.svg</file>
         <file>icons/user-group_whiteSB.svg</file>
         <file>icons/verticalSeparator.svg</file>
+        <file>icons/noun_Save_Floppy.svg</file>
+        <file>icons/noun_PDF_749513.svg</file>
+        <file>icons/CircleMask128x128.png</file>
     </qresource>
     <qresource prefix="/appIcon">
         <file>icons/CoText_landing.png</file>

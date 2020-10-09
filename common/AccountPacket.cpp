@@ -9,7 +9,7 @@
 AccountCreationPacket::AccountCreationPacket() : Packet(PACK_TYPE_ACC_CREATE) {}
 
 AccountCreationPacket::AccountCreationPacket(QString username, QString password, QString name, QString surname,
-                                             QIcon profilePic) : Packet(PACK_TYPE_ACC_CREATE), username(username),
+                                             QImage profilePic) : Packet(PACK_TYPE_ACC_CREATE), username(username),
                                                                  hashedPassword(hashedPassword), name(name),
                                                                  surname(surname), profilePic(profilePic) {};
 
@@ -30,7 +30,7 @@ QString AccountCreationPacket::getSurname() const {
     return surname;
 }
 
-QIcon AccountCreationPacket::getProfilePic() const {
+QImage AccountCreationPacket::getProfilePic() const {
     return profilePic;
 };
 
@@ -47,7 +47,7 @@ void AccountCreationPacket::readPayload(QDataStream &stream) {
 AccountUpdatePacket::AccountUpdatePacket() : Packet(PACK_TYPE_ACC_UPDATE) {};
 
 AccountUpdatePacket::AccountUpdatePacket(QString username, QString password, QString name, QString surname,
-                                         QIcon profilePic) : Packet(PACK_TYPE_ACC_UPDATE), username(username),
+                                         QImage profilePic) : Packet(PACK_TYPE_ACC_UPDATE), username(username),
                                                              hashedPassword(hashedPassword), name(name),
                                                              surname(surname), profilePic(profilePic) {};
 
@@ -67,7 +67,7 @@ QString AccountUpdatePacket::getSurname() const {
     return surname;
 }
 
-QIcon AccountUpdatePacket::getProfilePic() const {
+QImage AccountUpdatePacket::getProfilePic() const {
     return profilePic;
 };
 

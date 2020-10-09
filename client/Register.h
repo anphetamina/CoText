@@ -24,7 +24,10 @@ public:
 
 private slots:
     void on_pushButton_Register_clicked();
-    //void dragEnterEvent(QDragEnterEvent *event) override;
+	void on_pushButton_BrowseReg_clicked();
+	void on_pushButton_Canc_Reg_clicked();
+		
+		//void dragEnterEvent(QDragEnterEvent *event) override;
     //void dropEvent(QDropEvent *event) override;
     //void dragLeaveEvent(QDragLeaveEvent *event) override;
 
@@ -37,7 +40,7 @@ private:
     QString pass1;
     QString pass2;
     QString email;
-    QIcon profilePicture;
+    QImage profilePicture;
     Ui::Register *ui;
     void clearInput();
 };

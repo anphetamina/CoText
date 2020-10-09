@@ -82,5 +82,7 @@ public:
     void connectToLoginWindow(Login *login, MainWindow *mw);
     bool isConnected();
     int getLoginAttemptCount();
+    void sendRegistration(QString name, QString surname, QString username, QString nickname, QString password, QImage profilePic);
+    void registerUser(QString name, QString surname, QString username, QString nickname, QString password, QImage profilePic);
 };
 

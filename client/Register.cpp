@@ -3,9 +3,11 @@
 #include <QMessageBox>
 #include <QIcon>
 #include <QDebug>
+#include "sslechoclient.h"
 
 Register::Register(QWidget *parent) : QDialog(parent), ui(new Ui::Register) {
     ui->setupUi(this);
+    ui->labelPhoto->setVisible(false);
     //ui->dropBox->setAcceptDrops(true);
 }
 
@@ -22,38 +24,9 @@ void Register::clearInput() {
     ui->lineEdit_Pass2->text().clear();
     ui->lineEdit_email->text().clear();
 }
-/*
-void Register::dragEnterEvent(QDragEnterEvent *event) {
-    qDebug() << "Dragging now...";
-    if(event->mimeData()->hasImage()) {
-        event->acceptProposedAction();
-    } else {
-        QMessageBox::warning(this, "Type Error", "Your file does not seem belong to any image format.");
-    }
 
-}
 
-void Register::dropEvent(QDropEvent *event) {
-    qDebug() << "Something has been dropped";
-
-    //check if the proposedaction is acceptable
-    //handle case if not
-    //ex. QT::LinkAction ignore if not support links to external sources
-
-    //before calling accept() override setDropAction() with preferred action from Qt::DropAction
-    ////in this case replacement drop action is used instead of the proposed action
-    if(event->mimeData()->hasImage()) {
-        QIcon userIcon = qvariant_cast<QIcon>(event->mimeData()->imageData());
-        this->profilePicture = userIcon;
-
-    }else {
-        QMessageBox::warning(this, "Type Error", "Your file does not seem belong to any image format.");
-    }
-
-}
-*/
-void Register::on_pushButton_Register_clicked()
-{
+void Register::on_pushButton_Register_clicked() {
     clearInput();
     bool null = false;
     bool empty = false;
@@ -90,7 +63,11 @@ void Register::on_pushButton_Register_clicked()
                 email.clear();
             } else {
                 ////TODO
-
+				
+                client->sendRegistration(name, surname, email, nickname, pass1, profilePicture);
+                
+               
+                
                 //1#. Fill User Object instance, set stautus on, start timer
                 User *usr = new User();
                 usr->setName(name);
@@ -103,4 +80,82 @@ void Register::on_pushButton_Register_clicked()
             }
         }
     }
+}
+
+
+void Register::on_pushButton_BrowseReg_clicked() {
+	QMessageBox::warning(this, "Resize Warn", "The image will be resized in order to be 128x128px");
+	
+	QString filename = QFileDialog::getOpenFileName(this, tr("Open Image"), "/home", tr("Image Files (*.png *.jpg *.jpeg)"));
+	if(QString::compare(filename, QString()) != 0) {
+		
+		//#1. Open Image scale + covert in ARGB
+		QFileInfo f(filename);
+		QImage pixmap(filename);
+		QImage scaledPixmap = pixmap.scaled(128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+		QImage newPixmap = scaledPixmap.convertToFormat(QImage::Format_ARGB32);
+		
+		//#2. Crop to a square
+		int imgSize = std::min(newPixmap.width(), newPixmap.height());
+		QRect rect = QRect(
+				(newPixmap.width() - imgSize) / 2,
+				(newPixmap.height() - imgSize) / 2,
+				imgSize,
+				imgSize);
+		newPixmap = newPixmap.copy(rect);
+		
+		/*
+		//! Try to make label circular
+		//#3. Create the output image with the same dimensions and an alpha channel + make completely transparent
+		QImage output = QImage(imgSize, imgSize, QImage::Format_ARGB32);
+		output.fill(Qt::transparent);
+		
+		//Create a texture brush and paint a circle with the original image onto the output image
+		QBrush qBrush = QBrush(newPixmap);
+		QPainter qPainter = QPainter();
+		
+		
+		qPainter.setBrush(qBrush);
+		qPainter.setPen(Qt::NoPen);
+		qPainter.setRenderHint(QPainter::Antialiasing, true);
+		qPainter.drawEllipse(0, 0, imgSize, imgSize);
+		qPainter.end();
+		
+		//Convert the image to a pixmap and rescale it. Take pixel ratio into account to get a sharp image on retina display
+		auto pr = QWindow().devicePixelRatio();
+		QPixmap pm = QPixmap::fromImage(output);
+		imgSize  *=  pr;
+		pm = pm.scaled(imgSize, imgSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+		
+		pm.setDevicePixelRatio(pr);
+		//! end make label circular
+		*/
+		
+		
+		//this->profilePicture = pm;
+		//QPixmap circ(":/images/CircleMask128x128.png");
+		//QPixmap mask = circ.createMaskFromColor(Qt::white, Qt::MaskOutColor);
+		
+		this->profilePicture = newPixmap;
+		ui->labelPhoto->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+		ui->labelPhoto->setFixedWidth(newPixmap.width());
+		ui->labelPhoto->setFixedHeight(newPixmap.height());
+		//ui->labelPhoto->setMask(mask);
+		ui->labelPhoto->setPixmap(QPixmap::fromImage(newPixmap));
+		
+		ui->labelPhoto->setVisible(true);
+		
+		
+		
+	} else {
+		QMessageBox::warning(this, "File not valid", "The choosen file is not valid, please retry");
+	}
+	
+	qDebug() << filename;
+	
+	
+}
+
+void Register::on_pushButton_Canc_Reg_clicked() {
+	this->hide();
 }

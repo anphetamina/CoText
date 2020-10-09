@@ -8,6 +8,7 @@
 #include "Login.h"
 #include <QtWebSockets/QWebSocket>
 #include <QCoreApplication>
+#include <AccountPacket.h>
 
 QT_USE_NAMESPACE
 
@@ -110,6 +111,19 @@ void SslEchoClient::sendLogin(){
     this->authenticate(username, password);
 }
 
+void SslEchoClient::registerUser(QString name, QString surname, QString username, QString nickname, QString password, QImage profilePic){
+	qDebug() << "[NETWORK] ** Sending registerReqPacket : AccountCreationPacket()";
+	QString hashedPassword = password;
+	////TODO add nickname
+	AccountCreationPacket acp = AccountCreationPacket(username, hashedPassword, name, surname, profilePic);
+	acp.send(m_webSocket);
+}
+
+void SslEchoClient::sendRegistration(QString _name, QString _surname, QString _username, QString _nickname, QString _password, QImage _profilePic) {
+	//username is the field Email
+	this->registerUser(std::move(_name), std::move(_surname), std::move(_username), std::move(_nickname), std::move(_password), std::move(_profilePic));
+}
+
 int SslEchoClient::getLoginAttemptCount(){
     return this->loginAttemptCount;
 }
@@ -196,6 +210,22 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
 	        //qDebug() << "USER LOGGED " << user.getId() << " " << user.getEmail();
 
 	        break;
+        }
+        
+        case(PACK_TYPE_ACC_OK): {
+        	AccountOkPacket* registerOk = dynamic_cast<AccountOkPacket*>(rcvd_packet.get());
+        	User loggedUser = registerOk->getUser();
+        	if(loggedUser.isLogged()) {
+        		qDebug() << "[REGISTER AUTH] Logged in as: " << loggedUser.getEmail();
+        		emit registerSuccessfulReceived();
+        	} else {
+        		qDebug() << "[REGISTER AUTH] FAILED. See the server for the log";
+        		emit registerFailedReceived();
+        	}
+        	pServer = qobject_cast<QWebSocket *>(sender());
+        	user = loggedUser;
+        	break;
+        	
         }
 
         case (PACK_TYPE_MSG): {

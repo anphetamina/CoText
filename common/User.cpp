@@ -24,7 +24,7 @@ int User::getId() const { return this->id; }
 
 QString User::getNick() { return this->nickname; }
 
-QIcon User::getProfilePic() { return this->profilePic; }
+QImage User::getProfilePic() { return this->profilePic; }
 
 QList<User *> User::getFriends() { return this->friendList; }
 
@@ -42,7 +42,7 @@ void User::setName(QString _name) { this->name = _name; }
 
 void User::setSurname(QString _surname) { this->surname = _surname; }
 
-void User::setProfilePic(QIcon _profilePic) { this->profilePic = _profilePic; }
+void User::setProfilePic(QImage _profilePic) { this->profilePic = _profilePic; }
 
 void User::setNick(QString _nick) { this->nickname = _nick; }
 

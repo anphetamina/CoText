@@ -152,9 +152,9 @@ public:
     static PacketHandler LoginOk(User user);
     static PacketHandler LogoutReq();
 
-    static PacketHandler AccountCreationPacket(QString username,QString password, QString name, QString surname, QIcon profilePic);
+    static PacketHandler AccountCreationPacket(QString username,QString password, QString name, QString surname, QImage profilePic);
     static PacketHandler AccountOk(User user);
-    static PacketHandler AccountUpdatePacket(QString username,QString password, QString name, QString surname, QIcon profilePic);
+    static PacketHandler AccountUpdatePacket(QString username,QString password, QString name, QString surname, QImage profilePic);
 
     static PacketHandler Message(int type, QSymbol qs, int siteId);
     static PacketHandler BigMessage(int type, QVector<QSymbol> qss, int siteId);

@@ -36,13 +36,13 @@ public:
 
     QString getNick();
 
-    QIcon getProfilePic();
+    QImage getProfilePic();
 
     void setName(QString _name);
 
     void setSurname(QString _surname);
 
-    void setProfilePic(QIcon _profilePic);
+    void setProfilePic(QImage _profilePic);
 
     void setNick(QString _nickname);
 
@@ -70,7 +70,7 @@ private:
     QString surname;
     QString nickname;
     QString email;
-    QIcon profilePic;
+    QImage profilePic;
     int userState;
     int secondsBeforeInactive;
     uint8_t signature = 0x00;

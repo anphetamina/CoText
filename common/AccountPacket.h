@@ -14,7 +14,7 @@ private:
     QString hashedPassword;
     QString name;
     QString surname;
-    QIcon profilePic;
+    QImage profilePic;
 
 public:
     QString getUsername() const;
@@ -25,7 +25,7 @@ public:
 
     QString getSurname() const;
 
-    QIcon getProfilePic() const;
+    QImage getProfilePic() const;
 
 protected:
     AccountCreationPacket();
@@ -35,7 +35,7 @@ protected:
     void readPayload(QDataStream &stream) override;
 
 public:
-    AccountCreationPacket(QString username, QString password, QString name, QString surname, QIcon profilePic);
+    AccountCreationPacket(QString username, QString password, QString name, QString surname, QImage profilePic);
 
     ~AccountCreationPacket() {};
 
@@ -50,7 +50,7 @@ private:
     QString hashedPassword;
     QString name;
     QString surname;
-    QIcon profilePic;
+    QImage profilePic;
 protected:
     AccountUpdatePacket();
 
@@ -59,7 +59,7 @@ protected:
     void readPayload(QDataStream &stream) override;
 
 public:
-    AccountUpdatePacket(QString username, QString password, QString name, QString surname, QIcon profilePic);
+    AccountUpdatePacket(QString username, QString password, QString name, QString surname, QImage profilePic);
 
     ~AccountUpdatePacket() {};
 
@@ -71,7 +71,7 @@ public:
 
     QString getSurname() const;
 
-    QIcon getProfilePic() const;
+    QImage getProfilePic() const;
 };
 
 /** Account Creation or update success packet **/
