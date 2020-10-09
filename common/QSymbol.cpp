@@ -94,7 +94,7 @@ bool QSymbol::isValid() const {
 }
 
 bool QSymbol::isNewLine() const {
-    return c == QChar::LineFeed || c == QChar::ParagraphSeparator || c == QChar::LineSeparator || c=="\u2029";
+    return c == QChar::LineFeed || c == QChar::ParagraphSeparator || c == QChar::LineSeparator;
 }
 
 /**
