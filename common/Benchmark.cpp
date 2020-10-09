@@ -25,7 +25,7 @@ void Benchmark::startTimer() {
 void Benchmark::stopTimer() {
     end = clock();
     double time_taken = double(end - start) / double(CLOCKS_PER_SEC);
-    std::cout << "Time taken by" << name << " is : " << std::fixed
+    std::cout << "Time taken by " << name << " is : " << std::fixed
               << time_taken << std::setprecision(5);
     std::cout << " sec " << std::endl;
 }

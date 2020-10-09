@@ -40,6 +40,7 @@ signals:
     void loginFailedReceived();
     void askUriReceived(QString URI);
     void documentListReceived(QVector<QString> documentList);
+    void loginFailed();
 
 public slots:
     void sendInsert(std::vector<QSymbol> symbols, int siteId);
@@ -59,15 +60,12 @@ private Q_SLOTS:
 private:
     QString username, password;
     QWebSocket m_webSocket;
+    QWebSocket *pServer;
 
     void sendPing();
-
-    QWebSocket *pServer;
     int loginAttemptCount=0;
     void packetParse(QByteArray rcvd_packet);
-
     void sendTest();
-
     void dispatch(PacketHandler rcvd_packet, QWebSocket *pClient);
 
 public:
@@ -79,7 +77,7 @@ public:
     void set_password(QString password);
     void sendLogin();
     void socketDisconnected();
-    void connectToLoginWindow(Login *login, MainWindow *mw);
+    void connectToLogin(Login *login);
     bool isConnected();
     int getLoginAttemptCount();
 };

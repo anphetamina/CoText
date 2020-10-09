@@ -411,7 +411,6 @@ std::pair<int, int> SharedEditor::remoteInsert(const QSymbol &symbol) {
     int line = line_it - symbols.begin();
 
     if (*line_it->begin() == symbol) {
-        // todo check QChar::LineSeparator
         if (symbol.isNewLine()) {
             qDebug() << "remoteInsert symbol 'CRLF' ("+symbol.getId()+") already exists";
         } else {
