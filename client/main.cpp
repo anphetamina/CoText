@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 #include "Login.h"
 #include "MainMenu.h"
+#include "ServerUnreachable.h"
 #include <QApplication> //manages: widgets, events, mouse movements, overall looking feel
 #include <QThread>
 #include <iostream>
@@ -47,11 +48,18 @@ int main(int argc, char *argv[]) {
     client->connectToEditor(editor);
     //client->connectToLoginWindow(login, w); //TODO: use signal/slot for creating/closing diffent windows.tonote: login is a QDialog not QWindow
 
-    Benchmark b = Benchmark();
-    b.startTimer();
+    Benchmark* b = new Benchmark();
+    b->startTimer();
     while(!client->isConnected()){
         QCoreApplication::processEvents();
-        if(b.getTimer() > 6.0){
+        if(b->getTimer() > 6.0){
+            ServerUnreachable* serverUnreachable = new ServerUnreachable(b);
+            serverUnreachable->setWindowTitle("Server unreachable");
+            serverUnreachable->setModal(true);
+            serverUnreachable->exec();
+        }
+
+        if(b->isStopped()){
             qDebug() << "Connection timeout: Server is unreachable.";
             qApp->quit();
             return -1;
@@ -92,9 +100,6 @@ int main(int argc, char *argv[]) {
     mainMenu->setWindowTitle("Main Menu");
     mainMenu->setModal(true);
     mainMenu->exec();
-
-    // After a successful login show main window
-    //w->show();
 
     //delete client;
     return a.exec();

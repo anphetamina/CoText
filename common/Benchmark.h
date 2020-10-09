@@ -12,6 +12,7 @@ class Benchmark {
 private:
     clock_t start, end;
     std::string name = "";
+    bool stopped = true;
 public:
     Benchmark();
 
@@ -22,6 +23,8 @@ public:
     void stopTimer();
 
     double getTimer();
+
+    bool isStopped();
 };
 
 
