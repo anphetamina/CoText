@@ -334,7 +334,7 @@ void TextEditor::incrementIndex(int pos, int n) {
     }
 }
 
-/*void TextEditor::incrementIndexAtPos(int pos, int n) {
+void TextEditor::incrementIndexAtPos(int pos, int n) {
 
     if (pos < 0) {
         throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": pos is negative");
@@ -347,7 +347,7 @@ void TextEditor::incrementIndex(int pos, int n) {
     }
     index[pos] += n;
 
-}*/
+}
 
 /**
  * decrement n rows after pos
@@ -591,10 +591,10 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
 
 }
 
-/*void TextEditor::remoteOpenBlock(std::vector<QSymbol> symbols) {
+void TextEditor::remoteOpenBlock(std::vector<QSymbol> symbols) {
 
+    document()->blockSignals(true);
     textCursor().clearSelection();
-
     QString buffer_block;
     QTextCharFormat last_cf = QTextCharFormat();
     int last_position = 0;
@@ -624,7 +624,7 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
                     if(last_symbol_was_new_line) {
                         insertRow(last_row, line_count);
                         incrementIndexAtPos(last_row, line_len);
-                        last_row = line_count;
+                        last_row =+ line_count;
                         line_count = 0;
                         line_len = 0;
                     }
@@ -655,7 +655,6 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
 
     // Check if the last buffer_block (last_cf didnt changed almost for sure in the last char)
     if (!buffer_block.isEmpty()) {
-        isFromRemote = true;
 
         if(last_symbol_was_new_line) {
             //line_count++;
@@ -668,10 +667,10 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
         cursor.movePosition(QTextCursor::End);
         cursor.insertText(buffer_block, last_cf);
     }
-    isOpenDocumentCursor = false;
     //printSymbols();
+    document()->blockSignals(false);
 }
-}*/
+
 
 void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
     std::for_each(symbols.begin(), symbols.end(), [this](const QSymbol &it){ remoteErase(it); });
@@ -814,7 +813,7 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
     index.push_back(0);
 
     for (int i = 0; i < symbols.size(); i++) {
-        this->remoteInsertBlock(symbols[i]);
+        this->remoteOpenBlock(symbols[i]);
     }
 
     /*for (int i = 0; i < symbols.size(); i++) {
