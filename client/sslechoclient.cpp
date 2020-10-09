@@ -6,9 +6,11 @@
 #include "../common/PingPacket.h"
 #include "../common/LoginPacket.h"
 #include "Login.h"
+#include "ServerDisconnected.h"
 #include <QtWebSockets/QWebSocket>
 #include <QCoreApplication>
 #include <AccountPacket.h>
+#include <Benchmark.h>
 
 QT_USE_NAMESPACE
 
@@ -69,6 +71,14 @@ void SslEchoClient::onSslErrors(const QList<QSslError> &errors)
 void SslEchoClient::socketDisconnected()
 {
     qDebug() << "Server closed the connection.\n[HINT]Duplicated instance with the same user?";
+    ServerDisconnected* serverDisconnected = new ServerDisconnected();
+    connect(serverDisconnected, &ServerDisconnected::quitClicked, this, &SslEchoClient::quitApp);
+    serverDisconnected->setWindowTitle("Server disconnected");
+    serverDisconnected->setModal(true);
+    serverDisconnected->exec();
+}
+
+void SslEchoClient::quitApp(){
     qApp->exit(-2);
 }
 
@@ -251,6 +261,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
                     std::vector<QSymbol> symbols(syms.begin(), syms.end());
 
                     emit insertBlockReceived(symbols);
+                    break;
                 }
 
                 case(MSG_ERASE_SYM): {
@@ -258,6 +269,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
                     std::vector<QSymbol> symbols(syms.begin(), syms.end());
 
                     emit eraseBlockReceived(symbols);
+                    break;
                 }
             }
             break;
@@ -308,7 +320,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
 
 void SslEchoClient::sendInsert(std::vector<QSymbol> symbols, int siteId) {
     if (symbols.size() > 1) {
-        QVector syms(symbols.begin(), symbols.end());
+        QVector<QSymbol> syms(symbols.begin(), symbols.end());
         BigMessage msg = BigMessage(MSG_INSERT_SYM, syms, siteId);
         msg.send(*pServer);
         // qDebug() << "sent add block";
@@ -322,7 +334,7 @@ void SslEchoClient::sendInsert(std::vector<QSymbol> symbols, int siteId) {
 
 void SslEchoClient::sendErase(std::vector<QSymbol> symbols, int siteId) {
     if (symbols.size() > 1) {
-        QVector syms(symbols.begin(), symbols.end());
+        QVector<QSymbol> syms(symbols.begin(), symbols.end());
         BigMessage msg = BigMessage(MSG_ERASE_SYM, syms, siteId);
         msg.send(*pServer);
         // qDebug() << "sent del block";
@@ -385,6 +397,7 @@ void SslEchoClient::connectToMainWindow(MainWindow* mw) {
     connect(mw, &MainWindow::sendAskDocListMainWindow, this, &SslEchoClient::sendAskDocList);
     connect(this, &SslEchoClient::documentListReceived, mw, &MainWindow::documentListReceivedMainWindow);
     connect(mw, &MainWindow::sendOpenDocumentSignal, this, &SslEchoClient::sendDocOpen);
+    connect(this, &SslEchoClient::documentReceived, mw, &MainWindow::openDocumentMainWindow);
 }
 
 void SslEchoClient::sendAskDocList(qint32 userId) {
@@ -407,6 +420,12 @@ void SslEchoClient::sendDocCreate(QString docName, qint32 userId) {
 bool SslEchoClient::isConnected(){
     return m_webSocket.state() == QAbstractSocket::ConnectedState;
 }
+
+void SslEchoClient::connectToLogin(Login* login){
+    connect(this, &SslEchoClient::loginFailedReceived, login, &Login::loginFailed);
+    connect(this, &SslEchoClient::loginSuccessfulReceived, login, &Login::loginSuccessful);
+}
+
 /*
  * Dont delete pls. Possible enhancement
 void SslEchoClient::connectToLoginWindow(Login* login, MainWindow* mw) {//Qdialog as of now

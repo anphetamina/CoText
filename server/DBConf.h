@@ -19,9 +19,9 @@ User addUser(QString username, QString password, QString name, QString surname, 
 
 User *checkUserLoginData(QString email, QString password);
 
-QIcon loadProfilePic(int id);
+QImage loadProfilePic(int id);
 
-bool saveProfilePic(int id, QIcon newIcon);
+bool saveProfilePic(int id, QImage newIcon);
 
 QVector<QString> getDocuments(int userId);
 

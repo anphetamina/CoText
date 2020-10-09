@@ -25,6 +25,8 @@ signals:
 private:
     Ui::ChooseName *ui;
     QVector<QString> docList;
+
+
 };
 
 #endif // CHOOSENAME_H

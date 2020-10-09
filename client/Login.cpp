@@ -6,6 +6,7 @@
 
 Login::Login(QWidget *parent) : QDialog(parent), ui(new Ui::Login) {
     ui->setupUi(this);
+    ui->errorLabel->setText("");
 }
 
 Login::~Login() {
@@ -32,10 +33,6 @@ void Login::on_pushButton_Login_clicked()
 	    client->set_password(password);
 	    client->sendLogin();
     }
-	
-	//this->~Login();
-    //this->hide();
-    this->close();
 }
 
 
@@ -80,6 +77,16 @@ bool Login::checkInput(const QString& username, const QString& psw) {
 			return true;
 		
 	}
-	
+}
+
+void Login::loginFailed(){
+    ui->errorLabel->setText("Wrong Username or Password !");
+    ui->lineEdit_User->setText("");
+    ui->lineEdit_Pass->setText("");
+}
+
+void Login::loginSuccessful(){
+    emit setMainWindowTitle ("Welcome - "+ui->lineEdit_User->text());
+    this->close();
 }
 

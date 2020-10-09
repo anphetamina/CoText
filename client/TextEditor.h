@@ -25,11 +25,9 @@ class TextEditor : public QTextEdit {
 
 public:
     explicit TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent = nullptr);
-	
-	//! [Setters]
+
 	void setSiteId(int siteId);
-	
-	//! [Getters]
+
 	int getRow(int position) const;
 	int getCol(int row, int position) const;
 	
@@ -40,13 +38,6 @@ public:
 	
 	int getUserId(int row, int col) const;
 	QColor getUserColor(int userId) const;
-	
-	//![public attributes]
-	std::atomic<bool> isFromRemote;
-    std::atomic<bool> isFromRemoteCursor;
-
-    
-
 
 private:
     QWidget *parent;
@@ -54,18 +45,18 @@ private:
     SharedEditor editor;
     
     std::vector<int> index;
+    std::atomic<bool> isFromRemote;
+    bool isOpenDocumentCursor;
     std::vector<std::vector<QSymbol>> testSymbols;
     int currentSelectedChars;
     
     UserHighlighter highlighter;
     std::map<int, int> cursorMap;
     std::atomic<bool> isUserColorsToggled;
-    
-    //! [private Document attributes]
+
     int documentId;
     QString documentName = "";
     int nChars = 0;
-    //! [end Document attributes]
 
     void insertRow(int pos, int n);
     void deleteRow(int pos, int n);
@@ -74,17 +65,18 @@ private:
     int getPosition(int row, int col);
     void printSymbols();
     bool isNewLine(QChar c);
+    void incrementIndexAtPos(int pos, int n);
 
 public slots:
     void remoteInsert(QSymbol symbol);
     void remoteInsertBlock(std::vector<QSymbol> symbols);
+    void remoteOpenBlock(std::vector<QSymbol> symbols);
     void remoteErase(QSymbol symbol);
     void remoteEraseBlock(std::vector<QSymbol> symbols);
     void updateCursor(int userId, int position);
     void updateAlignment(Qt::Alignment alignment, int position);
     void openDocument(int docId, QString docName, std::vector<std::vector<QSymbol>> symbols);
     void updateCursorMap(QVector<User> onlineUserList);
-    //void loginSuccessful();
 
 private slots:
     void selectFont();
@@ -93,8 +85,8 @@ private slots:
     void setFontUnderline(bool underline);
     void setFontColor();
     void setTextAlignment(QAction *action);
-    void alignmentChanged(Qt::Alignment a);
-    void currentCharFormatChanged(const QTextCharFormat &f);
+    void alignmentChange(Qt::Alignment a);
+    void currentCharFormatChange(const QTextCharFormat &f);
     void contentsChange(int position, int charsRemoved, int charsAdded);
     void cursorPositionChange();
     void selectionChange();

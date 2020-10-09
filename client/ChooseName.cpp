@@ -6,7 +6,6 @@ ChooseName::ChooseName(QVector<QString> dList, QWidget *parent) :
     ui(new Ui::ChooseName)
 {
     ui->setupUi(this);
-
     ui->label->setVisible(false);
     QPalette palette = ui->label->palette();
     palette.setColor(ui->label->backgroundRole(), Qt::red);
@@ -29,7 +28,6 @@ void ChooseName::on_pushButton_ok_clicked()
         emit(nameChoosen(ui->lineEdit->text()));
         this->close();
     }
-
 }
 
 void ChooseName::on_pushButton_cancel_clicked()

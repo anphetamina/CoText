@@ -14,8 +14,11 @@ UserHighlighter::UserHighlighter(TextEditor &editor, QTextDocument *parent) : QS
 void UserHighlighter::highlightBlock(const QString &text) {
 
     try {
+
+        document.blockSignals(true);
+
         for (int i = currentBlock().position(), j = 0; i < currentBlock().position() + text.length(); i++, j++) {
-            editor.isFromRemote = true;
+
             QTextCharFormat format;
             format.setFontWeight(QFont::Bold);
             const int &row = editor.getRow(i);
@@ -28,6 +31,9 @@ void UserHighlighter::highlightBlock(const QString &text) {
     } catch (const std::exception &e) {
         qDebug() << e.what();
     }
+
+    document.blockSignals(false);
+
 }
 
 void UserHighlighter::enable() {

@@ -16,6 +16,7 @@ Benchmark::Benchmark(std::string name) : name(name) {};
  */
 void Benchmark::startTimer() {
     start = clock();
+    stopped = false;
 }
 
 /**
@@ -25,6 +26,7 @@ void Benchmark::startTimer() {
 void Benchmark::stopTimer() {
     end = clock();
     double time_taken = double(end - start) / double(CLOCKS_PER_SEC);
+    stopped = true;
     std::cout << "Time taken by " << name << " is : " << std::fixed
               << time_taken << std::setprecision(5);
     std::cout << " sec " << std::endl;
@@ -39,4 +41,9 @@ double Benchmark::getTimer() {
     clock_t partial = clock();
     double time_partial = double(partial - start) / double(CLOCKS_PER_SEC);
     return time_partial;
+}
+
+
+bool Benchmark::isStopped() {
+    return stopped;
 }

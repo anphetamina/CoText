@@ -50,7 +50,7 @@ bool getUserlist() {
 /**
  * Add a user to the DB and save the profile picture
  */
-User addUser(QString username, QString password, QString name, QString surname, QIcon profilePic) {
+User addUser(QString username, QString password, QString name, QString surname, QImage profilePic) {
     QSqlQuery query, query2, query3;
     QString email = username;
     QString hashedpassword = password;//perform hashing for sec. reason in production
@@ -125,28 +125,27 @@ User *checkUserLoginData(QString email, QString password) {
 }
 
 /**
- * Load a profile picture from disk as QICon given the userId
+ * Load a profile picture from disk as QImage given the userId
  */
-QIcon loadProfilePic(int id) {
+QImage loadProfilePic(int id) {
     QString pictureFileName = QString::number(id) + ".png";
-    QIcon myicon = QIcon();
+    QImage myicon = QImage();
     QString filePath = "./profilePictures/" + pictureFileName;
     QFile file(filePath);
     QVector<QVector<QSymbol>> qdoc;
     if (!file.open(QIODevice::ReadOnly)) {
-        myicon = QIcon(filePath);
+        myicon = QImage(filePath);
     }
 
     return myicon;
 }
 
 /**
- * Save a profile picture to disk as QICon given the userId and the icon
+ * Save a profile picture to disk as QImage given the userId and the icon
  */
-bool saveProfilePic(int id, QIcon newIcon) {
+bool saveProfilePic(int id, QImage newIcon) {
     QString pictureFileName = QString::number(id) + ".png";
-    QPixmap pixmap = newIcon.pixmap(64);
-    return pixmap.save("./profilePictures/" + pictureFileName);
+    return newIcon.save("./profilePictures/" + pictureFileName);
 }
 
 QVector<QString> getDocuments(int userId) {

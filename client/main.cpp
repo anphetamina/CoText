@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 #include "Login.h"
-
+#include "MainMenu.h"
+#include "ServerUnreachable.h"
 #include <QApplication> //manages: widgets, events, mouse movements, overall looking feel
 #include <QThread>
 #include <iostream>
@@ -38,7 +39,7 @@ int main(int argc, char *argv[]) {
     w->setWindowTitle("Welcome");
     w->setWindowIconText("Co-Text");
 
-    TextEditor* editor = new TextEditor(user.getId(), *w->getUi(), w);
+    TextEditor* editor = new TextEditor(user.getId(), *w->getUi(), w); // tonote: for the multiple document at the same time it would be better to use a better approach
     editor->setDisabled(true);
     w->setCentralWidget(editor);
     w->setTextEditor(editor);
@@ -47,17 +48,25 @@ int main(int argc, char *argv[]) {
     client->connectToEditor(editor);
     //client->connectToLoginWindow(login, w); //TODO: use signal/slot for creating/closing diffent windows.tonote: login is a QDialog not QWindow
 
-    Benchmark b = Benchmark();
-    b.startTimer();
+    Benchmark* b = new Benchmark();
+    b->startTimer();
     while(!client->isConnected()){
         QCoreApplication::processEvents();
-        if(b.getTimer() > 6.0){
+        if(b->getTimer() > 6.0){
+            ServerUnreachable* serverUnreachable = new ServerUnreachable(b);
+            serverUnreachable->setWindowTitle("Server unreachable");
+            serverUnreachable->setModal(true);
+            serverUnreachable->exec();
+        }
+
+        if(b->isStopped()){
             qDebug() << "Connection timeout: Server is unreachable.";
             qApp->quit();
             return -1;
         }
     }
 
+    // Perform authentication now if user and pass where passed as CLI arg
     QString quser, qpass;
     if (argc > 1) {
         std::string username = argv[1];
@@ -68,23 +77,29 @@ int main(int argc, char *argv[]) {
         client->set_password(qpass);
         client->sendLogin();
     }else {
-        // Set login GUI options
+        // Set login GUI options otherwise
+        client->connectToLogin(login);
+        w->connectToLogin(login);
         login->setWindowTitle("Welcome to CoText!");
         login->setModal(true);
         login->exec();
     }
 
+    // Wait until the user received a succesfull message
     while(!user.isLogged() && login->isVisible()) {
         QCoreApplication::processEvents();
     }
-    // Check if the while was broken by the login or the closing of the window
+    // Check if the while was broken by the login or the closing of the window (and so no auth was tried)
     if(client->getLoginAttemptCount() == 0){
         qApp->quit();
         return -1;
     }
 
-    // After a successful login show main window
-    w->show();
+    MainMenu* mainMenu = new MainMenu();
+    w->connectToMainMenu(mainMenu);
+    mainMenu->setWindowTitle("Main Menu");
+    mainMenu->setModal(true);
+    mainMenu->exec();
 
     //delete client;
     return a.exec();
