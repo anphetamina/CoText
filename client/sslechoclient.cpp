@@ -6,8 +6,10 @@
 #include "../common/PingPacket.h"
 #include "../common/LoginPacket.h"
 #include "Login.h"
+#include "ServerDisconnected.h"
 #include <QtWebSockets/QWebSocket>
 #include <QCoreApplication>
+#include <Benchmark.h>
 
 QT_USE_NAMESPACE
 
@@ -68,6 +70,14 @@ void SslEchoClient::onSslErrors(const QList<QSslError> &errors)
 void SslEchoClient::socketDisconnected()
 {
     qDebug() << "Server closed the connection.\n[HINT]Duplicated instance with the same user?";
+    ServerDisconnected* serverDisconnected = new ServerDisconnected();
+    connect(serverDisconnected, &ServerDisconnected::quitClicked, this, &SslEchoClient::quitApp);
+    serverDisconnected->setWindowTitle("Server disconnected");
+    serverDisconnected->setModal(true);
+    serverDisconnected->exec();
+}
+
+void SslEchoClient::quitApp(){
     qApp->exit(-2);
 }
 

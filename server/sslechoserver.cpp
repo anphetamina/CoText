@@ -333,7 +333,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
 
             // Broadcast to all the connected client of a document
             QList<QSharedPointer<Client>> onlineClientPerDoc = documentMapping[getDocIdOpenedByUserId(
-                    client->getUserId())]; //TODO: deccoment and delete for
+                    client->getUserId())];
             for (QSharedPointer<Client> onlineClient : onlineClientPerDoc) {
                 if (onlineClient != client && client->isLogged()) {
                     bmsg->send(*onlineClient->getSocket());
