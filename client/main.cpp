@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
     w->setWindowTitle("Welcome");
     w->setWindowIconText("Co-Text");
 
-    TextEditor* editor = new TextEditor(user.getId(), *w->getUi(), w);
+    TextEditor* editor = new TextEditor(user.getId(), *w->getUi(), w); // tonote: for the multiple document at the same time it would be better to use a better approach
     editor->setDisabled(true);
     w->setCentralWidget(editor);
     w->setTextEditor(editor);
@@ -58,6 +58,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    // Perform authentication now if user and pass where passed as CLI arg
     QString quser, qpass;
     if (argc > 1) {
         std::string username = argv[1];
@@ -68,7 +69,7 @@ int main(int argc, char *argv[]) {
         client->set_password(qpass);
         client->sendLogin();
     }else {
-        // Set login GUI options
+        // Set login GUI options otherwise
         client->connectToLogin(login);
         w->connectToLogin(login);
         login->setWindowTitle("Welcome to CoText!");
@@ -76,10 +77,11 @@ int main(int argc, char *argv[]) {
         login->exec();
     }
 
+    // Wait until the user received a succesfull message
     while(!user.isLogged() && login->isVisible()) {
         QCoreApplication::processEvents();
     }
-    // Check if the while was broken by the login or the closing of the window
+    // Check if the while was broken by the login or the closing of the window (and so no auth was tried)
     if(client->getLoginAttemptCount() == 0){
         qApp->quit();
         return -1;

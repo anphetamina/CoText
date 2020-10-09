@@ -107,6 +107,7 @@ public slots:
     void nameChoosenFromMainMenu(QString name);
     void sendOpenDocumentFromMainMenu(QString docName);
     void sendJoinFromMainMenu(qint32 userId, int docId, QString invCode);
+    void openDocumentMainWindow(int docId, QString docName, std::vector<std::vector<QSymbol>> qsymbols);
 
 signals:
     void newColorMapReceived(QMap<int, QColor> colorMap);
