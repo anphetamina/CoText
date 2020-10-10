@@ -28,11 +28,12 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     highlighter(*this, document()),
     isUserColorsToggled(false) {
 
+
+    //setAcceptRichText(false);
+
     /**
      * document default styling
      */
-    setAcceptRichText(false);
-
     setStyleSheet("QTextEdit {margin-left: 40px; margin-right: 40px; margin-top: 10px; margin-bottom: 10px; color: white; font-size: 16px; border: hidden}");
 
     /**
@@ -176,7 +177,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
      * https://github.com/anphetamina/CoText/issues/32 workaround
      */
 
-    if (document()->characterAt(position+charsAdded) == '\0') {
+    while (document()->characterAt(position+charsAdded) == '\0' && charsRemoved >0) {
         charsRemoved--;
         charsAdded--;
     }

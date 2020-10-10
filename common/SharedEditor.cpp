@@ -291,6 +291,13 @@ QSymbol SharedEditor::localInsert(int line, int index, QChar value, QTextCharFor
 std::vector<QSymbol> SharedEditor::eraseSingleLine(int startLine, int startIndex, int endLine, int endIndex) {
     endIndex++;
 
+    if(symbols[startLine].begin() -symbols[startLine].end() - startIndex  >= 0 || symbols[startLine].begin() - endIndex -symbols[startLine].end() >= 0){
+        qDebug("Index out of range.");
+    }
+    if(endIndex == startIndex){
+        std::vector<QSymbol> erasedSymbols = {};
+        return erasedSymbols;
+    }
     std::vector<QSymbol> erasedSymbols(symbols[startLine].begin() + startIndex, symbols[startLine].begin() + endIndex);
     symbols[startLine].erase(symbols[startLine].begin() + startIndex, symbols[startLine].begin() + endIndex);
     counter -= (endIndex - startIndex);
