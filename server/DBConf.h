@@ -15,7 +15,7 @@ bool dbConfigure();
 
 bool getUserlist();
 
-User addUser(QString username, QString password, QString name, QString surname, QIcon profilePic);
+User addUser(QString username, QString password, QString name, QString surname, QImage profilePic);
 
 User *checkUserLoginData(QString email, QString password);
 
