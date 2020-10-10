@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include <cstdlib>
 #include <QPointingDeviceUniqueId>
-//#include <QMainWindow>
 #include <QFile>
 #include <QFileDialog>
 #include <QTextStream>
