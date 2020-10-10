@@ -27,24 +27,26 @@ void OpenDocument::buttonPressed(int i){
 
 void OpenDocument::repaint(){
     for(QString document : documentList){
-        QListWidgetItem * item = new QListWidgetItem (document);
-        ui->listWidget->addItem ( item );
-        QWidget * w = new QWidget();
-        w->setLayout ( new QHBoxLayout() );
-        DeletePushButton *but = new DeletePushButton ( ui->listWidget->row(item));
-        QPixmap pixmap(":/imgs/icons/noun_user login_178831.svg");
-        QIcon buttonIcon(pixmap);
-        but->setIcon(buttonIcon);
-        but->setIconSize(pixmap.rect().size()/5);
-        but->setFixedSize(pixmap.rect().size()/5);
-        QLabel *lab = new QLabel ();
-        w->layout()->addWidget ( lab );
-        w->layout()->addWidget ( but );
-        w->layout()->setContentsMargins ( 1, 1, 1, 1 );
+        if(mainWindow->windowTitle() != document){
+            QListWidgetItem * item = new QListWidgetItem (document);
+            ui->listWidget->addItem ( item );
+            QWidget * w = new QWidget();
+            w->setLayout ( new QHBoxLayout() );
+            DeletePushButton *but = new DeletePushButton ( ui->listWidget->row(item));
+            QPixmap pixmap(":/imgs/icons/noun_user login_178831.svg");
+            QIcon buttonIcon(pixmap);
+            but->setIcon(buttonIcon);
+            but->setIconSize(pixmap.rect().size()/5);
+            but->setFixedSize(pixmap.rect().size()/5);
+            QLabel *lab = new QLabel ();
+            w->layout()->addWidget ( lab );
+            w->layout()->addWidget ( but );
+            w->layout()->setContentsMargins ( 1, 1, 1, 1 );
 
-        connect(but, &DeletePushButton::releasedWithIndex,this, &OpenDocument::buttonPressed);
+            connect(but, &DeletePushButton::releasedWithIndex,this, &OpenDocument::buttonPressed);
 
-        ui->listWidget->setItemWidget ( item, w );
+            ui->listWidget->setItemWidget ( item, w );
+        }
     }
 }
 
