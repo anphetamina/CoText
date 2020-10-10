@@ -50,7 +50,7 @@ bool getUserlist() {
 /**
  * Add a user to the DB and save the profile picture
  */
-User addUser(QString username, QString password, QString name, QString surname, QImage profilePic) {
+User addUser(QString username, QString password, QString name, QString surname/*, QImage profilePic*/) {
     QSqlQuery query, query2, query3;
     QString email = username;
     QString hashedpassword = password;//perform hashing for sec. reason in production
@@ -74,9 +74,9 @@ User addUser(QString username, QString password, QString name, QString surname, 
         QString name = query.value(3).toString();
         QString surname = query.value(4).toString();
 
-        if (!saveProfilePic(id, profilePic)) {
+       /* if (!saveProfilePic(id, profilePic)) {
             success = false;
-        }
+        }*/
 
         User loggedUser = User(id, email, name, surname);
         qDebug() << "[AUTH] New user registered with success." << endl << "\tRetrieved info = [Email: "
@@ -386,4 +386,12 @@ int docIdByName(QString docName, int userId) {
         return id;
     } else
         return -1;
+}
+
+bool deleteDocument(QString docName, int userId) {
+    QSqlQuery query;
+    QString quserId = QString::number(userId);
+    query.exec("DELETE FROM Permission WHERE userid=" + quserId + " AND documentname='" + docName + "'");
+    qDebug() << "[DB CONF] deleteDocument docName = "<<docName << " userId = "<< userId;
+    return true;
 }

@@ -51,6 +51,7 @@ public slots:
     void sendAskDocList(qint32 userId);
     void sendDocCreate(QString docName, qint32 userId);
     void quitApp();
+    void sendDocumentDeletedSlot(QString docName, quint32 userId);
 
 private Q_SLOTS:
     void onConnected();

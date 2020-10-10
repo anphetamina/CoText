@@ -398,6 +398,15 @@ void SslEchoClient::connectToMainWindow(MainWindow* mw) {
     connect(this, &SslEchoClient::documentListReceived, mw, &MainWindow::documentListReceivedMainWindow);
     connect(mw, &MainWindow::sendOpenDocumentSignal, this, &SslEchoClient::sendDocOpen);
     connect(this, &SslEchoClient::documentReceived, mw, &MainWindow::openDocumentMainWindow);
+    connect(mw, &MainWindow::sendDocumentDeletedSignal, this, &SslEchoClient::sendDocumentDeletedSlot);
+}
+
+void SslEchoClient::sendDocumentDeletedSlot(QString docName, quint32 userId) {
+    qDebug() << "[CLIENT] sendDocumentDeletedSlot docName = "<<docName << " userId = "<< userId;
+    if(!pServer->isValid()) // if u call this and login wasnt performed
+        return;
+    DocumentDelPacket ddp = DocumentDelPacket(docName, userId);
+    ddp.send(*pServer);
 }
 
 void SslEchoClient::sendAskDocList(qint32 userId) {
