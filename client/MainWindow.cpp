@@ -228,6 +228,7 @@ void MainWindow::connectToMainMenu(MainMenu* mainMenu) {
     connect(mainMenu, &MainMenu::openDocumentClicked, this, &MainWindow::openDocumentFromMainMenu);
     connect(mainMenu, &MainMenu::joinClicked, this, &MainWindow::joinFromMainMenu);
     connect(this, &MainWindow::closeMainMenu, mainMenu, &MainMenu::closeMainMenuSlot);
+    connect(mainMenu, &MainMenu::finished, this, &MainWindow::closeMainWindow);
 }
 
 void MainWindow::newDocumentFromMainMenu() {
@@ -366,14 +367,11 @@ void MainWindow::on_actionPrint_triggered() {
 
 void MainWindow::on_actionExit_triggered() {
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Exit", "Do you really want to quit the application?", QMessageBox::Yes | QMessageBox::No);
-
-
     if(reply == QMessageBox::Yes) {
         QApplication::quit();
     } else {
         return;
     }
-
 }
 
 void MainWindow::on_actionCopy_triggered() {
@@ -558,4 +556,8 @@ void MainWindow::openDocumentMainWindow(int docId, QString docName, std::vector<
     if(!docList.contains(docName)){
         docList.append(docName);
     }
+}
+
+void MainWindow::closeMainWindow(){
+    exit(0);
 }
