@@ -4,6 +4,8 @@
 #include <QtCore>
 #include "User.h"
 #include "QSymbol.h"
+#include <Message.h>
+
 
 extern QString HostName;
 extern QString UserName;
@@ -40,6 +42,10 @@ QString GetRandomString(int randomStringLength);
 void saveToDisk(QVector<QVector<QSymbol>> qdoc, int docId);
 
 QVector<QVector<QSymbol>> loadFromDisk(int docId);
+
+void saveAlignmentToDisk(QVector<AlignMessage> qadoc, int docId);
+
+QVector<AlignMessage> loadAlignmentFromDisk(int docId);
 
 int docIdByName(QString docName, int userId);
 

@@ -58,6 +58,11 @@ protected:
 class AlignMessage : public Packet {
 
     friend PacketBuilder;
+
+    friend QDataStream &operator>>(QDataStream &in, AlignMessage &am);
+
+    friend QDataStream &operator<<(QDataStream &out, const AlignMessage &am);
+
 private:
     int positionStart;
     int delta = 0;
@@ -65,6 +70,8 @@ private:
     int siteId;
 
 public:
+    AlignMessage();
+
     AlignMessage(int positionStart, int delta, Qt::Alignment alignment, int siteId);
 
     int getPositionStart() const;
@@ -76,7 +83,6 @@ public:
     int getSiteId() const;
 
 protected:
-    AlignMessage();
 
     void writePayload(QDataStream &stream) const override;
 

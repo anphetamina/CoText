@@ -154,11 +154,14 @@ bool SslEchoServer::closeDocumentById(int closedDocId, QSharedPointer<Client> cl
         editorMapping[closedDocId]->connectedUsersDecrease();
         qDebug() << "[DOC_CLOSE] Remaining online user in the same document: "
                  << editorMapping[closedDocId]->getConnectedUsers();
-        // Every time a user disconnect itself the server save a copy
+        // Every time a user disconnect itself the server save a copy (of document and its alignment info)
         saveToDisk(toQVector(editorMapping[closedDocId]->getSymbols()), closedDocId);
+        saveAlignmentToDisk(alignmentMapping[closedDocId], closedDocId);
         // if last user online is disconnecting,  delete the editorMapping entry
-        if (editorMapping[closedDocId]->getConnectedUsers() == 0)
+        if (editorMapping[closedDocId]->getConnectedUsers() == 0) {
             editorMapping.remove(closedDocId);
+            alignmentMapping.remove(closedDocId);
+        }
         // Send to all the the user connected to the document that was just closed by the client the new userlist
         sendUpdatedOnlineUserByDocId(closedDocId);
     }
@@ -241,7 +244,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
         case (PACK_TYPE_ACC_CREATE): {
             AccountCreationPacket *accReq = dynamic_cast<AccountCreationPacket *>(rcvd_packet.get());
             User loggedUser = addUser(accReq->getUsername(), accReq->getHashedPassword(), accReq->getName(),
-                                      accReq->getSurname()/*, accReq->getProfilePic()*/);
+                                      accReq->getSurname(), accReq->getProfilePic());
             AccountOkPacket aop = AccountOkPacket(loggedUser);
             aop.send(*pClient);
             break;
@@ -384,14 +387,17 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
             //qDebug() << msg->getData();
             qDebug() << "[ALIGN] New alignment  received." << endl;
             // Broadcast to all the connected client of a document
-            QList<QSharedPointer<Client>> onlineClientPerDoc = documentMapping[getDocIdOpenedByUserId(
-                    client->getUserId())]; //TODO: deccoment and delete for
+            int curDocId = getDocIdOpenedByUserId(client->getUserId());
+            QList<QSharedPointer<Client>> onlineClientPerDoc = documentMapping[curDocId];
             for (QSharedPointer<Client> onlineClient : onlineClientPerDoc) {
                 if (onlineClient != client && client->isLogged()) {
                     am->send(*onlineClient->getSocket());
                     //qDebug() << "\tBroadcasted to from: " << pClient->peerPort() << "sent to " << onlineClient->getSocket()->peerPort() ;
                 }
             }
+            // Update local instance of alignment per document. #TODO: change impl for alignment.
+            alignmentMapping[curDocId].push_back(*am);
+
             break;
         }
 
@@ -430,11 +436,16 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
             int docId = docIdByName(dop->getdocName(), dop->getuserId());
 
             // If the user has the privilege for opening, perform the whole loading operation
-            QVector<QVector<QSymbol>> doc = remoteOpenDocument(docId, client);
+            std::pair <QVector<QVector<QSymbol>>, QVector<AlignMessage> > docAndAlign = remoteOpenDocument(docId, client);
+            QVector<QVector<QSymbol>> doc = docAndAlign.first;
+            QVector<AlignMessage> align = docAndAlign.second;
 
             // And send the document content
             DocumentOkPacket dokp = DocumentOkPacket(docId, dop->getdocName(), doc);
             dokp.send(*pClient);
+
+            //Send alignment for that doc
+            sendDocAlignment(align, pClient);
 
             // Send current online userlist for the given document
             sendUpdatedOnlineUserByDocId(docId);
@@ -491,10 +502,16 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
                 QString docName = doc[1];
                 if (acceptInvite(invCode, userId)) {
                     // If the user has the privilege for opening, perform the whole loading operation
-                    QVector<QVector<QSymbol>> doc = remoteOpenDocument(docId, client);
+                    std::pair <QVector<QVector<QSymbol>>, QVector<AlignMessage> > docAndAlign = remoteOpenDocument(docId, client);
+                    QVector<QVector<QSymbol>> doc = docAndAlign.first;
+                    QVector<AlignMessage> align = docAndAlign.second;
                     // And send the document content
                     DocumentOkPacket dokp = DocumentOkPacket(docId, docName, doc);
                     dokp.send(*pClient);
+
+                    //Send alignment for that doc
+                    sendDocAlignment(align, pClient);
+
                     // Send current online userlist for the given document
                     sendUpdatedOnlineUserByDocId(docId);
                 } else {
@@ -514,7 +531,6 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
                 // Send the code
                 DocumentAskSharableURIPacket dasup = DocumentAskSharableURIPacket(docId, userId, invCode);
                 dasup.send(*pClient);
-
 
             }
             break;
@@ -652,14 +668,14 @@ bool SslEchoServer::isOpenedEditorForGivenDoc(int docId) {
  * @param client
  * @return document
  */
-QVector<QVector<QSymbol>> SslEchoServer::remoteOpenDocument(int docId, QSharedPointer<Client> client) {
+std::pair <QVector<QVector<QSymbol>>, QVector<AlignMessage> > SslEchoServer::remoteOpenDocument(int docId, QSharedPointer<Client> client) {
 
     int closedDocId = getDocIdOpenedByUserId(client->getUserId());
     closeDocumentById(closedDocId, client);
 
     //checkDocPermission(docId, client->getUserId());
     if (docId < 0) { // doesnt have permission (no document was found with that name associated to that user)
-        return QVector<QVector<QSymbol>>();
+        return std::make_pair(QVector<QVector<QSymbol>>(), QVector<AlignMessage>());
     }
 
     // Set the document in the packet as the current opened doc
@@ -667,19 +683,34 @@ QVector<QVector<QSymbol>> SslEchoServer::remoteOpenDocument(int docId, QSharedPo
 
     //** Send the content of the document
     QVector<QVector<QSymbol>> qsymbols;
+    QVector<AlignMessage> qalign;
     //Se non ancora aperto da nessun utente online carico da disco e inizializzo sharedEditor (istanza CRDT)
     if (!isOpenedEditorForGivenDoc(docId)) {
+        // Load document as qvec of symbols
         qsymbols = loadFromDisk(docId);
+        // Load alignment
+        //QSharedPointer<QVector<AlignMessage>> qalign(new QVector<AlignMessage>);
+        qalign = loadAlignmentFromDisk(docId);
+
         QSharedPointer<SharedEditor> se(new SharedEditor(9999));
         std::vector<std::vector<QSymbol>> symbols = toVector(qsymbols);
         se->setSymbols(symbols);
         editorMapping.insert(docId, se);
+        alignmentMapping.insert(docId, qalign);
     } else // Altrimenti prendo lo stato soltanto
     {
         std::vector<std::vector<QSymbol>> symbols = editorMapping[docId]->getSymbols();
         qsymbols = toQVector(symbols);
         editorMapping[docId]->connectedUsersIncrease();
+        qalign = alignmentMapping[docId];
     }
-    return qsymbols;
+    return std::make_pair(qsymbols, qalign) ;
 }
 //TODO: delete and call distructor for crdt istance after last user logged out
+
+void  SslEchoServer::sendDocAlignment(QVector<AlignMessage> docAlign, QWebSocket *pClient){
+    for (int i = 0; i < docAlign.size(); i++) {
+        qDebug() << "Send alignment: " << docAlign[i].getPositionStart();
+        docAlign[i].send(*pClient);
+    }
+}

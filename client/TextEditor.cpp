@@ -822,15 +822,15 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
     index.clear();
     index.push_back(0);
 
-    for (int i = 0; i < symbols.size(); i++) {
-        this->remoteOpenBlock(symbols[i]);
-    }
-
     /*for (int i = 0; i < symbols.size(); i++) {
+        this->remoteOpenBlock(symbols[i]);
+    }*/
+
+    for (int i = 0; i < symbols.size(); i++) {
         for (int j = 0; j < symbols[i].size(); j++) {
             this->remoteInsert(symbols[i][j]);
         }
-    }*/
+    }
 
     b.stopTimer();
 

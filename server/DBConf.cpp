@@ -50,7 +50,7 @@ bool getUserlist() {
 /**
  * Add a user to the DB and save the profile picture
  */
-User addUser(QString username, QString password, QString name, QString surname/*, QImage profilePic*/) {
+User addUser(QString username, QString password, QString name, QString surname, QImage profilePic) {
     QSqlQuery query, query2, query3;
     QString email = username;
     QString hashedpassword = password;//perform hashing for sec. reason in production
@@ -343,6 +343,33 @@ void saveToDisk(QVector<QVector<QSymbol>> qdoc, int docId) {
 }
 
 /**
+ * Save to disk the internal representation of the document alignment for a given document
+ */
+void saveAlignmentToDisk(QVector<AlignMessage> qadoc, int docId) {
+    QString qdocId = QString::number(docId);
+    QFile file("doc" + qdocId + ".adat");
+    file.open(QIODevice::WriteOnly);
+    QDataStream out(&file);   // we will serialize the data into the file
+    out << qadoc;
+    file.close();
+}
+
+/**
+ * Load the internal structure that represents the alignment of a given the documentId
+ */
+QVector<AlignMessage> loadAlignmentFromDisk(int docId) {
+    QString qdocId = QString::number(docId);
+    QFile file("doc" + qdocId + ".adat");
+    QVector<AlignMessage> qadoc;
+    if (!file.open(QIODevice::ReadOnly)) {
+        qadoc = QVector<AlignMessage> ();  // if no file is found, maybe it's an empty document for now.
+    } else {
+        QDataStream out(&file);   // we will serialize the data into the file
+        out >> qadoc;
+    }
+    return qadoc;
+}
+/**
  * Load the internal structure that represents a document given the documentId
  */
 QVector<QVector<QSymbol>> loadFromDisk(int docId) {
@@ -357,6 +384,8 @@ QVector<QVector<QSymbol>> loadFromDisk(int docId) {
     }
     return qdoc;
 }
+
+
 
 /**
  * Generate an alphanumerical string for the given length.
