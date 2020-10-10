@@ -171,13 +171,18 @@ void TextEditor::currentCharFormatChange(const QTextCharFormat &f) {
 
 void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) {
 
-    // todo check highlighter
+    if (document()->signalsBlocked()) {
+        document()->blockSignals(false);
+        return;
+    }
+
+    qDebug() << "contentsChange";
 
     /**
      * https://github.com/anphetamina/CoText/issues/32 workaround
      */
 
-    while (document()->characterAt(position+charsAdded) == '\0' && charsRemoved >0) {
+    while (document()->characterAt(position+charsAdded) == '\0' && charsRemoved > 0) {
         charsRemoved--;
         charsAdded--;
     }
@@ -803,8 +808,9 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
 
     documentId = docId;
 
-    if (document()->characterCount() > 1) {
+    if (document()->characterCount() > 1 || !editor.getSymbols()[0].empty()) {
         editor.clear();
+        document()->blockSignals(true);
         this->clear();
     }
 

@@ -16,6 +16,7 @@ void UserHighlighter::highlightBlock(const QString &text) {
     try {
 
         document.blockSignals(true);
+        editor.blockSignals(true);
 
         for (int i = currentBlock().position(), j = 0; i < currentBlock().position() + text.length(); i++, j++) {
 
@@ -33,6 +34,7 @@ void UserHighlighter::highlightBlock(const QString &text) {
     }
 
     document.blockSignals(false);
+    editor.blockSignals(false);
 
 }
 
@@ -41,5 +43,6 @@ void UserHighlighter::enable() {
 }
 
 void UserHighlighter::disable() {
+    document.blockSignals(true);
     setDocument(nullptr);
 }
