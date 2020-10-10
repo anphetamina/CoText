@@ -260,9 +260,15 @@ void MainWindow::openDocumentFromMainMenu() {
     //emit(sendAskDocListMainWindow(user.getId())); //todo understand if it's useful
     OpenDocument openDocument(docList, this);
     connect(&openDocument, &OpenDocument::sendOpenDocument, this, &MainWindow::sendOpenDocumentFromMainMenu);
+    connect(&openDocument, &OpenDocument::documentDeleted, this, &MainWindow::sendDocumentDeletedMainWindow);
     openDocument.setWindowTitle("Select a document");
     openDocument.setModal(true);
     openDocument.exec();
+}
+
+void MainWindow::sendDocumentDeletedMainWindow(QString docName){
+    emit sendDocumentDeletedSignal(docName, user.getId());
+    docList.removeOne(docName);
 }
 
 void MainWindow::sendOpenDocumentFromMainMenu(QString docName){

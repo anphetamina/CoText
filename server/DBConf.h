@@ -15,7 +15,7 @@ bool dbConfigure();
 
 bool getUserlist();
 
-User addUser(QString username, QString password, QString name, QString surname, QIcon profilePic);
+User addUser(QString username, QString password, QString name, QString surname/*, QIcon profilePic*/);
 
 User *checkUserLoginData(QString email, QString password);
 
@@ -44,3 +44,5 @@ QVector<QVector<QSymbol>> loadFromDisk(int docId);
 int docIdByName(QString docName, int userId);
 
 QVector<QString> docByInvURI(QString invURI);
+
+bool deleteDocument (QString docName, int userId);

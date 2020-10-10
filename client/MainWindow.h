@@ -108,6 +108,7 @@ public slots:
     void sendOpenDocumentFromMainMenu(QString docName);
     void sendJoinFromMainMenu(qint32 userId, int docId, QString invCode);
     void openDocumentMainWindow(int docId, QString docName, std::vector<std::vector<QSymbol>> qsymbols);
+    void sendDocumentDeletedMainWindow(QString docName);
 
 signals:
     void newColorMapReceived(QMap<int, QColor> colorMap);
@@ -116,6 +117,7 @@ signals:
     void sendOpenDocumentSignal(QString docName, qint32 user);
     void sendDocCreateMainWindow(QString docName, qint32 userId);
     void closeMainMenu();
+    void sendDocumentDeletedSignal(QString docName, quint32 userId);
 
 private:
     Ui::MainWindow *ui;

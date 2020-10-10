@@ -22,13 +22,18 @@ private slots:
 
 signals:
     void sendOpenDocument(QString docName);
+    void documentDeleted(QString docName);
 
 public slots:
     void forwardOpenNewDocument(QString docName);
+    void buttonPressed(int i);
 
 private:
     Ui::OpenDocument *ui;
     MainWindow* mainWindow;
+    QVector<QString> documentList;
+
+    void repaint();
 };
 
 #endif // OPENDOCUMENT_H

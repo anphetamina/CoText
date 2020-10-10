@@ -241,7 +241,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
         case (PACK_TYPE_ACC_CREATE): {
             AccountCreationPacket *accReq = dynamic_cast<AccountCreationPacket *>(rcvd_packet.get());
             User loggedUser = addUser(accReq->getUsername(), accReq->getHashedPassword(), accReq->getName(),
-                                      accReq->getSurname(), accReq->getProfilePic());
+                                      accReq->getSurname()/*, accReq->getProfilePic()*/);
             AccountOkPacket aop = AccountOkPacket(loggedUser);
             aop.send(*pClient);
             break;
@@ -456,10 +456,18 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
 
                 break;
             }*/
+
         case (PACK_TYPE_DOC_DEL): {
             if (!client->isLogged()) {
                 break;
             }
+
+            DocumentDelPacket* ddp = dynamic_cast<DocumentDelPacket *>(rcvd_packet.get());
+
+            deleteDocument(ddp->getdocName(), ddp->getuserId());
+
+            qDebug() << "[SERVER] DocumentDelPacket received docName = "<<ddp->getdocName() << " userId = "<<ddp->getuserId();
+
             break;
         }
 
