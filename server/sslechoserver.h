@@ -9,6 +9,7 @@
 #include <QtCore/QList>
 #include <QtCore/QByteArray>
 #include <QtNetwork/QSslError>
+#include <Message.h>
 #include "../common/Packet.h"
 #include "Client.h"
 #include "../common/CursorPacket.h"
@@ -51,6 +52,9 @@ private:
     // Association of opened document and crdt instances
     QMap<int, QSharedPointer<SharedEditor>> editorMapping;
 
+    // Association of opened document and alignement
+    QMap<int, QVector<AlignMessage>> alignmentMapping;
+
     void packetParse(QByteArray rcvd_packet);
 
     void dispatch(PacketHandler rcvd_packet, QWebSocket *pClient);
@@ -67,7 +71,9 @@ private:
 
     bool closeDocumentById(int closedDocId, QSharedPointer<Client> client);
 
-    QVector<QVector<QSymbol>> remoteOpenDocument(int docId, QSharedPointer<Client> client);
+    std::pair <QVector<QVector<QSymbol>>, QVector<AlignMessage> > remoteOpenDocument(int docId, QSharedPointer<Client> client);
+
+    void sendDocAlignment(QVector<AlignMessage> docAlign, QWebSocket *pClient);
 };
 
 #endif //SSLECHOSERVER_H

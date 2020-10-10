@@ -86,3 +86,13 @@ void AlignMessage::writePayload(QDataStream &stream) const {
 void AlignMessage::readPayload(QDataStream &stream) {
     stream >> positionStart >> delta >> alignment >> siteId;
 }
+
+QDataStream &operator>>(QDataStream &in, AlignMessage &am) {
+    in >> am.positionStart >> am.delta >> am.alignment >> am.siteId;
+    return in;
+}
+
+QDataStream &operator<<(QDataStream &out, const AlignMessage &am) {
+    out << am.positionStart << am.delta << am.alignment << am.siteId;
+    return out;
+}
