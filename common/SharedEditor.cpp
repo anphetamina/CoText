@@ -178,6 +178,9 @@ std::vector<Identifier> SharedEditor::generatePosBetween(std::vector<Identifier>
                 return this->generatePosBetween(pos1, pos2, newPos, level+1);
             }
         }
+
+        // todo check
+        throw;
     } catch (...) {
         throw;
     }
