@@ -7,6 +7,7 @@
 #include "OpenDocument.h"
 #include "AlertNewDocument.h"
 #include "ChooseName.h"
+#include "sslechoclient.h"
 #include <QPixmap> //allows to create a qpixmap onj which takes 1 arg
 #include <QPrinter>
 #include <QColorDialog>
@@ -366,12 +367,22 @@ void MainWindow::on_actionPrint_triggered() {
 */
 
 void MainWindow::on_actionExit_triggered() {
-    QMessageBox::StandardButton reply = QMessageBox::question(this, "Exit", "Do you really want to quit the application?", QMessageBox::Yes | QMessageBox::No);
-    if(reply == QMessageBox::Yes) {
-        QApplication::quit();
-    } else {
-        return;
-    }
+    user = User();
+    this->hide();
+    editor->setDisabled(true);
+
+    Login *login = new Login();
+    client->connectToLogin(login);
+    this->connectToLogin(login);
+    login->setWindowTitle("Welcome to CoText!");
+    login->setModal(true);
+    login->exec();
+
+    MainMenu* mainMenu = new MainMenu();
+    this->connectToMainMenu(mainMenu);
+    mainMenu->setWindowTitle("Main Menu");
+    mainMenu->setModal(true);
+    mainMenu->exec();
 }
 
 void MainWindow::on_actionCopy_triggered() {
@@ -417,14 +428,14 @@ void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> n
         actionUserList[j]->setVisible(false);
     }
 
-    //qDebug() << "[MAIN WINDOW] User list updated";
+    qDebug() << "[MAIN WINDOW] User list updated";
     onlineUserList = newOnlineUserList;
     completeUserList = newCompleteUserList;
     colorMap.clear();
-    //qDebug() << "[MAIN WINDOW] complete user list ";
+    qDebug() << "[MAIN WINDOW] complete user list ";
     for(int i=0; i<newCompleteUserList.size();i++){
         colorMap.insert(newCompleteUserList[i].getId(),colorList.at(i%19));
-        //qDebug() << "user = "<<newCompleteUserList[i].getId();
+        qDebug() << "user = "<<newCompleteUserList[i].getId();
     }
 
     for(int j=0; j<newOnlineUserList.size();j++){
