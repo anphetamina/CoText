@@ -33,7 +33,8 @@ signals:
     void eraseBlockReceived(std::vector<QSymbol> symbols);
     void updateCursorReceived(int userId, int position);
     void updateAlignmentReceived(Qt::Alignment alignment, int position);
-    void updateUserListReceived(QVector<User> userlist);
+    void updateUserListReceivedToTextEditor(QVector<User> onlineUserList, QVector<User> completeUserList);
+    void updateUserListReceivedToMainWindow(QVector<User> onlineUserList, QVector<User> completeUserList);
     void auth(User loggedUser);
     void documentReceived(int docId, QString docName, std::vector<std::vector<QSymbol>> qsymbols);
     void loginSuccessfulReceived();

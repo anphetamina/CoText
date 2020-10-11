@@ -66,7 +66,7 @@ public:
     	return user;
     }
     
-    QVector<User> getUserList() const;
+    QVector<User> getOnlineUserList() const;
 
     //! [other member functions]
     void connectToTextEditor(TextEditor* te);
@@ -92,7 +92,7 @@ private slots:
     void on_actionNew_triggered();
 
 public slots:
-    void updateUserList(QVector<User> newUserList);
+    void updateUserList(QVector<User> newOnlineUserList, QVector<User> newCompleteUserList);
     void askUriReceivedMainWindow(QString URI);
     void sendJoinMainWindow(qint32 userId, int docId, QString invCode);
     void sendOpenDocumentMainWindow(QString docName);
@@ -122,12 +122,14 @@ signals:
 private:
     Ui::MainWindow *ui;
     StatusBar *qSB;
-
     TextEditor *editor;
     QString currentFileName = "";
     QVector<QString> docList;
-    QVector<User> userList = {};
-    //std::vector<User> userList = {};
+
+    QVector<User> onlineUserList = {};        //list of all the user online on this document
+    QVector<User> completeUserList = {};        //list of all the user (online and offline) on this document
+
+    QVector<QAction*> actionUserList;
     QMap<int, QColor> colorMap = {};
     QVector<QColor> colorList = {QColor(255,0,0),   //red
                                  QColor(0,255,0),   //lime
@@ -151,57 +153,6 @@ private:
                                  QColor(128,0,128)   //purple
     }; //is a static array of color
 
-    /*QMap<QColor, bool> colorList = {
-            {QColor(255, 0, 0),     false},  //red
-            {QColor(0, 255, 0),     false}, //lime
-            { QColor(0, 0, 255),     false}, //blue
-            {QColor(255, 255, 0),   false},  //yellow
-            {QColor(0, 255, 255),   false},  //aqua
-            {QColor(255, 0, 255),   false}, //magenta
-            {QColor(210, 105, 30),  false},   //chocolate
-            {QColor(189, 183, 107), false}, //dark kaki
-            {QColor(0, 128, 0),     false}, //green
-            {QColor(255, 127, 80),  false},  //coral
-            {QColor(154, 205, 50),  false},  //yellow green
-            {QColor(102, 205, 170), false}, //medium aqua marine
-            {QColor(175, 238, 238), false}, //pale turquoise
-            {QColor(147, 112, 219), false},  //medium purple
-            {QColor(255, 165, 0),   false},  //orange
-            {QColor(176, 196, 222), false},  //light steel blue
-            {QColor(255, 182, 193), false}, //light pink
-            {QColor(0, 128, 128),   false},  //teal
-            {QColor(0, 0, 128),     false},  //navy
-            {QColor(128, 0, 128),   false} //purple
-    }*/
-                                     //is a static array of color
-
-    /*std::multimap<int, QColor> colorMap = {
-            {-1, QColor(255, 0, 0)},  //red
-            {-1, QColor(0, 255, 0)}, //lime
-            {-1, QColor(0, 0, 255)}, //blue
-            {-1, QColor(255, 255, 0)},  //yellow
-            {-1,QColor(0, 255, 255)},  //aqua
-            {-1, QColor(255, 0, 255)}, //magenta
-            {-1, QColor(210, 105, 30)},   //chocolate
-            {-1, QColor(189, 183, 107)}, //dark kaki
-            {-1, QColor(0, 128, 0)}, //green
-            {-1, QColor(255, 127, 80)},  //coral
-            {-1,QColor(154, 205, 50)},  //yellow green
-            {-1,QColor(102, 205, 170)}, //medium aqua marine
-            {-1,QColor(175, 238, 238)}, //pale turquoise
-            {-1,QColor(147, 112, 219)},  //medium purple
-            {-1,QColor(255, 165, 0)},  //orange
-            {-1,QColor(176, 196, 222)},  //light steel blue
-            {-1,QColor(255, 182, 193)}, //light pink
-            {-1,QColor(0, 128, 128)},  //teal
-            {-1,QColor(0, 0, 128)},  //navy
-            {-1,QColor(128, 0, 128)} //purple
-    };*/
-
-    //std::multimap<int, QAction*> actionUserMap;
-    QVector<QAction*> actionUserList;
-    //QAction* actionUserList;
-    //SslEchoClient *client;
     void Save_as();
     void closeEvent(QCloseEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;

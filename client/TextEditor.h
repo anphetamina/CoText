@@ -76,7 +76,7 @@ public slots:
     void updateCursor(int userId, int position);
     void updateAlignment(Qt::Alignment alignment, int position);
     void openDocument(int docId, QString docName, std::vector<std::vector<QSymbol>> symbols);
-    void updateCursorMap(QVector<User> onlineUserList);
+    void updateCursorMap(QVector<User> newOnlineUserList, QVector<User> newCompleteUserList);
 
 private slots:
     void selectFont();

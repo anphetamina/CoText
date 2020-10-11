@@ -52,3 +52,5 @@ int docIdByName(QString docName, int userId);
 QVector<QString> docByInvURI(QString invURI);
 
 bool deleteDocument (QString docName, int userId);
+
+QVector<User> getUserListByDocId(int docId);

@@ -186,8 +186,9 @@ public:
 class DocumentBeaconOnlineUsers : public Packet {
     friend PacketBuilder;
 private:
-    QVector<User> userList;
+    QVector<User> onlineUserList;
     qint32 docId;
+    QVector<User> completeUserList;
 
 protected:
     DocumentBeaconOnlineUsers();
@@ -197,13 +198,15 @@ protected:
     void readPayload(QDataStream &stream) override;
 
 public:
-    DocumentBeaconOnlineUsers(QVector<User> userList, qint32 docId);
+    DocumentBeaconOnlineUsers(QVector<User> onlineUserList, qint32 docId, QVector<User> completeUserList);
 
     ~DocumentBeaconOnlineUsers() {};
 
     int getdocId() const;
 
-    QVector<User> getuserList() const;
+    QVector<User> getOnlineUserList() const;
+
+    QVector<User> getCompleteUserList() const;
 
 };
 

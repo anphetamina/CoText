@@ -180,23 +180,27 @@ void DocumentAskSharableURIPacket::readPayload(QDataStream &stream) {
 // Inherit from a DocumentBaseActionClass?
 DocumentBeaconOnlineUsers::DocumentBeaconOnlineUsers() : Packet(PACK_TYPE_DOC_USERLIST) {}
 
-DocumentBeaconOnlineUsers::DocumentBeaconOnlineUsers(QVector<User> userList, qint32 docId) : Packet(
-        PACK_TYPE_DOC_USERLIST), userList(userList), docId(docId) {};
+DocumentBeaconOnlineUsers::DocumentBeaconOnlineUsers(QVector<User> onlineUserList, qint32 docId, QVector<User> completeUserList) : Packet(
+        PACK_TYPE_DOC_USERLIST), onlineUserList(onlineUserList), docId(docId) , completeUserList(completeUserList){};
 
 int DocumentBeaconOnlineUsers::getdocId() const {
     return docId;
 }
 
-QVector<User> DocumentBeaconOnlineUsers::getuserList() const {
-    return userList;
+QVector<User> DocumentBeaconOnlineUsers::getOnlineUserList() const {
+    return onlineUserList;
+}
+
+QVector<User> DocumentBeaconOnlineUsers::getCompleteUserList() const {
+    return completeUserList;
 }
 
 void DocumentBeaconOnlineUsers::writePayload(QDataStream &stream) const {
-    stream << userList << docId;
+    stream << onlineUserList << docId << completeUserList;
 }
 
 void DocumentBeaconOnlineUsers::readPayload(QDataStream &stream) {
-    stream >> userList >> docId;
+    stream >> onlineUserList >> docId >> completeUserList;
 }
 
 //QVector::fromStdVector ( const std::vector<T> & vector )

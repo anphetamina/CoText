@@ -874,10 +874,11 @@ bool TextEditor::isNewLine(QChar c) {
     return c == QChar::LineFeed || c == QChar::ParagraphSeparator || c == QChar::LineSeparator;
 }
 
-void TextEditor::updateCursorMap(QVector<User> onlineUserList) {
-
+void TextEditor::updateCursorMap(QVector<User> newOnlineUserList, QVector<User> newCompleteUserList) {
+    
+    //TODO passo newCompleteUserList che è la lista di tutti gli utenti (online e offline) che hanno i permessi su questo documento
     std::vector<int> onlineUserIds{};
-    std::for_each(onlineUserList.begin(), onlineUserList.end(), [&](const User &u) { onlineUserIds.push_back(u.getId()); });
+    std::for_each(newOnlineUserList.begin(), newOnlineUserList.end(), [&](const User &u) { onlineUserIds.push_back(u.getId()); });
     std::sort(onlineUserIds.begin(), onlineUserIds.end());
 
     std::vector<int> currentUserList{};

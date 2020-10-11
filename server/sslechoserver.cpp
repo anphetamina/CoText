@@ -605,17 +605,21 @@ void SslEchoServer::sendUpdatedOnlineUserByDocId(int docId) {
     if (docId < 0)
         return;
 
-    // Compose the updated userlist of online user per document
+    // Compose the updated onlineUserlist and completeUserList per document
     QVector<User> onlineUserPerDoc = {};
     for (QSharedPointer<Client> onlineClient : documentMapping[docId]) {
         if (onlineClient->isLogged()) {
             onlineUserPerDoc.insert(0, onlineClient->getUser());
         }
     }
+
+    //getCompleteUserList for the document
+    QVector<User> completeUserList = getUserListByDocId(docId);
+    
     // Send to all the client the new userlist
     for (QSharedPointer<Client> onlineClient : documentMapping[docId]) {
         if (onlineClient->isLogged()) {
-            DocumentBeaconOnlineUsers bou = DocumentBeaconOnlineUsers(onlineUserPerDoc, docId);
+            DocumentBeaconOnlineUsers bou = DocumentBeaconOnlineUsers(onlineUserPerDoc, docId, completeUserList);
             bou.send(*onlineClient->getSocket());
         }
     }

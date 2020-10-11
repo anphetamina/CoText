@@ -365,6 +365,6 @@ PacketHandler PacketBuilder::DocumentListPacket(qint32 userId, QVector<QString> 
     return new class DocumentListPacket(userId, docList);
 }
 
-PacketHandler PacketBuilder::DocumentBeaconOnlineUsers(QVector<User> userList, qint32 docId) {
-    return new class DocumentBeaconOnlineUsers(userList, docId);
+PacketHandler PacketBuilder::DocumentBeaconOnlineUsers(QVector<User> onlineUserList, qint32 docId, QVector<User> completeUserList) {
+    return new class DocumentBeaconOnlineUsers(onlineUserList, docId, completeUserList);
 }

@@ -1,6 +1,7 @@
 #include "MainMenu.h"
 #include "ui_MainMenu.h"
 
+
 MainMenu::MainMenu(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::MainMenu)
@@ -32,4 +33,21 @@ void MainMenu::on_pushButton_join_clicked()
 
 void MainMenu::closeMainMenuSlot(){
     this->close();
+}
+
+void MainMenu::closeEvent (QCloseEvent *event)
+{
+    /*QMessageBox::StandardButton resBtn = QMessageBox::question( this, APP_NAME,
+                                                                tr("Are you sure?\n"),
+                                                                QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
+                                                                QMessageBox::Yes);
+    if (resBtn != QMessageBox::Yes) {
+        event->ignore();
+    } else {
+        event->accept();
+    }*/
+
+    event->accept();
+    emit sendCloseMainWindow();
+
 }

@@ -2,7 +2,7 @@
 #define MAINMENU_H
 
 #include <QDialog>
-
+#include <QCloseEvent>
 
 namespace Ui {
 class MainMenu;
@@ -15,6 +15,7 @@ class MainMenu : public QDialog
 public:
     explicit MainMenu(QWidget *parent = nullptr);
     ~MainMenu();
+    void closeEvent (QCloseEvent *event);
 
 private slots:
     void on_pushButton_newDocument_clicked();
@@ -28,6 +29,7 @@ signals:
     void newDocumentClicked();
     void openDocumentClicked();
     void joinClicked();
+    void sendCloseMainWindow();
 
 private:
     Ui::MainMenu *ui;

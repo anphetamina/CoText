@@ -228,7 +228,7 @@ void MainWindow::connectToMainMenu(MainMenu* mainMenu) {
     connect(mainMenu, &MainMenu::openDocumentClicked, this, &MainWindow::openDocumentFromMainMenu);
     connect(mainMenu, &MainMenu::joinClicked, this, &MainWindow::joinFromMainMenu);
     connect(this, &MainWindow::closeMainMenu, mainMenu, &MainMenu::closeMainMenuSlot);
-    connect(mainMenu, &MainMenu::finished, this, &MainWindow::closeMainWindow);
+    //connect(mainMenu, &MainMenu::sendCloseMainWindow, this, &MainWindow::closeMainWindow);
 }
 
 void MainWindow::newDocumentFromMainMenu() {
@@ -412,69 +412,32 @@ void MainWindow::on_actionLogin_triggered()
 }
 
 
-void MainWindow::updateUserList(QVector<User> newUserList){
+void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> newCompleteUserList){
     for(int j=0; j<20; j++){
         actionUserList[j]->setVisible(false);
     }
 
     qDebug() << "[MAIN WINDOW] User list updated";
-    userList = newUserList;
+    onlineUserList = newOnlineUserList;
+    completeUserList = newCompleteUserList;
     colorMap.clear();
-    for(int i=0; i<newUserList.size();i++){
-        colorMap.insert(newUserList[i].getId(),colorList.at(i%19));
-        actionUserList[i]->setVisible(true);
-        if(newUserList[i].getId() == user.getId()) {
-            actionUserList[i]->setText(newUserList[i].getEmail() + " (YOU)");
+    qDebug() << "[MAIN WINDOW] complete user list ";
+    for(int i=0; i<newCompleteUserList.size();i++){
+        colorMap.insert(newCompleteUserList[i].getId(),colorList.at(i%19));
+        qDebug() << "user = "<<newCompleteUserList[i].getId();
+    }
+
+    for(int j=0; j<newOnlineUserList.size();j++){
+        actionUserList[j]->setVisible(true);
+        if(newOnlineUserList[j].getId() == user.getId()) {
+            actionUserList[j]->setText(newOnlineUserList[j].getEmail() + " (YOU)");
         }else {
-            actionUserList[i]->setText(newUserList[i].getEmail());
+            actionUserList[j]->setText(newOnlineUserList[j].getEmail());
         }
-        ui->rightToolBar->widgetForAction(actionUserList[i])->setStyleSheet("color:"+colorList.at(i).name());
+        ui->rightToolBar->widgetForAction(actionUserList[j])->setStyleSheet("color:"+colorMap[newOnlineUserList[j].getId()].name());
     }
 
     emit newColorMapReceived(colorMap);
-
-    /*std::vector<User> newUserListStd = newUserList.toStdVector();
-    //users that before were online and now are offline
-    QVector<User> usersNoMoreOnline;
-    std::set_difference (userList.begin(), userList.end(), newUserListStd.begin(), newUserListStd.end(), usersNoMoreOnline.begin());
-    for(int i=0; i<usersNoMoreOnline.size(); i++){
-        //std::map<int,QColor> stdMap = colorMap.toStdMap();
-        auto nodeHandler = colorMap.extract(usersNoMoreOnline[i].getId());
-        nodeHandler.key() = -1;
-        colorMap.insert(std::move(nodeHandler));
-        //colorMap = QMultiMap(QMap(stdMap));
-
-        actionUserMap.find(usersNoMoreOnline[i].getId())->second->setVisible(false);
-
-       // std::map<int,QAction*> stdMap2 = actionUserMap.toStdMap();
-        auto nodeHandler2 = actionUserMap.extract(usersNoMoreOnline[i].getId());
-        nodeHandler2.key() = -1;
-        actionUserMap.insert(std::move(nodeHandler2));
-        //actionUserMap = QMultiMap(QMap(stdMap2));
-    }
-
-   ///users that before were offline and now are online
-    QVector<User> newUsersOnline;
-    std::set_difference ( newUserList.begin(), newUserList.end(), userList.begin(), userList.end(), newUsersOnline.begin());
-    for(int i=0; i<newUsersOnline.size(); i++){
-        std::map<int,QColor> stdMap = colorMap.toStdMap();
-        auto nodeHandler = stdMap.extract(-1);
-        nodeHandler.key() = newUsersOnline[i].getId();
-        stdMap.insert(std::move(nodeHandler));
-        colorMap = QMultiMap(QMap(stdMap));
-
-        std::map<int,QAction*> stdMap2 = actionUserMap.toStdMap();
-        auto nodeHandler2 = stdMap2.extract(-1);
-        nodeHandler2.key() = newUsersOnline[i].getId();
-        stdMap2.insert(std::move(nodeHandler2));
-        actionUserMap = QMultiMap(QMap(stdMap2));
-
-        actionUserMap.take(newUsersOnline[i].getId())->setVisible(true);
-        actionUserMap.take(newUsersOnline[i].getId())->setText(usersNoMoreOnline[i].getEmail());
-        ui->rightToolBar->widgetForAction(actionUserMap.take(newUsersOnline[i].getId()))->setStyleSheet("color:"+colorMap.take(newUsersOnline[i].getId()).name());
-    }
-
-    userList = newUserListStd;*/
 }
 
 
@@ -547,8 +510,8 @@ TextEditor* MainWindow::getTextEditor() const{
     return editor;
 }
 
-QVector<User> MainWindow::getUserList() const {
-	return userList;
+QVector<User> MainWindow::getOnlineUserList() const {
+	return onlineUserList;
 }
 
 void MainWindow::openDocumentMainWindow(int docId, QString docName, std::vector<std::vector<QSymbol>> qsymbols){
@@ -559,5 +522,6 @@ void MainWindow::openDocumentMainWindow(int docId, QString docName, std::vector<
 }
 
 void MainWindow::closeMainWindow(){
+    qDebug()<<"[MAIN WINDOW] close ";
     exit(0);
 }
