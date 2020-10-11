@@ -76,7 +76,7 @@ public:
 
 private slots:
     void on_actionOpen_triggered();
-    void on_actionExit_triggered();
+    void on_actionLogout_triggered();
     void on_actionCopy_triggered();
     void on_actionPaste_triggered();
     void on_actionCut_triggered();

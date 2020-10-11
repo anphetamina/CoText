@@ -27,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionOpen))->installEventFilter(this);
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionNew))->installEventFilter(this);
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionShare_Uri))->installEventFilter(this);
-    dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionExit))->installEventFilter(this);
+    dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionLogout))->installEventFilter(this);
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionSettings))->installEventFilter(this);
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionJoin))->installEventFilter(this);
 
@@ -35,7 +35,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     QPixmap icon(":/appIcon/CoText.ico");
     //ui->iconLabel->setPixmap(icon);
     // ui->statusbar->addPermanentWidget();
-    
 	
 	ui->actionCut->setShortcut(QKeySequence::Cut);
     ui->actionCopy->setShortcut(QKeySequence::Copy);
@@ -125,13 +124,13 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         return true;
     }
 
-    //Exit
-    if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionExit)) && event->type() == QEvent::Enter) {
+    //Logout
+    if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionLogout)) && event->type() == QEvent::Enter) {
         setCursor(Qt::PointingHandCursor);
         ui->actionExit->setIcon(QIcon(":/imgs/icons/noun_Exit_1558251_white.svg"));
         return true;
     }
-    if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionExit)) && event->type() == QEvent::Leave) {
+    if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionLogout)) && event->type() == QEvent::Leave) {
         setCursor(Qt::ArrowCursor);
         ui->actionExit->setIcon(QIcon(":/imgs/icons/noun_Exit_1558251.svg"));
         return true;
@@ -289,7 +288,7 @@ void MainWindow::on_actionPrint_triggered() {
 }
 */
 
-void MainWindow::on_actionExit_triggered() {
+void MainWindow::on_actionLogout_triggered() {
     user = User();
     this->hide();
     editor->setDisabled(true);
@@ -334,15 +333,12 @@ void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> n
     for(int j=0; j<20; j++){
         actionUserList[j]->setVisible(false);
     }
-
-    qDebug() << "[MAIN WINDOW] User list updated";
+    
     onlineUserList = newOnlineUserList;
     completeUserList = newCompleteUserList;
     colorMap.clear();
-    qDebug() << "[MAIN WINDOW] complete user list ";
     for(int i=0; i<newCompleteUserList.size();i++){
         colorMap.insert(newCompleteUserList[i].getId(),colorList.at(i%19));
-        qDebug() << "user = "<<newCompleteUserList[i].getId();
     }
 
     for(int j=0; j<newOnlineUserList.size();j++){

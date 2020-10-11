@@ -75,7 +75,6 @@
     <addaction name="actionNew"/>
     <addaction name="actionPrintPDF"/>
     <addaction name="actionShare_Uri"/>
-    <addaction name="actionExit"/>
     <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
@@ -157,7 +156,7 @@
    <addaction name="actionShare_Uri"/>
    <addaction name="actionJoin"/>
    <addaction name="actionSettings"/>
-   <addaction name="actionExit"/>
+   <addaction name="actionLogout"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="minimumSize">
@@ -429,6 +428,10 @@
    </property>
   </action>
   <action name="actionLogout">
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/imgs/icons/noun_Exit_1558251.svg</normaloff>:/imgs/icons/noun_Exit_1558251.svg</iconset>
+   </property>
    <property name="text">
     <string>Logout</string>
    </property>
