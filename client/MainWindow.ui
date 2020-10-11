@@ -73,8 +73,6 @@
      <string>File</string>
     </property>
     <addaction name="actionNew"/>
-    <addaction name="actionSave"/>
-    <addaction name="actionSave_as"/>
     <addaction name="actionPrintPDF"/>
     <addaction name="actionShare_Uri"/>
     <addaction name="actionExit"/>
@@ -96,7 +94,6 @@
     <property name="title">
      <string>User</string>
     </property>
-    <addaction name="actionLogin"/>
     <addaction name="actionLogout"/>
     <addaction name="actionSettings"/>
    </widget>
@@ -155,9 +152,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionLogin"/>
-   <addaction name="actionOpen"/>
    <addaction name="actionNew"/>
+   <addaction name="actionOpen"/>
    <addaction name="actionShare_Uri"/>
    <addaction name="actionJoin"/>
    <addaction name="actionSettings"/>

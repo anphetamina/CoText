@@ -22,8 +22,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     ui->setupUi(this);
     ui->rightToolBar->setVisible(false);
+
     //installing EventFilter for QToolButtons on the qToolBar
-    dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionLogin))->installEventFilter(this);
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionOpen))->installEventFilter(this);
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionNew))->installEventFilter(this);
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionShare_Uri))->installEventFilter(this);
@@ -68,32 +68,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->qSB = dynamic_cast<StatusBar *>(statusBar());
     qSB->setupSB();
     qSB->displaySB();
-    
-    
-	
-	
-	
-	
-    /*actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser0));
-    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser1));
-    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser2));
-    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser3));
-    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser4));
-    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser5));
-    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser6));
-    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser7));
-    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser8));
-    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser9));
-    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser10));
-    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser11));
-    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser12));
-    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser13));
-    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser14));
-    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser15));
-    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser16));
-    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser17));
-    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser18));
-    actionUserMap.insert(std::pair<int,QAction*>(-1,ui->actionUser19));*/
 }
 
 
@@ -114,18 +88,6 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
 bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
     // qDebug()<<"Sono entrato nella eventFilter" << event->type() << watched;
-
-    //Login
-    if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionLogin)) && event->type() == QEvent::Enter) {
-        setCursor(Qt::PointingHandCursor);
-        ui->actionLogin->setIcon(QIcon(":/imgs/icons/noun_user login_178831_white.svg"));
-        return true;
-    }
-    if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionLogin)) && event->type() == QEvent::Leave) {
-        setCursor(Qt::ArrowCursor);
-        ui->actionLogin->setIcon(QIcon(":/imgs/icons/noun_user login_178831.svg"));
-        return true;
-    }
 
     //Open
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionOpen)) && event->type() == QEvent::Enter) {
@@ -306,45 +268,6 @@ void MainWindow::sendJoinFromMainMenu(qint32 userId, int docId, QString invCode)
     this->show();
 }
 
-void MainWindow::Save_as() {
-
-    QString filename = QFileDialog::getSaveFileName(this, "Save as");
-    QFile file(filename);
-    if(!file.open(QIODevice::WriteOnly | QFile::Text)) {
-        QMessageBox::warning(this, "Warning", "Can not save the file:  "+ file.errorString() + ". Choose a name and save.");
-        return;
-    }
-    currentFileName = filename;
-    setWindowTitle(filename);
-    QTextStream out(&file);
-//    QString text = ui->textEdit->toPlainText();
-//    out << text;
-    file.close();
-    return;
-
-}
-void MainWindow::on_actionSave_as_triggered() {
-    Save_as();
-    return;
-}
-
-void MainWindow::on_actionSave_triggered() {
-    QString filename = currentFileName;
-    QFile file(filename);
-
-    if(!file.open(QIODevice::WriteOnly | QFile::Text)) {
-        QMessageBox::warning(this, "Warning", "Can not save the file:  "+ file.errorString()+ ". Choose a name and save.");
-        Save_as();
-        return;
-    } else {
-        QTextStream out(&file);
-//        QString text = ui->textEdit->toPlainText();
-//        out << text;
-        file.close();
-        return;
-    }
-}
-
 void MainWindow::on_actionPrintPDF_triggered() {
     QPrinter printer;
     printer.setOutputFormat(QPrinter::PdfFormat);
@@ -406,22 +329,6 @@ void MainWindow::on_actionUndo_triggered() {
 void MainWindow::on_actionRedo_triggered() {
 //    ui->textEdit->redo();
 }
-
-
-void MainWindow::on_actionLogin_triggered()
-{
-    //Modal approach to create loginForm (cannot access mainWindow at same time)
-    //It is on the stack, if we want it on the heap just have the pointer on mainwindow.h and call new here
-
-    Login login;
-    login.setModal(true);
-    login.exec();
-
-    //hide(); //hide the MainWindow
-    //lf = new loginform(this); //giving also the parent class
-    //lf->show();
-}
-
 
 void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> newCompleteUserList){
     for(int j=0; j<20; j++){
