@@ -228,7 +228,7 @@ void MainWindow::connectToMainMenu(MainMenu* mainMenu) {
     connect(mainMenu, &MainMenu::openDocumentClicked, this, &MainWindow::openDocumentFromMainMenu);
     connect(mainMenu, &MainMenu::joinClicked, this, &MainWindow::joinFromMainMenu);
     connect(this, &MainWindow::closeMainMenu, mainMenu, &MainMenu::closeMainMenuSlot);
-    //connect(mainMenu, &MainMenu::sendCloseMainWindow, this, &MainWindow::closeMainWindow);
+    connect(mainMenu, &MainMenu::sendCloseMainWindow, this, &MainWindow::closeMainWindow);
 }
 
 void MainWindow::newDocumentFromMainMenu() {
@@ -417,14 +417,14 @@ void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> n
         actionUserList[j]->setVisible(false);
     }
 
-    qDebug() << "[MAIN WINDOW] User list updated";
+    //qDebug() << "[MAIN WINDOW] User list updated";
     onlineUserList = newOnlineUserList;
     completeUserList = newCompleteUserList;
     colorMap.clear();
-    qDebug() << "[MAIN WINDOW] complete user list ";
+    //qDebug() << "[MAIN WINDOW] complete user list ";
     for(int i=0; i<newCompleteUserList.size();i++){
         colorMap.insert(newCompleteUserList[i].getId(),colorList.at(i%19));
-        qDebug() << "user = "<<newCompleteUserList[i].getId();
+        //qDebug() << "user = "<<newCompleteUserList[i].getId();
     }
 
     for(int j=0; j<newOnlineUserList.size();j++){

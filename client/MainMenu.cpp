@@ -14,7 +14,6 @@ MainMenu::~MainMenu()
     delete ui;
 }
 
-
 void MainMenu::on_pushButton_newDocument_clicked()
 {
     emit newDocumentClicked();
@@ -32,22 +31,11 @@ void MainMenu::on_pushButton_join_clicked()
 
 
 void MainMenu::closeMainMenuSlot(){
-    this->close();
+    this->done(0);
 }
 
 void MainMenu::closeEvent (QCloseEvent *event)
 {
-    /*QMessageBox::StandardButton resBtn = QMessageBox::question( this, APP_NAME,
-                                                                tr("Are you sure?\n"),
-                                                                QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
-                                                                QMessageBox::Yes);
-    if (resBtn != QMessageBox::Yes) {
-        event->ignore();
-    } else {
-        event->accept();
-    }*/
-
     event->accept();
     emit sendCloseMainWindow();
-
 }
