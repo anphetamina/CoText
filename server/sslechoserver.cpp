@@ -249,6 +249,14 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
             aop.send(*pClient);
             break;
         }
+        case (PACK_TYPE_ACC_UPDATE): {
+            AccountUpdatePacket *accReq = dynamic_cast<AccountUpdatePacket *>(rcvd_packet.get());
+            User loggedUser = updateUser(accReq->getId(),accReq->getUsername(), accReq->getHashedPassword(), accReq->getName(),
+                                      accReq->getSurname(), accReq->getProfilePic());
+            AccountOkPacket aop = AccountOkPacket(loggedUser);
+            aop.send(*pClient);
+            break;
+        }
         case (PACK_TYPE_LOGIN_REQ): {
             LoginReqPacket *loginReq = dynamic_cast<LoginReqPacket *>(rcvd_packet.get());
             QString username = loginReq->getUsername();

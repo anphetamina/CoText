@@ -319,9 +319,9 @@ PacketHandler PacketBuilder::AccountOk(User user) {
     return new class AccountOkPacket(user);
 }
 
-PacketHandler PacketBuilder::AccountUpdatePacket(QString username, QString password, QString name, QString surname,
+PacketHandler PacketBuilder::AccountUpdatePacket(int id, QString username, QString password, QString name, QString surname,
                                                  QImage profilePic) {
-    return new class AccountUpdatePacket(username, password, name, surname, profilePic);
+    return new class AccountUpdatePacket(id, username, password, name, surname, profilePic);
 }
 
 PacketHandler PacketBuilder::Message(int type, QSymbol qs, int siteId) {

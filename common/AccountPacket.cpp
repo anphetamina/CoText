@@ -46,9 +46,9 @@ void AccountCreationPacket::readPayload(QDataStream &stream) {
 // TOIMPROVE: Maybe an aCCount packet and child class AccountUpdate and AccountCreate?
 AccountUpdatePacket::AccountUpdatePacket() : Packet(PACK_TYPE_ACC_UPDATE) {};
 
-AccountUpdatePacket::AccountUpdatePacket(QString username, QString password, QString name, QString surname,
-                                         QImage profilePic) : Packet(PACK_TYPE_ACC_UPDATE), username(username),
-                                                             hashedPassword(hashedPassword), name(name),
+AccountUpdatePacket::AccountUpdatePacket(int id, QString username, QString password, QString name, QString surname,
+                                         QImage profilePic) : Packet(PACK_TYPE_ACC_UPDATE), id(id), username(username),
+                                                             hashedPassword(password), name(name),
                                                              surname(surname), profilePic(profilePic) {};
 
 QString AccountUpdatePacket::getUsername() const {
@@ -69,14 +69,17 @@ QString AccountUpdatePacket::getSurname() const {
 
 QImage AccountUpdatePacket::getProfilePic() const {
     return profilePic;
-};
+}
+int AccountUpdatePacket::getId() const {
+    return id;
+}
 
 void AccountUpdatePacket::writePayload(QDataStream &stream) const {
-    stream << username << hashedPassword << name << surname << profilePic;
+    stream << id << username << hashedPassword << name << surname << profilePic;
 }
 
 void AccountUpdatePacket::readPayload(QDataStream &stream) {
-    stream >> username >> hashedPassword >> name >> surname >> profilePic;
+    stream >> id >> username >> hashedPassword >> name >> surname >> profilePic;
 }
 
 /** Account Creation/Update Success packet **/

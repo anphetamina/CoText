@@ -54,3 +54,5 @@ QVector<QString> docByInvURI(QString invURI);
 bool deleteDocument (QString docName, int userId);
 
 QVector<User> getUserListByDocId(int docId);
+
+User updateUser(int userId, QString username, QString password, QString name, QString surname, QImage profilePic);

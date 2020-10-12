@@ -59,7 +59,7 @@ User addUser(QString username, QString password, QString name, QString surname, 
 
     if (!query.exec(
             "INSERT INTO User(username,email, name, surname, password) VALUES ('" + username + "','" + email + "','" +
-            name + "'," + surname + "'," + hashedpassword + ")")) {
+            name + "','" + surname + "','" + hashedpassword + "')")) {
         success = false;
     }
 
@@ -68,19 +68,53 @@ User addUser(QString username, QString password, QString name, QString surname, 
                 hashedpassword + "'");
 
     if (query2.next() && success) {
-        QString username = query.value(0).toString();
-        int id = query.value(1).toInt();
-        QString email = query.value(2).toString();
-        QString name = query.value(3).toString();
-        QString surname = query.value(4).toString();
+        QString username = query2.value(0).toString();
+        int id = query2.value(1).toInt();
+        QString email = query2.value(2).toString();
+        QString name = query2.value(3).toString();
+        QString surname = query2.value(4).toString();
 
        /* if (!saveProfilePic(id, profilePic)) {
             success = false;
         }*/
 
         User loggedUser = User(id, email, name, surname);
+        //User loggedUser = checkUserLoginData(email, password);
         qDebug() << "[AUTH] New user registered with success." << endl << "\tRetrieved info = [Email: "
                  << loggedUser.getEmail() << "; Name:" << loggedUser.getName() << "]";
+        saveProfilePic(id, profilePic);
+        return loggedUser;
+    }
+    User failedUser = User();
+    failedUser.setEmail(email);
+    failedUser.setId(-1);
+    qDebug() << "[AUTH] A user failed the auth. Email tried: " << email;
+    return failedUser;
+
+}
+
+/**
+ * Update a user in the DB and save the profile picture
+ */
+User updateUser(int userId, QString username, QString password, QString name, QString surname, QImage profilePic) {
+    QSqlQuery query, query2, query3;
+    QString email = username;
+    QString hashedpassword = password;//perform hashing for sec. reason in production
+
+    bool success = true;
+
+    if (!query.exec(
+            "UPDATE User SET username = '"+username+"',email = '"+email+"', name='"+name+"', surname'"+surname+"', password='"+password+"' WHERE id="+userId+";")) {
+        success = false;
+    }
+
+
+
+    if ( success) {
+        User loggedUser = User(userId, email, name, surname);
+        qDebug() << "[ACC] USer data updated with success." << endl << "\tRetrieved info = [Email: "
+                 << loggedUser.getEmail() << "; Name:" << loggedUser.getName() << "]";
+        saveProfilePic(userId, profilePic);
         return loggedUser;
     }
     User failedUser = User();

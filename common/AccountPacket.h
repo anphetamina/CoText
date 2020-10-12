@@ -46,6 +46,7 @@ class AccountUpdatePacket : public Packet {
     friend PacketBuilder;
 
 private:
+    int id;
     QString username;
     QString hashedPassword;
     QString name;
@@ -59,7 +60,7 @@ protected:
     void readPayload(QDataStream &stream) override;
 
 public:
-    AccountUpdatePacket(QString username, QString password, QString name, QString surname, QImage profilePic);
+    AccountUpdatePacket(int id, QString username, QString password, QString name, QString surname, QImage profilePic);
 
     ~AccountUpdatePacket() {};
 
@@ -72,6 +73,8 @@ public:
     QString getSurname() const;
 
     QImage getProfilePic() const;
+
+    int getId() const;
 };
 
 /** Account Creation or update success packet **/

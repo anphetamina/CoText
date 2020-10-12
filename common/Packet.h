@@ -154,7 +154,7 @@ public:
 
     static PacketHandler AccountCreationPacket(QString username,QString password, QString name, QString surname, QImage profilePic);
     static PacketHandler AccountOk(User user);
-    static PacketHandler AccountUpdatePacket(QString username,QString password, QString name, QString surname, QImage profilePic);
+    static PacketHandler AccountUpdatePacket(int id, QString username,QString password, QString name, QString surname, QImage profilePic);
 
     static PacketHandler Message(int type, QSymbol qs, int siteId);
     static PacketHandler BigMessage(int type, QVector<QSymbol> qss, int siteId);
