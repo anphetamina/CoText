@@ -76,7 +76,7 @@ MainWindow::~MainWindow(){
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-    QMessageBox::StandardButton resBtn = QMessageBox::question(this, "CoText", tr("Are your sure to quit?\n"), QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
+    QMessageBox::StandardButton resBtn = QMessageBox::question(this, "CoText", tr("Are you sure to quit?\n"), QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
     if(resBtn != QMessageBox::Yes) {
         event->ignore();
     } else {
@@ -289,21 +289,25 @@ void MainWindow::on_actionPrint_triggered() {
 */
 
 void MainWindow::on_actionLogout_triggered() {
-    user = User();
-    this->hide();
-    editor->setDisabled(true);
+    QMessageBox::StandardButton resBtn = QMessageBox::question(this, "Logout", tr("Are you sure to logout ?\n"),  QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
 
-    Login *login = new Login();
-    client->connectToLogin(login);
-    login->setWindowTitle("Welcome to CoText!");
-    login->setModal(true);
-    login->exec();
+    if(resBtn == QMessageBox::Yes) {
+        user = User();
+        this->hide();
+        editor->setDisabled(true);
 
-    MainMenu* mainMenu = new MainMenu();
-    this->connectToMainMenu(mainMenu);
-    mainMenu->setWindowTitle("Main Menu");
-    mainMenu->setModal(true);
-    mainMenu->exec();
+        Login *login = new Login();
+        client->connectToLogin(login);
+        login->setWindowTitle("Welcome to CoText!");
+        login->setModal(true);
+        login->exec();
+
+        MainMenu* mainMenu = new MainMenu();
+        this->connectToMainMenu(mainMenu);
+        mainMenu->setWindowTitle("Main Menu");
+        mainMenu->setModal(true);
+        mainMenu->exec();
+    }
 }
 
 void MainWindow::on_actionCopy_triggered() {

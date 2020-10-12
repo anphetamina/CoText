@@ -18,11 +18,15 @@ OpenDocument::OpenDocument(QVector<QString> docList, MainWindow* mw, QWidget *pa
 }
 
 void OpenDocument::buttonPressed(int i){
-    emit documentDeleted(ui->listWidget->item(i)->text());
-    documentList.removeOne(ui->listWidget->item(i)->text());
-    ui->listWidget->removeItemWidget(ui->listWidget->currentItem());
-    ui->listWidget->clear();
-    repaint();
+    QMessageBox::StandardButton resBtn = QMessageBox::question(this, "Delete document", tr("Are you sure to delete the document ?\n"), QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
+
+    if(resBtn == QMessageBox::Yes) {
+        emit documentDeleted(ui->listWidget->item(i)->text());
+        documentList.removeOne(ui->listWidget->item(i)->text());
+        ui->listWidget->removeItemWidget(ui->listWidget->currentItem());
+        ui->listWidget->clear();
+        repaint();
+    }
 }
 
 void OpenDocument::repaint(){
