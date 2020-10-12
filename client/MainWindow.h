@@ -94,7 +94,7 @@ public slots:
     void sendJoinMainWindow(qint32 userId, int docId, QString invCode);
     void sendOpenDocumentMainWindow(QString docName);
     void documentListReceivedMainWindow(QVector<QString> documentList);
-    void setMainWindowTitleSlot(QString title);
+    void setMainWindowTitle(QString title);
     void openNewDocumentMainWindow(QString docName);
     void nameChosenMainWindow(QString name);
     void newDocumentFromMainMenu();
