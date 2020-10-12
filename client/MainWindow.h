@@ -111,7 +111,6 @@ public slots:
     void closeMainWindow();
 
 signals:
-    void newColorMapReceived(QMap<int, QColor> colorMap);
     void sendAskUriMainWindow(qint32 userId, int docId, QString invCode);
     void sendAskDocListMainWindow(qint32 user);
     void sendOpenDocumentSignal(QString docName, qint32 user);

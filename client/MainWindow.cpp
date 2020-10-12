@@ -436,8 +436,6 @@ void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> n
         }
         ui->rightToolBar->widgetForAction(actionUserList[j])->setStyleSheet("color:"+colorMap[newOnlineUserList[j].getId()].name());
     }
-
-    emit newColorMapReceived(colorMap);
 }
 
 
