@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.14)
 
 project(CoText-client)
 
@@ -38,6 +38,6 @@ file(GLOB client_src "*.h" "*.cpp" "Resources.qrc")
 file(GLOB common_src "${common_dir}/*.h" "${common_dir}/*.cpp")
 
 
-add_executable(CoText-client ${common_src} ${client_src})
+add_executable(CoText-client ${common_src} ${client_src} ClickableLabel.cpp ClickableLabel.h)
 
 target_link_libraries(CoText-client Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Network Qt5::Svg Qt5::PrintSupport Qt5::WebSockets ${OS_SPECIFIC_LIBS})

@@ -3,6 +3,7 @@
 //
 
 
+#include <ui_mainwindow.h>
 #include "StatusBar.h"
 #include "MainWindow.h"
 
@@ -43,6 +44,9 @@ void StatusBar::setupSB() {
 	QPixmap userListPM(QPixmap(":imgs/icons/user-group_whiteSB.svg"));
 	userListToggle->setPixmap(userListPM);
 	userListToggle->setFixedWidth(20);
+	
+	connect(userListToggle, SIGNAL(ClickableLabel::clicked()), this, SLOT(showActiveUsersList()));
+	
 	
 	//3.
 	nActiveUsers = new QLabel(tr("#activeUsers"));
@@ -150,3 +154,12 @@ QString StatusBar::calculateDocSize() {
 
 void StatusBar::updateDocInfo() {}
 void StatusBar::updateUsersInfo() {}
+
+void StatusBar::showActiveUsersList() {
+	Ui::MainWindow *ui = mw->getUi();
+	if(!ui->rightToolBar->isVisible())
+		ui->rightToolBar->setVisible(false);
+	else
+		ui->rightToolBar->setVisible(true);
+}
+//void StatusBar::on_userListToggle_clicked() { }

@@ -11,6 +11,7 @@
 #include <QPixmap>
 #include <QtWidgets/QStatusBar>
 #include <QMainWindow>
+#include "ClickableLabel.h"
 
 namespace Ui { class MainWindow; }
 class MainWindow;
@@ -35,7 +36,7 @@ private:
 	MainWindow* mw;
 	
 	/** Users Info */
-	QLabel *userListToggle = new QLabel(tr("userList"));
+	ClickableLabel *userListToggle = new ClickableLabel();
 	QLabel *nActiveUsers;
 	std::atomic<bool> isUserListToggled;
 
@@ -48,14 +49,17 @@ private:
 protected:
 
 
+
 	
 	
 
 public slots:
+	void showActiveUsersList();
 
 private slots:
 
 signals:
+
 
 
 };
