@@ -20,7 +20,7 @@ void Login::clearInput() {
 
 void Login::on_pushButton_Login_clicked()
 {
-	clearInput();
+	//clearInput();
 	bool checkDone = false;
     QString username = ui->lineEdit_User->text();
     QString password = ui->lineEdit_Pass->text();
@@ -42,6 +42,7 @@ void Login::on_pushButton_Reg_clicked()
     clearInput();
     hide();
     Register regForm;
+    connect(&regForm, &Register::closeLogin, this, &Login::loginSuccessful);
     client->connectToRegister(&regForm);
     regForm.setModal(true);
     regForm.exec();
@@ -52,7 +53,7 @@ bool Login::checkInput(const QString& username, const QString& psw) {
 	bool isNull = false;
 	bool isEmpty = false;
 	
-	if(username.isNull() || username.isNull())
+	if(username.isNull() || psw.isNull())
 		isNull = true;
 	if(username.isEmpty() || psw.isEmpty())
 		isEmpty = true;

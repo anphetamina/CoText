@@ -24,13 +24,12 @@ public:
     explicit UserWidget(QWidget *parent = nullptr);
     ~UserWidget();
 
-private slots:
+
 
 
 
 private:
     Ui::UserWidget *ui;
-	bool eventFilter(QObject *watched, QEvent *event) override;
 
 };
 

@@ -7,6 +7,7 @@
 #include "../common/LoginPacket.h"
 #include "Login.h"
 #include "Register.h"
+#include "usereditwidget.h"
 #include "ServerDisconnected.h"
 #include <QtWebSockets/QWebSocket>
 #include <QCoreApplication>
@@ -135,6 +136,19 @@ void SslEchoClient::sendRegistration(QString _name, QString _surname, QString _u
 	this->registerUser(_name, _surname, _username, _nickname, _password, _profilePic);
 }
 
+void SslEchoClient::sendUpdateProfile(QString name, QString surname, QString email, QString oldUsername,
+                                      QImage newPP) {
+	
+	this->updateUser(name, surname, email, oldUsername, newPP);
+}
+
+void SslEchoClient::updateUser(QString name, QString surname, QString email, QString oldUsername, QImage newPP) {
+	//The field 'password' was used in order to pass the oldUsername for which do the query
+	////TODO pass the field password, update the layout in order to insert old + new password
+	//! We need first to check if the oldPassword match the oldPassword inserted
+	AccountUpdatePacket aup = AccountUpdatePacket(email, oldUsername, name, surname, newPP);
+}
+
 int SslEchoClient::getLoginAttemptCount(){
     return this->loginAttemptCount;
 }
@@ -237,8 +251,26 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
         	pServer = qobject_cast<QWebSocket *>(sender());
         	user = loggedUser;
         	break;
-        	
+	        
         }
+        
+	    case(PACK_TYPE_ACC_UPDATE): {
+		    AccountUpdatePacket* updateOk = dynamic_cast<AccountUpdatePacket*>(rcvd_packet.get());
+		    User loggedUser;
+		    loggedUser.setEmail(updateOk->getUsername());
+		    loggedUser.setName(updateOk->getName());
+		    loggedUser.setSurname(updateOk->getSurname());
+		    loggedUser.setProfilePic(updateOk->getProfilePic());
+		    
+		    if(loggedUser.isLogged()) {
+			    qDebug() << "[REGISTER AUTH] Logged in as: " << loggedUser.getEmail();
+			    emit updateSuccessfulReceived();
+		    }
+		    
+		    pServer = qobject_cast<QWebSocket *>(sender());
+		    user = loggedUser;
+		    break;
+	    }
 
         case (PACK_TYPE_MSG): {
             Message *msg = dynamic_cast<Message *>(rcvd_packet.get());
@@ -407,6 +439,11 @@ void SslEchoClient::connectToMainWindow(MainWindow* mw) {
 
 void SslEchoClient::connectToRegister(Register* r) {
 	connect(this, &SslEchoClient::registerFailedReceived, r, &Register::showError);
+	connect(this, &SslEchoClient::loginSuccessfulReceived, r, &Register::registerOk);
+}
+
+void SslEchoClient::connectToUserEdit(UserEditWidget* uew) {
+	connect(this, &SslEchoClient::updateSuccessfulReceived, uew, &UserEditWidget::updateOk);
 }
 
 void SslEchoClient::sendDocumentDeletedSlot(QString docName, quint32 userId) {
@@ -441,6 +478,7 @@ bool SslEchoClient::isConnected(){
 void SslEchoClient::connectToLogin(Login* login){
     connect(this, &SslEchoClient::loginFailedReceived, login, &Login::loginFailed);
     connect(this, &SslEchoClient::loginSuccessfulReceived, login, &Login::loginSuccessful);
+    
 }
 
 /*

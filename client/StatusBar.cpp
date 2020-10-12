@@ -158,7 +158,7 @@ void StatusBar::updateUsersInfo() {}
 void StatusBar::showActiveUsersList() {
 	Ui::MainWindow *ui = mw->getUi();
 	qDebug() << "ShowActiveUserList";
-	if(!ui->rightToolBar->isVisible())
+	if(ui->rightToolBar->isVisible())
 		ui->rightToolBar->setVisible(false);
 	else
 		ui->rightToolBar->setVisible(true);

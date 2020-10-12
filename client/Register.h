@@ -29,6 +29,12 @@ private slots:
 	
 public slots:
 	void showError();
+	void registerOk();
+	
+signals:
+	void closeLogin();
+	
+	
 		
 		//void dragEnterEvent(QDragEnterEvent *event) override;
     //void dropEvent(QDropEvent *event) override;
