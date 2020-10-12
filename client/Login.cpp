@@ -42,6 +42,7 @@ void Login::on_pushButton_Reg_clicked()
     clearInput();
     hide();
     Register regForm;
+    client->connectToRegister(&regForm);
     regForm.setModal(true);
     regForm.exec();
 }

@@ -6,6 +6,7 @@
 #include "../common/PingPacket.h"
 #include "../common/LoginPacket.h"
 #include "Login.h"
+#include "Register.h"
 #include "ServerDisconnected.h"
 #include <QtWebSockets/QWebSocket>
 #include <QCoreApplication>
@@ -124,14 +125,14 @@ void SslEchoClient::sendLogin(){
 void SslEchoClient::registerUser(QString name, QString surname, QString username, QString nickname, QString password, QImage profilePic){
 	qDebug() << "[NETWORK] ** Sending registerReqPacket : AccountCreationPacket()";
 	QString hashedPassword = password;
-	////TODO add nickname
+	////TODO remove nickname
 	AccountCreationPacket acp = AccountCreationPacket(username, hashedPassword, name, surname, profilePic);
 	acp.send(m_webSocket);
 }
 
 void SslEchoClient::sendRegistration(QString _name, QString _surname, QString _username, QString _nickname, QString _password, QImage _profilePic) {
 	//username is the field Email
-	this->registerUser(std::move(_name), std::move(_surname), std::move(_username), std::move(_nickname), std::move(_password), std::move(_profilePic));
+	this->registerUser(_name, _surname, _username, _nickname, _password, _profilePic);
 }
 
 int SslEchoClient::getLoginAttemptCount(){
@@ -227,10 +228,11 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
         	User loggedUser = registerOk->getUser();
         	if(loggedUser.isLogged()) {
         		qDebug() << "[REGISTER AUTH] Logged in as: " << loggedUser.getEmail();
-        		//emit registerSuccessfulReceived();
+		        emit loginSuccessfulReceived();
         	} else {
         		qDebug() << "[REGISTER AUTH] FAILED. See the server for the log";
-        		//emit registerFailedReceived();
+		        emit registerFailedReceived();
+		        
         	}
         	pServer = qobject_cast<QWebSocket *>(sender());
         	user = loggedUser;
@@ -400,6 +402,11 @@ void SslEchoClient::connectToMainWindow(MainWindow* mw) {
     connect(this, &SslEchoClient::documentReceived, mw, &MainWindow::openDocumentMainWindow);
     connect(mw, &MainWindow::sendDocumentDeletedSignal, this, &SslEchoClient::sendDocumentDeletedSlot);
     connect(this, &SslEchoClient::documentNameReceived, mw, &MainWindow::setMainWindowTitle);
+    
+}
+
+void SslEchoClient::connectToRegister(Register* r) {
+	connect(this, &SslEchoClient::registerFailedReceived, r, &Register::showError);
 }
 
 void SslEchoClient::sendDocumentDeletedSlot(QString docName, quint32 userId) {

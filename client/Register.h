@@ -26,6 +26,9 @@ private slots:
     void on_pushButton_Register_clicked();
 	void on_pushButton_BrowseReg_clicked();
 	void on_pushButton_Canc_Reg_clicked();
+	
+public slots:
+	void showError();
 		
 		//void dragEnterEvent(QDragEnterEvent *event) override;
     //void dropEvent(QDropEvent *event) override;

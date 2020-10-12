@@ -10,7 +10,7 @@ AccountCreationPacket::AccountCreationPacket() : Packet(PACK_TYPE_ACC_CREATE) {}
 
 AccountCreationPacket::AccountCreationPacket(QString username, QString password, QString name, QString surname,
                                              QImage profilePic) : Packet(PACK_TYPE_ACC_CREATE), username(username),
-                                                                 hashedPassword(hashedPassword), name(name),
+                                                                 hashedPassword(password), name(name),
                                                                  surname(surname), profilePic(profilePic) {};
 
 

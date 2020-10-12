@@ -104,6 +104,9 @@
         </item>
         <item>
          <widget class="QLineEdit" name="lineEdit_Pass2">
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
+          </property>
           <property name="placeholderText">
            <string>enter password</string>
           </property>
@@ -135,6 +138,9 @@
         </item>
         <item>
          <widget class="QLineEdit" name="lineEdit_Pass1">
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
+          </property>
           <property name="placeholderText">
            <string>re-type password</string>
           </property>
