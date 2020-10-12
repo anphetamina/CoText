@@ -295,7 +295,6 @@ void MainWindow::on_actionLogout_triggered() {
 
     Login *login = new Login();
     client->connectToLogin(login);
-    this->connectToLogin(login);
     login->setWindowTitle("Welcome to CoText!");
     login->setModal(true);
     login->exec();
