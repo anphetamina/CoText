@@ -25,7 +25,7 @@ void ChooseName::on_pushButton_ok_clicked()
     if(docList.contains(ui->lineEdit->text())){
         ui->label->setVisible(true);
     }else{
-        emit(nameChoosen(ui->lineEdit->text()));
+        emit(nameChosen(ui->lineEdit->text()));
         this->close();
     }
 }

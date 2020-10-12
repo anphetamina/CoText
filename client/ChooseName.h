@@ -20,7 +20,7 @@ private slots:
     void on_pushButton_cancel_clicked();
 
 signals:
-    void nameChoosen(QString name);
+    void nameChosen(QString name);
 
 private:
     Ui::ChooseName *ui;
