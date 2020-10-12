@@ -37,6 +37,7 @@ signals:
     void updateUserListReceivedToMainWindow(QVector<User> onlineUserList, QVector<User> completeUserList);
     void auth(User loggedUser);
     void documentReceived(int docId, QString docName, std::vector<std::vector<QSymbol>> qsymbols);
+    void documentNameReceived(QString title);
     void loginSuccessfulReceived();
     void loginFailedReceived();
     void askUriReceived(QString URI);

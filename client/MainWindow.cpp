@@ -479,17 +479,8 @@ QColor MainWindow::getUserColor(int userId) const {
     return colorMap[userId];
 }
 
-void MainWindow::connectToTextEditor(TextEditor* te) {
-    connect(te, &TextEditor::setMainWindowTitle, this, &MainWindow::setMainWindowTitleSlot);
-}
-
-void MainWindow::connectToLogin(Login* login) {
-    // connect(this, &MainWindow::newColorMapReceived, te, &TextEditor::updateColorMap);
-    connect(login, &Login::setMainWindowTitle, this, &MainWindow::setMainWindowTitleSlot);
-}
-
-void MainWindow::setMainWindowTitleSlot(QString title){
-    this->setWindowTitle(title);
+void MainWindow::setMainWindowTitle(QString title){
+    setWindowTitle(title);
 }
 
 void MainWindow::sendJoinMainWindow(qint32 userId, int docId, QString invCode){

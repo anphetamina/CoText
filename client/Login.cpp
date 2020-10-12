@@ -86,7 +86,6 @@ void Login::loginFailed(){
 }
 
 void Login::loginSuccessful(){
-    emit setMainWindowTitle ("Welcome - "+ui->lineEdit_User->text());
     this->close();
 }
 

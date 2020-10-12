@@ -68,9 +68,6 @@ public:
     
     QVector<User> getOnlineUserList() const;
 
-    //! [other member functions]
-    void connectToTextEditor(TextEditor* te);
-    void connectToLogin(Login* login);
     void connectToMainMenu(MainMenu* mainMenu);
     
 

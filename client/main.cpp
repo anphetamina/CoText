@@ -43,12 +43,10 @@ int main(int argc, char *argv[]) {
     editor->setDisabled(true);
     w->setCentralWidget(editor);
     w->setTextEditor(editor);
-    w->connectToTextEditor(editor);
     client->connectToMainWindow(w);
     client->connectToEditor(editor);
-    //client->connectToLoginWindow(login, w); //TODO: use signal/slot for creating/closing diffent windows.tonote: login is a QDialog not QWindow
 
-    Benchmark* b = new Benchmark();
+    Benchmark* b = new Benchmark("main");
     b->startTimer();
     while(!client->isConnected()){
         QCoreApplication::processEvents();
@@ -79,7 +77,6 @@ int main(int argc, char *argv[]) {
     }else {
         // Set login GUI options otherwise
         client->connectToLogin(login);
-        w->connectToLogin(login);
         login->setWindowTitle("Welcome to CoText!");
         login->setModal(true);
         login->exec();

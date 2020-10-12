@@ -293,6 +293,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             }
             QVector<QVector<QSymbol>> qsymbols = doc->getqsymbols();
             std::vector<std::vector<QSymbol>> symbols  = toVector(qsymbols);
+            emit documentNameReceived(doc->getdocName());
             emit documentReceived(doc->getdocId(), doc->getdocName(), symbols);
             break;
         }
@@ -400,6 +401,7 @@ void SslEchoClient::connectToMainWindow(MainWindow* mw) {
     connect(mw, &MainWindow::sendOpenDocumentSignal, this, &SslEchoClient::sendDocOpen);
     connect(this, &SslEchoClient::documentReceived, mw, &MainWindow::openDocumentMainWindow);
     connect(mw, &MainWindow::sendDocumentDeletedSignal, this, &SslEchoClient::sendDocumentDeletedSlot);
+    connect(this, &SslEchoClient::documentNameReceived, mw, &MainWindow::setMainWindowTitle);
 }
 
 void SslEchoClient::sendDocumentDeletedSlot(QString docName, quint32 userId) {

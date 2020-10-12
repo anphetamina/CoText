@@ -26,8 +26,6 @@ public slots:
     void loginFailed();
     void loginSuccessful();
 
-signals:
-    void setMainWindowTitle(QString title);
 
 private:
     Ui::Login *ui;
