@@ -5,7 +5,7 @@
 #include <QDebug>
 #include "QSymbol.h"
 
-QSymbol::QSymbol(){}
+QSymbol::QSymbol() : c(QChar()), id(QString()), position({}), cf(QTextCharFormat()) {}
 QSymbol::QSymbol(const QChar &c, const QString &id, const std::vector<Identifier> &position, QTextCharFormat cf) : c(c), id(id),
                                                                                             position(position), cf(cf) {}
 QSymbol::QSymbol(QChar &c, QString &id, std::vector<Identifier> &position, QTextCharFormat cf) : c(c), id(id),
