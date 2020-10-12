@@ -34,7 +34,7 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     /**
      * document default styling
      */
-    setStyleSheet("QTextEdit {margin-left: 40px; margin-right: 40px; margin-top: 10px; margin-bottom: 10px; color: white; font-size: 16px; border: hidden}"); // todo change default font
+    //setStyleSheet("QTextEdit {}"); // todo change default font
 
     /**
      * each alignment option is mutual exclusive

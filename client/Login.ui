@@ -76,6 +76,9 @@
         </item>
         <item>
          <widget class="QLineEdit" name="lineEdit_Pass">
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
+          </property>
           <property name="placeholderText">
            <string>enter your password</string>
           </property>

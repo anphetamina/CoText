@@ -62,12 +62,12 @@ void Register::on_pushButton_Register_clicked() {
                 QMessageBox::warning(this, "Register failure", "Email format is not correct, please use a correct email format.");
                 email.clear();
             } else {
-                ////TODO
-				
+            
+				qDebug() << name, surname;
                 client->sendRegistration(name, surname, email, nickname, pass1, profilePicture);
                 
                
-                
+                /*
                 //1#. Fill User Object instance, set stautus on, start timer
                 User *usr = new User();
                 usr->setName(name);
@@ -77,6 +77,7 @@ void Register::on_pushButton_Register_clicked() {
                 usr->setProfilePic(profilePicture);
 
                 MainWindow::setUser(usr);
+                */
             }
         }
     }
@@ -158,4 +159,8 @@ void Register::on_pushButton_BrowseReg_clicked() {
 
 void Register::on_pushButton_Canc_Reg_clicked() {
 	this->hide();
+}
+
+void Register::showError() {
+	QMessageBox::warning(this, "Error", "Error from server");
 }

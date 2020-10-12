@@ -33,7 +33,7 @@ void OpenDocument::repaint(){
             QWidget * w = new QWidget();
             w->setLayout ( new QHBoxLayout() );
             DeletePushButton *but = new DeletePushButton ( ui->listWidget->row(item));
-            QPixmap pixmap(":/imgs/icons/noun_user login_178831.svg");
+            QPixmap pixmap(":/imgs/icons/noun_Garbage_2025401.svg");
             QIcon buttonIcon(pixmap);
             but->setIcon(buttonIcon);
             but->setIconSize(pixmap.rect().size()/5);

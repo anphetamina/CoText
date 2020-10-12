@@ -17,6 +17,7 @@
 #include "TextEditor.h"
 #include "MainWindow.h"
 #include "Login.h"
+#include "Register.h"
 
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
 
@@ -42,6 +43,7 @@ signals:
     void askUriReceived(QString URI);
     void documentListReceived(QVector<QString> documentList);
     void loginFailed();
+    void registerFailedReceived();
 
 public slots:
     void sendInsert(std::vector<QSymbol> symbols, int siteId);
@@ -74,6 +76,7 @@ private:
 public:
     void connectToEditor(TextEditor* te);
     void connectToMainWindow(MainWindow* mw);
+    void connectToRegister(Register* r);
     void sendDocOpen(QString docName, qint32 userId);
     void authenticate(QString username, QString password);
     void set_username(QString username);

@@ -127,12 +127,12 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
     //Logout
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionLogout)) && event->type() == QEvent::Enter) {
         setCursor(Qt::PointingHandCursor);
-        ui->actionExit->setIcon(QIcon(":/imgs/icons/noun_Exit_1558251_white.svg"));
+        ui->actionLogout->setIcon(QIcon(":/imgs/icons/noun_Exit_1558251_white.svg"));
         return true;
     }
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionLogout)) && event->type() == QEvent::Leave) {
         setCursor(Qt::ArrowCursor);
-        ui->actionExit->setIcon(QIcon(":/imgs/icons/noun_Exit_1558251.svg"));
+        ui->actionLogout->setIcon(QIcon(":/imgs/icons/noun_Exit_1558251.svg"));
         return true;
     }
 
