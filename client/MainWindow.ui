@@ -55,7 +55,7 @@
      <x>0</x>
      <y>0</y>
      <width>946</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <property name="palette">
@@ -73,11 +73,8 @@
      <string>File</string>
     </property>
     <addaction name="actionNew"/>
-    <addaction name="actionSave"/>
-    <addaction name="actionSave_as"/>
     <addaction name="actionPrintPDF"/>
     <addaction name="actionShare_Uri"/>
-    <addaction name="actionExit"/>
     <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
@@ -96,7 +93,6 @@
     <property name="title">
      <string>User</string>
     </property>
-    <addaction name="actionLogin"/>
     <addaction name="actionLogout"/>
     <addaction name="actionSettings"/>
    </widget>
@@ -155,13 +151,12 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionLogin"/>
-   <addaction name="actionOpen"/>
    <addaction name="actionNew"/>
+   <addaction name="actionOpen"/>
    <addaction name="actionShare_Uri"/>
    <addaction name="actionJoin"/>
-   <addaction name="actionExit"/>
    <addaction name="actionSettings"/>
+   <addaction name="actionLogout"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="minimumSize">
@@ -263,9 +258,9 @@
   </action>
   <action name="actionSave">
    <property name="icon">
-    <iconset resource="Resources.qrc">
-     <normaloff>:/imgs/icons/noun_Save_Floppy.svg</normaloff>
-     <normalon>:/imgs/icons/noun_Download_2383249.png</normalon>:/imgs/icons/noun_Save_Floppy.svg</iconset>
+    <iconset>
+     <normalon>:/imgs/icons/noun_Download_2383249.png</normalon>
+    </iconset>
    </property>
    <property name="text">
     <string>Save</string>
@@ -287,10 +282,6 @@
    </property>
   </action>
   <action name="actionPrintPDF">
-   <property name="icon">
-    <iconset resource="Resources.qrc">
-     <normaloff>:/imgs/icons/noun_PDF_749513.svg</normaloff>:/imgs/icons/noun_PDF_749513.svg</iconset>
-   </property>
    <property name="text">
     <string>Export as PDF...</string>
    </property>
@@ -437,6 +428,10 @@
    </property>
   </action>
   <action name="actionLogout">
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/imgs/icons/noun_Exit_1558251.svg</normaloff>:/imgs/icons/noun_Exit_1558251.svg</iconset>
+   </property>
    <property name="text">
     <string>Logout</string>
    </property>
