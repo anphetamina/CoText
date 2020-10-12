@@ -99,11 +99,11 @@ public slots:
     void documentListReceivedMainWindow(QVector<QString> documentList);
     void setMainWindowTitleSlot(QString title);
     void openNewDocumentMainWindow(QString docName);
-    void nameChoosenMainWindow(QString name);
+    void nameChosenMainWindow(QString name);
     void newDocumentFromMainMenu();
     void openDocumentFromMainMenu();
     void joinFromMainMenu();
-    void nameChoosenFromMainMenu(QString name);
+    void nameChosenFromMainMenu(QString name);
     void sendOpenDocumentFromMainMenu(QString docName);
     void sendJoinFromMainMenu(qint32 userId, int docId, QString invCode);
     void openDocumentMainWindow(int docId, QString docName, std::vector<std::vector<QSymbol>> qsymbols);

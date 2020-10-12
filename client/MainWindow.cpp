@@ -204,13 +204,13 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
 
 void MainWindow::on_actionNew_triggered() {
     ChooseName chooseName(docList);
-    connect(&chooseName, &ChooseName::nameChoosen, this, &MainWindow::nameChoosenMainWindow);
+    connect(&chooseName, &ChooseName::nameChosen, this, &MainWindow::nameChosenMainWindow);
     chooseName.setWindowTitle("Choose document name");
     chooseName.setModal(true);
     chooseName.exec();
 }
 
-void MainWindow::nameChoosenMainWindow(QString name){
+void MainWindow::nameChosenMainWindow(QString name){
     if(editor->isEnabled()){    //c'è già un documento aperto
         AlertNewDocument alert(this->windowTitle(), name);
         connect(&alert, &AlertNewDocument::openNewDocument, this, &MainWindow::openNewDocumentMainWindow);
@@ -233,13 +233,13 @@ void MainWindow::connectToMainMenu(MainMenu* mainMenu) {
 
 void MainWindow::newDocumentFromMainMenu() {
     ChooseName chooseName(docList);
-    connect(&chooseName, &ChooseName::nameChoosen, this, &MainWindow::nameChoosenFromMainMenu);
+    connect(&chooseName, &ChooseName::nameChosen, this, &MainWindow::nameChosenFromMainMenu);
     chooseName.setWindowTitle("Choose document name");
     chooseName.setModal(true);
     chooseName.exec();
 }
 
-void MainWindow::nameChoosenFromMainMenu(QString name){
+void MainWindow::nameChosenFromMainMenu(QString name){
     emit closeMainMenu();
     emit(sendDocCreateMainWindow(name, user.getId()));   //il server poi risponde con DocumentOkPacket e il client nella slot apre il nuovo documento
     docList.append(name);
