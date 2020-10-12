@@ -313,8 +313,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             // When a client receive this it means that some user just went online/offline
             DocumentBeaconOnlineUsers *bou = dynamic_cast<DocumentBeaconOnlineUsers *>(rcvd_packet.get());
             //qDebug() << "[DOC] Online userlist updated for DocId: " << bou->getdocId();
-            emit updateUserListReceivedToTextEditor(bou->getOnlineUserList(), bou->getCompleteUserList());
-            emit updateUserListReceivedToMainWindow(bou->getOnlineUserList(), bou->getCompleteUserList());
+            emit updateUserListReceived(bou->getOnlineUserList(), bou->getCompleteUserList());
             break;
         }
     }
@@ -381,8 +380,7 @@ void SslEchoClient::connectToEditor(TextEditor* te) {
     connect(this, &SslEchoClient::updateCursorReceived, te, &TextEditor::updateCursor);
     connect(this, &SslEchoClient::documentReceived, te, &TextEditor::openDocument);
     connect(this, &SslEchoClient::updateAlignmentReceived, te, &TextEditor::updateAlignment);
-    connect(this, &SslEchoClient::updateUserListReceivedToTextEditor, te, &TextEditor::updateCursorMap);
-    //connect(this, &SslEchoClient::loginSuccessfulReceived, te, &TextEditor::loginSuccessful);
+    connect(this, &SslEchoClient::updateUserListReceived, te, &TextEditor::updateCursorMap);
 
     connect(te, &TextEditor::symbolsInserted, this, &SslEchoClient::sendInsert);
     connect(te, &TextEditor::symbolsErased, this, &SslEchoClient::sendErase);
@@ -392,7 +390,7 @@ void SslEchoClient::connectToEditor(TextEditor* te) {
 }
 
 void SslEchoClient::connectToMainWindow(MainWindow* mw) {
-    connect(this, &SslEchoClient::updateUserListReceivedToMainWindow, mw, &MainWindow::updateUserList);
+    connect(this, &SslEchoClient::updateUserListReceived, mw, &MainWindow::updateUserList);
     connect(mw, &MainWindow::sendAskUriMainWindow, this, &SslEchoClient::sendAskUri);
     connect(this, &SslEchoClient::askUriReceived, mw, &MainWindow::askUriReceivedMainWindow);
     connect(mw, &MainWindow::sendDocCreateMainWindow, this, &SslEchoClient::sendDocCreate);
