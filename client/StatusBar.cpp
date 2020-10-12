@@ -45,7 +45,7 @@ void StatusBar::setupSB() {
 	userListToggle->setPixmap(userListPM);
 	userListToggle->setFixedWidth(20);
 	
-	connect(userListToggle, SIGNAL(ClickableLabel::clicked()), this, SLOT(showActiveUsersList()));
+	connect(userListToggle, &ClickableLabel::clicked, this, &StatusBar::showActiveUsersList);
 	
 	
 	//3.
@@ -157,6 +157,7 @@ void StatusBar::updateUsersInfo() {}
 
 void StatusBar::showActiveUsersList() {
 	Ui::MainWindow *ui = mw->getUi();
+	qDebug() << "ShowActiveUserList";
 	if(!ui->rightToolBar->isVisible())
 		ui->rightToolBar->setVisible(false);
 	else

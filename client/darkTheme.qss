@@ -9,7 +9,19 @@ QMainWindow#MainWindow {
 QTextEdit#textEdit {
 	border-radius: 3px;
 
+
+
 }
+TextEditor {
+    margin-left: 40px;
+    margin-right: 40px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    color: white;
+    font-size: 16px;
+    border: hidden;
+}
+
 
 QWidget#centralWidget{
 	background-color: rgb(37, 37, 38);
