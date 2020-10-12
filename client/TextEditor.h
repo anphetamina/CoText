@@ -5,7 +5,6 @@
 #ifndef COTEXT_CLIENT_TEXTEDITOR_H
 #define COTEXT_CLIENT_TEXTEDITOR_H
 
-
 #include <QDebug>
 #include <iostream>
 #include <QtGui/QPainter>
@@ -39,24 +38,24 @@ public:
 	int getUserId(int row, int col) const;
 	QColor getUserColor(int userId) const;
 
+    std::atomic<bool> isFromRemote;
+
 private:
     QWidget *parent;
     Ui::MainWindow &ui;
     SharedEditor editor;
     
     std::vector<int> index;
-    std::atomic<bool> isFromRemote;
-    bool isOpenDocumentCursor;
     std::vector<std::vector<QSymbol>> testSymbols;
     int currentSelectedChars;
     
     UserHighlighter highlighter;
     std::map<int, int> cursorMap;
     std::atomic<bool> isUserColorsToggled;
+    std::atomic<bool> hasLostFocus;
 
     int documentId;
-    QString documentName = "";
-    int nChars = 0;
+    QString documentName;
 
     void insertRow(int pos, int n);
     void deleteRow(int pos, int n);
@@ -91,16 +90,19 @@ private slots:
     void cursorPositionChange();
     void selectionChange();
     void toggleUserColors();
+    void clipboardDataChange();
 
 protected:
     void paintEvent(QPaintEvent *e) override;
+
+    void focusInEvent(QFocusEvent *e) override;
+    void focusOutEvent(QFocusEvent *e) override;
 
 signals:
     void symbolsInserted(std::vector<QSymbol> symbols, int siteId);
     void symbolsErased(std::vector<QSymbol> symbols, int siteId);
     void cursorPositionChanged(int userId, int position);
     void textAlignmentChanged(Qt::Alignment alignment, int position, int siteId);
-    void setMainWindowTitle(QString title);
 
 };
 

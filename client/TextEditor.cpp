@@ -7,13 +7,11 @@
 #include <QtWidgets/QFontDialog>
 #include <QThread>
 #include <QRandomGenerator>
-#include <QtWidgets/QLabel>
 #include "../common/Shuffler.h"
 #include "TextEditor.h"
-#include <thread>
 #include <mutex>
-#include "MainWindow.h"
 #include "Benchmark.h"
+#include "MainWindow.h"
 
 
 TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
@@ -26,15 +24,17 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     cursorMap({}),
     currentSelectedChars(0),
     highlighter(*this, document()),
-    isUserColorsToggled(false) {
+    isUserColorsToggled(false),
+    hasLostFocus(false),
+    documentId(0),
+    documentName(QString()) {
 
-
-    //setAcceptRichText(false);
+    setAcceptRichText(false);
 
     /**
      * document default styling
      */
-    setStyleSheet("QTextEdit {margin-left: 40px; margin-right: 40px; margin-top: 10px; margin-bottom: 10px; color: white; font-size: 16px; border: hidden}");
+    setStyleSheet("QTextEdit {margin-left: 40px; margin-right: 40px; margin-top: 10px; margin-bottom: 10px; color: white; font-size: 16px; border: hidden}"); // todo change default font
 
     /**
      * each alignment option is mutual exclusive
@@ -70,6 +70,7 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
 
     connect(ui.actionToggle_user_colors, &QAction::triggered, this, &TextEditor::toggleUserColors);
 
+    connect(QApplication::clipboard(), &QClipboard::dataChanged, this, &TextEditor::clipboardDataChange);
 
     /**
      * testing code
@@ -583,7 +584,6 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
         }
     }
 
-    // Check if the last buffer_block (last_cf didnt changed almost for sure in the last char)
     if (!buffer_block.isEmpty()) {
 
         incrementIndex(last_row, buffer_block.size());
@@ -616,7 +616,6 @@ void TextEditor::remoteOpenBlock(std::vector<QSymbol> symbols) {
     for (int j = 0; j < symbols.size(); j++) {
         QSymbol symbol = symbols[j];
         isFromRemote = true;
-        isOpenDocumentCursor = true;
         try {
             std::pair<int, int> pos = editor.remoteInsert(symbol);
 
@@ -803,15 +802,14 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
 
     this->setSiteId(user.getId());
     qDebug() << "[DOC_OPENED] : updating siteId "<< this->getSiteId();
-
-    emit(setMainWindowTitle(docName));
-
     documentId = docId;
+    documentName = docName;
 
     if (document()->characterCount() > 1 || !editor.getSymbols()[0].empty()) {
         editor.clear();
         document()->blockSignals(true);
         this->clear();
+        document()->blockSignals(false);
     }
 
     this->setDisabled(false);
@@ -822,14 +820,8 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
     index.clear();
     index.push_back(0);
 
-    /*for (int i = 0; i < symbols.size(); i++) {
-        this->remoteOpenBlock(symbols[i]);
-    }*/
-
     for (int i = 0; i < symbols.size(); i++) {
-        for (int j = 0; j < symbols[i].size(); j++) {
-            this->remoteInsert(symbols[i][j]);
-        }
+        this->remoteInsertBlock(symbols[i]);
     }
 
     b.stopTimer();
@@ -852,7 +844,6 @@ void TextEditor::printSymbols() {
 }
 
 void TextEditor::updateAlignment(Qt::Alignment alignment, int position) {
-    blockSignals(true);
     document()->blockSignals(true);
 
     QTextBlockFormat f;
@@ -866,7 +857,6 @@ void TextEditor::updateAlignment(Qt::Alignment alignment, int position) {
         qDebug() << "TextEditor::updateAlignment" << __PRETTY_FUNCTION__ << e.what();
     }
 
-    blockSignals(false);
     document()->blockSignals(false);
 }
 
@@ -928,5 +918,27 @@ QString TextEditor::getDocName() const {
 }
 
 int TextEditor::getNumChars() const {
-	return nChars;
+	return document()->characterCount();
+}
+
+void TextEditor::clipboardDataChange() {
+    if (QApplication::clipboard()->mimeData()) {
+        if (hasLostFocus) {
+            qDebug() << "copy done outside the editor";
+            setAcceptRichText(false);
+        } else {
+            qDebug() << "copy done inside the editor";
+            setAcceptRichText(true);
+        }
+    }
+}
+
+void TextEditor::focusInEvent(QFocusEvent *e) {
+    hasLostFocus = e->lostFocus();
+    QTextEdit::focusInEvent(e);
+}
+
+void TextEditor::focusOutEvent(QFocusEvent *e) {
+    hasLostFocus = e->lostFocus();
+    QTextEdit::focusOutEvent(e);
 }
