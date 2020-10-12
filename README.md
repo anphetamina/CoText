@@ -54,6 +54,7 @@ In the repo an example (self-signed) certificate and its private key are given f
 ### :computer: Platforms 
 The current tested platform are:
 - OSX (Catalina 10.15.6)
+- OSX (Mojave 10.14.6)
 - Windows 10
 
 ### :hammer: Toolchain
