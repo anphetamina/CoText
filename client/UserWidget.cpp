@@ -37,10 +37,12 @@ UserWidget::~UserWidget() {
 }
 
 void UserWidget::on_pushButton_Edit_clicked() {
+	
 	UserEditWidget uew;
 	//connect(&uew, &Register::closeLogin, this, &Login::loginSuccessful);
 	//client->connectToRegister(&regForm);
 	uew.setModal(true);
+	this->hide();
 	uew.exec();
 }
 
