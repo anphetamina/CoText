@@ -177,10 +177,9 @@ std::vector<Identifier> SharedEditor::generatePosBetween(std::vector<Identifier>
                 newPos.emplace_back(id1, siteId2);
                 return this->generatePosBetween(pos1, pos2, newPos, level+1);
             }
+        } else {
+            throw std::runtime_error("fix symbols position");
         }
-
-        // todo check
-        throw;
     } catch (...) {
         throw;
     }

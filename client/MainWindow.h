@@ -11,6 +11,7 @@
 #include <QWidget>
 #include <QEvent>
 #include <QtGui/QTextCharFormat>
+#include <QtWidgets/QFontComboBox>
 #include "UserWidget.h"
 #include "TextEditor.h"
 #include "StatusBar.h"
@@ -69,6 +70,9 @@ public:
     QVector<User> getOnlineUserList() const;
 
     void connectToMainMenu(MainMenu* mainMenu);
+
+    QFontComboBox *fontComboBox;
+    QComboBox *sizeComboBox;
     
 
 private slots:
