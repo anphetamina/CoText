@@ -145,6 +145,7 @@ private:
     void closeEvent(QCloseEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
     void removeOldOnlineNowOffline(QVector<User> newOnlineUserList);
+    QPixmap addImageInRightToolBar(const QPixmap &orig, QColor color);
 
 };
 #endif // MAINWINDOW_H
