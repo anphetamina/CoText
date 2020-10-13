@@ -19,7 +19,6 @@ void Register::clearInput() {
     qDebug() << "Input cleared";
     ui->lineEdit_Name->text().clear();
     ui->lineEdit_Surname->text().clear();
-    ui->lineEdit_Nick->text().clear();
     ui->lineEdit_Pass1->text().clear();
     ui->lineEdit_Pass2->text().clear();
     ui->lineEdit_email->text().clear();
@@ -32,14 +31,13 @@ void Register::on_pushButton_Register_clicked() {
     bool empty = false;
     name = ui->lineEdit_Name->text();
     surname = ui->lineEdit_Surname->text();
-    nickname = ui->lineEdit_Nick->text();
     pass1 = ui->lineEdit_Pass1->text();
     pass2 = ui->lineEdit_Pass2->text();
     email = ui->lineEdit_email->text();
 
-    if(name.isNull() || surname.isNull() || nickname.isNull() || pass1.isNull() || pass2.isNull() || email.isNull())
+    if(name.isNull() || surname.isNull() || pass1.isNull() || pass2.isNull() || email.isNull())
         null = true;
-    if(name.isEmpty() || surname.isEmpty() || nickname.isEmpty() || pass1.isEmpty() || pass2.isEmpty() || email.isEmpty())
+    if(name.isEmpty() || surname.isEmpty() || pass1.isEmpty() || pass2.isEmpty() || email.isEmpty())
         empty = true;
 
     if(null || empty)
