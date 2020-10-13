@@ -188,13 +188,16 @@
    </attribute>
    <addaction name="actionFont"/>
    <addaction name="actionTextColor"/>
+   <addaction name="separator"/>
    <addaction name="actionBold"/>
    <addaction name="actionItalic"/>
    <addaction name="actionUnderline"/>
+   <addaction name="separator"/>
    <addaction name="actionAlign_left"/>
    <addaction name="actionAlign_center"/>
    <addaction name="actionAlign_right"/>
    <addaction name="actionJustify"/>
+   <addaction name="separator"/>
    <addaction name="actionToggle_user_colors"/>
   </widget>
   <widget class="QToolBar" name="rightToolBar">

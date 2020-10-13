@@ -9,6 +9,7 @@
 #include <iostream>
 #include <QtGui/QPainter>
 #include <QtWidgets/QTextEdit>
+#include <QtWidgets/QFontComboBox>
 #include "../common/SharedEditor.h"
 #include "../common/QSymbol.h"
 #include "UserHighlighter.h"
@@ -54,6 +55,9 @@ private:
     std::atomic<bool> isUserColorsToggled;
     std::atomic<bool> hasLostFocus;
 
+    QFontComboBox *fontComboBox;
+    QComboBox *sizeComboBox;
+
     int documentId;
     QString documentName;
 
@@ -78,7 +82,8 @@ public slots:
     void updateCursorMap(QVector<User> onlineUserList, QVector<User> completeUserList);
 
 private slots:
-    void selectFont();
+    void setFontFamily(const QFont &font);
+    void setFontSize(const QString &text);
     void setFontBold(bool bold);
     void setFontItalic(bool italic);
     void setFontUnderline(bool underline);

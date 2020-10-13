@@ -67,6 +67,20 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->qSB = dynamic_cast<StatusBar *>(statusBar());
     qSB->setupSB();
     qSB->displaySB();
+
+
+    fontComboBox = new QFontComboBox(this);
+    ui->mainToolBar->insertWidget(ui->actionTextColor, fontComboBox);
+
+    sizeComboBox = new QComboBox(this);
+    ui->mainToolBar->insertWidget(ui->actionTextColor, sizeComboBox);
+    sizeComboBox->setEditable(true);
+
+    const QList<int> standardSizes = QFontDatabase::standardSizes();
+    for (int size : standardSizes) {
+        sizeComboBox->addItem(QString::number(size));
+    }
+
 }
 
 

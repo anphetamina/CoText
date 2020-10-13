@@ -32,11 +32,6 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     setAcceptRichText(false);
 
     /**
-     * document default styling
-     */
-    //setStyleSheet("QTextEdit {}"); // todo change default font
-
-    /**
      * each alignment option is mutual exclusive
      */
     QActionGroup *alignGroup = new QActionGroup(this);
@@ -50,14 +45,21 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     /**
     * font styling connections
     */
-    
-    connect(ui.actionFont, &QAction::triggered, this, &TextEditor::selectFont);
+
     connect(ui.actionBold, &QAction::triggered, this, &TextEditor::setFontBold);
     connect(ui.actionItalic, &QAction::triggered, this, &TextEditor::setFontItalic);
     connect(ui.actionUnderline, &QAction::triggered, this, &TextEditor::setFontUnderline);
     connect(ui.actionTextColor, &QAction::triggered, this, &TextEditor::setFontColor);
 
     connect(this, &QTextEdit::currentCharFormatChanged, this, &TextEditor::currentCharFormatChange);
+
+    if (MainWindow *mw = dynamic_cast<MainWindow*>(parent)) {
+        fontComboBox = mw->fontComboBox; // hmmm
+        sizeComboBox = mw->sizeComboBox;
+
+        connect(fontComboBox, &QFontComboBox::currentFontChanged, this, &TextEditor::setFontFamily);
+        connect(sizeComboBox, &QFontComboBox::textActivated, this, &TextEditor::setFontSize);
+    }
 
     /**
      * document content connections
@@ -92,11 +94,18 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     openDocument(testSymbols);*/
 }
 
-void TextEditor::selectFont() {
-    bool fontSelected;
-    QFont font = QFontDialog::getFont(&fontSelected, parent);
-    if (fontSelected) {
-        setCurrentFont(font);
+void TextEditor::setFontFamily(const QFont &font) {
+    QTextCharFormat f;
+    f.setFontFamily(font.family());
+    mergeCurrentCharFormat(f);
+}
+
+void TextEditor::setFontSize(const QString &text) {
+    qreal pointSize = text.toFloat();
+    if (text.toFloat() > 0) {
+        QTextCharFormat f;
+        f.setFontPointSize(pointSize);
+        mergeCurrentCharFormat(f);
     }
 }
 
@@ -114,8 +123,9 @@ void TextEditor::setFontUnderline(bool underline) {
 
 void TextEditor::setFontColor() {
     QColor color = QColorDialog::getColor(textColor(), parent);
-    if (!color.isValid())
+    if (!color.isValid()){
         return;
+    }
     setTextColor(color);
 }
 
@@ -165,9 +175,32 @@ void TextEditor::alignmentChange(Qt::Alignment alignment) {
 }
 
 void TextEditor::currentCharFormatChange(const QTextCharFormat &f) {
-    ui.actionBold->setChecked(f.font().bold());
-    ui.actionItalic->setChecked(f.font().italic());
-    ui.actionUnderline->setChecked(f.font().underline());
+
+    document()->blockSignals(true);
+
+    QTextCharFormat format{f};
+
+    QTextCursor cursor(document());
+    cursor.setPosition(textCursor().selectionEnd());
+    format = cursor.charFormat();
+
+    if (fontComboBox) {
+        fontComboBox->blockSignals(true);
+        fontComboBox->setCurrentIndex(fontComboBox->findText(QFontInfo(format.font()).family()));
+        fontComboBox->blockSignals(false);
+    }
+
+    if (sizeComboBox) {
+        sizeComboBox->blockSignals(true);
+        sizeComboBox->setCurrentIndex(sizeComboBox->findText(QString::number(format.font().pointSize())));
+        sizeComboBox->blockSignals(false);
+    }
+
+    ui.actionBold->setChecked(format.font().bold());
+    ui.actionItalic->setChecked(format.font().italic());
+    ui.actionUnderline->setChecked(format.font().underline());
+
+    document()->blockSignals(false);
 }
 
 void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) {
@@ -177,7 +210,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
         return;
     }
 
-    qDebug() << "contentsChange";
+    //qDebug() << "contentsChange";
 
     /**
      * https://github.com/anphetamina/CoText/issues/32 workaround
@@ -761,10 +794,7 @@ void TextEditor::selectionChange() {
         currentSelectedChars = 0;
     }
 
-    QTextCursor cursor(document());
-    cursor.setPosition(selectionEnd);
-    QTextCharFormat currentFormat = cursor.charFormat();
-    currentCharFormatChange(currentFormat);
+    currentCharFormatChange(textCursor().charFormat());
 }
 
 void TextEditor::toggleUserColors() {
@@ -827,6 +857,8 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
     b.stopTimer();
 
     alignmentChange(alignment());
+    currentCharFormatChange(currentCharFormat());
+    setFocus();
 
 }
 
