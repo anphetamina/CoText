@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     QApplication::instance()->setAttribute(Qt::AA_DontShowIconsInMenus, true);
 
     ui->setupUi(this);
-    ui->rightToolBar->setVisible(false);
+    ui->rightToolBar->setVisible(true);
 
     //installing EventFilter for QToolButtons on the qToolBar
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionOpen))->installEventFilter(this);
@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     //ui->actionRemove->setShortcut(QKeySequence::Delete);
 
     // What about using a container?
-    actionUserList.insert(0,ui->actionUser0);
+    /*actionUserList.insert(0,ui->actionUser0);
     actionUserList.insert(1,ui->actionUser1);
     actionUserList.insert(2,ui->actionUser2);
     actionUserList.insert(3,ui->actionUser3);
@@ -61,7 +61,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     actionUserList.insert(16,ui->actionUser16);
     actionUserList.insert(17,ui->actionUser17);
     actionUserList.insert(18,ui->actionUser18);
-    actionUserList.insert(19,ui->actionUser19);
+    actionUserList.insert(19,ui->actionUser19);*/
     
     setStatusBar(new StatusBar(*ui, this));
     this->qSB = dynamic_cast<StatusBar *>(statusBar());
@@ -333,32 +333,50 @@ void MainWindow::on_actionRedo_triggered() {
 }
 
 void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> newCompleteUserList){
-    for(int j=0; j<20; j++){
-        actionUserList[j]->setVisible(false);
-    }
-    
-    onlineUserList = newOnlineUserList;
-    completeUserList = newCompleteUserList;
-    colorMap.clear();
+
+    //remove users that before were online and now are offline
+    removeOldOnlineNowOffline(newOnlineUserList);
+
     for(int i=0; i<newCompleteUserList.size();i++){
-        colorMap.insert(newCompleteUserList[i].getId(),colorList.at(i%19));
+        if(!colorMap.contains(newCompleteUserList[i].getId())){
+            colorMap.insert(newCompleteUserList[i].getId(),colorList.at(i%(colorList.size()-1)));
+        }
+
+        if(newOnlineUserList.contains(newCompleteUserList[i])){
+            QLabel* label = new QLabel();
+            QString text;
+
+            if(newCompleteUserList[i].getId() == user.getId()) {
+                text = "  "+newCompleteUserList[i].getEmail() + " (YOU)  ";
+            }else {
+                text = "  "+newCompleteUserList[i].getEmail()+"  ";
+            }
+
+            if(ui->rightToolBar->findChild<QLabel*>(QString::number(newCompleteUserList[i].getId())) == nullptr){
+                label->setObjectName(QString::number(newCompleteUserList[i].getId()));
+                label->setText(text);
+                label->setStyleSheet("font-weight: bold; color:"+colorMap[newCompleteUserList[i].getId()].name());
+                ui->rightToolBar->addWidget(label);
+            }
+        }
     }
 
-    for(int j=0; j<newOnlineUserList.size();j++){
-        actionUserList[j]->setVisible(true);
-        if(newOnlineUserList[j].getId() == user.getId()) {
-            actionUserList[j]->setText(newOnlineUserList[j].getEmail() + " (YOU)");
-        }else {
-            actionUserList[j]->setText(newOnlineUserList[j].getEmail());
+    onlineUserList = newOnlineUserList;
+}
+
+void MainWindow::removeOldOnlineNowOffline(QVector<User> newOnlineUserList){
+    QVector<User> toRemove;
+    for(User u: onlineUserList){
+        if(!newOnlineUserList.contains(u)){
+            delete ui->rightToolBar->findChild<QLabel*>(QString::number(u.getId()));
         }
-        ui->rightToolBar->widgetForAction(actionUserList[j])->setStyleSheet("color:"+colorMap[newOnlineUserList[j].getId()].name());
     }
+
 }
 
 
 void MainWindow::on_actionShare_Uri_triggered() {
     emit(sendAskUriMainWindow(user.getId(), editor->getDocId(), ""));   //todo change userId and docId
-    //qDebug() << "[MAIN WINDOW] sendAskUriMainWindow userId = "<< user.getId();
 }
 
 void MainWindow::askUriReceivedMainWindow(QString URI) {

@@ -64,6 +64,8 @@ public:
 
     int getActualSecondsBeforeInactive();
 
+    bool operator== (User u) const;
+
 private:
     QList<User *> friendList;
     QString name;

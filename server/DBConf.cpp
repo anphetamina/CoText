@@ -466,7 +466,7 @@ QVector<User> getUserListByDocId(int docId) {
     QSqlQuery query;
     QString qdocId = QString::number(docId);
     QVector<User> userList = QVector<User>();
-    query.exec("SELECT U.ID, U.email, U.name, U.username FROM Permission P, User U WHERE P.UserID = U.ID AND documentid='" + qdocId + "'");
+    query.exec("SELECT U.ID, U.email, U.name, U.surname FROM Permission P, User U WHERE P.UserID = U.ID AND documentid='" + qdocId + "'");
     while (query.next()) {
         int id = query.value(0).toInt();
         QString email = query.value(1).toString();

@@ -12,8 +12,8 @@ StatusBar::StatusBar(Ui::MainWindow &ui, MainWindow* mw, QWidget *parent): mw(mw
 	
 	//this->setupSB();
 	//this->displaySB();
-	
 }
+
 StatusBar::~StatusBar() {
 	delete this;
 }
