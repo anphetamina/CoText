@@ -228,7 +228,7 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_11">
        <item>
-        <widget class="QPushButton" name="Edit">
+        <widget class="QPushButton" name="pushButton_Edit">
          <property name="text">
           <string>Edit</string>
          </property>
@@ -239,7 +239,7 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_12">
        <item>
-        <widget class="QPushButton" name="Cancel">
+        <widget class="QPushButton" name="pushButton_Cancel">
          <property name="text">
           <string>Cancel</string>
          </property>

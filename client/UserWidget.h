@@ -31,6 +31,10 @@ public:
 private:
     Ui::UserWidget *ui;
 
+private slots:
+	void on_pushButton_Edit_clicked();
+	void on_pushButton_Cancel_clicked();
+	
 };
 
 #endif // USERWIDGET_H

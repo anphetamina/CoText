@@ -45,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->qSB = dynamic_cast<StatusBar *>(statusBar());
     qSB->setupSB();
     qSB->displaySB();
+    
 }
 
 

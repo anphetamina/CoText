@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 #include "ui_userwidget.h"
 #include "UserWidget.h"
+#include "usereditwidget.h"
 
 #include <QDebug>
 #include <QPixmap>
@@ -35,5 +36,16 @@ UserWidget::~UserWidget() {
 	
 }
 
+void UserWidget::on_pushButton_Edit_clicked() {
+	UserEditWidget uew;
+	//connect(&uew, &Register::closeLogin, this, &Login::loginSuccessful);
+	//client->connectToRegister(&regForm);
+	uew.setModal(true);
+	uew.exec();
+}
+
+void UserWidget::on_pushButton_Cancel_clicked() {
+	this->close();
+}
 
 
