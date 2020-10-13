@@ -120,13 +120,8 @@ private:
     Ui::MainWindow *ui;
     StatusBar *qSB;
     TextEditor *editor;
-    QString currentFileName = "";
     QVector<QString> docList;
-
     QVector<User> onlineUserList = {};        //list of all the user online on this document
-    QVector<User> completeUserList = {};        //list of all the user (online and offline) on this document
-
-    QVector<QAction*> actionUserList;
     QMap<int, QColor> colorMap = {};
     QVector<QColor> colorList = {QColor(255,0,0),       //red
                                  QColor(0,255,0),       //lime
@@ -153,6 +148,8 @@ private:
     void Save_as();
     void closeEvent(QCloseEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
+    void removeOldOnlineNowOffline(QVector<User> newOnlineUserList);
+    QPixmap addImageInRightToolBar(const QPixmap &orig, QColor color);
 
 };
 #endif // MAINWINDOW_H

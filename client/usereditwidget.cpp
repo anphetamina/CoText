@@ -14,9 +14,11 @@ UserEditWidget::UserEditWidget(QWidget *parent) :
     this->setOldUsername(usr.getEmail());
     this->setOldPP(usr.getProfilePic());
 	ui->LnewPP->setVisible(false);
-    ui->lineEditName->setPlaceholderText(usr.getName());
-    ui->lineEditSurname->setPlaceholderText(usr.getSurname());
-    ui->lineEditEmail->setPlaceholderText(usr.getEmail());
+    ui->lineEditName->setText(usr.getName());
+    ui->lineEditSurname->setText(usr.getSurname());
+    ui->lineEditEmail->setText(usr.getEmail());
+    //ui->lineEditPass->setText(usr.getPassword());
+    //ui->lineEditRePass->setText(usr.getPassword());
     
 }
 
@@ -50,17 +52,22 @@ void UserEditWidget::clearInput() {
 	ui->lineEditName->text().clear();
 	ui->lineEditSurname->text().clear();
 	ui->lineEditEmail->text().clear();
+	ui->lineEditPass->text().clear();
+	ui->lineEditRePass->text().clear();
 }
 
 void UserEditWidget::on_pushButton_Done_clicked() {
 	User usr = MainWindow::getUser();
 	bool checkDone = false;
+	
 	QString name = ui->lineEditName->text();
 	QString surname = ui->lineEditSurname->text();
 	QString email = ui->lineEditEmail->text();
+	QString password = ui->lineEditPass->text();
+	QString re_pass = ui->lineEditRePass->text();
 	
 	
-	while(checkInput(name, surname, email) && !checkDone) {
+	while(checkInput(name, surname, email, password, re_pass) && !checkDone) {
 		checkDone = true;
 		
 		if(isPPChanged)
@@ -73,7 +80,7 @@ void UserEditWidget::on_pushButton_Done_clicked() {
 	
 }
 
-bool UserEditWidget::checkInput(const QString &name, const QString &surname, const QString &email) {
+bool UserEditWidget::checkInput(const QString &name, const QString &surname, const QString &email, const QString &pass, const QString &re_pass) {
 	bool isNull = false;
 	bool isEmpty = false;
 	
@@ -88,25 +95,22 @@ bool UserEditWidget::checkInput(const QString &name, const QString &surname, con
 		return false;
 	} else {
 		
-		QRegExp mailREX("\\b[A-Z0-9._%+-]+@[A-Z0-0.-]+\\.[A-Z]{2,4}\\b");
-		mailREX.setCaseSensitivity(Qt::CaseInsensitive);
-		mailREX.setPatternSyntax(QRegExp::RegExp);
-		
-		bool regMat = mailREX.exactMatch(email);
-		if(!regMat) {
-			QMessageBox::warning(this, "Update Failure", "Email format is incorrect, retry");
-			clearInput();
-			return false;
-		} else
-			return true;
-		
-		
+		if(pass != re_pass) {
+			QMessageBox::warning(this, "Edit failure", "Passwords don't match each other");
+		} else {
+			QRegExp mailREX("\\b[A-Z0-9._%+-]+@[A-Z0-0.-]+\\.[A-Z]{2,4}\\b");
+			mailREX.setCaseSensitivity(Qt::CaseInsensitive);
+			mailREX.setPatternSyntax(QRegExp::RegExp);
+			
+			bool regMat = mailREX.exactMatch(email);
+			if(!regMat) {
+				QMessageBox::warning(this, "Update Failure", "Email format is incorrect, retry");
+				clearInput();
+				return false;
+			} else
+				return true;
+		}
 	}
-	
-	
-	
-	
-	
 }
 
 void UserEditWidget::on_pushButton_Cancel_clicked() {

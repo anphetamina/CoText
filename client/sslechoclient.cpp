@@ -146,7 +146,7 @@ void SslEchoClient::updateUser(QString name, QString surname, QString email, QSt
 	//The field 'password' was used in order to pass the oldUsername for which do the query
 	////TODO pass the field password, update the layout in order to insert old + new password
 	//! We need first to check if the oldPassword match the oldPassword inserted
-	AccountUpdatePacket aup = AccountUpdatePacket(email, oldUsername, name, surname, newPP);
+	AccountUpdatePacket aup = AccountUpdatePacket(0, email, oldUsername, name, surname, newPP);
 }
 
 int SslEchoClient::getLoginAttemptCount(){

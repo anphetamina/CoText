@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     QApplication::instance()->setAttribute(Qt::AA_DontShowIconsInMenus, true);
 
     ui->setupUi(this);
-    ui->rightToolBar->setVisible(false);
+    ui->rightToolBar->setVisible(true);
 
     //installing EventFilter for QToolButtons on the qToolBar
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionOpen))->installEventFilter(this);
@@ -40,33 +40,12 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     ui->actionCopy->setShortcut(QKeySequence::Copy);
     ui->actionPaste->setShortcut(QKeySequence::Paste);
     //ui->actionRemove->setShortcut(QKeySequence::Delete);
-
-    // What about using a container?
-    actionUserList.insert(0,ui->actionUser0);
-    actionUserList.insert(1,ui->actionUser1);
-    actionUserList.insert(2,ui->actionUser2);
-    actionUserList.insert(3,ui->actionUser3);
-    actionUserList.insert(4,ui->actionUser4);
-    actionUserList.insert(5,ui->actionUser5);
-    actionUserList.insert(6,ui->actionUser6);
-    actionUserList.insert(7,ui->actionUser7);
-    actionUserList.insert(8,ui->actionUser8);
-    actionUserList.insert(9,ui->actionUser9);
-    actionUserList.insert(10,ui->actionUser10);
-    actionUserList.insert(11,ui->actionUser11);
-    actionUserList.insert(12,ui->actionUser12);
-    actionUserList.insert(13,ui->actionUser13);
-    actionUserList.insert(14,ui->actionUser14);
-    actionUserList.insert(15,ui->actionUser15);
-    actionUserList.insert(16,ui->actionUser16);
-    actionUserList.insert(17,ui->actionUser17);
-    actionUserList.insert(18,ui->actionUser18);
-    actionUserList.insert(19,ui->actionUser19);
     
     setStatusBar(new StatusBar(*ui, this));
     this->qSB = dynamic_cast<StatusBar *>(statusBar());
     qSB->setupSB();
     qSB->displaySB();
+
 
 
     fontComboBox = new QFontComboBox(this);
@@ -347,32 +326,108 @@ void MainWindow::on_actionRedo_triggered() {
 }
 
 void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> newCompleteUserList){
-    for(int j=0; j<20; j++){
-        actionUserList[j]->setVisible(false);
-    }
-    
-    onlineUserList = newOnlineUserList;
-    completeUserList = newCompleteUserList;
-    colorMap.clear();
+
+    //remove users that before were online and now are offline
+    removeOldOnlineNowOffline(newOnlineUserList);
+
     for(int i=0; i<newCompleteUserList.size();i++){
-        colorMap.insert(newCompleteUserList[i].getId(),colorList.at(i%19));
+        if(!colorMap.contains(newCompleteUserList[i].getId())){
+            colorMap.insert(newCompleteUserList[i].getId(),colorList.at(i%(colorList.size()-1)));
+        }
+
+        if(newOnlineUserList.contains(newCompleteUserList[i])){
+            QLabel* label = new QLabel();
+            QLabel* iconLabel = new QLabel();
+            QString text;
+            QHBoxLayout *hBox = new QHBoxLayout;
+
+
+            if(newCompleteUserList[i].getId() == user.getId()) {
+                text = "  "+newCompleteUserList[i].getEmail() + " (YOU)  ";
+            }else {
+                text = "  "+newCompleteUserList[i].getEmail()+"  ";
+            }
+
+            if(ui->rightToolBar->findChild<QWidget*>(QString::number(newCompleteUserList[i].getId())) == nullptr){
+                label->setText(text);
+                label->setStyleSheet("font-weight: bold; color:"+colorMap[newCompleteUserList[i].getId()].name());
+
+                QPixmap orig;
+                orig.load(":/imgs/icons/user-group.svg");
+                QPixmap background = addImageInRightToolBar(orig, colorMap[newCompleteUserList[i].getId()].name());
+                iconLabel->setPixmap(background);
+
+                QSizePolicy spLeft(QSizePolicy::Preferred, QSizePolicy::Preferred);
+                spLeft.setHorizontalStretch(1);
+                iconLabel->setSizePolicy(spLeft);
+                QSizePolicy spRight(QSizePolicy::Preferred, QSizePolicy::Preferred);
+                spRight.setHorizontalStretch(5);
+                label->setSizePolicy(spRight);
+
+                hBox->addWidget( iconLabel);
+                hBox->addWidget( label);
+
+                QWidget *w = new QWidget();
+                w->setLayout(hBox);
+                w->setObjectName(QString::number(newCompleteUserList[i].getId()));
+                ui->rightToolBar->addWidget(w);
+            }
+        }
     }
 
-    for(int j=0; j<newOnlineUserList.size();j++){
-        actionUserList[j]->setVisible(true);
-        if(newOnlineUserList[j].getId() == user.getId()) {
-            actionUserList[j]->setText(newOnlineUserList[j].getEmail() + " (YOU)");
-        }else {
-            actionUserList[j]->setText(newOnlineUserList[j].getEmail());
+    onlineUserList = newOnlineUserList;
+}
+
+void MainWindow::removeOldOnlineNowOffline(QVector<User> newOnlineUserList){
+    QVector<User> toRemove;
+    for(User u: onlineUserList){
+        if(!newOnlineUserList.contains(u)){
+            delete ui->rightToolBar->findChild<QWidget*>(QString::number(u.getId()));
         }
-        ui->rightToolBar->widgetForAction(actionUserList[j])->setStyleSheet("color:"+colorMap[newOnlineUserList[j].getId()].name());
     }
+}
+
+QPixmap MainWindow::addImageInRightToolBar(const QPixmap &orig, QColor color) {
+    // Getting size if the original picture is not square
+    int size = qMin(orig.width(), orig.height());
+
+    // Creating circle clip area
+    QPixmap rounded = QPixmap(size, size);
+    rounded.fill(Qt::transparent);
+    QPainterPath path;
+    path.addEllipse(rounded.rect());
+    QPainter painter(&rounded);
+    painter.setClipPath(path);
+
+    // Filling rounded area if needed
+    painter.fillRect(rounded.rect(), Qt::black);
+
+    // Getting offsets if the original picture is not square
+    int x = qAbs(orig.width() - size) / 2;
+    int y = qAbs(orig.height() - size) / 2;
+    painter.drawPixmap(-x, -y, orig.width(), orig.height(), orig);
+
+    QPixmap background = QPixmap(size + 50, size + 50);
+    background.fill(Qt::transparent);
+    QPainterPath path1;
+    path1.addEllipse(background.rect());
+    QPainter painter1(&background);
+    painter1.setClipPath(path1);
+
+    // Filling rounded area if needed
+    painter1.fillRect(background.rect(), color);
+
+    // Getting offsets if the original picture is not square
+    x = qAbs(rounded.width() - size - 50) / 2;
+    y = qAbs(rounded.height() - size - 50) / 2;
+    painter1.drawPixmap(x, y, rounded.width(), rounded.height(), rounded);
+
+    return background.scaled(30,30);
 }
 
 
 void MainWindow::on_actionShare_Uri_triggered() {
     emit(sendAskUriMainWindow(user.getId(), editor->getDocId(), ""));   //todo change userId and docId
-    //qDebug() << "[MAIN WINDOW] sendAskUriMainWindow userId = "<< user.getId();
 }
 
 void MainWindow::askUriReceivedMainWindow(QString URI) {
@@ -445,3 +500,4 @@ void MainWindow::closeMainWindow(){
     qDebug()<<"[MAIN WINDOW] close ";
     exit(0);
 }
+

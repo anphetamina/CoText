@@ -2,7 +2,7 @@
 // Created by Emanuele Munafò on 13/04/2020.
 //
 #include "User.h"
-
+#include <QDebug>
 
 User::User() {
 
@@ -82,3 +82,9 @@ QDataStream &operator<<(QDataStream &out, const User &user) {
         << user.signature;
     return out;
 }
+
+bool User::operator== (User u) const{
+    return id==u.id && name == u.name && surname == u.surname && email == u.email;
+}
+
+

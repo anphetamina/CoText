@@ -175,26 +175,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionUser0"/>
-   <addaction name="actionUser1"/>
-   <addaction name="actionUser2"/>
-   <addaction name="actionUser3"/>
-   <addaction name="actionUser4"/>
-   <addaction name="actionUser5"/>
-   <addaction name="actionUser6"/>
-   <addaction name="actionUser7"/>
-   <addaction name="actionUser8"/>
-   <addaction name="actionUser9"/>
-   <addaction name="actionUser10"/>
-   <addaction name="actionUser11"/>
-   <addaction name="actionUser12"/>
-   <addaction name="actionUser13"/>
-   <addaction name="actionUser14"/>
-   <addaction name="actionUser15"/>
-   <addaction name="actionUser16"/>
-   <addaction name="actionUser17"/>
-   <addaction name="actionUser18"/>
-   <addaction name="actionUser19"/>
+   <addaction name="separator"/>
   </widget>
   <action name="actionNew">
    <property name="checkable">
@@ -522,7 +503,7 @@
     </font>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionUser1">
@@ -542,7 +523,7 @@
     </font>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionUser2">
@@ -562,7 +543,7 @@
     </font>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="menuRole">
     <enum>QAction::NoRole</enum>
@@ -582,7 +563,7 @@
     </font>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionUser4">
@@ -602,7 +583,7 @@
     </font>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionUser5">
@@ -622,7 +603,7 @@
     </font>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionUser6">
@@ -642,7 +623,7 @@
     </font>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionUser7">
@@ -662,7 +643,7 @@
     </font>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionUser8">
@@ -682,7 +663,7 @@
     </font>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionUser9">
@@ -702,7 +683,7 @@
     </font>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionUser10">
@@ -722,7 +703,7 @@
     </font>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionUser11">
@@ -742,7 +723,7 @@
     </font>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionUser12">
@@ -762,7 +743,7 @@
     </font>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionUser13">
@@ -782,7 +763,7 @@
     </font>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionUser14">
@@ -802,7 +783,7 @@
     </font>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionUser15">
@@ -822,7 +803,7 @@
     </font>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionUser16">
@@ -842,7 +823,7 @@
     </font>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionUser17">
@@ -862,7 +843,7 @@
     </font>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionUser18">
@@ -882,7 +863,7 @@
     </font>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionUser19">
@@ -902,7 +883,7 @@
     </font>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionJoin">

@@ -23,7 +23,7 @@ public:
 	void setOldPP(QImage _oldPP);
 	
 	void clearInput();
-    bool checkInput(const QString& name, const QString& surname, const QString& email);
+    bool checkInput(const QString& name, const QString& surname, const QString& email, const QString &pass, const QString &re_pass);
 	bool isPPChanged = false;
 
 private:
