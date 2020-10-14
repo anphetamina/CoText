@@ -6,6 +6,7 @@ QLineEdit {
 
 QDialog {
     background-color: rgb(30, 30, 30);
+    color: #858585;
 }
 
 QListWidget {
