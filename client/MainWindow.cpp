@@ -30,8 +30,25 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionLogout))->installEventFilter(this);
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionSettings))->installEventFilter(this);
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionJoin))->installEventFilter(this);
-
-    //this->setCentralWidget(ui->textEdit);
+    
+    //installing EventiFilter for QToolButtons on the upperQToolBar
+    dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionPrintPDF))->installEventFilter(this);
+	dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionUndo))->installEventFilter(this);
+	dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionRedo))->installEventFilter(this);
+	dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionCopy))->installEventFilter(this);
+	dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionPaste))->installEventFilter(this);
+	dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionCut))->installEventFilter(this);
+	dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionTextColor))->installEventFilter(this);
+	dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionBold))->installEventFilter(this);
+	dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionItalic))->installEventFilter(this);
+	dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionUnderline))->installEventFilter(this);
+	dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionAlign_left))->installEventFilter(this);
+	dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionAlign_center))->installEventFilter(this);
+	dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionAlign_right))->installEventFilter(this);
+	dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionJustify))->installEventFilter(this);
+	dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionToggle_user_colors))->installEventFilter(this);
+	
+	//this->setCentralWidget(ui->textEdit);
     QPixmap icon(":/appIcon/CoText.ico");
     //ui->iconLabel->setPixmap(icon);
     // ui->statusbar->addPermanentWidget();
@@ -52,13 +69,16 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     ui->mainToolBar->insertWidget(ui->actionTextColor, fontComboBox);
 
     sizeComboBox = new QComboBox(this);
+    
+	const QList<int> standardSizes = QFontDatabase::standardSizes();
+	for (int size : standardSizes) {
+		sizeComboBox->addItem(QString::number(size));
+	}
+	sizeComboBox->setFixedWidth(60);
     ui->mainToolBar->insertWidget(ui->actionTextColor, sizeComboBox);
     sizeComboBox->setEditable(true);
 
-    const QList<int> standardSizes = QFontDatabase::standardSizes();
-    for (int size : standardSizes) {
-        sizeComboBox->addItem(QString::number(size));
-    }
+
 
 }
 
@@ -152,6 +172,186 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         ui->actionJoin->setIcon(QIcon(":/imgs/icons/join_grey.svg"));
         return true;
     }
+    
+    //Print PDF
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionPrintPDF)) && event->type() == QEvent::Enter) {
+		setCursor(Qt::PointingHandCursor);
+		ui->actionPrintPDF->setIcon(QIcon(":/imgs/icons/noun_PDF_749513white.svg"));
+		return true;
+	}
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionPrintPDF)) && event->type() == QEvent::Leave) {
+		setCursor(Qt::ArrowCursor);
+		ui->actionPrintPDF->setIcon(QIcon(":/imgs/icons/noun_PDF_749513.svg"));
+		return true;
+	}
+    
+    //Undo
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUndo)) && event->type() == QEvent::Enter) {
+		setCursor(Qt::PointingHandCursor);
+		ui->actionUndo->setIcon(QIcon(":/imgs/icons/noun_Undo_1246691_white.svg"));
+		return true;
+	}
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUndo)) && event->type() == QEvent::Leave) {
+		setCursor(Qt::ArrowCursor);
+		ui->actionUndo->setIcon(QIcon(":/imgs/icons/noun_Undo_1246691.svg"));
+		return true;
+	}
+    
+    //Redo
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionRedo)) && event->type() == QEvent::Enter) {
+		setCursor(Qt::PointingHandCursor);
+		ui->actionRedo->setIcon(QIcon(":/imgs/icons/noun_Redo_124669_white.svg"));
+		return true;
+	}
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionRedo)) && event->type() == QEvent::Leave) {
+		setCursor(Qt::ArrowCursor);
+		ui->actionRedo->setIcon(QIcon(":/imgs/icons/noun_Redo_124669.svg"));
+		return true;
+	}
+    
+    //Copy
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionCopy)) && event->type() == QEvent::Enter) {
+		setCursor(Qt::PointingHandCursor);
+		ui->actionCopy->setIcon(QIcon(":/imgs/icons/noun_copy_2080193_white.svg"));
+		return true;
+	}
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionCopy)) && event->type() == QEvent::Leave) {
+		setCursor(Qt::ArrowCursor);
+		ui->actionCopy->setIcon(QIcon(":/imgs/icons/noun_copy_2080193.svg"));
+		return true;
+	}
+    
+    //Paste
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionPaste)) && event->type() == QEvent::Enter) {
+		setCursor(Qt::PointingHandCursor);
+		ui->actionPaste->setIcon(QIcon(":/imgs/icons/noun_paste_2302624_white.svg"));
+		return true;
+	}
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionPaste)) && event->type() == QEvent::Leave) {
+		setCursor(Qt::ArrowCursor);
+		ui->actionPaste->setIcon(QIcon(":/imgs/icons/noun_paste_2302624.svg"));
+		return true;
+	}
+    
+    //Cut
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionCut)) && event->type() == QEvent::Enter) {
+		setCursor(Qt::PointingHandCursor);
+		ui->actionCut->setIcon(QIcon(":/imgs/icons/noun_Cut File_3118760_white.svg"));
+		return true;
+	}
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionCut)) && event->type() == QEvent::Leave) {
+		setCursor(Qt::ArrowCursor);
+		ui->actionCut->setIcon(QIcon(":/imgs/icons/noun_Cut File_3118760.svg"));
+		return true;
+	}
+    
+    //TextColor
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionTextColor)) && event->type() == QEvent::Enter) {
+		setCursor(Qt::PointingHandCursor);
+		ui->actionTextColor->setIcon(QIcon(":/imgs/icons/noun_color_3170276_white.svg"));
+		return true;
+	}
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionTextColor)) && event->type() == QEvent::Leave) {
+		setCursor(Qt::ArrowCursor);
+		ui->actionTextColor->setIcon(QIcon(":/imgs/icons/noun_color_3170276.svg"));
+		return true;
+	}
+    
+    //Bold
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionBold)) && event->type() == QEvent::Enter) {
+		setCursor(Qt::PointingHandCursor);
+		ui->actionBold->setIcon(QIcon(":/imgs/icons/noun_bold_1076853_white.svg"));
+		return true;
+	}
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionBold)) && event->type() == QEvent::Leave) {
+		setCursor(Qt::ArrowCursor);
+		ui->actionBold->setIcon(QIcon(":/imgs/icons/noun_bold_1076853.svg"));
+		return true;
+	}
+    
+    //Italic
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionItalic)) && event->type() == QEvent::Enter) {
+		setCursor(Qt::PointingHandCursor);
+		ui->actionItalic->setIcon(QIcon(":/imgs/icons/noun_italics_1076852_white.svg"));
+		return true;
+	}
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionItalic)) && event->type() == QEvent::Leave) {
+		setCursor(Qt::ArrowCursor);
+		ui->actionItalic->setIcon(QIcon(":/imgs/icons/noun_italics_1076852.svg"));
+		return true;
+	}
+	
+    //Underline
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUnderline)) && event->type() == QEvent::Enter) {
+		setCursor(Qt::PointingHandCursor);
+		ui->actionUnderline->setIcon(QIcon(":/imgs/icons/noun_underline_1384032_white.svg"));
+		return true;
+	}
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionUnderline)) && event->type() == QEvent::Leave) {
+		setCursor(Qt::ArrowCursor);
+		ui->actionUnderline->setIcon(QIcon(":/imgs/icons/noun_underline_1384032.svg"));
+		return true;
+	}
+    
+    //AlignLeft
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionAlign_left)) && event->type() == QEvent::Enter) {
+		setCursor(Qt::PointingHandCursor);
+		ui->actionAlign_left->setIcon(QIcon(":/imgs/icons/textleft_white.svg"));
+		return true;
+	}
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionAlign_left)) && event->type() == QEvent::Leave) {
+		setCursor(Qt::ArrowCursor);
+		ui->actionAlign_left->setIcon(QIcon(":/imgs/icons/textleft.svg"));
+		return true;
+	}
+    
+    //AlignCenterr
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionAlign_center)) && event->type() == QEvent::Enter) {
+		setCursor(Qt::PointingHandCursor);
+		ui->actionAlign_center->setIcon(QIcon(":/imgs/icons/textcenter_white.svg"));
+		return true;
+	}
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionAlign_center)) && event->type() == QEvent::Leave) {
+		setCursor(Qt::ArrowCursor);
+		ui->actionAlign_center->setIcon(QIcon(":/imgs/icons/textcenter.svg"));
+		return true;
+	}
+    
+    //AlignRight
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionAlign_right)) && event->type() == QEvent::Enter) {
+		setCursor(Qt::PointingHandCursor);
+		ui->actionAlign_right->setIcon(QIcon(":/imgs/icons/textright_white.svg"));
+		return true;
+	}
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionAlign_right)) && event->type() == QEvent::Leave) {
+		setCursor(Qt::ArrowCursor);
+		ui->actionAlign_right->setIcon(QIcon(":/imgs/icons/textright.svg"));
+		return true;
+	}
+    
+    //Justify
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionJustify)) && event->type() == QEvent::Enter) {
+		setCursor(Qt::PointingHandCursor);
+		ui->actionJustify->setIcon(QIcon(":/imgs/icons/textjustify_white.svg"));
+		return true;
+	}
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionJustify)) && event->type() == QEvent::Leave) {
+		setCursor(Qt::ArrowCursor);
+		ui->actionJustify->setIcon(QIcon(":/imgs/icons/textjustify.svg"));
+		return true;
+	}
+    
+    //Toggle UserColors
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionToggle_user_colors)) && event->type() == QEvent::Enter) {
+		setCursor(Qt::PointingHandCursor);
+		ui->actionToggle_user_colors->setIcon(QIcon(":/imgs/icons/noun_Light_1841928_white.svg"));
+		return true;
+	}
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionToggle_user_colors)) && event->type() == QEvent::Leave) {
+		setCursor(Qt::ArrowCursor);
+		ui->actionToggle_user_colors->setIcon(QIcon(":/imgs/icons/noun_Light_1841928.svg"));
+		return true;
+	}
 
     return false;
 }

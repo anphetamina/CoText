@@ -26,11 +26,12 @@ int main(int argc, char *argv[]) {
 	a.setStyleSheet(stylesheetString);
 
     /** Login Phase */
-	client = new SslEchoClient(QUrl(QStringLiteral("wss://localhost:12345")));
+	client = new SslEchoClient(QUrl(QStringLiteral("wss://93.51.11.223:9088")));
 	Q_UNUSED(*client);
 
     MainWindow *w = new MainWindow();
-    Login *login = new Login();
+    Login *login =  new Login();
+    
 
 
 
@@ -45,7 +46,8 @@ int main(int argc, char *argv[]) {
     w->setTextEditor(editor);
     client->connectToMainWindow(w);
     client->connectToEditor(editor);
-
+    //client->connectToLoginWindow(login, w); //TODO: use signal/slot for creating/closing diffent windows.tonote: login is a QDialog not QWindow
+	/*
     Benchmark* b = new Benchmark("main");
     b->startTimer();
     while(!client->isConnected()){
@@ -91,13 +93,14 @@ int main(int argc, char *argv[]) {
         qApp->quit();
         return -1;
     }
-
+	
     MainMenu* mainMenu = new MainMenu();
     w->connectToMainMenu(mainMenu);
     mainMenu->setWindowTitle("Main Menu");
     mainMenu->setModal(true);
     mainMenu->exec();
-
+	*/
+	w->show();
     //delete client;
     return a.exec();
 }

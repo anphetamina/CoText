@@ -1,15 +1,5 @@
 <RCC>
     <qresource prefix="/imgs">
-        <file>icons/noun_copy_2080193.png</file>
-        <file>icons/noun_Cut File_3118760.png</file>
-        <file>icons/noun_Download_2383249.png</file>
-        <file>icons/noun_file find_556585.png</file>
-        <file>icons/noun_new file_2650249.png</file>
-        <file>icons/noun_paste_2302624.png</file>
-        <file>icons/noun_Redo_124669.png</file>
-        <file>icons/noun_replace_1913722.png</file>
-        <file>icons/noun_Save_1435429.png</file>
-        <file>icons/noun_Undo_1246691.png</file>
         <file>icons/noun_Exit_1558251.svg</file>
         <file>icons/noun_Folder_2047792.svg</file>
         <file>icons/noun_new document_2429385.svg</file>
@@ -22,11 +12,6 @@
         <file>icons/noun_new document_2429385_white.svg</file>
         <file>icons/noun_Settings_2324598_white.svg</file>
         <file>icons/noun_user login_178831_white.svg</file>
-        <file>icons/font.png</file>
-        <file>icons/info.png</file>
-        <file>icons/bold.png</file>
-        <file>icons/underline.png</file>
-        <file>icons/italic.png</file>
         <file>icons/noun_bold_1076853.svg</file>
         <file>icons/noun_color_3170276.svg</file>
         <file>icons/noun_font_2669552.svg</file>
@@ -34,10 +19,6 @@
         <file>icons/noun_underline_1384032.svg</file>
         <file>icons/user-group.svg</file>
         <file>icons/user-group_white.svg</file>
-        <file>icons/textjustify.png</file>
-        <file>icons/textcenter.png</file>
-        <file>icons/textright.png</file>
-        <file>icons/textleft.png</file>
         <file>icons/join_grey.svg</file>
         <file>icons/join_white.svg</file>
         <file>icons/textcenter.svg</file>
@@ -51,6 +32,27 @@
         <file>icons/noun_PDF_749513.svg</file>
         <file>icons/CircleMask128x128.png</file>
         <file>icons/noun_Garbage_2025401.svg</file>
+        <file>icons/noun_bold_1076853_white.svg</file>
+        <file>icons/noun_copy_2080193_white.svg</file>
+        <file>icons/noun_copy_2080193.svg</file>
+        <file>icons/noun_Cut File_3118760_white.svg</file>
+        <file>icons/noun_Cut File_3118760.svg</file>
+        <file>icons/noun_italics_1076852_white.svg</file>
+        <file>icons/noun_Light_1841928_white.svg</file>
+        <file>icons/noun_paste_2302624_white.svg</file>
+        <file>icons/noun_paste_2302624.svg</file>
+        <file>icons/noun_PDF_749513white.svg</file>
+        <file>icons/noun_Redo_124669_white.svg</file>
+        <file>icons/noun_Redo_124669.svg</file>
+        <file>icons/noun_underline_1384032_white.svg</file>
+        <file>icons/noun_Undo_1246691_white.svg</file>
+        <file>icons/noun_Undo_1246691.svg</file>
+        <file>icons/textcenter_white.svg</file>
+        <file>icons/textjustify_white.svg</file>
+        <file>icons/textleft_white.svg</file>
+        <file>icons/textright_white.svg</file>
+        <file>icons/noun_color_3170276_white.svg</file>
+        <file>icons/verticalSeparator_toolbar.svg</file>
     </qresource>
     <qresource prefix="/appIcon">
         <file>icons/CoText_landing.png</file>

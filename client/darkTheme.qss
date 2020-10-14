@@ -1,5 +1,6 @@
 QLineEdit {
     color: black;
+
 }
 
 
@@ -23,11 +24,24 @@ QTextEdit {
 }
 
 QComboBox {
-    color: white;
-    background-color: rgb(51, 51, 51);
+    color: #909090;
+    border: 0px;
+    background-color: rgb(37, 37, 38);
     height: 25px;
     font-size: 12pt;
+    border-radius: 5px;
 }
+
+QComboBox::down-arrow {
+    color: #909090;
+
+}
+
+QComboBox QAbstractItemView {
+    border-radius: 5px;
+    selection-background-color: #222222;
+}
+
 
 
 QWidget#centralWidget{
@@ -42,9 +56,9 @@ QToolBar {
 }
 
 QToolBar#mainToolBar {
-    spacing: 2px;
+    spacing: 1px;
     border-radius: 0px;
-    background-color: rgb(55, 55, 55);
+    background-color: rgb(51, 51, 51);
 }
 
 QAction#actionLogin {
@@ -135,9 +149,42 @@ QLabel#email {
 	border: 3px white;
 
 }
-QLabel#friends {
-	
-	border-radius: 3px;
-	border: 2px white;
+
+/**** UserEditWIDGET ****/
+
+QDialog#UserEditWidget {
+
+    background-color: rgb(30, 30, 30);
 
 }
+
+
+
+
+StatusBar::item {
+    border: none;
+}
+
+StatusBar ClickableLabel {
+    background: transparent;
+}
+
+StatusBar QLabel {
+    background: transparent;
+}
+
+QToolBar QToolButton:checked {
+    background-color: transparent;
+}
+
+QToolBar::separator:vertical {
+    height: 16px;
+    image: url(":/imgs/icons/verticalSeparator_toolbar.svg");
+}
+
+
+
+
+
+
+

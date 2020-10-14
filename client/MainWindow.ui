@@ -57,7 +57,7 @@
   <widget class="QToolBar" name="toolBar">
    <property name="minimumSize">
     <size>
-     <width>55</width>
+     <width>0</width>
      <height>0</height>
     </size>
    </property>
@@ -238,7 +238,7 @@
   <action name="actionUndo">
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/imgs/icons/noun_Undo_1246691.png</normaloff>:/imgs/icons/noun_Undo_1246691.png</iconset>
+     <normaloff>:/imgs/icons/noun_Undo_1246691.svg</normaloff>:/imgs/icons/noun_Undo_1246691.svg</iconset>
    </property>
    <property name="text">
     <string>Undo</string>
@@ -250,7 +250,7 @@
   <action name="actionCopy">
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/imgs/icons/noun_copy_2080193.png</normaloff>:/imgs/icons/noun_copy_2080193.png</iconset>
+     <normaloff>:/imgs/icons/noun_copy_2080193.svg</normaloff>:/imgs/icons/noun_copy_2080193.svg</iconset>
    </property>
    <property name="text">
     <string>Copy</string>
@@ -262,7 +262,7 @@
   <action name="actionPaste">
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/imgs/icons/noun_paste_2302624.png</normaloff>:/imgs/icons/noun_paste_2302624.png</iconset>
+     <normaloff>:/imgs/icons/noun_paste_2302624.svg</normaloff>:/imgs/icons/noun_paste_2302624.svg</iconset>
    </property>
    <property name="text">
     <string>Paste</string>
@@ -274,7 +274,7 @@
   <action name="actionCut">
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/imgs/icons/noun_Cut File_3118760.png</normaloff>:/imgs/icons/noun_Cut File_3118760.png</iconset>
+     <normaloff>:/imgs/icons/noun_Cut File_3118760.svg</normaloff>:/imgs/icons/noun_Cut File_3118760.svg</iconset>
    </property>
    <property name="text">
     <string>Cut</string>
@@ -286,7 +286,7 @@
   <action name="actionRedo">
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/imgs/icons/noun_Redo_124669.png</normaloff>:/imgs/icons/noun_Redo_124669.png</iconset>
+     <normaloff>:/imgs/icons/noun_Redo_124669.svg</normaloff>:/imgs/icons/noun_Redo_124669.svg</iconset>
    </property>
    <property name="text">
     <string>Redo</string>
