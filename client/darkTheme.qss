@@ -40,6 +40,7 @@ QComboBox::down-arrow {
 
 QComboBox QAbstractItemView {
     selection-background-color: #333333;
+    background-color: #858585;
 }
 
 QWidget#centralWidget{
