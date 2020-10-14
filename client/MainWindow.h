@@ -88,6 +88,7 @@ private slots:
     void on_actionSettings_triggered();
     void on_actionJoin_triggered();
     void on_actionNew_triggered();
+	void on_actionCoTextInfo_triggered();
 
 public slots:
     void updateUserList(QVector<User> newOnlineUserList, QVector<User> newCompleteUserList);

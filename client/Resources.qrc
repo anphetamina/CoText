@@ -58,6 +58,7 @@
         <file>icons/CoText_landing.png</file>
         <file>CoText.icns</file>
         <file>CoText.ico</file>
+        <file>icons/CoText.png</file>
     </qresource>
     <qresource prefix="/style">
         <file>darkTheme.qss</file>

@@ -8,6 +8,7 @@
 #include "AlertNewDocument.h"
 #include "ChooseName.h"
 #include "sslechoclient.h"
+#include "info.h"
 #include <QPixmap> //allows to create a qpixmap onj which takes 1 arg
 #include <QPrinter>
 #include <QColorDialog>
@@ -22,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     ui->setupUi(this);
     ui->rightToolBar->setVisible(true);
+    ui->mainToolBar->setMaximumHeight(42);
 
     //installing EventFilter for QToolButtons on the qToolBar
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionOpen))->installEventFilter(this);
@@ -70,15 +72,15 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     sizeComboBox = new QComboBox(this);
     
+
+	sizeComboBox->setFixedWidth(60);
+    ui->mainToolBar->insertWidget(ui->actionTextColor, sizeComboBox);
+    sizeComboBox->setEditable(true);
+    
 	const QList<int> standardSizes = QFontDatabase::standardSizes();
 	for (int size : standardSizes) {
 		sizeComboBox->addItem(QString::number(size));
 	}
-	sizeComboBox->setFixedWidth(60);
-    ui->mainToolBar->insertWidget(ui->actionTextColor, sizeComboBox);
-    sizeComboBox->setEditable(true);
-
-
 
 }
 
@@ -650,6 +652,13 @@ void MainWindow::on_actionJoin_triggered() {
     connect(&join, &Join::sendJoin, this, &MainWindow::sendJoinMainWindow);
     join.setModal(true);
     join.exec();
+}
+
+void MainWindow::on_actionCoTextInfo_triggered() {
+	Info info;
+	info.setWindowTitle("About");
+	info.setModal(true);
+	info.exec();
 }
 
 

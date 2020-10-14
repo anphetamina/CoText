@@ -132,6 +132,9 @@
    <property name="movable">
     <bool>false</bool>
    </property>
+   <property name="allowedAreas">
+    <set>Qt::AllToolBarAreas</set>
+   </property>
    <property name="iconSize">
     <size>
      <width>42</width>
@@ -144,6 +147,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionCoTextInfo"/>
    <addaction name="actionPrintPDF"/>
    <addaction name="separator"/>
    <addaction name="actionUndo"/>
@@ -902,6 +906,18 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Alt+S</string>
+   </property>
+  </action>
+  <action name="actionCoTextInfo">
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/appIcon/icons/CoText_landing.png</normaloff>:/appIcon/icons/CoText_landing.png</iconset>
+   </property>
+   <property name="text">
+    <string>Info</string>
+   </property>
+   <property name="toolTip">
+    <string>About...</string>
    </property>
   </action>
  </widget>

@@ -1,10 +1,11 @@
+/** General **/
+
 QLineEdit {
     color: black;
-
 }
 
 
-/*****. QMAINWINDOW. *****/
+/***** .QMAINWINDOW. *****/
 
 QMainWindow#MainWindow {
 
@@ -38,8 +39,7 @@ QComboBox::down-arrow {
 }
 
 QComboBox QAbstractItemView {
-    border-radius: 5px;
-    selection-background-color: #222222;
+    selection-background-color: #333333;
 }
 
 
@@ -177,9 +177,11 @@ QToolBar QToolButton:checked {
     background-color: transparent;
 }
 
-QToolBar::separator:vertical {
-    height: 16px;
+QToolBar::separator:horizontal {
+
     image: url(":/imgs/icons/verticalSeparator_toolbar.svg");
+    margin-right: 5px;
+    margin-left: 5px;
 }
 
 
