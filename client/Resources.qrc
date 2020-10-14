@@ -53,6 +53,8 @@
         <file>icons/textright_white.svg</file>
         <file>icons/noun_color_3170276_white.svg</file>
         <file>icons/verticalSeparator_toolbar.svg</file>
+        <file>icons/noun_integration_3266029_white.svg</file>
+        <file>icons/noun_integration_3266029.svg</file>
     </qresource>
     <qresource prefix="/appIcon">
         <file>icons/CoText_landing.png</file>

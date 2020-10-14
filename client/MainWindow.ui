@@ -896,7 +896,7 @@
    </property>
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/imgs/icons/join_grey.svg</normaloff>:/imgs/icons/join_grey.svg</iconset>
+     <normaloff>:/imgs/icons/noun_integration_3266029.svg</normaloff>:/imgs/icons/noun_integration_3266029.svg</iconset>
    </property>
    <property name="text">
     <string>Join</string>

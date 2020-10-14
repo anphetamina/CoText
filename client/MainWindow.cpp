@@ -166,12 +166,12 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
     //Join to a shared document (invite)
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionJoin)) && event->type() == QEvent::Enter) {
         setCursor(Qt::PointingHandCursor);
-        ui->actionJoin->setIcon(QIcon(":/imgs/icons/join_white.svg"));
+        ui->actionJoin->setIcon(QIcon(":/imgs/icons/noun_integration_3266029_white.svg"));
         return true;
     }
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionJoin)) && event->type() == QEvent::Leave) {
         setCursor(Qt::ArrowCursor);
-        ui->actionJoin->setIcon(QIcon(":/imgs/icons/join_grey.svg"));
+        ui->actionJoin->setIcon(QIcon(":/imgs/icons/noun_integration_3266029.svg"));
         return true;
     }
     
