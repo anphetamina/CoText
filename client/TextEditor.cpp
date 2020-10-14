@@ -310,7 +310,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
     }
 
-    printSymbols();
+    //printSymbols();
 }
 
 /**
@@ -499,7 +499,7 @@ void TextEditor::remoteInsert(QSymbol symbol) {
         qDebug() << __PRETTY_FUNCTION__ << e.what();
     }
 
-    printSymbols();
+    //printSymbols();
 
     document()->blockSignals(false);
 
@@ -543,7 +543,7 @@ void TextEditor::remoteErase(QSymbol symbol) {
         qDebug() << __PRETTY_FUNCTION__ << e.what();
     }
 
-    printSymbols();
+    //printSymbols();
 
     document()->blockSignals(false);
 
@@ -716,13 +716,10 @@ void TextEditor::remoteOpenBlock(std::vector<QSymbol> symbols) {
 void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
 
     std::for_each(symbols.begin(), symbols.end(), [this](const QSymbol &it){ remoteErase(it); });
-    // qDebug() << "received del " << symbol.getC();
-
     return;
-    //document()->blockSignals(true);
+    document()->blockSignals(true);
     textCursor().clearSelection();
     QTextCursor cursor(document());
-
     /*
     cursor = QTextCursor(doc.firstBlock())
     cursor.select(QTextCursor.BlockUnderCursor)

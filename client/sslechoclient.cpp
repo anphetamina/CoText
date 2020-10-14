@@ -243,7 +243,8 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
         	User loggedUser = registerOk->getUser();
         	if(loggedUser.isLogged()) {
         		qDebug() << "[REGISTER AUTH] Logged in as: " << loggedUser.getEmail();
-		        emit loginSuccessfulReceived();
+		        emit registerSuccessfulReceived();
+		        loginAttemptCount++;
         	} else {
         		qDebug() << "[REGISTER AUTH] FAILED. See the server for the log";
 		        emit registerFailedReceived();
@@ -440,7 +441,7 @@ void SslEchoClient::connectToMainWindow(MainWindow* mw) {
 
 void SslEchoClient::connectToRegister(Register* r) {
 	connect(this, &SslEchoClient::registerFailedReceived, r, &Register::showError);
-	connect(this, &SslEchoClient::loginSuccessfulReceived, r, &Register::registerOk);
+	connect(this, &SslEchoClient::registerSuccessfulReceived, r, &Register::registerOk);
 }
 
 void SslEchoClient::connectToUserEdit(UserEditWidget* uew) {

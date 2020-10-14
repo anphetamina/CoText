@@ -4,6 +4,20 @@ QLineEdit {
     color: black;
 }
 
+QDialog {
+    background-color: rgb(30, 30, 30);
+    color: #858585;
+}
+
+QListWidget {
+    background-color: rgb(51, 51, 51);
+    color: white;
+}
+
+QPushButton {
+    color: black;
+}
+
 
 /***** .QMAINWINDOW. *****/
 
@@ -40,11 +54,9 @@ QComboBox::down-arrow {
 
 QComboBox QAbstractItemView {
     selection-background-color: #333333;
+    background-color: #858585;
+    width: 170px;
 }
-
-
-
-
 
 QWidget#centralWidget{
 	background-color: rgb(37, 37, 38);
@@ -78,18 +90,36 @@ QLabel#label_profilpic {
 }
 
 
+StatusBar::item {
+    border: none;
+}
+
+StatusBar ClickableLabel {
+    background: transparent;
+}
+
+StatusBar QLabel {
+    background: transparent;
+    color: white;
+}
+
+QToolBar QToolButton:checked {
+    background-color: transparent;
+}
+
+QToolBar::separator:horizontal {
+
+    image: url(":/imgs/icons/verticalSeparator_toolbar.svg");
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+
+
 
 
 /**** REGISTER ****/
 
-
-
-QWidget#dropBox {
-	background-color: rgb(61, 61, 61);
-	border-radius: 4px;
-	border: 2px dashed white;
-
-}
 
 
 QDialog#Register {
@@ -163,28 +193,6 @@ QDialog#UserEditWidget {
 
 
 
-StatusBar::item {
-    border: none;
-}
-
-StatusBar ClickableLabel {
-    background: transparent;
-}
-
-StatusBar QLabel {
-    background: transparent;
-}
-
-QToolBar QToolButton:checked {
-    background-color: transparent;
-}
-
-QToolBar::separator:horizontal {
-
-    image: url(":/imgs/icons/verticalSeparator_toolbar.svg");
-    margin-right: 5px;
-    margin-left: 5px;
-}
 
 
 

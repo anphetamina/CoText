@@ -40,7 +40,7 @@ void Login::on_pushButton_Reg_clicked()
 {
     //open Register Form
     clearInput();
-    hide();
+    //hide();
     Register regForm;
     connect(&regForm, &Register::closeLogin, this, &Login::loginSuccessful);
     client->connectToRegister(&regForm);
