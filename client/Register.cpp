@@ -152,6 +152,6 @@ void Register::showError() {
 	QMessageBox::warning(this, "Error", "Error from server");
 }
 void Register::registerOk() {
-	emit closeLogin();
-	this->close();
+    emit closeLogin();
+    this->close();
 }

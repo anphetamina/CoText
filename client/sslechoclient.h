@@ -44,6 +44,7 @@ signals:
     void askUriReceived(QString URI);
     void documentListReceived(QVector<QString> documentList);
     void loginFailed();
+    void registerSuccessfulReceived();
     void registerFailedReceived();
     void updateSuccessfulReceived();
 
