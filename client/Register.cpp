@@ -62,20 +62,9 @@ void Register::on_pushButton_Register_clicked() {
             } else {
             
 				qDebug() << name, surname;
+				//here password is not hashed, it will be hashed in sendRegistration
                 client->sendRegistration(name, surname, email, nickname, pass1, profilePicture);
-                
-                
-                /*
-                //1#. Fill User Object instance, set stautus on, start timer
-                User *usr = new User();
-                usr->setName(name);
-                usr->setNick(nickname);
-                usr->setSurname(surname);
-                usr->setEmail(email);
-                usr->setProfilePic(profilePicture);
 
-                MainWindow::setUser(usr);
-                */
             }
         }
     }

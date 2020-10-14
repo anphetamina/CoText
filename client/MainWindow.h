@@ -50,8 +50,8 @@ public:
 	static void setUser(User* usr){
 		user.setName(usr->getName());
 		user.setSurname(usr->getSurname());
-		user.setNick(usr->getNick());
-		user.setEmail(usr->getNick());
+		user.setPassword(usr->getPassword());
+		user.setEmail(usr->getEmail());
 		user.setProfilePic(usr->getProfilePic());
 		user.setUserState(20); //ACTIVE USER
 	}

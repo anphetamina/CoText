@@ -18,7 +18,7 @@
 #include "MainWindow.h"
 #include "Login.h"
 #include "Register.h"
-#include "UserEditWidget.h"
+#include "usereditwidget.h"
 
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
 

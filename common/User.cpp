@@ -22,7 +22,7 @@ QString User::getEmail() { return this->email; }
 
 int User::getId() const { return this->id; }
 
-QString User::getNick() { return this->nickname; }
+QString User::getPassword()  { return this->hashedPsw; }
 
 QImage User::getProfilePic() { return this->profilePic; }
 
@@ -44,7 +44,7 @@ void User::setSurname(QString _surname) { this->surname = _surname; }
 
 void User::setProfilePic(QImage _profilePic) { this->profilePic = _profilePic; }
 
-void User::setNick(QString _nick) { this->nickname = _nick; }
+void User::setPassword(QString _hashedPassword) { this->hashedPsw = _hashedPassword; }
 
 void User::setEmail(QString _email) { this->email = _email; }
 
@@ -60,9 +60,8 @@ void User::setSignature(uint8_t signature) { this->signature = signature; }
 
 QDataStream &operator>>(QDataStream &in, User &user) {
     in >> user.id >> user.name >> user.surname >> user.email
-       >> user.nickname
        >> user.profilePic
-       //>> user.friendList
+       >> user.hashedPsw
        >> user.userState
        >> user.secondsBeforeInactive
        >> user.userState
@@ -73,9 +72,8 @@ QDataStream &operator>>(QDataStream &in, User &user) {
 
 QDataStream &operator<<(QDataStream &out, const User &user) {
     out << user.id << user.name << user.surname << user.email
-        << user.nickname
         << user.profilePic
-        //<< user.friendList
+        << user.hashedPsw
         << user.userState
         << user.secondsBeforeInactive
         << user.userState

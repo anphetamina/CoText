@@ -31,10 +31,12 @@ public:
     QString getSurname();
 
     QString getEmail();
+    
+    QString getPassword();
 
     int getId() const;
 
-    QString getNick();
+
 
     QImage getProfilePic();
 
@@ -43,9 +45,9 @@ public:
     void setSurname(QString _surname);
 
     void setProfilePic(QImage _profilePic);
-
-    void setNick(QString _nickname);
-
+    
+	void setPassword(QString hashedPassword);
+	
     void setEmail(QString _email);
 
     void setId(int _id);
@@ -70,9 +72,9 @@ private:
     QList<User *> friendList;
     QString name;
     QString surname;
-    QString nickname;
     QString email;
     QImage profilePic;
+    QString hashedPsw;
     int userState;
     int secondsBeforeInactive;
     uint8_t signature = 0x00;

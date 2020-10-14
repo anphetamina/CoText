@@ -17,8 +17,9 @@ UserEditWidget::UserEditWidget(QWidget *parent) :
     ui->lineEditName->setText(usr.getName());
     ui->lineEditSurname->setText(usr.getSurname());
     ui->lineEditEmail->setText(usr.getEmail());
-    //ui->lineEditPass->setText(usr.getPassword());
-    //ui->lineEditRePass->setText(usr.getPassword());
+    //the password is hashed
+    ui->lineEditPass->setText(usr.getPassword());
+    ui->lineEditRePass->setText(usr.getPassword());
     
 }
 
@@ -111,6 +112,7 @@ bool UserEditWidget::checkInput(const QString &name, const QString &surname, con
 				return true;
 		}
 	}
+	return false;
 }
 
 void UserEditWidget::on_pushButton_Cancel_clicked() {
