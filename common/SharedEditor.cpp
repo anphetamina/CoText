@@ -536,6 +536,51 @@ std::pair<int, int> SharedEditor::remoteErase(const QSymbol &symbol) {
     return std::make_pair(-1, -1);
 }
 
+std::pair<int, int> SharedEditor::getPos(const QSymbol &symbol) {
+
+    if (!symbol.isValid()) {
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": symbol is invalid");
+    }
+
+    if (!symbols.front().empty()) {
+        bool mergeLines = false;
+        std::vector<std::vector<QSymbol>>::iterator line_it;
+        std::vector<std::vector<QSymbol>>::iterator last;
+        if (symbols.back().empty()) {
+            last = symbols.end()-1;
+        } else {
+            last = symbols.end();
+        }
+        line_it = std::lower_bound(symbols.begin(), last, symbol, [](const std::vector<QSymbol> & it, const QSymbol& symbol){
+            return it[0] < symbol;
+        });
+
+
+        if (!(line_it == last) && !(line_it == symbols.begin() || line_it->front().getPosition() == symbol.getPosition())) {
+            line_it--;
+        } else if (line_it == last && !(line_it == symbols.begin())) {
+            line_it--;
+        }
+        int line = line_it - symbols.begin();
+
+        std::vector<QSymbol>::iterator index_it;
+        index_it = std::find(line_it->begin(), line_it->end(), symbol);
+
+        if (index_it == line_it->end()) {
+            if (symbol.isNewLine()) {
+                qDebug() << "symbol 'CRLF' ("+symbol.getId()+") not found";
+            } else {
+                qDebug() << "symbol '"+ QString(symbol.getC()) +"' ("+symbol.getId()+") not found";
+            }
+        } else {
+            int index = index_it - line_it->begin();
+            return std::make_pair(line, index);
+        }
+    }
+
+    return std::make_pair(-1, -1);
+}
+
 int SharedEditor::getSiteId() const {
     return siteId;
 }

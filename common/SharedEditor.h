@@ -67,6 +67,8 @@ public:
     int getConnectedUsers();
 
     void setConnectedUsers(int connectedUsers);
+
+    std::pair<int, int> getPos(const QSymbol &symbol);
 };
 
 
