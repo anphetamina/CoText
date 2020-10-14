@@ -15,7 +15,7 @@ QListWidget {
 }
 
 QPushButton {
-    color: white;
+    color: black;
 }
 
 
