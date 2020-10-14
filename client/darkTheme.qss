@@ -42,10 +42,6 @@ QComboBox QAbstractItemView {
     selection-background-color: #333333;
 }
 
-
-
-
-
 QWidget#centralWidget{
 	background-color: rgb(37, 37, 38);
 }
@@ -76,6 +72,32 @@ QStatusBar {
 QLabel#label_profilpic {
 	border-radius: 10px;
 }
+
+
+StatusBar::item {
+    border: none;
+}
+
+StatusBar ClickableLabel {
+    background: transparent;
+}
+
+StatusBar QLabel {
+    background: transparent;
+    color: white;
+}
+
+QToolBar QToolButton:checked {
+    background-color: transparent;
+}
+
+QToolBar::separator:horizontal {
+
+    image: url(":/imgs/icons/verticalSeparator_toolbar.svg");
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
 
 
 
@@ -162,29 +184,6 @@ QDialog#UserEditWidget {
 
 
 
-
-StatusBar::item {
-    border: none;
-}
-
-StatusBar ClickableLabel {
-    background: transparent;
-}
-
-StatusBar QLabel {
-    background: transparent;
-}
-
-QToolBar QToolButton:checked {
-    background-color: transparent;
-}
-
-QToolBar::separator:horizontal {
-
-    image: url(":/imgs/icons/verticalSeparator_toolbar.svg");
-    margin-right: 5px;
-    margin-left: 5px;
-}
 
 
 
