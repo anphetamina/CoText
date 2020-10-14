@@ -79,6 +79,7 @@ User addUser(QString username, QString password, QString name, QString surname, 
         }*/
 
         User loggedUser = User(id, email, name, surname);
+        loggedUser.setPassword(hashedpassword);
         //User loggedUser = checkUserLoginData(email, password);
         qDebug() << "[AUTH] New user registered with success." << endl << "\tRetrieved info = [Email: "
                  << loggedUser.getEmail() << "; Name:" << loggedUser.getName() << "]";
@@ -146,6 +147,7 @@ User *checkUserLoginData(QString email, QString password) {
         QString name = query.value(3).toString();
         QString surname = query.value(4).toString();
         User *loggedUser = new User(id, email, name, surname);
+        loggedUser->setPassword(hashedpassword);
         qDebug() << "[AUTH] New user authenticated with success." << endl << "\tRetrieved info = [Email: "
                  << loggedUser->getEmail() << "; Name:" << loggedUser->getName() << "]";
         return loggedUser;
