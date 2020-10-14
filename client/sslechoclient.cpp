@@ -136,17 +136,16 @@ void SslEchoClient::sendRegistration(QString _name, QString _surname, QString _u
 	this->registerUser(_name, _surname, _username, _nickname, _password, _profilePic);
 }
 
-void SslEchoClient::sendUpdateProfile(QString name, QString surname, QString email, QString oldUsername,
+void SslEchoClient::sendUpdateProfile(int uID, QString name, QString surname, QString email, QString password,
                                       QImage newPP) {
 	
-	this->updateUser(name, surname, email, oldUsername, newPP);
+	this->updateUser(uID, name, surname, email, password, newPP);
 }
 
-void SslEchoClient::updateUser(QString name, QString surname, QString email, QString oldUsername, QImage newPP) {
-	//The field 'password' was used in order to pass the oldUsername for which do the query
-	////TODO pass the field password, update the layout in order to insert old + new password
-	//! We need first to check if the oldPassword match the oldPassword inserted
-	AccountUpdatePacket aup = AccountUpdatePacket(0, email, oldUsername, name, surname, newPP);
+void SslEchoClient::updateUser(int uID, QString name, QString surname, QString email, QString password, QImage newPP) {
+
+	AccountUpdatePacket aup = AccountUpdatePacket(uID, email, password, name, surname, newPP);
+	
 }
 
 int SslEchoClient::getLoginAttemptCount(){

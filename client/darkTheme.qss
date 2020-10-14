@@ -44,6 +44,8 @@ QComboBox QAbstractItemView {
 
 
 
+
+
 QWidget#centralWidget{
 	background-color: rgb(37, 37, 38);
 }

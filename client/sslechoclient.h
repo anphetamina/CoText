@@ -91,8 +91,8 @@ public:
     int getLoginAttemptCount();
     void sendRegistration(QString name, QString surname, QString username, QString nickname, QString password, QImage profilePic);
     void registerUser(QString name, QString surname, QString username, QString nickname, QString password, QImage profilePic);
-    void sendUpdateProfile(QString name, QString surname, QString email, QString oldUsername, QImage newPP);
+    void sendUpdateProfile(int uID, QString name, QString surname, QString email, QString password, QImage newPP);
     
-    void updateUser(QString name, QString surname, QString email, QString oldUsername, QImage newPP);
+    void updateUser(int uID, QString name, QString surname, QString email, QString password, QImage newPP);
 };
 

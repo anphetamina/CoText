@@ -71,9 +71,9 @@ void UserEditWidget::on_pushButton_Done_clicked() {
 		checkDone = true;
 		
 		if(isPPChanged)
-			client->sendUpdateProfile(name, surname, email, getOldUsername(), getNewPP());
+			client->sendUpdateProfile(usr.getId(), name, surname, email, password, getNewPP());
 		else
-			client->sendUpdateProfile(name, surname, email, getOldUsername(), getOldPP());
+			client->sendUpdateProfile(usr.getId(), name, surname, email, password, getOldPP());
 		
 		
 	}
