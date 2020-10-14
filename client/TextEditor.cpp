@@ -714,8 +714,61 @@ void TextEditor::remoteOpenBlock(std::vector<QSymbol> symbols) {
 
 
 void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
+
     std::for_each(symbols.begin(), symbols.end(), [this](const QSymbol &it){ remoteErase(it); });
+    // qDebug() << "received del " << symbol.getC();
+
+    return;
+    //document()->blockSignals(true);
+    textCursor().clearSelection();
+    QTextCursor cursor(document());
+
+    /*
+    cursor = QTextCursor(doc.firstBlock())
+    cursor.select(QTextCursor.BlockUnderCursor)
+    cursor.removeSelectedText()
+    cursor.deleteChar()*/
+
+    //cursor.setPosition(symbols.front().getPosition());
+    std::pair<int, int> possStart = editor.getPos(symbols.front());
+    int positionStart = getPosition(possStart.first, possStart.second);
+    std::pair<int, int> possEnd = editor.getPos(symbols.back());
+    //cursor.select(symbols.back().getPosition());
+    int positionEnd = getPosition(possEnd.first, possEnd.second);
+    cursor = QTextCursor(document());
+    cursor.setPosition(positionStart);
+    cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, positionEnd);
+    cursor.removeSelectedText();
+    cursor.deleteChar();
+
+    //std::for_each(symbols.begin(), symbols.end(), [this](const QSymbol &symbol){
+    for (int i = 0; i < symbols.size(); ++i) {
+        QSymbol symbol = symbols[i];
+        try {
+
+            std::pair<int, int> pos = editor.remoteErase(symbol);
+            /*
+            if (pos.first != -1 || pos.second != -1) {
+
+                decrementIndex(pos.first, 1);
+
+                if (symbol.isNewLine()) {
+                    deleteRow(pos.first, 1);
+                }
+
+                int position = getPosition(pos.first, pos.second);
+
+                if (position < 0 || position > document()->characterCount()) {
+                    throw std::runtime_error(": invalid cursor position");
+                }
+            }*/
+        } catch (const std::exception &e) {
+            qDebug() << __PRETTY_FUNCTION__ << e.what();
+        }
+    }
     printSymbols();
+
+    document()->blockSignals(false);
 }
 
 void TextEditor::paintEvent(QPaintEvent *e) {
