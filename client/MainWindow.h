@@ -120,7 +120,7 @@ signals:
 private:
     Ui::MainWindow *ui;
     StatusBar *qSB;
-    TextEditor *editor;
+    TextEditor * editor;
     QVector<QString> docList;
     QVector<User> onlineUserList = {};        //list of all the user online on this document
     QMap<int, QColor> colorMap = {};

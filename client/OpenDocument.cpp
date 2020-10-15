@@ -18,7 +18,7 @@ OpenDocument::OpenDocument(QVector<QString> docList, MainWindow* mw, QWidget *pa
 }
 
 void OpenDocument::buttonPressed(int i){
-    QMessageBox::StandardButton resBtn = QMessageBox::question(this, "Delete document", tr("Are you sure to delete the document ?\n"), QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
+    QMessageBox::StandardButton resBtn = QMessageBox::question(this, "Delete document", "Are you sure to delete '"+ui->listWidget->item(i)->text()+"' ?\n", QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
 
     if(resBtn == QMessageBox::Yes) {
         emit documentDeleted(ui->listWidget->item(i)->text());
@@ -40,8 +40,8 @@ void OpenDocument::repaint(){
             QPixmap pixmap(":/imgs/icons/noun_Garbage_2025401.svg");
             QIcon buttonIcon(pixmap);
             but->setIcon(buttonIcon);
-            but->setIconSize(pixmap.rect().size()/5);
-            but->setFixedSize(pixmap.rect().size()/5);
+            but->setIconSize(pixmap.rect().size());
+            but->setFixedSize(pixmap.rect().size());
             QLabel *lab = new QLabel ();
             w->layout()->addWidget ( lab );
             w->layout()->addWidget ( but );
