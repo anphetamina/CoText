@@ -17,10 +17,6 @@ if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
 endif (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
 
 
-if(CMAKE_VERSION VERSION_LESS "3.7.0")
-    set(CMAKE_INCLUDE_CURRENT_DIR ON)
-endif()
-
 IF(WIN32)
     SET(OS_SPECIFIC_LIBS netapi32 wsock32)
 ENDIF(WIN32)
@@ -34,10 +30,10 @@ find_package(Qt5 COMPONENTS Svg REQUIRED)
 find_package(Qt5 COMPONENTS PrintSupport REQUIRED)
 find_package(Qt5WebSockets REQUIRED)
 
-file(GLOB client_src "*.h" "*.cpp" "Resources.qrc")
+file(GLOB client_src "*.h" "*.cpp" "*.ui" "Resources.qrc")
 file(GLOB common_src "${common_dir}/*.h" "${common_dir}/*.cpp")
 
 
-add_executable(CoText-client ${common_src} ${client_src} ClickableLabel.cpp ClickableLabel.h)
+add_executable(CoText-client ${common_src} ${client_src})
 
 target_link_libraries(CoText-client Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Network Qt5::Svg Qt5::PrintSupport Qt5::WebSockets ${OS_SPECIFIC_LIBS})
