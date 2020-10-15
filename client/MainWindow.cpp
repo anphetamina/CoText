@@ -1,5 +1,5 @@
 #include "MainWindow.h"
-#include "ui_mainwindow.h"
+#include <ui_MainWindow.h>
 #include "Login.h"
 #include "TextEditor.h"
 #include "ShareUri.h"

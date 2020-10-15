@@ -1,5 +1,5 @@
 #include "Register.h"
-#include "ui_register.h"
+#include <ui_Register.h>
 #include <QMessageBox>
 #include <QIcon>
 #include <QDebug>

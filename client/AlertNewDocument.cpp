@@ -1,7 +1,5 @@
 #include "AlertNewDocument.h"
-#include "ui_AlertNewDocument.h"
-
-#include <QDebug.h>
+#include <ui_AlertNewDocument.h>
 
 AlertNewDocument::AlertNewDocument(QString currentDocument, QString newDoc, QWidget *parent) :
     QDialog(parent),

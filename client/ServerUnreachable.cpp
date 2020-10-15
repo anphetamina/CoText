@@ -1,5 +1,5 @@
 #include "ServerUnreachable.h"
-#include "ui_ServerUnreachable.h"
+#include <ui_ServerUnreachable.h>
 
 ServerUnreachable::ServerUnreachable(Benchmark* b, QWidget *parent) :
     QDialog(parent),

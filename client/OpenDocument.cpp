@@ -1,8 +1,7 @@
 #include "OpenDocument.h"
-#include "ui_OpenDocument.h"
+#include <ui_OpenDocument.h>
 #include "AlertNewDocument.h"
 #include "DeletePushButton.h"
-#include <QDebug.h>
 #include <QtWidgets/QHBoxLayout>
 
 OpenDocument::OpenDocument(QVector<QString> docList, MainWindow* mw, QWidget *parent) :

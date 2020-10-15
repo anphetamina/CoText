@@ -1,5 +1,5 @@
 #include "MainWindow.h"
-#include "ui_userwidget.h"
+#include <ui_UserWidget.h>
 #include "UserWidget.h"
 #include "usereditwidget.h"
 

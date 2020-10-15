@@ -14,15 +14,15 @@ bool dbConfigure() {
 
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
     db.setHostName(DB_HOST);
-    db.setConnectOptions(DB_OPT); // Needed for MAMP
+    //db.setConnectOptions(DB_OPT); // Needed for MAMP
 
     db.setUserName(DB_USER);
     db.setPassword(DB_PASSWORD);
     db.setDatabaseName(DB_NAME);
-    //db.setPort(DB_PORT);//8889
+    db.setPort(DB_PORT);
 
     //qDebug() << QCoreApplication::libraryPaths();
-    //qDebug() << QSqlDatabase::drivers();
+    qDebug() << QSqlDatabase::drivers();
     bool db_res = db.open();
     if (db_res) {
         qDebug() << "[DB] Connected to DB.";

@@ -1,5 +1,5 @@
 #include "ChooseName.h"
-#include "ui_ChooseName.h"
+#include <ui_ChooseName.h>
 
 ChooseName::ChooseName(QVector<QString> dList, QWidget *parent) :
     QDialog(parent),

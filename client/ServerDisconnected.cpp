@@ -1,5 +1,5 @@
 #include "ServerDisconnected.h"
-#include "ui_ServerDisconnected.h"
+#include <ui_ServerDisconnected.h>
 
 ServerDisconnected::ServerDisconnected(QWidget *parent) :
     QDialog(parent),

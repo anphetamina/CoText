@@ -2,7 +2,7 @@
 // Created by Antonio Santoro on 06/08/2020.
 //
 
-#include <ui_mainwindow.h>
+#include <ui_MainWindow.h>
 #include <QtWidgets/QColorDialog>
 #include <QtWidgets/QFontDialog>
 #include <QThread>
@@ -58,7 +58,7 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
         sizeComboBox = mw->sizeComboBox;
 
         connect(fontComboBox, &QFontComboBox::currentFontChanged, this, &TextEditor::setFontFamily);
-        connect(sizeComboBox, &QFontComboBox::textActivated, this, &TextEditor::setFontSize);
+        connect(sizeComboBox, &QFontComboBox::currentTextChanged, this, &TextEditor::setFontSize);
     }
 
     /**
@@ -310,7 +310,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
     }
 
-    //printSymbols();
+    printSymbols();
 }
 
 /**
@@ -499,7 +499,7 @@ void TextEditor::remoteInsert(QSymbol symbol) {
         qDebug() << __PRETTY_FUNCTION__ << e.what();
     }
 
-    //printSymbols();
+    printSymbols();
 
     document()->blockSignals(false);
 
@@ -543,7 +543,7 @@ void TextEditor::remoteErase(QSymbol symbol) {
         qDebug() << __PRETTY_FUNCTION__ << e.what();
     }
 
-    //printSymbols();
+    printSymbols();
 
     document()->blockSignals(false);
 
@@ -708,7 +708,7 @@ void TextEditor::remoteOpenBlock(std::vector<QSymbol> symbols) {
         cursor.movePosition(QTextCursor::End);
         cursor.insertText(buffer_block, last_cf);
     }
-    //printSymbols();
+    printSymbols();
     document()->blockSignals(false);
 }
 
@@ -865,7 +865,7 @@ QColor TextEditor::getUserColor(int userId) const {
     }
 
     qDebug() << "color for" << userId << "not found";
-    return QColorConstants::White;
+    return Qt::white;
 }
 
 int TextEditor::getUserId(int row, int col) const {

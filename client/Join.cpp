@@ -1,5 +1,5 @@
 #include "Join.h"
-#include "ui_Join.h"
+#include <ui_Join.h>
 
 Join::Join(QWidget *parent) :
     QDialog(parent),

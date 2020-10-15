@@ -1,5 +1,5 @@
 #include "ShareUri.h"
-#include "ui_ShareUri.h"
+#include <ui_ShareUri.h>
 
 ShareUri::ShareUri(QString URI, QWidget *parent) :
     QDialog(parent),

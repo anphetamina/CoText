@@ -2,6 +2,7 @@
 // Created by asant on 28/03/2020.
 //
 
+#include <climits>
 #include "Shuffler.h"
 
 Shuffler::Shuffler() : generator(static_cast<int>(std::chrono::high_resolution_clock::now().time_since_epoch().count())) {}

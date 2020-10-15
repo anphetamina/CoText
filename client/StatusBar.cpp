@@ -3,7 +3,7 @@
 //
 
 
-#include <ui_mainwindow.h>
+#include <ui_MainWindow.h>
 #include "StatusBar.h"
 #include "MainWindow.h"
 
