@@ -148,7 +148,7 @@ User *checkUserLoginData(QString email, QString password) {
         QString name = query.value(3).toString();
         QString surname = query.value(4).toString();
         User *loggedUser = new User(id, email, name, surname);
-        loggedUser.setSurname(surname);
+        loggedUser->setSurname(surname);
         loggedUser->setPassword(hashedpassword);
         qDebug() << "[AUTH] New user authenticated with success." << endl << "\tRetrieved info = [Email: "
                  << loggedUser->getEmail() << "; Name:" << loggedUser->getName() << "]";
