@@ -717,16 +717,11 @@ void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
 
     std::for_each(symbols.begin(), symbols.end(), [this](const QSymbol &it){ remoteErase(it); });
     return;
+    
     document()->blockSignals(true);
     textCursor().clearSelection();
     QTextCursor cursor(document());
-    /*
-    cursor = QTextCursor(doc.firstBlock())
-    cursor.select(QTextCursor.BlockUnderCursor)
-    cursor.removeSelectedText()
-    cursor.deleteChar()*/
 
-    //cursor.setPosition(symbols.front().getPosition());
     std::pair<int, int> possStart = editor.getPos(symbols.front());
     int positionStart = getPosition(possStart.first, possStart.second);
     std::pair<int, int> possEnd = editor.getPos(symbols.back());
@@ -744,21 +739,6 @@ void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
         try {
 
             std::pair<int, int> pos = editor.remoteErase(symbol);
-            /*
-            if (pos.first != -1 || pos.second != -1) {
-
-                decrementIndex(pos.first, 1);
-
-                if (symbol.isNewLine()) {
-                    deleteRow(pos.first, 1);
-                }
-
-                int position = getPosition(pos.first, pos.second);
-
-                if (position < 0 || position > document()->characterCount()) {
-                    throw std::runtime_error(": invalid cursor position");
-                }
-            }*/
         } catch (const std::exception &e) {
             qDebug() << __PRETTY_FUNCTION__ << e.what();
         }
