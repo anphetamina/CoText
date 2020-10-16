@@ -61,16 +61,18 @@ OpenDocument::~OpenDocument()
 
 void OpenDocument::on_pushButton_clicked()
 {
-    if(mainWindow->getTextEditor()->isEnabled()){    //c'è già un documento aperto
-        AlertNewDocument alert(mainWindow->windowTitle(), ui->listWidget->currentItem()->text());
-        connect(&alert, &AlertNewDocument::openNewDocument, this, &OpenDocument::forwardOpenNewDocument);
-        alert.setWindowTitle("Alert");
-        alert.setModal(true);
-        alert.exec();
-    }else { //non c'è nessun documento aperto
-        emit(sendOpenDocument(ui->listWidget->currentItem()->text()));
+    if(ui->listWidget->currentItem() != nullptr){
+        if(mainWindow->getTextEditor()->isEnabled()){    //c'è già un documento aperto
+            AlertNewDocument alert(mainWindow->windowTitle(), ui->listWidget->currentItem()->text());
+            connect(&alert, &AlertNewDocument::openNewDocument, this, &OpenDocument::forwardOpenNewDocument);
+            alert.setWindowTitle("Alert");
+            alert.setModal(true);
+            alert.exec();
+        }else { //non c'è nessun documento aperto
+            emit(sendOpenDocument(ui->listWidget->currentItem()->text()));
+        }
+        this->close();
     }
-    this->close();
 }
 
 void OpenDocument::forwardOpenNewDocument(QString docName){
