@@ -182,6 +182,9 @@ QImage loadProfilePic(int id) {
  * Save a profile picture to disk as QImage given the userId and the icon
  */
 bool saveProfilePic(int id, QImage newIcon) {
+    if(!QDir("./profilePictures").exists()) {
+        QDir().mkdir("./profilePictures");
+    }
     QString pictureFileName = QString::number(id) + ".png";
     return newIcon.save("./profilePictures/" + pictureFileName);
 }
