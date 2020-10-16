@@ -39,6 +39,11 @@ public:
 	int getUserId(int row, int col) const;
 	QColor getUserColor(int userId) const;
 
+    SharedEditor getEditor() const;
+    std::vector<int> getIndex() const;
+
+    QString getText() const;
+
     std::atomic<bool> isFromRemote;
 
 private:

@@ -310,7 +310,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
     }
 
-    //printSymbols();
+    printSymbols();
 }
 
 /**
@@ -499,7 +499,7 @@ void TextEditor::remoteInsert(QSymbol symbol) {
         qDebug() << __PRETTY_FUNCTION__ << e.what();
     }
 
-    //printSymbols();
+    printSymbols();
 
     document()->blockSignals(false);
 
@@ -543,7 +543,7 @@ void TextEditor::remoteErase(QSymbol symbol) {
         qDebug() << __PRETTY_FUNCTION__ << e.what();
     }
 
-    //printSymbols();
+    printSymbols();
 
     document()->blockSignals(false);
 
@@ -708,7 +708,7 @@ void TextEditor::remoteOpenBlock(std::vector<QSymbol> symbols) {
         cursor.movePosition(QTextCursor::End);
         cursor.insertText(buffer_block, last_cf);
     }
-    //printSymbols();
+    printSymbols();
     document()->blockSignals(false);
 }
 
@@ -892,6 +892,14 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
 
 }
 
+SharedEditor TextEditor::getEditor() const{
+    return editor;
+}
+
+std::vector<int> TextEditor::getIndex() const{
+    return index;
+}
+
 void TextEditor::printSymbols() {
     std::cout << "---" << std::endl;
     const auto& symbols = editor.getSymbols();
@@ -1003,4 +1011,20 @@ void TextEditor::focusInEvent(QFocusEvent *e) {
 void TextEditor::focusOutEvent(QFocusEvent *e) {
     hasLostFocus = e->lostFocus();
     QTextEdit::focusOutEvent(e);
+}
+
+QString TextEditor::getText() const{
+    QString text;
+    const auto& symbols = editor.getSymbols();
+    for (int i = 0; i < symbols.size(); i++) {
+        for (int j = 0; j < symbols[i].size(); j++) {
+            const QSymbol &s = symbols[i][j];
+            if(s.isNewLine()){
+                text = text + "\r\n";
+            }else{
+                text = text + s.getC().toLatin1();
+            }
+        }
+    }
+    return text;
 }
