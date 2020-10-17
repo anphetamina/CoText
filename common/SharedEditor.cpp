@@ -178,7 +178,7 @@ std::vector<Identifier> SharedEditor::generatePosBetween(std::vector<Identifier>
                 return this->generatePosBetween(pos1, pos2, newPos, level+1);
             }
         } else {
-            throw std::runtime_error("fix symbols position");
+            throw std::runtime_error(std::string{} + __PRETTY_FUNCTION__ + ":invalid symbols ordering");
         }
     } catch (...) {
         throw;
@@ -329,10 +329,6 @@ std::vector<QSymbol> SharedEditor::eraseMultipleLines(int startLine, int startIn
         symbols.erase(symbols.begin() + startLine + 1, symbols.begin() + endLine);
     }
 
-    if (erasedSymbols.back().isNewLine()) {
-        symbols.erase(symbols.begin() + endLine);
-    }
-
     counter -= erasedSymbols.size();
 
     return erasedSymbols;
@@ -367,6 +363,9 @@ std::vector<QSymbol> SharedEditor::localErase(int startLine, int startIndex, int
         return {};
     } else if (startLine != endLine) {
         erasedSymbols = eraseMultipleLines(startLine, startIndex, endLine, endIndex);
+        if (erasedSymbols.back().isNewLine()) {
+            symbols.erase(symbols.begin() + startLine + 1);
+        }
         mergeLines = true;
     } else {
         erasedSymbols = eraseSingleLine(startLine, startIndex, endLine, endIndex);

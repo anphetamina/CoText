@@ -310,7 +310,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
     }
 
-    //printSymbols();
+    printSymbols();
 }
 
 /**
@@ -499,7 +499,7 @@ void TextEditor::remoteInsert(QSymbol symbol) {
         qDebug() << __PRETTY_FUNCTION__ << e.what();
     }
 
-    //printSymbols();
+    printSymbols();
 
     document()->blockSignals(false);
 
@@ -543,7 +543,7 @@ void TextEditor::remoteErase(QSymbol symbol) {
         qDebug() << __PRETTY_FUNCTION__ << e.what();
     }
 
-    //printSymbols();
+    printSymbols();
 
     document()->blockSignals(false);
 
@@ -708,7 +708,7 @@ void TextEditor::remoteOpenBlock(std::vector<QSymbol> symbols) {
         cursor.movePosition(QTextCursor::End);
         cursor.insertText(buffer_block, last_cf);
     }
-    //printSymbols();
+    printSymbols();
     document()->blockSignals(false);
 }
 
