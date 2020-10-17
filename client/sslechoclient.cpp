@@ -233,13 +233,10 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
                 emit loginFailedReceived();
             }
             pServer = qobject_cast<QWebSocket *>(sender());
-            // .... DEBUG TODO: REMOVE when opendoc GUI is implemented and linked here
-            //this->sendDocOpen("AAA", loggedUser.getId());
-
 	        //emit auth(loggedUser);
 	        user = loggedUser;
 
-	        //qDebug() << "USER LOGGED " << user.getId() << " " << user.getEmail();
+	       // qDebug() << "USER LOGGED " << user.getId() << " " << user.getEmail() << " profilePic = "<<user.getProfilePic();
 
 	        break;
         }

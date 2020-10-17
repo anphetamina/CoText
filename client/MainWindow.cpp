@@ -566,11 +566,10 @@ void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> n
                 label->setStyleSheet("font-weight: bold; color:"+colorMap[newCompleteUserList[i].getId()].name());
 
                 QPixmap orig;
+                qDebug() << "User pic = " << user.getProfilePic();
                 if(!user.getProfilePic().isNull()){
-                    qDebug() << "User pic = "<< user.getProfilePic();
                     orig = QPixmap::fromImage(user.getProfilePic());
                 }else{
-                    qDebug() << "User pic null";
                     orig.load(":/imgs/icons/user-group.svg");
                 }
                 QPixmap background = addImageInRightToolBar(orig, colorMap[newCompleteUserList[i].getId()].name());

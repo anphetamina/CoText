@@ -248,6 +248,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
             User loggedUser = addUser(accReq->getUsername(), accReq->getHashedPassword(), accReq->getName(),
                                       accReq->getSurname(), accReq->getProfilePic());
             AccountOkPacket aop = AccountOkPacket(loggedUser);
+            qDebug() <<"[ECHO SERVER] profile pic = "<<loggedUser.getProfilePic();
             aop.send(*pClient);
             break;
         }
