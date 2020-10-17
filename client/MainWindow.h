@@ -90,7 +90,7 @@ private slots:
     void on_actionRedo_triggered();
     void on_actionPrintPDF_triggered();
     void on_actionShare_Uri_triggered();
-    void on_actionSettings_triggered();
+    void on_actionUserInfo_triggered();
     void on_actionJoin_triggered();
     void on_actionNew_triggered();
 	void on_actionCoTextInfo_triggered();

@@ -24,12 +24,10 @@ public:
     explicit UserWidget(QWidget *parent = nullptr);
     ~UserWidget();
 
-
-
-
-
 private:
     Ui::UserWidget *ui;
+
+    QPixmap makeRoundImage(const QPixmap &orig);
 
 private slots:
 	void on_pushButton_Edit_clicked();
