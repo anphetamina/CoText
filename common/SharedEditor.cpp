@@ -4,6 +4,9 @@
 #include "Shuffler.h"
 #include <QDebug>
 
+#ifdef _MSC_VER
+#define __PRETTY_FUNCTION__ __FUNCSIG__
+#endif
 
 SharedEditor::SharedEditor(int siteId)
         : siteId(siteId), counter(0), base(32), boundary(10), idCounter(0) {

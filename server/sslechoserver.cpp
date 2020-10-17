@@ -28,8 +28,8 @@ SslEchoServer::SslEchoServer(quint16 port, QObject *parent) :
                                               QWebSocketServer::SecureMode,
                                               this);
     QSslConfiguration sslConfiguration;
-    QFile certFile(QStringLiteral("../localhost.cert"));
-    QFile keyFile(QStringLiteral("../localhost.key"));
+    QFile certFile(QStringLiteral("./localhost.cert"));
+    QFile keyFile(QStringLiteral("./localhost.key"));
     certFile.open(QIODevice::ReadOnly);
     keyFile.open(QIODevice::ReadOnly);
     QSslCertificate certificate(&certFile, QSsl::Pem);
@@ -164,7 +164,9 @@ bool SslEchoServer::closeDocumentById(int closedDocId, QSharedPointer<Client> cl
         }
         // Send to all the the user connected to the document that was just closed by the client the new userlist
         sendUpdatedOnlineUserByDocId(closedDocId);
+        return true;
     }
+    return false;
 }
 
 void SslEchoServer::onSslErrors(const QList<QSslError> &) {
