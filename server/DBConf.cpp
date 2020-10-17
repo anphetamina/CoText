@@ -35,7 +35,7 @@ bool dbConfigure() {
 /**
  * Print the current user in the DB
  */
-bool getUserlist() {
+void getUserlist() {
     QSqlQuery query;
     qDebug() << "[INFO] Getting user list.. (username, id)";
     query.exec("SELECT username, id FROM User WHERE 1");
