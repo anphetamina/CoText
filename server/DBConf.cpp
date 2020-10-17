@@ -84,7 +84,9 @@ User addUser(QString username, QString password, QString name, QString surname, 
         //User loggedUser = checkUserLoginData(email, password);
         qDebug() << "[AUTH] New user registered with success." << endl << "\tRetrieved info = [Email: "
                  << loggedUser.getEmail() << "; Name:" << loggedUser.getName() << "]";
-        saveProfilePic(id, profilePic);
+        if(saveProfilePic(id, profilePic)){
+            loggedUser.setProfilePic(profilePic);
+        }
         return loggedUser;
     }
     User failedUser = User();
@@ -134,7 +136,7 @@ User updateUser(int userId, QString username, QString password, QString name, QS
 User *checkUserLoginData(QString email, QString password) {
     QSqlQuery query;
     QString hashedpassword = password;
-    qDebug() << "[AUTH] Trying authentication for Mario Rossi (test@test.test)";
+    //qDebug() << "[AUTH] Trying authentication for Mario Rossi (test@test.test)";
 
     // Avoiding security concerns about sql for now. Security :(
     QString squery = "SELECT username, id, email, name, surname FROM User WHERE email='" + email + "' AND password='" +

@@ -125,6 +125,7 @@ void SslEchoClient::authenticate(QString username, QString password) {
     lrp.send(m_webSocket);
 }
 void SslEchoClient::sendLogin(){
+    qDebug() << "sendLogin username = "<<username<<" password = "<<password;
     this->authenticate(username, password);
 }
 
@@ -244,19 +245,18 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
         }
         
         case(PACK_TYPE_ACC_OK): {
+
         	AccountOkPacket* registerOk = dynamic_cast<AccountOkPacket*>(rcvd_packet.get());
-        	User loggedUser = registerOk->getUser();
-        	if(loggedUser.isLogged()) {
-        		qDebug() << "[REGISTER AUTH] Logged in as: " << loggedUser.getEmail();
+        	User registeredUser = registerOk->getUser();
+        	if(registeredUser.isLogged()) {
+        		qDebug() << "[REGISTER AUTH] Registered as: " << registeredUser.getEmail();
+        		sendLogin();
 		        emit registerSuccessfulReceived();
-		        loginAttemptCount++;
         	} else {
         		qDebug() << "[REGISTER AUTH] FAILED. See the server for the log";
 		        emit registerFailedReceived();
-		        
         	}
-        	pServer = qobject_cast<QWebSocket *>(sender());
-        	user = loggedUser;
+
         	break;
 	        
         }
@@ -353,7 +353,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
         case (PACK_TYPE_DOC_USERLIST): {
             // When a client receive this it means that some user just went online/offline
             DocumentBeaconOnlineUsers *bou = dynamic_cast<DocumentBeaconOnlineUsers *>(rcvd_packet.get());
-            //qDebug() << "[DOC] Online userlist updated for DocId: " << bou->getdocId();
+            qDebug() << "[DOC] Online userlist updated for DocId: " << bou->getdocId();
             emit updateUserListReceived(bou->getOnlineUserList(), bou->getCompleteUserList());
             break;
         }
@@ -469,6 +469,7 @@ void SslEchoClient::sendAskDocList(qint32 userId) {
 }
 
 void SslEchoClient::sendDocCreate(QString docName, qint32 userId) {
+    qDebug() << "[ECHO CLIENT] sendDocCreate docName = "<<docName<<" userId = "<<userId;
     if(!pServer->isValid()) // if u call this and login wasnt performed
         return;
     DocumentCreatePacket dcp = DocumentCreatePacket(docName, userId );

@@ -538,6 +538,8 @@ void MainWindow::on_actionRedo_triggered() {
 
 void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> newCompleteUserList){
 
+    qDebug() << "[MW} Update user list";
+
     //remove users that before were online and now are offline
     removeOldOnlineNowOffline(newOnlineUserList);
 
@@ -564,7 +566,13 @@ void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> n
                 label->setStyleSheet("font-weight: bold; color:"+colorMap[newCompleteUserList[i].getId()].name());
 
                 QPixmap orig;
-                orig.load(":/imgs/icons/user-group.svg");
+                if(!user.getProfilePic().isNull()){
+                    qDebug() << "User pic = "<< user.getProfilePic();
+                    orig = QPixmap::fromImage(user.getProfilePic());
+                }else{
+                    qDebug() << "User pic null";
+                    orig.load(":/imgs/icons/user-group.svg");
+                }
                 QPixmap background = addImageInRightToolBar(orig, colorMap[newCompleteUserList[i].getId()].name());
                 iconLabel->setPixmap(background);
 

@@ -420,6 +420,11 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
 
             createDoc(dcp->getdocName(), dcp->getuserId());
 
+            /*int docId = docIdByName(dcp->getdocName(), dcp->getuserId());
+
+            // Send current online userlist for the given document
+            sendUpdatedOnlineUserByDocId(docId);*/
+
             break;
         }
 

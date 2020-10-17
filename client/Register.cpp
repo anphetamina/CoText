@@ -63,6 +63,8 @@ void Register::on_pushButton_Register_clicked() {
             
 				qDebug() << name, surname;
 				//here password is not hashed, it will be hashed in sendRegistration
+                client->set_username(email);
+                client->set_password(pass1);
                 client->sendRegistration(name, surname, email, nickname, pass1, profilePicture);
 
             }
@@ -152,6 +154,7 @@ void Register::showError() {
 	QMessageBox::warning(this, "Error", "Error from server");
 }
 void Register::registerOk() {
-    emit closeLogin();
+    qDebug() << "[REGISTER] registerOk";
+    //emit closeLogin();
     this->close();
 }
