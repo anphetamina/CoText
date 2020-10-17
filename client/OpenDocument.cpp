@@ -18,7 +18,7 @@ OpenDocument::OpenDocument(QVector<QString> docList, MainWindow* mw, QWidget *pa
 }
 
 void OpenDocument::buttonPressed(int i){
-    QMessageBox::StandardButton resBtn = QMessageBox::question(this, "Delete document", tr("Are you sure to delete the document ?\n"), QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
+    QMessageBox::StandardButton resBtn = QMessageBox::question(this, "Delete document", "Are you sure to delete '"+ui->listWidget->item(i)->text()+"' ?\n", QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
 
     if(resBtn == QMessageBox::Yes) {
         emit documentDeleted(ui->listWidget->item(i)->text());
@@ -40,8 +40,8 @@ void OpenDocument::repaint(){
             QPixmap pixmap(":/imgs/icons/noun_Garbage_2025401.svg");
             QIcon buttonIcon(pixmap);
             but->setIcon(buttonIcon);
-            but->setIconSize(pixmap.rect().size()/5);
-            but->setFixedSize(pixmap.rect().size()/5);
+            but->setIconSize(pixmap.rect().size());
+            but->setFixedSize(pixmap.rect().size());
             QLabel *lab = new QLabel ();
             w->layout()->addWidget ( lab );
             w->layout()->addWidget ( but );
@@ -61,16 +61,18 @@ OpenDocument::~OpenDocument()
 
 void OpenDocument::on_pushButton_clicked()
 {
-    if(mainWindow->getTextEditor()->isEnabled()){    //c'è già un documento aperto
-        AlertNewDocument alert(mainWindow->windowTitle(), ui->listWidget->currentItem()->text());
-        connect(&alert, &AlertNewDocument::openNewDocument, this, &OpenDocument::forwardOpenNewDocument);
-        alert.setWindowTitle("Alert");
-        alert.setModal(true);
-        alert.exec();
-    }else { //non c'è nessun documento aperto
-        emit(sendOpenDocument(ui->listWidget->currentItem()->text()));
+    if(ui->listWidget->currentItem() != nullptr){
+        if(mainWindow->getTextEditor()->isEnabled()){    //c'è già un documento aperto
+            AlertNewDocument alert(mainWindow->windowTitle(), ui->listWidget->currentItem()->text());
+            connect(&alert, &AlertNewDocument::openNewDocument, this, &OpenDocument::forwardOpenNewDocument);
+            alert.setWindowTitle("Alert");
+            alert.setModal(true);
+            alert.exec();
+        }else { //non c'è nessun documento aperto
+            emit(sendOpenDocument(ui->listWidget->currentItem()->text()));
+        }
+        this->close();
     }
-    this->close();
 }
 
 void OpenDocument::forwardOpenNewDocument(QString docName){
