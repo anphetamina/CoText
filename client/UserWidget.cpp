@@ -16,7 +16,6 @@
 UserWidget::UserWidget(QWidget *parent) : QDialog(parent), ui(new Ui::UserWidget) {
 	
     ui->setupUi(this);
-
     this->setWindowTitle("Personal information");
 
     //get info and fill contents
@@ -33,7 +32,6 @@ UserWidget::~UserWidget() {
 }
 
 void UserWidget::on_pushButton_Edit_clicked() {
-	
 	UserEditWidget uew;
 	//connect(&uew, &Register::closeLogin, this, &Login::loginSuccessful);
 	//client->connectToRegister(&regForm);
@@ -65,21 +63,6 @@ QPixmap UserWidget::makeRoundImage(const QPixmap &orig) {
     int x = qAbs(orig.width() - size) / 2;
     int y = qAbs(orig.height() - size) / 2;
     painter.drawPixmap(-x, -y, orig.width(), orig.height(), orig);
-
-    /*QPixmap background = QPixmap(size + 50, size + 50);
-    background.fill(Qt::transparent);
-    QPainterPath path1;
-    path1.addEllipse(background.rect());
-    QPainter painter1(&background);
-    painter1.setClipPath(path1);
-
-    // Filling rounded area if needed
-    painter1.fillRect(background.rect(), color);
-
-    // Getting offsets if the original picture is not square
-    x = qAbs(rounded.width() - size - 50) / 2;
-    y = qAbs(rounded.height() - size - 50) / 2;
-    painter1.drawPixmap(x, y, rounded.width(), rounded.height(), rounded);*/
 
     return rounded;
 }
