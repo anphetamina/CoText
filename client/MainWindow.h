@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <unistd.h>
+
 #include <cstdlib>
 #include <QPointingDeviceUniqueId>
 #include <QFile>
@@ -18,6 +18,11 @@
 #include "Login.h"
 #include "MainMenu.h"
 
+#ifdef _MSC_VER
+#define __PRETTY_FUNCTION__ __FUNCSIG__
+#else 
+#include <unistd.h>
+#endif
 
 //#include <QSqlDatabase>
 

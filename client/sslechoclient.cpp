@@ -17,12 +17,13 @@
 QT_USE_NAMESPACE
 
 //! [constructor]
-SslEchoClient::SslEchoClient(const QUrl &url, QObject *parent) :
+ SslEchoClient::SslEchoClient(const QUrl &url, QObject* parent) :
         QObject(parent)
 {
     connect(&m_webSocket, &QWebSocket::connected, this, &SslEchoClient::onConnected);
     connect(&m_webSocket, QOverload<const QList<QSslError>&>::of(&QWebSocket::sslErrors),
             this, &SslEchoClient::onSslErrors);
+    connect(&m_webSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onError(QAbstractSocket::SocketError)));
 
     m_webSocket.open(QUrl(url));
 }
@@ -68,6 +69,10 @@ void SslEchoClient::onSslErrors(const QList<QSslError> &errors)
     m_webSocket.ignoreSslErrors();
 }
 //! [onTextMessageReceived]
+void SslEchoClient::onError(QAbstractSocket::SocketError error)
+{
+    std::cout << error << std::endl;
+}
 
 //! [socketDisconnected]
 void SslEchoClient::socketDisconnected()

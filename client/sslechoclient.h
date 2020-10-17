@@ -61,9 +61,12 @@ public slots:
 
 private Q_SLOTS:
     void onConnected();
+
     void onTextMessageReceived(QString message);
     void onBinaryMessageReceived(QByteArray message);
     void onSslErrors(const QList<QSslError> &errors);
+
+    void onError(QAbstractSocket::SocketError error);
 
 private:
     QString username, password;
