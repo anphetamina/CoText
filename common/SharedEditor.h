@@ -60,6 +60,8 @@ public:
 
     bool isNewLine(QChar &c);
 
+    std::vector<QSymbol> getBlock(int startLine, int startIndex, int endLine, int endIndex);
+
     void connectedUsersDecrease();
 
     void connectedUsersIncrease();

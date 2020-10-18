@@ -625,3 +625,33 @@ void SharedEditor::setConnectedUsers(int connectedUsers){
 void SharedEditor::setSiteId(int siteId){
     this->siteId = siteId;
 }
+
+std::vector<QSymbol> SharedEditor::getBlock(int startLine, int startIndex, int endLine, int endIndex) {
+    std::vector<QSymbol> block;
+
+    if (symbols[startLine].empty()) {
+        return {};
+    } else if (startLine == endLine) {
+        for (int i = startIndex; i <= endIndex; i++) {
+            block.push_back(symbols[startLine][i]);
+        }
+    } else {
+        for (int i = startIndex; i < symbols[startLine].size(); i++) {
+            block.push_back(symbols[startLine][i]);
+        }
+
+        for (int i = startLine + 1; i <= endLine-1; i++) {
+            for (int j = 0; j < symbols[i].size(); j++) {
+                block.push_back(symbols[i][j]);
+            }
+        }
+
+        for (int i = 0; i <= endIndex; i++) {
+            block.push_back(symbols[endLine][i]);
+        }
+    }
+
+
+
+    return block;
+}
