@@ -73,7 +73,6 @@ private:
 public slots:
     void remoteInsert(QSymbol symbol);
     void remoteInsertBlock(std::vector<QSymbol> symbols);
-    void remoteOpenBlock(std::vector<QSymbol> symbols);
     void remoteErase(QSymbol symbol);
     void remoteEraseBlock(std::vector<QSymbol> symbols);
     void updateCursor(int userId, int position);

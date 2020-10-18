@@ -208,7 +208,7 @@ void SslEchoServer::packetParse(QByteArray rcvd_packet) {
 
             // If the type is correct TODO: add HeadID check
             if (mType == PACK_TYPE_PING || mType <= PACK_TYPE_LAST_CODE) {
-                qDebug() << "[INFO] Parsed new packet. Type: " << mType;
+                //qDebug() << "[INFO] Parsed new packet. Type: " << mType;
                 QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
                 dispatch(packetH, pClient);
             } else
@@ -303,16 +303,15 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
 
         case (PACK_TYPE_MSG): {
             Message *msg = dynamic_cast<Message *>(rcvd_packet.get());
-            qDebug() << "[MSG] New symbol received." << endl << "\tChar: " << msg->getQS().getC() << " SiteId: "
-                     << msg->getSiteId();
+            //qDebug() << "[MSG] New symbol received." << endl << "\tChar: " << msg->getQS().getC() << " SiteId: "
+                     //<< msg->getSiteId();
             // Broadcast to all the connected client of a document
             QList<QSharedPointer<Client>> onlineClientPerDoc = documentMapping[getDocIdOpenedByUserId(
                     client->getUserId())];
             for (QSharedPointer<Client> onlineClient : onlineClientPerDoc) {
                 if (onlineClient != client && client->isLogged()) {
                     msg->send(*onlineClient->getSocket());
-                    qDebug() << "\tfrom: " << pClient->peerPort() << "sent to "
-                             << onlineClient->getSocket()->peerPort();
+                    //qDebug() << "\tfrom: " << pClient->peerPort() << "sent to " << onlineClient->getSocket()->peerPort();
                 }
             }
             // Run actions on the CRDT instances of the server (one for each document)
@@ -348,8 +347,8 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
             for (QSharedPointer<Client> onlineClient : onlineClientPerDoc) {
                 if (onlineClient != client && client->isLogged()) {
                     bmsg->send(*onlineClient->getSocket());
-                    qDebug() << "\tfrom: " << pClient->peerPort() << "sent to "
-                             << onlineClient->getSocket()->peerPort();
+                    //qDebug() << "\tfrom: " << pClient->peerPort() << "sent to "
+                             //<< onlineClient->getSocket()->peerPort();
                 }
             }
             // Run actions on the CRDT instances of the server (one for each document)
@@ -377,8 +376,8 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
         case (PACK_TYPE_CURSOR_POS): {
             CursorPacket *cp = dynamic_cast<CursorPacket *>(rcvd_packet.get());
             //qDebug() << msg->getData();
-            qDebug() << "[CP] New cursor position received." << endl << "Pos: " << cp->getnewPosition() << " User id: "
-                     << cp->getuserId();
+            //qDebug() << "[CP] New cursor position received." << endl << "Pos: " << cp->getnewPosition() << " User id: "
+                     //<< cp->getuserId();
             // Broadcast to all the connected client of a document
             QList<QSharedPointer<Client>> onlineClientPerDoc = documentMapping[getDocIdOpenedByUserId(
                     client->getUserId())]; //TODO: deccoment and delete for
@@ -393,7 +392,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
         case (PACK_TYPE_ALIGN): {
             AlignMessage *am = dynamic_cast<AlignMessage *>(rcvd_packet.get());
             //qDebug() << msg->getData();
-            qDebug() << "[ALIGN] New alignment  received." << endl;
+            //qDebug() << "[ALIGN] New alignment  received." << endl;
             // Broadcast to all the connected client of a document
             int curDocId = getDocIdOpenedByUserId(client->getUserId());
             QList<QSharedPointer<Client>> onlineClientPerDoc = documentMapping[curDocId];
