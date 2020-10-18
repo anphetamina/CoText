@@ -15,7 +15,7 @@ extern int port;
 
 bool dbConfigure();
 
-bool getUserlist();
+void getUserlist();
 
 User addUser(QString username, QString password, QString name, QString surname, QImage profilePic);
 

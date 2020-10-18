@@ -28,8 +28,8 @@ SslEchoServer::SslEchoServer(quint16 port, QObject *parent) :
                                               QWebSocketServer::SecureMode,
                                               this);
     QSslConfiguration sslConfiguration;
-    QFile certFile(QStringLiteral("../localhost.cert"));
-    QFile keyFile(QStringLiteral("../localhost.key"));
+    QFile certFile(QStringLiteral("./localhost.cert"));
+    QFile keyFile(QStringLiteral("./localhost.key"));
     certFile.open(QIODevice::ReadOnly);
     keyFile.open(QIODevice::ReadOnly);
     QSslCertificate certificate(&certFile, QSsl::Pem);
@@ -164,7 +164,9 @@ bool SslEchoServer::closeDocumentById(int closedDocId, QSharedPointer<Client> cl
         }
         // Send to all the the user connected to the document that was just closed by the client the new userlist
         sendUpdatedOnlineUserByDocId(closedDocId);
+        return true;
     }
+    return false;
 }
 
 void SslEchoServer::onSslErrors(const QList<QSslError> &) {
@@ -246,6 +248,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
             User loggedUser = addUser(accReq->getUsername(), accReq->getHashedPassword(), accReq->getName(),
                                       accReq->getSurname(), accReq->getProfilePic());
             AccountOkPacket aop = AccountOkPacket(loggedUser);
+            qDebug() <<"[ECHO SERVER] profile pic = "<<loggedUser.getProfilePic();
             aop.send(*pClient);
             break;
         }
@@ -417,6 +420,11 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
             }
 
             createDoc(dcp->getdocName(), dcp->getuserId());
+
+            /*int docId = docIdByName(dcp->getdocName(), dcp->getuserId());
+
+            // Send current online userlist for the given document
+            sendUpdatedOnlineUserByDocId(docId);*/
 
             break;
         }

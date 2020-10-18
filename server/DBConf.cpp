@@ -35,7 +35,7 @@ bool dbConfigure() {
 /**
  * Print the current user in the DB
  */
-bool getUserlist() {
+void getUserlist() {
     QSqlQuery query;
     qDebug() << "[INFO] Getting user list.. (username, id)";
     query.exec("SELECT username, id FROM User WHERE 1");
@@ -84,7 +84,11 @@ User addUser(QString username, QString password, QString name, QString surname, 
         //User loggedUser = checkUserLoginData(email, password);
         qDebug() << "[AUTH] New user registered with success." << endl << "\tRetrieved info = [Email: "
                  << loggedUser.getEmail() << "; Name:" << loggedUser.getName() << "]";
-        saveProfilePic(id, profilePic);
+        qDebug() << "[DB CONF] Profile pic = "<<profilePic;
+        if(saveProfilePic(id, profilePic)){
+            qDebug() << "[DB CONF] save profile succeeded";
+            loggedUser.setProfilePic(profilePic);
+        }
         return loggedUser;
     }
     User failedUser = User();
@@ -134,7 +138,7 @@ User updateUser(int userId, QString username, QString password, QString name, QS
 User *checkUserLoginData(QString email, QString password) {
     QSqlQuery query;
     QString hashedpassword = password;
-    qDebug() << "[AUTH] Trying authentication for Mario Rossi (test@test.test)";
+    //qDebug() << "[AUTH] Trying authentication for Mario Rossi (test@test.test)";
 
     // Avoiding security concerns about sql for now. Security :(
     QString squery = "SELECT username, id, email, name, surname FROM User WHERE email='" + email + "' AND password='" +
@@ -150,6 +154,7 @@ User *checkUserLoginData(QString email, QString password) {
         User *loggedUser = new User(id, email, name, surname);
         loggedUser->setSurname(surname);
         loggedUser->setPassword(hashedpassword);
+        loggedUser->setProfilePic(loadProfilePic(id));
         qDebug() << "[AUTH] New user authenticated with success." << endl << "\tRetrieved info = [Email: "
                  << loggedUser->getEmail() << "; Name:" << loggedUser->getName() << "]";
         return loggedUser;
@@ -166,15 +171,13 @@ User *checkUserLoginData(QString email, QString password) {
  * Load a profile picture from disk as QImage given the userId
  */
 QImage loadProfilePic(int id) {
-    QString pictureFileName = QString::number(id) + ".png";
     QImage myicon = QImage();
+    QString pictureFileName = QString::number(id) + ".png";
     QString filePath = "./profilePictures/" + pictureFileName;
     QFile file(filePath);
-    QVector<QVector<QSymbol>> qdoc;
-    if (!file.open(QIODevice::ReadOnly)) {
+    if (file.open(QIODevice::ReadOnly)) {
         myicon = QImage(filePath);
     }
-
     return myicon;
 }
 
@@ -186,6 +189,7 @@ bool saveProfilePic(int id, QImage newIcon) {
         QDir().mkdir("./profilePictures");
     }
     QString pictureFileName = QString::number(id) + ".png";
+
     return newIcon.save("./profilePictures/" + pictureFileName);
 }
 

@@ -5,6 +5,10 @@
 #include <QDebug>
 #include "QSymbol.h"
 
+#ifdef _MSC_VER
+    #define __PRETTY_FUNCTION__ __FUNCSIG__
+#endif
+
 QSymbol::QSymbol() : c(QChar()), id(QString()), position({}), cf(QTextCharFormat()) {}
 QSymbol::QSymbol(const QChar &c, const QString &id, const std::vector<Identifier> &position, QTextCharFormat cf) : c(c), id(id),
                                                                                             position(position), cf(cf) {}

@@ -38,9 +38,7 @@ void Login::on_pushButton_Login_clicked()
 
 void Login::on_pushButton_Reg_clicked()
 {
-    //open Register Form
     clearInput();
-    //hide();
     Register regForm;
     connect(&regForm, &Register::closeLogin, this, &Login::loginSuccessful);
     client->connectToRegister(&regForm);
@@ -88,6 +86,7 @@ void Login::loginFailed(){
 }
 
 void Login::loginSuccessful(){
+    qDebug() << "[LOGIN] loginSuccessfull";
     this->close();
 }
 

@@ -723,8 +723,8 @@ void TextEditor::remoteOpenBlock(std::vector<QSymbol> symbols) {
 
 void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
 
-    std::for_each(symbols.begin(), symbols.end(), [this](const QSymbol &it){ remoteErase(it); });
-    return;
+    //std::for_each(symbols.begin(), symbols.end(), [this](const QSymbol &it){ remoteErase(it); });
+    //return;
     
     document()->blockSignals(true);
     textCursor().clearSelection();
@@ -735,22 +735,44 @@ void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
     std::pair<int, int> possEnd = editor.getPos(symbols.back());
     //cursor.select(symbols.back().getPosition());
     int positionEnd = getPosition(possEnd.first, possEnd.second);
-    cursor = QTextCursor(document());
-    cursor.setPosition(positionStart);
-    cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, positionEnd);
-    cursor.removeSelectedText();
-    cursor.deleteChar();
+   
 
     //std::for_each(symbols.begin(), symbols.end(), [this](const QSymbol &symbol){
     for (int i = 0; i < symbols.size(); ++i) {
-        QSymbol symbol = symbols[i];
         try {
 
-            std::pair<int, int> pos = editor.remoteErase(symbol);
-        } catch (const std::exception &e) {
+            std::pair<int, int> pos = editor.remoteErase(symbols[i]);
+            if (pos.first != -1 || pos.second != -1) {
+
+                decrementIndex(pos.first, 1);
+
+                if (symbols[i].isNewLine()) {
+                    deleteRow(pos.first, 1);
+                }
+
+                int position = getPosition(pos.first, pos.second);
+
+                if (position < 0 || position > document()->characterCount()) {
+                    throw std::runtime_error(": invalid cursor position");
+                }
+
+                //QTextCursor cursor(document());
+                //cursor.setPosition(position);
+                //cursor.deleteChar();
+
+                //cursorPositionChange();
+            }
+        }
+
+        catch (const std::exception& e) {
             qDebug() << __PRETTY_FUNCTION__ << e.what();
         }
     }
+    cursor = QTextCursor(document());
+    cursor.setPosition(positionStart);
+    cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, symbols.size());
+    cursor.removeSelectedText();
+    //cursor.deleteChar();
     printSymbols();
 
     document()->blockSignals(false);

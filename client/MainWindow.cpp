@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionNew))->installEventFilter(this);
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionShare_Uri))->installEventFilter(this);
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionLogout))->installEventFilter(this);
-    dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionSettings))->installEventFilter(this);
+    dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionUserInfo))->installEventFilter(this);
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionJoin))->installEventFilter(this);
     
     //installing EventiFilter for QToolButtons on the upperQToolBar
@@ -150,15 +150,15 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         return true;
     }
 
-    //Settings
-    if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionSettings)) && event->type() == QEvent::Enter) {
+    //User Information
+    if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionUserInfo)) && event->type() == QEvent::Enter) {
         setCursor(Qt::PointingHandCursor);
-        ui->actionSettings->setIcon(QIcon(":/imgs/icons/noun_Settings_2324598_white.svg"));
+        ui->actionUserInfo->setIcon(QIcon(":/imgs/icons/noun_Settings_2324598_white.svg"));
         return true;
     }
-    if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionSettings)) && event->type() == QEvent::Leave) {
+    if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionUserInfo)) && event->type() == QEvent::Leave) {
         setCursor(Qt::ArrowCursor);
-        ui->actionSettings->setIcon(QIcon(":/imgs/icons/noun_Settings_2324598.svg"));
+        ui->actionUserInfo->setIcon(QIcon(":/imgs/icons/noun_Settings_2324598.svg"));
         return true;
     }
 
@@ -538,6 +538,8 @@ void MainWindow::on_actionRedo_triggered() {
 
 void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> newCompleteUserList){
 
+    qDebug() << "[MW} Update user list";
+
     //remove users that before were online and now are offline
     removeOldOnlineNowOffline(newOnlineUserList);
 
@@ -564,7 +566,12 @@ void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> n
                 label->setStyleSheet("font-weight: bold; color:"+colorMap[newCompleteUserList[i].getId()].name());
 
                 QPixmap orig;
-                orig.load(":/imgs/icons/user-group.svg");
+                qDebug() << "User pic = " << user.getProfilePic();
+                if(!user.getProfilePic().isNull()){
+                    orig = QPixmap::fromImage(user.getProfilePic());
+                }else{
+                    orig.load(":/imgs/icons/user-group.svg");
+                }
                 QPixmap background = addImageInRightToolBar(orig, colorMap[newCompleteUserList[i].getId()].name());
                 iconLabel->setPixmap(background);
 
@@ -648,7 +655,7 @@ void MainWindow::askUriReceivedMainWindow(QString URI) {
     shareUri.exec();
 }
 
-void MainWindow::on_actionSettings_triggered() {
+void MainWindow::on_actionUserInfo_triggered() {
 
     UserWidget uw;
     uw.setModal(true);
@@ -715,7 +722,7 @@ void MainWindow::openDocumentMainWindow(int docId, QString docName, std::vector<
 }
 
 void MainWindow::closeMainWindow(){
-    qDebug()<<"[MAIN WINDOW] close ";
+    //qDebug()<<"[MAIN WINDOW] close ";
     exit(0);
 }
 

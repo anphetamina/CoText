@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1200</width>
+    <width>981</width>
     <height>600</height>
    </rect>
   </property>
@@ -104,7 +104,7 @@
    <addaction name="actionOpen"/>
    <addaction name="actionShare_Uri"/>
    <addaction name="actionJoin"/>
-   <addaction name="actionSettings"/>
+   <addaction name="actionUserInfo"/>
    <addaction name="actionLogout"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -173,13 +173,15 @@
    <property name="windowTitle">
     <string>toolBar_2</string>
    </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
    <attribute name="toolBarArea">
     <enum>RightToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="separator"/>
   </widget>
   <action name="actionNew">
    <property name="checkable">
@@ -299,41 +301,6 @@
     <string>Ctrl+Shift+Z</string>
    </property>
   </action>
-  <action name="actionLogin">
-   <property name="checkable">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="Resources.qrc">
-     <normaloff>:/imgs/icons/noun_user login_178831.svg</normaloff>
-     <normalon>:/imgs/icons/noun_user login_178831.svg</normalon>
-     <activeoff>:/imgs/icons/noun_user login_178831.svg</activeoff>
-     <activeon>:/imgs/icons/noun_user login_178831_white.svg</activeon>
-     <selectedoff>:/imgs/icons/noun_user login_178831.svg</selectedoff>
-     <selectedon>:/imgs/icons/noun_user login_178831_white.svg</selectedon>:/imgs/icons/noun_user login_178831.svg</iconset>
-   </property>
-   <property name="text">
-    <string>Login...</string>
-   </property>
-   <property name="font">
-    <font/>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+L</string>
-   </property>
-   <property name="autoRepeat">
-    <bool>true</bool>
-   </property>
-   <property name="visible">
-    <bool>true</bool>
-   </property>
-   <property name="menuRole">
-    <enum>QAction::TextHeuristicRole</enum>
-   </property>
-   <property name="shortcutVisibleInContextMenu">
-    <bool>false</bool>
-   </property>
-  </action>
   <action name="actionLogout">
    <property name="icon">
     <iconset resource="Resources.qrc">
@@ -355,13 +322,13 @@
     <string>Ctrl+Alt+S</string>
    </property>
   </action>
-  <action name="actionSettings">
+  <action name="actionUserInfo">
    <property name="icon">
     <iconset resource="Resources.qrc">
      <normaloff>:/imgs/icons/noun_Settings_2324598.svg</normaloff>:/imgs/icons/noun_Settings_2324598.svg</iconset>
    </property>
    <property name="text">
-    <string>Settings</string>
+    <string>User Information</string>
    </property>
   </action>
   <action name="actionItalic">
@@ -491,403 +458,6 @@
    </property>
    <property name="text">
     <string>Align center</string>
-   </property>
-  </action>
-  <action name="actionUser0">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>User0</string>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="visible">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionUser1">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>User1</string>
-   </property>
-   <property name="toolTip">
-    <string>User1</string>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="visible">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionUser2">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>User2</string>
-   </property>
-   <property name="toolTip">
-    <string>User2</string>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="visible">
-    <bool>true</bool>
-   </property>
-   <property name="menuRole">
-    <enum>QAction::NoRole</enum>
-   </property>
-  </action>
-  <action name="actionUser3">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>User3</string>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="visible">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionUser4">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>User4</string>
-   </property>
-   <property name="toolTip">
-    <string>User4</string>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="visible">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionUser5">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>User5</string>
-   </property>
-   <property name="toolTip">
-    <string>User5</string>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="visible">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionUser6">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>User6</string>
-   </property>
-   <property name="toolTip">
-    <string>User6</string>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="visible">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionUser7">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>User7</string>
-   </property>
-   <property name="toolTip">
-    <string>User7</string>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="visible">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionUser8">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>User8</string>
-   </property>
-   <property name="toolTip">
-    <string>User8</string>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="visible">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionUser9">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>User9</string>
-   </property>
-   <property name="toolTip">
-    <string>User9</string>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="visible">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionUser10">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>User10</string>
-   </property>
-   <property name="toolTip">
-    <string>User10</string>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="visible">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionUser11">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>User11</string>
-   </property>
-   <property name="toolTip">
-    <string>User11</string>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="visible">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionUser12">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>User12</string>
-   </property>
-   <property name="toolTip">
-    <string>User12</string>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="visible">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionUser13">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>User13</string>
-   </property>
-   <property name="toolTip">
-    <string>User13</string>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="visible">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionUser14">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>User14</string>
-   </property>
-   <property name="toolTip">
-    <string>User14</string>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="visible">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionUser15">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>User15</string>
-   </property>
-   <property name="toolTip">
-    <string>User15</string>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="visible">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionUser16">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>User16</string>
-   </property>
-   <property name="toolTip">
-    <string>User16</string>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="visible">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionUser17">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>User17</string>
-   </property>
-   <property name="toolTip">
-    <string>User17</string>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="visible">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionUser18">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>User18</string>
-   </property>
-   <property name="toolTip">
-    <string>User18</string>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="visible">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionUser19">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>User19</string>
-   </property>
-   <property name="toolTip">
-    <string>User19</string>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="visible">
-    <bool>true</bool>
    </property>
   </action>
   <action name="actionJoin">

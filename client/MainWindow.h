@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <unistd.h>
+
 #include <cstdlib>
 #include <QPointingDeviceUniqueId>
 #include <QFile>
@@ -18,6 +18,11 @@
 #include "Login.h"
 #include "MainMenu.h"
 
+#ifdef _MSC_VER
+#define __PRETTY_FUNCTION__ __FUNCSIG__
+#else 
+#include <unistd.h>
+#endif
 
 //#include <QSqlDatabase>
 
@@ -85,7 +90,7 @@ private slots:
     void on_actionRedo_triggered();
     void on_actionPrintPDF_triggered();
     void on_actionShare_Uri_triggered();
-    void on_actionSettings_triggered();
+    void on_actionUserInfo_triggered();
     void on_actionJoin_triggered();
     void on_actionNew_triggered();
 	void on_actionCoTextInfo_triggered();
