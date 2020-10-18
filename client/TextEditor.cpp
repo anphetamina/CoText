@@ -563,6 +563,10 @@ int TextEditor::getPosition(int row, int col) {
 
 void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
 
+    if (symbols.empty()) {
+        return;
+    }
+
     document()->blockSignals(true);
 
     textCursor().clearSelection();
@@ -589,10 +593,9 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
                 if (j == 0) {
                     firstLine = pos.first;
                     firstIndex = pos.second;
-                } else if (j == symbols.size() - 1) {
-                    lastLine = pos.first;
-                    lastIndex = pos.second;
                 }
+                lastLine = pos.first;
+                lastIndex = pos.second;
 
             }
         }
@@ -607,8 +610,6 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
         QString bufferString;
         QTextCursor cursor(document());
         cursor.setPosition(lastPosition);
-
-
 
         for (int i = 0; i < block.size(); i++) {
             if (i != 0 && block[i].getCF() != lastCF) {

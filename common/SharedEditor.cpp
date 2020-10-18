@@ -629,7 +629,9 @@ void SharedEditor::setSiteId(int siteId){
 std::vector<QSymbol> SharedEditor::getBlock(int startLine, int startIndex, int endLine, int endIndex) {
     std::vector<QSymbol> block;
 
-    if (startLine == endLine) {
+    if (symbols[startLine].empty()) {
+        return {};
+    } else if (startLine == endLine) {
         for (int i = startIndex; i <= endIndex; i++) {
             block.push_back(symbols[startLine][i]);
         }
