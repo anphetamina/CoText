@@ -329,10 +329,6 @@ std::vector<QSymbol> SharedEditor::eraseMultipleLines(int startLine, int startIn
         symbols.erase(symbols.begin() + startLine + 1, symbols.begin() + endLine);
     }
 
-    if (erasedSymbols.back().isNewLine()) {
-        symbols.erase(symbols.begin() + endLine);
-    }
-
     counter -= erasedSymbols.size();
 
     return erasedSymbols;
@@ -367,6 +363,9 @@ std::vector<QSymbol> SharedEditor::localErase(int startLine, int startIndex, int
         return {};
     } else if (startLine != endLine) {
         erasedSymbols = eraseMultipleLines(startLine, startIndex, endLine, endIndex);
+        if (erasedSymbols.back().isNewLine()) {
+            symbols.erase(symbols.begin() + startLine + 1);
+        }
         mergeLines = true;
     } else {
         erasedSymbols = eraseSingleLine(startLine, startIndex, endLine, endIndex);
