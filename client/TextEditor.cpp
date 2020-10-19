@@ -710,7 +710,7 @@ void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
     int position = getPosition(firstLine, firstIndex);
     cursor.setPosition(position);
     cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, erasedBlock.size());
-    cursor.deleteChar();
+    cursor.removeSelectedText();
 
     remoteInsertBlock(diffBlock);
 
