@@ -238,7 +238,7 @@ bool createDoc(QString docName, int userId) {
     QString available_docName = docName;
     bool available_name = false;
 
-    while (!available_name) {//TODO: improve logic, but good PoC
+    while (!available_name) {//NOTE: logic can be improved, but good PoC
         // Check if it was already added (userid, docID) should be UNIQUE
         query0.exec(
                 "SELECT id FROM Permission WHERE userid=" + quserId + "AND documentname=" + available_docName + ";");
