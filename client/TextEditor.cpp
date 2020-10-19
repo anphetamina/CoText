@@ -606,10 +606,18 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
         insertRow(firstLine, lineCount);
 
         int lastPosition = getPosition(firstLine, firstIndex);
-        QTextCharFormat lastCF = QTextCharFormat();
-        QString bufferString;
+
+        int diffSize = static_cast<int>(block.size() - symbols.size());
         QTextCursor cursor(document());
         cursor.setPosition(lastPosition);
+        cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, diffSize);
+        cursor.removeSelectedText();
+        cursor.setPosition(lastPosition);
+
+        //std::cout << document()->toPlainText().toStdString() << std::endl;
+
+        QTextCharFormat lastCF = QTextCharFormat();
+        QString bufferString;
 
         for (int i = 0; i < block.size(); i++) {
             if (i != 0 && block[i].getCF() != lastCF) {
