@@ -66,7 +66,7 @@ private:
     void incrementIndex(int pos, int n);
     void decrementIndex(int pos, int n);
     int getPosition(int row, int col);
-    void printSymbols();
+    void printSymbols(const std::string &functionName);
     bool isNewLine(QChar c);
     void incrementIndexAtPos(int pos, int n);
 

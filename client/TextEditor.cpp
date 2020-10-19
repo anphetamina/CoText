@@ -310,7 +310,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
     }
 
-    printSymbols();
+    printSymbols(__PRETTY_FUNCTION__);
 }
 
 /**
@@ -499,7 +499,7 @@ void TextEditor::remoteInsert(QSymbol symbol) {
         qDebug() << __PRETTY_FUNCTION__ << e.what();
     }
 
-    printSymbols();
+    printSymbols(__PRETTY_FUNCTION__);
 
     document()->blockSignals(false);
 
@@ -543,7 +543,7 @@ void TextEditor::remoteErase(QSymbol symbol) {
         qDebug() << __PRETTY_FUNCTION__ << e.what();
     }
 
-    printSymbols();
+    printSymbols(__PRETTY_FUNCTION__);
 
     document()->blockSignals(false);
 
@@ -632,7 +632,7 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
 
         cursorPositionChange();
 
-        printSymbols();
+        printSymbols(__PRETTY_FUNCTION__);
     } catch (const std::exception &e) {
         qDebug() << "TextEditor::remoteInsertBlock" << __PRETTY_FUNCTION__ << e.what();
     }
@@ -644,7 +644,73 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
 
 void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
 
-    std::for_each(symbols.begin(), symbols.end(), [this](const QSymbol &it){ remoteErase(it); });
+    if (symbols.empty()) {
+        return;
+    }
+
+    document()->blockSignals(true);
+
+    std::pair<int, int> firstPos = std::make_pair(-1, -1);
+    std::pair<int, int> lastPos = std::make_pair(-1, -1);
+
+    for (int i = 0; i < symbols.size(); i++) {
+        std::pair<int, int> pos = editor.getPos(symbols[i]);
+
+        if (pos.first != -1 || pos.second != -1) {
+
+            if (firstPos.first == -1 || firstPos.second == -1) {
+                firstPos = pos;
+            }
+
+            lastPos = pos;
+        }
+
+    }
+
+    int firstLine = firstPos.first;
+    int firstIndex = firstPos.second;
+    int lastLine = lastPos.first;
+    int lastIndex = lastPos.second;
+
+    if (firstLine == -1 || firstIndex == -1 || lastLine == -1 || lastIndex == -1) {
+        return;
+    }
+
+    std::vector<QSymbol> oldBlock = editor.getBlock(firstLine, firstIndex, lastLine, lastIndex);
+
+    std::vector<QSymbol> erasedBlock{};
+
+    int lineCount = 0;
+    for (int i = 0; i < symbols.size(); i++) {
+        std::pair<int, int> pos = editor.remoteErase(symbols[i]);
+
+        if (pos.first != -1 || pos.second != -1) {
+            if (symbols[i].isNewLine()) {
+                lineCount++;
+            }
+            erasedBlock.push_back(symbols[i]);
+        }
+    }
+
+    std::vector<QSymbol> diffBlock{};
+    std::set_difference(oldBlock.begin(), oldBlock.end(), erasedBlock.begin(), erasedBlock.end(), diffBlock.begin());
+
+    decrementIndex(firstLine, diffBlock.size());
+    deleteRow(firstLine, lineCount);
+
+    QTextCursor cursor(document());
+    int position = getPosition(firstLine, firstIndex);
+    cursor.setPosition(position);
+    cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, erasedBlock.size());
+    cursor.deleteChar();
+
+    remoteInsertBlock(diffBlock);
+
+    cursorPositionChange();
+    printSymbols(__PRETTY_FUNCTION__);
+
+    document()->blockSignals(false);
+
 }
 
 void TextEditor::paintEvent(QPaintEvent *e) {
@@ -791,8 +857,8 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
 
 }
 
-void TextEditor::printSymbols() {
-    std::cout << "---" << std::endl;
+void TextEditor::printSymbols(const std::string &functionName) {
+    std::cout << "--- " << functionName << " ---" << std::endl;
     const auto& symbols = editor.getSymbols();
     for (int i = 0; i < symbols.size(); i++) {
         std::cout << "[" << index[i] << "] ";
