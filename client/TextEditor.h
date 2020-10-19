@@ -71,14 +71,13 @@ private:
     void incrementIndex(int pos, int n);
     void decrementIndex(int pos, int n);
     int getPosition(int row, int col);
-    void printSymbols();
+    void printSymbols(const std::string &functionName);
     bool isNewLine(QChar c);
     void incrementIndexAtPos(int pos, int n);
 
 public slots:
     void remoteInsert(QSymbol symbol);
     void remoteInsertBlock(std::vector<QSymbol> symbols);
-    void remoteOpenBlock(std::vector<QSymbol> symbols);
     void remoteErase(QSymbol symbol);
     void remoteEraseBlock(std::vector<QSymbol> symbols);
     void updateCursor(int userId, int position);

@@ -545,7 +545,6 @@ std::pair<int, int> SharedEditor::getPos(const QSymbol &symbol) {
     }
 
     if (!symbols.front().empty()) {
-        bool mergeLines = false;
         std::vector<std::vector<QSymbol>>::iterator line_it;
         std::vector<std::vector<QSymbol>>::iterator last;
         if (symbols.back().empty()) {
