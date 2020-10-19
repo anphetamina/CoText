@@ -24,7 +24,7 @@ QT_USE_NAMESPACE
 SslEchoServer::SslEchoServer(quint16 port, QObject *parent) :
         QObject(parent),
         m_pWebSocketServer(nullptr) {
-    m_pWebSocketServer = new QWebSocketServer(QStringLiteral("SSL Echo Server"),
+    m_pWebSocketServer = new QWebSocketServer(QStringLiteral("CotextServer"),
                                               QWebSocketServer::SecureMode,
                                               this);
     QSslConfiguration sslConfiguration;
@@ -42,13 +42,13 @@ SslEchoServer::SslEchoServer(quint16 port, QObject *parent) :
     m_pWebSocketServer->setSslConfiguration(sslConfiguration);
 
     if (m_pWebSocketServer->listen(QHostAddress::Any, port)) {
-        qDebug() << "SSL Echo Server listening on port" << port;
+        qInfo() << "Server listening on port" << port;
         connect(m_pWebSocketServer, &QWebSocketServer::newConnection,
                 this, &SslEchoServer::onNewConnection);
         connect(m_pWebSocketServer, &QWebSocketServer::sslErrors,
                 this, &SslEchoServer::onSslErrors);
     } else {
-        qDebug() << "Cant listen";
+        qFatal("Cant listen");
     }
 
 }
@@ -208,7 +208,7 @@ void SslEchoServer::packetParse(QByteArray rcvd_packet) {
             // Clear the buffer when a full packet is received (we are ready for the next one!)
             pBuffer->clearBuffer();
 
-            // If the type is correct TODO: add HeadID check
+            // If the type is correct
             if (mType == PACK_TYPE_PING || mType <= PACK_TYPE_LAST_CODE) {
                 qDebug() << "[INFO] Parsed new packet. Type: " << mType;
                 QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
@@ -290,7 +290,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
             LogoutReqPacket *logoutReq = dynamic_cast<LogoutReqPacket *>(rcvd_packet.get());
 
             if (client->isLogged()) {
-                qDebug() << "User " << client->getEmail() << " disconnected";
+                qDebug() << "[LOGOUT] User " << client->getEmail() << " disconnected";
             }
             // Remove from documentopen map
             this->findAndDeleteFromDoclist(client);
@@ -331,14 +331,6 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
                     break;
                 }
             }
-
-            // Full broadcast (no per document behaviour) follows. *For quick and dirty Debug only usage*
-            /*for (QWebSocket* onlineClient : clientMapping.keys()) {
-                if(onlineClient != pClient) {
-                    msg->send(*(onlineClient));
-                    qDebug() << "from: " << pClient->peerPort() << "sent to " << onlineClient->peerPort() ;
-                }
-            }*/
 
             break;
         }
@@ -384,7 +376,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
                      << cp->getuserId();
             // Broadcast to all the connected client of a document
             QList<QSharedPointer<Client>> onlineClientPerDoc = documentMapping[getDocIdOpenedByUserId(
-                    client->getUserId())]; //TODO: deccoment and delete for
+                    client->getUserId())];
             for (QSharedPointer<Client> onlineClient : onlineClientPerDoc) {
                 if (onlineClient != client && client->isLogged()) {
                     cp->send(*onlineClient->getSocket());
@@ -395,8 +387,8 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
         }
         case (PACK_TYPE_ALIGN): {
             AlignMessage *am = dynamic_cast<AlignMessage *>(rcvd_packet.get());
-            //qDebug() << msg->getData();
             qDebug() << "[ALIGN] New alignment  received." << endl;
+
             // Broadcast to all the connected client of a document
             int curDocId = getDocIdOpenedByUserId(client->getUserId());
             QList<QSharedPointer<Client>> onlineClientPerDoc = documentMapping[curDocId];
@@ -406,7 +398,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
                     //qDebug() << "\tBroadcasted to from: " << pClient->peerPort() << "sent to " << onlineClient->getSocket()->peerPort() ;
                 }
             }
-            // Update local instance of alignment per document. #TODO: change impl for alignment.
+            // Update local instance of alignment per document.
             alignmentMapping[curDocId].push_back(*am);
 
             break;
@@ -592,7 +584,6 @@ bool SslEchoServer::findAndDeleteFromDoclist(QSharedPointer<Client> client) {
  */
 void SslEchoServer::pruneOldConnectionsIfAny(QSharedPointer<Client> client, QWebSocket *pClient) {
 
-    //TODO: Check if user already exist in the map values, (i.e. connected from 1 device first and then an other)
     QWebSocket *duplicatedConnection = nullptr;
     for (auto it = this->clientMapping.begin(); it != this->clientMapping.end();) {
         if ((it.value()->getSocket() != pClient) && (it.value()->getUserId() == client->getUserId())) {
@@ -642,7 +633,7 @@ void SslEchoServer::sendUpdatedOnlineUserByDocId(int docId) {
 }
 
 /**
- * Return the documentId currently opened by the user.
+ * Return the documentId of the document currently opened by the user.
  * Return -1 if the user has no document opened
  *
  * @param userId
@@ -726,7 +717,6 @@ std::pair <QVector<QVector<QSymbol>>, QVector<AlignMessage> > SslEchoServer::rem
     }
     return std::make_pair(qsymbols, qalign) ;
 }
-//TODO: delete and call distructor for crdt istance after last user logged out
 
 void  SslEchoServer::sendDocAlignment(QVector<AlignMessage> docAlign, QWebSocket *pClient){
     for (int i = 0; i < docAlign.size(); i++) {

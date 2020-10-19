@@ -38,7 +38,6 @@ class LoginOkPacket : public Packet {
     friend PacketBuilder;
 private:
     User user;
-    //TODO: add list of document accessible by that user
 protected:
     LoginOkPacket();
 
@@ -53,7 +52,6 @@ public:
     ~LoginOkPacket() {};
 
     User getUser() const;
-    //TODO: add getter for list of document accessible by that user
 
 };
 

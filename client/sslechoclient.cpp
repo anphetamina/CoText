@@ -132,15 +132,12 @@ void SslEchoClient::sendLogin(){
 void SslEchoClient::registerUser(QString name, QString surname, QString username, QString nickname, QString password, QImage profilePic){
 	qDebug() << "[NETWORK] ** Sending registerReqPacket : AccountCreationPacket()";
 	QString hashedPassword = password;
-	////TODO the password has to be hashed un sendRegistration
 	AccountCreationPacket acp = AccountCreationPacket(username, hashedPassword, name, surname, profilePic);
 	acp.send(m_webSocket);
 }
 
 void SslEchoClient::sendRegistration(QString _name, QString _surname, QString _username, QString _nickname, QString _password, QImage _profilePic) {
 	//username is the field Email
-	
-	////TODO HASH THE PASSWORD!!
 	this->registerUser(_name, _surname, _username, _nickname, _password, _profilePic);
 }
 
@@ -173,7 +170,6 @@ void SslEchoClient::packetParse(QByteArray rcvd_packet) {
     if (pBuffer->getDataSize() == 0) {
         streamRcv >> *pBuffer;
     }
-    // Append the continuation of the packet TODO:check
     QByteArray payload = rcvd_packet.mid(4+sizeof(quint32));//header+Payoadlen skip
     pBuffer->append(payload);
 
@@ -189,7 +185,6 @@ void SslEchoClient::packetParse(QByteArray rcvd_packet) {
             // Clear the buffer when a full packet is received (we are ready for the next one!)
             pBuffer->clearBuffer();
 
-            // If the type is correct TODO: add HeadID check
             if (mType == PACK_TYPE_PING || mType <= PACK_TYPE_LAST_CODE) {
 //                qDebug() << "---";
 //                qDebug() << "[INFO] Parsed new packet. Type: " << mType;

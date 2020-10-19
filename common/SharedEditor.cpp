@@ -545,7 +545,6 @@ std::pair<int, int> SharedEditor::getPos(const QSymbol &symbol) {
     }
 
     if (!symbols.front().empty()) {
-        bool mergeLines = false;
         std::vector<std::vector<QSymbol>>::iterator line_it;
         std::vector<std::vector<QSymbol>>::iterator last;
         if (symbols.back().empty()) {
@@ -627,4 +626,34 @@ void SharedEditor::setConnectedUsers(int connectedUsers){
 }
 void SharedEditor::setSiteId(int siteId){
     this->siteId = siteId;
+}
+
+std::vector<QSymbol> SharedEditor::getBlock(int startLine, int startIndex, int endLine, int endIndex) {
+    std::vector<QSymbol> block;
+
+    if (symbols[startLine].empty()) {
+        return {};
+    } else if (startLine == endLine) {
+        for (int i = startIndex; i <= endIndex; i++) {
+            block.push_back(symbols[startLine][i]);
+        }
+    } else {
+        for (int i = startIndex; i < symbols[startLine].size(); i++) {
+            block.push_back(symbols[startLine][i]);
+        }
+
+        for (int i = startLine + 1; i <= endLine-1; i++) {
+            for (int j = 0; j < symbols[i].size(); j++) {
+                block.push_back(symbols[i][j]);
+            }
+        }
+
+        for (int i = 0; i <= endIndex; i++) {
+            block.push_back(symbols[endLine][i]);
+        }
+    }
+
+
+
+    return block;
 }

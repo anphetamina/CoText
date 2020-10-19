@@ -123,7 +123,6 @@ public:
 };
 
 /** Document Ok packet: the desirable response for a DocumentOpen packet **/
-//TODO: Add attribute for whatever will be used to exchange the whole document in bulk
 class DocumentOkPacket : public Packet {
 
     friend PacketBuilder;

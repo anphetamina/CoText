@@ -41,7 +41,6 @@ void Packet::serialize(QByteArray buf, QDataStream &stream) {
 void Packet::send(QWebSocket &m_webSocket) {
     if (!m_webSocket.isValid())
         return;
-    // Other check if missing fields? TODO:check later
     // Create buffer and stream
     QByteArray qbuf;
     QDataStream stream(&qbuf, QIODevice::WriteOnly);

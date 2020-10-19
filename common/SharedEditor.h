@@ -60,6 +60,9 @@ public:
 
     bool isNewLine(QChar &c);
 
+    std::vector<QSymbol> getBlock(int startLine, int startIndex, int endLine, int endIndex);
+    std::pair<int, int> getPos(const QSymbol &symbol);
+
     void connectedUsersDecrease();
 
     void connectedUsersIncrease();
@@ -68,7 +71,7 @@ public:
 
     void setConnectedUsers(int connectedUsers);
 
-    std::pair<int, int> getPos(const QSymbol &symbol);
+
 };
 
 

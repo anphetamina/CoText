@@ -29,4 +29,3 @@ void PingPacket::readPayload(QDataStream &stream) {
 QString PingPacket::getDebugMsg() const {
     return m_debug_msg;
 }
-// TODO: add a setter for m_debug_msg
