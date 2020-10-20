@@ -73,7 +73,7 @@ private:
     int getPosition(int row, int col);
     void printSymbols(const std::string &functionName);
     bool isNewLine(QChar c);
-    void incrementIndexAtPos(int pos, int n);
+    void insertBlock(const std::vector<QSymbol> &block, int position);
 
 public slots:
     void remoteInsert(QSymbol symbol);
@@ -102,7 +102,6 @@ private slots:
     void clipboardDataChange();
 
 protected:
-    void paintEvent(QPaintEvent *e) override;
 
     void focusInEvent(QFocusEvent *e) override;
     void focusOutEvent(QFocusEvent *e) override;
