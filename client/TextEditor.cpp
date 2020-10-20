@@ -831,17 +831,20 @@ std::vector<int> TextEditor::getIndex() const{
     return index;
 }
 
+
 void TextEditor::printSymbols(const std::string &functionName) {
-    std::cout << "--- " << functionName << " ---" << std::endl;
+    QString fn = QString::fromStdString(functionName);
+    qDebug()  << "--- " << fn << " ---\n" ;
     const auto& symbols = editor.getSymbols();
     for (int i = 0; i < symbols.size(); i++) {
-        std::cout << "[" << index[i] << "] ";
+        QString sline = QString();
         for (int j = 0; j < symbols[i].size(); j++) {
             const QSymbol &s = symbols[i][j];
-            s.isNewLine() ? std::cout << std::endl : std::cout << s.getC().toLatin1();
+            sline.append(s.getC());
         }
+        qDebug() << "[" << index[i] << "] " << sline;
     }
-    std::cout << std::endl;
+    qDebug() << "\n";
 }
 
 void TextEditor::updateAlignment(Qt::Alignment alignment, int position) {
