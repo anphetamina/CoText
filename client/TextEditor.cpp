@@ -81,6 +81,24 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &TextEditor::paintCursors);
 
     /**
+     * action connections
+     */
+
+    connect(this, &QTextEdit::undoAvailable, ui.actionUndo, &QAction::setEnabled);
+    connect(this, &QTextEdit::redoAvailable, ui.actionRedo, &QAction::setEnabled);
+    ui.actionCopy->setEnabled(false);
+    connect(this, &QTextEdit::copyAvailable, ui.actionCopy, &QAction::setEnabled);
+    ui.actionCut->setEnabled(false);
+    connect(this, &QTextEdit::copyAvailable, ui.actionCut, &QAction::setEnabled);
+
+    ui.actionUndo->setEnabled(document()->isUndoAvailable());
+    ui.actionRedo->setEnabled(document()->isUndoAvailable());
+
+    if (const QMimeData *md = QApplication::clipboard()->mimeData()) {
+        ui.actionPaste->setEnabled(md->hasText());
+    }
+
+    /**
      * testing code
      */
 
@@ -963,7 +981,11 @@ int TextEditor::getNumChars() const {
 }
 
 void TextEditor::clipboardDataChange() {
-    if (QApplication::clipboard()->mimeData()) {
+
+    if (const QMimeData *md = QApplication::clipboard()->mimeData()) {
+
+        ui.actionPaste->setEnabled(md->hasText());
+
         if (hasLostFocus) {
             qDebug() << "clipboard changed outside";
             copiedFromOutside = true;
