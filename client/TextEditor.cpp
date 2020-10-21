@@ -179,13 +179,17 @@ void TextEditor::alignmentChange(Qt::Alignment alignment) {
 
 void TextEditor::currentCharFormatChange(const QTextCharFormat &f) {
 
-    document()->blockSignals(true);
-
     QTextCharFormat format{f};
 
-    QTextCursor cursor(document());
-    cursor.setPosition(textCursor().selectionEnd());
-    format = cursor.charFormat();
+    /**
+     * the format toolbar will be updated with the current selected text format
+     */
+    if (textCursor().hasSelection()) {
+        QTextCursor cursor(document());
+        cursor.setPosition(textCursor().selectionEnd());
+        format = cursor.charFormat();
+    }
+
 
     if (fontComboBox) {
         fontComboBox->blockSignals(true);
@@ -195,15 +199,13 @@ void TextEditor::currentCharFormatChange(const QTextCharFormat &f) {
 
     if (sizeComboBox) {
         sizeComboBox->blockSignals(true);
-        sizeComboBox->setCurrentIndex(sizeComboBox->findText(QString::number(format.font().pointSize())));
+        sizeComboBox->setCurrentText(QString::number(format.font().pointSize()));
         sizeComboBox->blockSignals(false);
     }
 
     ui.actionBold->setChecked(format.font().bold());
     ui.actionItalic->setChecked(format.font().italic());
     ui.actionUnderline->setChecked(format.font().underline());
-
-    document()->blockSignals(false);
 }
 
 void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) {
@@ -747,15 +749,23 @@ void TextEditor::updateCursor(int userId, int position) {
 }
 
 void TextEditor::selectionChange() {
+
+    /**
+     * this condition is true when the cursor was selecting a text and now no more
+     * causing the update of the current format change
+     */
+    if (currentSelectedChars != 0 && !textCursor().hasSelection()) {
+        currentCharFormatChange(currentCharFormat());
+    }
+
     int selectionEnd = textCursor().selectionEnd();
     int selectionStart = textCursor().selectionStart();
+
     if (selectionStart != selectionEnd) {
         currentSelectedChars = selectionEnd - selectionStart;
     } else {
         currentSelectedChars = 0;
     }
-
-    currentCharFormatChange(textCursor().charFormat());
 }
 
 void TextEditor::toggleUserColors() {
