@@ -610,20 +610,6 @@ bool SharedEditor::isNewLine(QChar &c) {
     return c == QChar::LineFeed || c == QChar::ParagraphSeparator || c == QChar::LineSeparator;
 }
 
-void SharedEditor::connectedUsersIncrease() {
-    connectedUsers++;
-}
-void SharedEditor::connectedUsersDecrease() {
-    connectedUsers--;
-}
-
-int SharedEditor::getConnectedUsers(){
-    return connectedUsers;
-}
-
-void SharedEditor::setConnectedUsers(int connectedUsers){
-    this->connectedUsers = connectedUsers;
-}
 void SharedEditor::setSiteId(int siteId){
     this->siteId = siteId;
 }
