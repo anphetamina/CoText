@@ -49,6 +49,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionAlign_right))->installEventFilter(this);
 	dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionJustify))->installEventFilter(this);
 	dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionToggle_user_colors))->installEventFilter(this);
+	dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionCoTextInfo))->installEventFilter(this);
 	
 	//this->setCentralWidget(ui->textEdit);
     QPixmap icon(":/appIcon/CoText.ico");
@@ -353,6 +354,18 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
 		ui->actionToggle_user_colors->setIcon(QIcon(":/imgs/icons/noun_Light_1841928.svg"));
 		return true;
 	}
+	
+	//Info
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionCoTextInfo)) && event->type() == QEvent::Enter) {
+		setCursor(Qt::PointingHandCursor);
+		ui->actionCoTextInfo->setIcon(QIcon(":/appIcon/icons/CoText.png"));
+		return true;
+	}
+	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionCoTextInfo)) && event->type() == QEvent::Leave) {
+		setCursor(Qt::ArrowCursor);
+		ui->actionCoTextInfo->setIcon(QIcon(":/appIcon/icons/CoText_landing.png"));
+		return true;
+	}
 
     return false;
 }
@@ -399,6 +412,7 @@ void MainWindow::nameChosenFromMainMenu(QString name){
     emit closeMainMenu();
     emit(sendDocCreateMainWindow(name, user.getId()));   //il server poi risponde con DocumentOkPacket e il client nella slot apre il nuovo documento
     docList.append(name);
+    this->qSB->updateDocInfo(name);
     this->show();
 }
 
@@ -410,7 +424,8 @@ void MainWindow::openNewDocumentMainWindow(QString docName){
         name = docName + "" + QString::number(i);
     }
     emit(sendDocCreateMainWindow(name, user.getId()));   //il server poi risponde con DocumentOkPacket e il client nella slot apre il nuovo documento
-    docList.append(name);
+	this->qSB->updateDocInfo(name);
+	docList.append(name);
 }
 
 void MainWindow::openDocumentFromMainMenu() {
@@ -431,7 +446,8 @@ void MainWindow::sendDocumentDeletedMainWindow(QString docName){
 void MainWindow::sendOpenDocumentFromMainMenu(QString docName){
     emit closeMainMenu();
     emit(sendOpenDocumentSignal(docName, user.getId()));
-    this->show();
+	this->qSB->updateDocInfo(docName);
+	this->show();
 }
 void MainWindow::on_actionOpen_triggered() {
     //emit(sendAskDocListMainWindow(user.getId())); //todo understand if it's useful
@@ -538,7 +554,7 @@ void MainWindow::on_actionRedo_triggered() {
 
 void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> newCompleteUserList){
 
-    qDebug() << "[MW} Update user list";
+    qDebug() << "[MW] Update user list";
 
     //remove users that before were online and now are offline
     removeOldOnlineNowOffline(newOnlineUserList);
@@ -594,6 +610,8 @@ void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> n
     }
 
     onlineUserList = newOnlineUserList;
+    QString n = QString(onlineUserList.size());
+    this->qSB->updateUsersInfo(n);
 }
 
 void MainWindow::removeOldOnlineNowOffline(QVector<User> newOnlineUserList){
@@ -603,6 +621,9 @@ void MainWindow::removeOldOnlineNowOffline(QVector<User> newOnlineUserList){
             delete ui->rightToolBar->findChild<QWidget*>(QString::number(u.getId()));
         }
     }
+	QString n = QString(onlineUserList.size());
+    this->qSB->updateUsersInfo(n);
+	
 }
 
 QPixmap MainWindow::addImageInRightToolBar(const QPixmap &orig, QColor color) {
@@ -613,9 +634,12 @@ QPixmap MainWindow::addImageInRightToolBar(const QPixmap &orig, QColor color) {
     QPixmap rounded = QPixmap(size, size);
     rounded.fill(Qt::transparent);
     QPainterPath path;
+    //path.setFillRule(QPainterPath::QVectorPath);
     path.addEllipse(rounded.rect());
     QPainter painter(&rounded);
+    painter.setRenderHint(QPainter::Antialiasing);
     painter.setClipPath(path);
+
 
     // Filling rounded area if needed
     painter.fillRect(rounded.rect(), Qt::black);
@@ -630,7 +654,8 @@ QPixmap MainWindow::addImageInRightToolBar(const QPixmap &orig, QColor color) {
     QPainterPath path1;
     path1.addEllipse(background.rect());
     QPainter painter1(&background);
-    painter1.setClipPath(path1);
+	painter1.setRenderHint(QPainter::Antialiasing);
+	painter1.setClipPath(path1);
 
     // Filling rounded area if needed
     painter1.fillRect(background.rect(), color);
@@ -692,6 +717,8 @@ QColor MainWindow::getUserColor(int userId) const {
 
 void MainWindow::setMainWindowTitle(QString title){
     setWindowTitle(title);
+    this->qSB->updateDocInfo(title);
+    
 }
 
 void MainWindow::sendJoinMainWindow(qint32 userId, int docId, QString invCode){
@@ -719,6 +746,7 @@ void MainWindow::openDocumentMainWindow(int docId, QString docName, std::vector<
     if(!docList.contains(docName)){
         docList.append(docName);
     }
+    this->qSB->updateDocInfo(docName);
 }
 
 void MainWindow::closeMainWindow(){

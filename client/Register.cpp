@@ -81,57 +81,42 @@ void Register::on_pushButton_BrowseReg_clicked() {
 		
 		//#1. Open Image scale + covert in ARGB
 		QFileInfo f(filename);
-		QImage pixmap(filename);
-		QImage scaledPixmap = pixmap.scaled(128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-		QImage newPixmap = scaledPixmap.convertToFormat(QImage::Format_ARGB32);
-		
+		QImage img(filename);
+		QImage scaledImage = img.scaled(128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+		QImage squaredImage = scaledImage.convertToFormat(QImage::Format_ARGB32);
+		QPixmap squaredpixmap = QPixmap::fromImage(squaredImage);
 		//#2. Crop to a square
-		int imgSize = std::min(newPixmap.width(), newPixmap.height());
+		int imgSize = qMin(squaredImage.width(), squaredImage.height());
+		
 		QRect rect = QRect(
-				(newPixmap.width() - imgSize) / 2,
-				(newPixmap.height() - imgSize) / 2,
+				qAbs(squaredImage.width() - imgSize) / 2,
+				qAbs(squaredImage.height() - imgSize) / 2,
 				imgSize,
 				imgSize);
-		newPixmap = newPixmap.copy(rect);
+		squaredImage = squaredImage.copy(rect);
 		
+		//#3. Create circle clip area
+		QPixmap rounded = QPixmap(imgSize, imgSize);
+		rounded.fill(Qt::transparent);
+		QPainterPath path;
+		path.addEllipse(rounded.rect());
+		QPainter painter(&rounded);
+		painter.setClipPath(path);
+		//fill rounded area if needed
+		painter.fillRect(rounded.rect(), Qt::transparent);
 		/*
-		//! Try to make label circular
-		//#3. Create the output image with the same dimensions and an alpha channel + make completely transparent
-		QImage output = QImage(imgSize, imgSize, QImage::Format_ARGB32);
-		output.fill(Qt::transparent);
-		
-		//Create a texture brush and paint a circle with the original image onto the output image
-		QBrush qBrush = QBrush(newPixmap);
-		QPainter qPainter = QPainter();
-		
-		
-		qPainter.setBrush(qBrush);
-		qPainter.setPen(Qt::NoPen);
-		qPainter.setRenderHint(QPainter::Antialiasing, true);
-		qPainter.drawEllipse(0, 0, imgSize, imgSize);
-		qPainter.end();
-		
-		//Convert the image to a pixmap and rescale it. Take pixel ratio into account to get a sharp image on retina display
-		auto pr = QWindow().devicePixelRatio();
-		QPixmap pm = QPixmap::fromImage(output);
-		imgSize  *=  pr;
-		pm = pm.scaled(imgSize, imgSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-		
-		pm.setDevicePixelRatio(pr);
-		//! end make label circular
+		int x = qAbs(pixmap.width() + imgSize)
+		painter.drawPixmap()
 		*/
 		
 		
-		//this->profilePicture = pm;
-		//QPixmap circ(":/images/CircleMask128x128.png");
-		//QPixmap mask = circ.createMaskFromColor(Qt::white, Qt::MaskOutColor);
 		
-		this->profilePicture = newPixmap;
+		this->profilePicture = squaredImage;
 		ui->labelPhoto->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-		ui->labelPhoto->setFixedWidth(newPixmap.width());
-		ui->labelPhoto->setFixedHeight(newPixmap.height());
+		ui->labelPhoto->setFixedWidth(squaredImage.width());
+		ui->labelPhoto->setFixedHeight(squaredImage.height());
 		//ui->labelPhoto->setMask(mask);
-		ui->labelPhoto->setPixmap(QPixmap::fromImage(newPixmap));
+		ui->labelPhoto->setPixmap(QPixmap::fromImage(squaredImage));
 		
 		ui->labelPhoto->setVisible(true);
 		

@@ -20,8 +20,8 @@ UserWidget::UserWidget(QWidget *parent) : QDialog(parent), ui(new Ui::UserWidget
 
     //get info and fill contents
 	ui->label_profilpic->setPixmap(makeRoundImage(QPixmap::fromImage(user.getProfilePic())));
-	ui->label_profilpic->setMaximumWidth(100);
-	ui->label_profilpic->setMaximumHeight(100);
+	ui->label_profilpic->setMaximumWidth(128);
+	ui->label_profilpic->setMaximumHeight(128);
 	ui->Name->setText(user.getName());
 	ui->Surname->setText(user.getSurname());
 	ui->email->setText(user.getEmail());
@@ -54,7 +54,8 @@ QPixmap UserWidget::makeRoundImage(const QPixmap &orig) {
     QPainterPath path;
     path.addEllipse(rounded.rect());
     QPainter painter(&rounded);
-    painter.setClipPath(path);
+	painter.setRenderHint(QPainter::Antialiasing);
+	painter.setClipPath(path);
 
     // Filling rounded area if needed
     painter.fillRect(rounded.rect(), Qt::black);

@@ -113,6 +113,7 @@ public slots:
     void openDocumentMainWindow(int docId, QString docName, std::vector<std::vector<QSymbol>> qsymbols);
     void sendDocumentDeletedMainWindow(QString docName);
     void closeMainWindow();
+    
 
 signals:
     void sendAskUriMainWindow(qint32 userId, int docId, QString invCode);
@@ -121,6 +122,7 @@ signals:
     void sendDocCreateMainWindow(QString docName, qint32 userId);
     void closeMainMenu();
     void sendDocumentDeletedSignal(QString docName, quint32 userId);
+    
 
 private:
     Ui::MainWindow *ui;
@@ -129,26 +131,26 @@ private:
     QVector<QString> docList;
     QVector<User> onlineUserList = {};        //list of all the user online on this document
     QMap<int, QColor> colorMap = {};
-    QVector<QColor> colorList = {QColor(255,0,0),       //red
-                                 QColor(0,255,0),       //lime
-                                 QColor(0,0,255),       //blue
-                                 QColor(255,255,0),     //yellow
-                                 QColor(0,255,255),     //aqua
-                                 QColor(255,0,255),     //magenta
-                                 QColor(210,105,30),    //chocolate
-                                 QColor(189,183,107),   //dark kaki
-                                 QColor(0,128,0),       //green
-                                 QColor(255,127,80),    //coral
+    QVector<QColor> colorList = {QColor(193,26,26),       //red
+                                 QColor(63,204,63),       //lime
+                                 QColor(24,24,182),       //blue
+                                 QColor(222,222,36),     //yellow
+                                 QColor(25,224,224),     //aqua
+                                 QColor(198,33,198),     //magenta
+                                 QColor(243,149,82),    //chocolate
+                                 QColor(195,187,91),   //dark kaki
+                                 QColor(20,115,20),       //green
+                                 QColor(243,115,69),    //coral
                                  QColor(154,205,50),    //yellow green
                                  QColor(102,205,170),   //medium aqua marine
-                                 QColor(175,238,238),   //pale turquoise
-                                 QColor(147,112,219),   //medium purple
-                                 QColor(255,165,0),     //orange
+                                 QColor(154,218,218),   //pale turquoise
+                                 QColor(120,89,183),   //medium purple
+                                 QColor(238,161,21),     //orange
                                  QColor(176,196,222),   //light steel blue
-                                 QColor(255,182,193),   //light pink
-                                 QColor(0,128,128),     //teal
-                                 QColor(0,0,128),       //navy
-                                 QColor(128,0,128)      //purple
+                                 QColor(135,173,183),   //light pink
+                                 QColor(33,141,141),     //teal
+                                 QColor(23,23,122),       //navy
+                                 QColor(138,24,138)      //purple
     }; //is a static array of color
 
     void Save_as();
