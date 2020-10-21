@@ -198,8 +198,6 @@ std::vector<Identifier> SharedEditor::generatePosBetween(std::vector<Identifier>
  */
 void SharedEditor::insertSymbol(int line, int index, QSymbol symbol) {
 
-    QChar value = symbol.getC();
-
     if (symbol.isNewLine()) {
 
         std::vector<QSymbol> lineAfter;
@@ -544,6 +542,8 @@ std::pair<int, int> SharedEditor::getPos(const QSymbol &symbol) {
         throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": symbol is invalid");
     }
 
+    std::pair<int, int> pos = std::make_pair(-1, -1);
+
     if (!symbols.front().empty()) {
         std::vector<std::vector<QSymbol>>::iterator line_it;
         std::vector<std::vector<QSymbol>>::iterator last;
@@ -552,7 +552,7 @@ std::pair<int, int> SharedEditor::getPos(const QSymbol &symbol) {
         } else {
             last = symbols.end();
         }
-        line_it = std::lower_bound(symbols.begin(), last, symbol, [](const std::vector<QSymbol> & it, const QSymbol& symbol){
+        line_it = std::lower_bound(symbols.begin(), last, symbol, [](const std::vector<QSymbol> & it, const QSymbol& symbol) {
             return it[0] < symbol;
         });
 
@@ -563,6 +563,7 @@ std::pair<int, int> SharedEditor::getPos(const QSymbol &symbol) {
             line_it--;
         }
         int line = line_it - symbols.begin();
+        pos.first = line;
 
         std::vector<QSymbol>::iterator index_it;
         index_it = std::find(line_it->begin(), line_it->end(), symbol);
@@ -575,11 +576,11 @@ std::pair<int, int> SharedEditor::getPos(const QSymbol &symbol) {
             }
         } else {
             int index = index_it - line_it->begin();
-            return std::make_pair(line, index);
+            pos.second = index;
         }
     }
 
-    return std::make_pair(-1, -1);
+    return pos;
 }
 
 int SharedEditor::getSiteId() const {
