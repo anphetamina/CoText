@@ -31,11 +31,13 @@ QTextEdit {
     margin-left: 40px;
     margin-right: 40px;
     margin-top: 10px;
-    margin-bottom: 10px;
-    color: white;
+    margin-bottom: -10px;
+    color: black;
+    background-color: white;
     font-size: 18pt;
     font-family: Arial;
     border: hidden;
+    border-radius: 3px;
 }
 
 QComboBox {
@@ -189,6 +191,20 @@ QDialog#UserEditWidget {
     background-color: rgb(30, 30, 30);
 
 }
+
+QDialog QLabel#AgosLabel {
+    color: #efecec;
+}
+
+QDialog QLabel#MunaLabel {
+    color: #efecec;
+}
+QDialog QLabel#TonyLabel {
+    color: #efecec;
+}
+QDialog QLabel#MarcoLabel {
+     color: #efecec;
+ }
 
 
 

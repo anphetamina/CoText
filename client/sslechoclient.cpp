@@ -273,9 +273,11 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
 
         case (PACK_TYPE_MSG): {
             Message *msg = dynamic_cast<Message *>(rcvd_packet.get());
+            qDebug() << "PACK_TYPE_MSG messaggio ricevuto: siteID:" << msg->getSiteId() << " char: " << msg->getQS().getC();
             switch (msg->getType()) {
                 case(MSG_INSERT_SYM): {
                     emit insertReceived(msg->getQS());
+                    
                     break;
                 }
 

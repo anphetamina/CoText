@@ -24,9 +24,9 @@ public:
 	~StatusBar();
 	void setupSB();
 	void displaySB();
-	void updateDocInfo();
-	void updateUsersInfo();
-	QString calculateDocSize();
+	void updateDocInfo(QString title);
+	void updateUsersInfo(QString n);
+	
 	
 private:
 	QWidget *parent; //pointer to MainWindow
@@ -43,8 +43,8 @@ private:
 	
 	/** Document info */
 	QLabel *docTitle;
-	QLabel *docSize;
-	QLabel *nChars;
+	//QLabel *docSize;
+	//QLabel *nChars;
 	
 protected:
 

@@ -56,6 +56,12 @@
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
           <widget class="QLabel" name="Logo">
+           <property name="maximumSize">
+            <size>
+             <width>104</width>
+             <height>100</height>
+            </size>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -158,7 +164,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QLabel" name="label_2">
+        <widget class="QLabel" name="AgosLabel">
          <property name="text">
           <string>Di Maro Agostino</string>
          </property>
@@ -185,7 +191,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QLabel" name="label_3">
+        <widget class="QLabel" name="MunaLabel">
          <property name="text">
           <string>Munafò Emanuele</string>
          </property>
@@ -212,7 +218,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QLabel" name="label_4">
+        <widget class="QLabel" name="TonyLabel">
          <property name="text">
           <string>Santoro Antonio</string>
          </property>
@@ -239,7 +245,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QLabel" name="label_5">
+        <widget class="QLabel" name="MarcoLabel">
          <property name="text">
           <string>Testa Marco</string>
          </property>

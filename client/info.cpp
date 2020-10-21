@@ -8,7 +8,8 @@ Info::Info(QWidget *parent) :
     ui->setupUi(this);
     QString filename(":/appIcon/icons/CoText.png");
     QImage pixmap(filename);
-    QImage scaledPixmap = pixmap.scaled(96, 96, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QImage scaledPixmap = pixmap.scaled(104, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
 	QImage logo = scaledPixmap.convertToFormat(QImage::Format_ARGB32);
     ui->Logo->setPixmap(QPixmap::fromImage(logo));
 }

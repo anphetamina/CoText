@@ -77,20 +77,21 @@ void StatusBar::setupSB() {
 	docTitle->setFixedWidth(66);
 	docTitle->setToolTip("This is the current document title");
 	
+	/*
 	//5.
 	docSize = new QLabel(tr("Document Size"));
 	docSize->setMinimumSize(docSize->sizeHint());
 	docSize->setFixedWidth(22);
 	docSize->setAlignment((Qt::AlignRight | Qt::AlignVCenter));
-	/*
+
 	if(mw->getTextEditor()->getNumChars() == 0)
 		docSize->setText("0 B");
 	else
 		docSize->setText(this->calculateDocSize());
-	 */
+
 	docSize->setText("0");
 	//docSize->setText(this->calculateDocSize());
-	docSize->setToolTip(tr("The memory used for the current document.")); //TODO implement the count in KB -> MB
+	docSize->setToolTip(tr("The memory used for the current document."));
 	docSize->setCursor(Qt::PointingHandCursor);
 	
 	//6.
@@ -101,7 +102,7 @@ void StatusBar::setupSB() {
 	//nChars->setText(QString(mw->getTextEditor()->getNumChars()));
 	nChars->setText("0");
 	nChars->setToolTip("Total amount of chars of the document");
-	
+	*/
 	
 	
 	//7. TODO error messages with icon
@@ -119,41 +120,22 @@ void StatusBar::displaySB() {
 	addPermanentWidget(nActiveUsers);
 	addPermanentWidget(vSeparator);
 	addPermanentWidget(appName);
-	// TODO handling click on the widget to show up the list of users
 	
 	//starting from left
 	addWidget(docTitle);
-	addWidget(docSize);
-	addWidget(nChars);
+	//addWidget(docSize);
+	//addWidget(nChars);
 	/**end display */
 	
 }
 
-QString StatusBar::calculateDocSize() {
-	//Assuming each char is 8 bit = 1 Byte
-	float size = 0;
-	QString newSize = "";
-	int nCh = mw->getTextEditor()->getNumChars();
-	
-	if(nCh < 1000) {
-		newSize = QString(nCh)+" Bytes";
-		return newSize;
-	} else {
-		if(nCh < 1000*1000) { //use KB
-			size = (float) nCh / 1000;
-			newSize = QString::number(size)+" KB";
-		} else { // use MB
-			size = (float) nCh / (1000*1000);
-			newSize = QString::number(size)+" MB";
-		}
-	
-	}
-	
-	return newSize;
-}
 
-void StatusBar::updateDocInfo() {}
-void StatusBar::updateUsersInfo() {}
+void StatusBar::updateDocInfo(QString title) {
+	this->docTitle->setText(title);
+}
+void StatusBar::updateUsersInfo(QString n) {
+	this->nActiveUsers->setText(n);
+}
 
 void StatusBar::showActiveUsersList() {
 	Ui::MainWindow *ui = mw->getUi();
