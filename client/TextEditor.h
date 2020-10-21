@@ -59,6 +59,9 @@ private:
     std::map<int, int> cursorMap;
     std::atomic<bool> isUserColorsToggled;
     std::atomic<bool> hasLostFocus;
+    std::atomic<bool> copiedFromOutside;
+    std::atomic<bool> draggedFromOutside;
+    std::atomic<bool> mousePressed;
 
     QFontComboBox *fontComboBox;
     QComboBox *sizeComboBox;
@@ -105,6 +108,10 @@ protected:
 
     void focusInEvent(QFocusEvent *e) override;
     void focusOutEvent(QFocusEvent *e) override;
+    void dragEnterEvent(QDragEnterEvent *e) override;
+    void mousePressEvent(QMouseEvent *e) override;
+    void mouseReleaseEvent(QMouseEvent *e) override;
+    void insertFromMimeData(const QMimeData *source) override;
 
 signals:
     void symbolsInserted(std::vector<QSymbol> symbols, int siteId);

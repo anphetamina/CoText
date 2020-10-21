@@ -26,6 +26,9 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     highlighter(*this, document()),
     isUserColorsToggled(false),
     hasLostFocus(false),
+    copiedFromOutside(false),
+    draggedFromOutside(false),
+    mousePressed(false),
     documentId(0),
     documentName(QString()) {
 
@@ -209,8 +212,6 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
         document()->blockSignals(false);
         return;
     }
-
-    //qDebug() << "contentsChange";
 
     /**
      * https://github.com/anphetamina/CoText/issues/32 workaround
@@ -447,7 +448,6 @@ int TextEditor::getRow(int position) const {
  */
 void TextEditor::remoteInsert(QSymbol symbol) {
 
-    // qDebug() << "received add " << symbol.getC();
 
     /**
      * block updates
@@ -834,17 +834,17 @@ std::vector<int> TextEditor::getIndex() const{
 
 void TextEditor::printSymbols(const std::string &functionName) {
     QString fn = QString::fromStdString(functionName);
-    qDebug()  << "--- " << fn << " ---\n" ;
+    qDebug()  << "--- " << fn << " ---" ;
     const auto& symbols = editor.getSymbols();
     for (int i = 0; i < symbols.size(); i++) {
         QString sline = QString();
         for (int j = 0; j < symbols[i].size(); j++) {
             const QSymbol &s = symbols[i][j];
-            sline.append(s.getC());
+            sline.append(isNewLine(s.getC()) ? QChar::LineFeed : s.getC());
         }
         qDebug() << "[" << index[i] << "] " << sline;
     }
-    qDebug() << "\n";
+    qDebug();
 }
 
 void TextEditor::updateAlignment(Qt::Alignment alignment, int position) {
@@ -928,11 +928,11 @@ int TextEditor::getNumChars() const {
 void TextEditor::clipboardDataChange() {
     if (QApplication::clipboard()->mimeData()) {
         if (hasLostFocus) {
-            qDebug() << "copy done outside the editor";
-            setAcceptRichText(false);
+            qDebug() << "clipboard changed outside";
+            copiedFromOutside = true;
         } else {
-            qDebug() << "copy done inside the editor";
-            setAcceptRichText(true);
+            qDebug() << "clipboard changed inside";
+            copiedFromOutside = false;
         }
     }
 }
@@ -944,7 +944,35 @@ void TextEditor::focusInEvent(QFocusEvent *e) {
 
 void TextEditor::focusOutEvent(QFocusEvent *e) {
     hasLostFocus = e->lostFocus();
+    mousePressed = false;
     QTextEdit::focusOutEvent(e);
+}
+
+void TextEditor::dragEnterEvent(QDragEnterEvent *e) {
+    draggedFromOutside = !mousePressed;
+    qDebug() << "dragged from" << (draggedFromOutside ? "outside" : "inside");
+    QTextEdit::dragEnterEvent(e);
+}
+
+void TextEditor::mousePressEvent(QMouseEvent *e) {
+    mousePressed = true;
+    QTextEdit::mousePressEvent(e);
+}
+
+void TextEditor::mouseReleaseEvent(QMouseEvent *e) {
+    mousePressed = false;
+    QTextEdit::mouseReleaseEvent(e);
+}
+
+void TextEditor::insertFromMimeData(const QMimeData *source) {
+    if (copiedFromOutside || draggedFromOutside) {
+        qDebug() << "paste format disabled";
+        setAcceptRichText(false);
+    } else {
+        qDebug() << "paste format enabled";
+        setAcceptRichText(true);
+    }
+    QTextEdit::insertFromMimeData(source);
 }
 
 QString TextEditor::getText() const{
@@ -962,3 +990,5 @@ QString TextEditor::getText() const{
     }
     return text;
 }
+
+
