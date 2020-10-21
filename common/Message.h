@@ -64,7 +64,7 @@ class AlignMessage : public Packet {
     friend QDataStream &operator<<(QDataStream &out, const AlignMessage &am);
 
 private:
-    int positionStart;
+    QSymbol positionStart;
     int delta = 0;
     Qt::Alignment alignment;
     int siteId;
@@ -72,9 +72,9 @@ private:
 public:
     AlignMessage();
 
-    AlignMessage(int positionStart, int delta, Qt::Alignment alignment, int siteId);
+    AlignMessage(QSymbol positionStart, int delta, Qt::Alignment alignment, int siteId);
 
-    int getPositionStart() const;
+    QSymbol getPositionStart() const;
 
     int getDelta() const;
 

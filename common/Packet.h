@@ -158,7 +158,7 @@ public:
 
     static PacketHandler Message(int type, QSymbol qs, int siteId);
     static PacketHandler BigMessage(int type, QVector<QSymbol> qss, int siteId);
-    static PacketHandler AlignMessage(int positionStart, int delta, Qt::Alignment alignment, int siteId);
+    static PacketHandler AlignMessage(QSymbol positionStart, int delta, Qt::Alignment alignment, int siteId);
 
     static PacketHandler CursorPacket(qint32 userId, qint32 newPosition);
 

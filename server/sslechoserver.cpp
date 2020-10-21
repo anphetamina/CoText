@@ -720,7 +720,7 @@ std::pair <QVector<QVector<QSymbol>>, QVector<AlignMessage> > SslEchoServer::rem
 
 void  SslEchoServer::sendDocAlignment(QVector<AlignMessage> docAlign, QWebSocket *pClient){
     for (int i = 0; i < docAlign.size(); i++) {
-        qDebug() << "Send alignment: " << docAlign[i].getPositionStart();
+        //qDebug() << "Send alignment: " << docAlign[i].getPositionStart();
         docAlign[i].send(*pClient);
     }
 }
