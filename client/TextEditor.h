@@ -10,6 +10,7 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QTextEdit>
 #include <QtWidgets/QFontComboBox>
+#include <QtWidgets/QLabel>
 #include "../common/SharedEditor.h"
 #include "../common/QSymbol.h"
 #include "UserHighlighter.h"
@@ -56,7 +57,7 @@ private:
     int currentSelectedChars;
     
     UserHighlighter highlighter;
-    std::map<int, int> cursorMap;
+    std::map<int, std::pair<int, QLabel*>> cursorMap;
     std::atomic<bool> isUserColorsToggled;
     std::atomic<bool> hasLostFocus;
     std::atomic<bool> copiedFromOutside;
@@ -87,6 +88,7 @@ public slots:
     void updateAlignment(Qt::Alignment alignment, int position);
     void openDocument(int docId, QString docName, std::vector<std::vector<QSymbol>> symbols);
     void updateCursorMap(QVector<User> onlineUserList, QVector<User> completeUserList);
+    void paintCursors();
 
 private slots:
     void setFontFamily(const QFont &font);

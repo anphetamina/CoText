@@ -411,6 +411,7 @@ void SslEchoClient::connectToEditor(TextEditor* te) {
     connect(this, &SslEchoClient::insertBlockReceived, te, &TextEditor::remoteInsertBlock);
     connect(this, &SslEchoClient::eraseBlockReceived, te, &TextEditor::remoteEraseBlock);
     connect(this, &SslEchoClient::updateCursorReceived, te, &TextEditor::updateCursor);
+    connect(this, &SslEchoClient::updateCursorReceived, te, &TextEditor::paintCursors);
     connect(this, &SslEchoClient::documentReceived, te, &TextEditor::openDocument);
     connect(this, &SslEchoClient::updateAlignmentReceived, te, &TextEditor::updateAlignment);
     connect(this, &SslEchoClient::updateUserListReceived, te, &TextEditor::updateCursorMap);

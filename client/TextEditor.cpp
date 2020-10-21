@@ -739,7 +739,7 @@ void TextEditor::updateCursor(int userId, int position) {
 
     if (cursorMap.find(userId) != cursorMap.end()) {
 
-        cursorMap[userId] = position;
+        cursorMap[userId].first = position;
 
     } else {
 
@@ -885,7 +885,7 @@ void TextEditor::updateCursorMap(QVector<User> onlineUserList, QVector<User> com
     std::sort(onlineUserIds.begin(), onlineUserIds.end());
 
     std::vector<int> currentUserList{};
-    std::for_each(cursorMap.begin(), cursorMap.end(), [&](const std::pair<int, int> &u) { currentUserList.push_back(u.first); });
+    std::for_each(cursorMap.begin(), cursorMap.end(), [&](const std::pair<int, std::pair<int, QLabel*>> &u) { currentUserList.push_back(u.first); });
 
     std::vector<int> offlineUserIds{};
     std::set_difference(currentUserList.begin(), currentUserList.end(), onlineUserIds.begin(), onlineUserIds.end(), std::inserter(offlineUserIds, offlineUserIds.begin()), [](const int &id1, const int &id2){
@@ -902,17 +902,40 @@ void TextEditor::updateCursorMap(QVector<User> onlineUserList, QVector<User> com
     }
 
     for (auto it : newOnlineUserIds) {
-
-        /**
-         * it will not print the new cursor instead wait for the updated valid position
-         */
-        cursorMap[it] = document()->characterCount()+1;
+        cursorMap[it].first = document()->characterCount()-1;
+        cursorMap[it].second = new QLabel(this);
     }
 
     /**
      * step necessary to avoid printing multiple cursor for the local user
      */
     cursorMap.erase(user.getId());
+
+    paintCursors();
+}
+
+void TextEditor::paintCursors() {
+    QTextCursor cursor(document());
+    for (const std::pair<int, std::pair<int, QLabel*>> &c : cursorMap) {
+        int position = std::min(c.second.first, document()->characterCount()-1);
+        cursor.setPosition(position);
+        QRect cRect = cursorRect(cursor);
+        //QPoint centerY = cRect.center();
+
+        int width = cRect.width() + 1;
+        int height = cRect.height();
+        //int height = QFontMetrics(cursor.charFormat().font()).height();
+        //cRect.setHeight(height);
+        //cRect.moveCenter(centerY);
+
+        QPixmap pixmap(width, height);
+        pixmap.fill(getUserColor(c.first));
+
+        c.second.second->move(cRect.left(), cRect.top());
+        c.second.second->resize(width, height);
+        c.second.second->setPixmap(pixmap);
+        c.second.second->show();
+    }
 }
 
 void TextEditor::setSiteId(int siteId){
