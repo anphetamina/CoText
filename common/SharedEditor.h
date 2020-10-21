@@ -56,8 +56,6 @@ public:
     std::pair<int, int> remoteInsert(const QSymbol &symbol);
     std::pair<int, int> remoteErase(const QSymbol &symbol);
 
-    bool isNewLine(QChar &c);
-
     std::vector<QSymbol> getBlock(int startLine, int startIndex, int endLine, int endIndex);
     std::pair<int, int> getPos(const QSymbol &symbol);
 
