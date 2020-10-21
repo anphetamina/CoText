@@ -610,7 +610,8 @@ void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> n
     }
 
     onlineUserList = newOnlineUserList;
-    QString n = QString(onlineUserList.size());
+    QString n = QString::number(onlineUserList.size());
+	qDebug() << " online User size: "<<onlineUserList.size() << "n:" << n;
     this->qSB->updateUsersInfo(n);
 }
 
@@ -621,8 +622,9 @@ void MainWindow::removeOldOnlineNowOffline(QVector<User> newOnlineUserList){
             delete ui->rightToolBar->findChild<QWidget*>(QString::number(u.getId()));
         }
     }
-	QString n = QString(onlineUserList.size());
-    this->qSB->updateUsersInfo(n);
+	QString n = QString::number(onlineUserList.size());
+	
+	this->qSB->updateUsersInfo(n);
 	
 }
 
