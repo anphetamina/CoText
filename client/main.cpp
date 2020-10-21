@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
 	a.setStyleSheet(stylesheetString);
 
     /** Login Phase */
-	client = new SslEchoClient(QUrl(QStringLiteral("wss://93.51.11.223:9088")));
+	client = new SslEchoClient(QUrl(QStringLiteral("wss://93.51.11.223:12345")));
 	Q_UNUSED(*client);
 
     MainWindow *w = new MainWindow();
