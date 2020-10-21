@@ -591,6 +591,21 @@ const std::vector<std::vector<QSymbol>>& SharedEditor::getSymbols() const {
     return symbols;
 }
 
+const QSymbol &SharedEditor::getSymbol(int row, int col) const {
+
+    if (row >= symbols.size()) {
+        throw std::out_of_range("row is greater than symbols size");
+    }
+
+    const std::vector<QSymbol> &line = symbols[row];
+
+    if (col >= line.size()) {
+        throw std::out_of_range("col " +std::to_string(col)+ " is greater than line " +std::to_string(row)+ " size");
+    }
+
+    return line[col];
+}
+
 void SharedEditor::clear() {
     symbols.clear();
     symbols.emplace_back();

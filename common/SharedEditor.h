@@ -37,6 +37,7 @@ public:
     void setSiteId(int siteId);
 
     const std::vector<std::vector<QSymbol>>& getSymbols() const;
+    const QSymbol& getSymbol(int row, int col) const;
 
     void setSymbols(std::vector<std::vector<QSymbol>> symbols);
 
