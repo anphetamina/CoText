@@ -443,17 +443,28 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
             // Get DocID and check permission of the user for that doc
             int docId = docIdByName(dop->getdocName(), dop->getuserId());
 
-            // If the user has the privilege for opening, perform the whole loading operation
-            std::pair <QVector<QVector<QSymbol>>, QVector<AlignMessage> > docAndAlign = remoteOpenDocument(docId, client);
-            QVector<QVector<QSymbol>> doc = docAndAlign.first;
-            QVector<AlignMessage> align = docAndAlign.second;
+            QVector<QVector<QSymbol>> docContent;
+            QVector<AlignMessage> alignContent;
+            // if docid = -1 no permission
+            if (docId > 0) {
+                // If the user has the privilege for opening, perform the whole loading operation
+                std::pair <QVector<QVector<QSymbol>>, QVector<AlignMessage> > docAndAlign = remoteOpenDocument(docId, client);
+                //QVector<QVector<QSymbol>> doc = docAndAlign.first;
+                //QVector<AlignMessage> align = docAndAlign.second;
+                docContent = docAndAlign.first;
+                alignContent = docAndAlign.second;
+            }
+            else {
+                docContent = { {} };
+                alignContent = {};
+            }
 
+            DocumentOkPacket dokp = DocumentOkPacket(docId, dop->getdocName(), docContent);
             // And send the document content
-            DocumentOkPacket dokp = DocumentOkPacket(docId, dop->getdocName(), doc);
             dokp.send(*pClient);
 
             //Send alignment for that doc
-            sendDocAlignment(align, pClient);
+            sendDocAlignment(alignContent, pClient);
 
             // Send current online userlist for the given document
             sendUpdatedOnlineUserByDocId(docId);
@@ -523,7 +534,11 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
                     // Send current online userlist for the given document
                     sendUpdatedOnlineUserByDocId(docId);
                 } else {
-                    qDebug() << "INVITATION NOT ACCEPTED";
+                    QVector<QVector<QSymbol>> doc = { {} };
+                    docId = PACK_TYPE_DOC_INV_ERROR;
+                    qDebug() << "INVITATION ACCEPTED Failed";
+                    DocumentOkPacket dokp = DocumentOkPacket(docId, docName, doc);
+                    dokp.send(*pClient);
                 }
 
             } else {
@@ -634,7 +649,7 @@ void SslEchoServer::sendUpdatedOnlineUserByDocId(int docId) {
 
 /**
  * Return the documentId of the document currently opened by the user.
- * Return -1 if the user has no document opened
+ * Return PACK_TYPE_DOC_OPEN_ERROR if the user has no document opened
  *
  * @param userId
  * @return docId
@@ -649,7 +664,7 @@ int SslEchoServer::getDocIdOpenedByUserId(int userId) {
         }
         it++;
     }
-    return -1;
+    return PACK_TYPE_DOC_OPEN_ERROR;
 }
 
 /**

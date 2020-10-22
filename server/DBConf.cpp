@@ -6,6 +6,8 @@
 #include <QSqlQuery>
 
 #include "DBAuthData.h"
+#include "PacketDef.h"
+
 
 /**
  * Perform connection to the DB
@@ -449,7 +451,7 @@ QString GetRandomString(int randomStringLength = 100) {
 
 /*
  * Returns the document Id given a documentName if the given userId has the right to access.
- * Return -1 if the document doesnt exist or the current user has not the privilege.
+ * Return PACK_TYPE_DOC_OPEN_ERROR if the document doesnt exist or the current user has not the privilege.
  */
 int docIdByName(QString docName, int userId) {
     QSqlQuery query;
@@ -459,7 +461,7 @@ int docIdByName(QString docName, int userId) {
         int id = query.value(0).toInt();
         return id;
     } else
-        return -1;
+        return PACK_TYPE_DOC_OPEN_ERROR;
 }
 
 bool deleteDocument(QString docName, int userId) {
