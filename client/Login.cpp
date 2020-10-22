@@ -7,6 +7,14 @@
 Login::Login(QWidget *parent) : QDialog(parent), ui(new Ui::Login) {
     ui->setupUi(this);
     ui->errorLabel->setText("");
+    
+	QString filename(":/appIcon/icons/CoText.png");
+	QImage pixmap(filename);
+	QImage scaledPixmap = pixmap.scaled(128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+	
+	QImage logo = scaledPixmap.convertToFormat(QImage::Format_ARGB32);
+	ui->IconLabel->setPixmap(QPixmap::fromImage(logo));
+
 }
 
 Login::~Login() {
