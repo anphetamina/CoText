@@ -178,8 +178,20 @@ void TextEditor::setTextAlignment(QAction *action) {
         QTextBlock block = document()->findBlock(textCursor().selectionStart());
         int pos = 0;
         while (block.isValid() && block.position() <= textCursor().selectionEnd()) {
-            block.position() != -1 ? pos = block.position() : pos = textCursor().selectionEnd();
-            emit textAlignmentChanged(flag, pos, editor.getSiteId());
+            block.position() != -1 ? pos = block.position()-1 : pos = document()->findBlock(textCursor().selectionEnd()).position()-1;
+            if (pos < 0) {
+                qDebug() << "first block encountered ( pos = " << pos << ")";
+            } else {
+                try {
+                    int row = getRow(pos);
+                    int col = getCol(row, pos);
+                    QSymbol symbol = editor.getSymbol(row, col);
+                    emit textAlignmentChanged(flag, symbol, editor.getSiteId());
+                } catch (const std::exception &e) {
+                    qDebug() << __PRETTY_FUNCTION__ << e.what();
+                }
+            }
+
             block = block.next();
         }
     }
@@ -878,7 +890,8 @@ void TextEditor::printSymbols(const std::string &functionName) {
     qDebug();
 }
 
-void TextEditor::updateAlignment(Qt::Alignment alignment, int position) {
+void TextEditor::updateAlignment(Qt::Alignment alignment, QSymbol symbol) {
+    // todo check cursors
     document()->blockSignals(true);
 
     QTextBlockFormat f;
@@ -886,6 +899,15 @@ void TextEditor::updateAlignment(Qt::Alignment alignment, int position) {
 
     try {
         QTextCursor c(document());
+        std::pair<int, int> pos = editor.getPos(symbol);
+        int position = getPosition(pos.first, pos.second)+1;
+
+        if (pos.first == -1 || pos.second == -1) {
+            throw std::runtime_error("symbol not found");
+        } else if (position > document()->characterCount()) {
+            throw std::out_of_range(std::to_string(position) + " greater than character count " + std::to_string(document()->characterCount()));
+        }
+
         c.setPosition(position);
         c.setBlockFormat(f);
     } catch (const std::exception &e) {
@@ -901,6 +923,7 @@ bool TextEditor::isNewLine(QChar c) {
 
 void TextEditor::updateCursorMap(QVector<User> onlineUserList, QVector<User> completeUserList /*ignored*/) {
 
+    // todo check when users disconnect
     std::vector<int> onlineUserIds{};
     std::for_each(onlineUserList.begin(), onlineUserList.end(), [&](const User &u) { onlineUserIds.push_back(u.getId()); });
     std::sort(onlineUserIds.begin(), onlineUserIds.end());
