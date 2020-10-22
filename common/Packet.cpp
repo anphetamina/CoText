@@ -331,7 +331,7 @@ PacketHandler PacketBuilder::BigMessage(int type, QVector<QSymbol> qss, int site
     return new class BigMessage(type, qss, siteId);
 }
 
-PacketHandler PacketBuilder::AlignMessage(int positionStart, int delta, Qt::Alignment alignment, int siteId) {
+PacketHandler PacketBuilder::AlignMessage(QSymbol positionStart, int delta, Qt::Alignment alignment, int siteId) {
     return new class AlignMessage(positionStart, delta, alignment, siteId);
 }
 

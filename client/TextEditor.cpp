@@ -7,6 +7,7 @@
 #include <QtWidgets/QFontDialog>
 #include <QThread>
 #include <QRandomGenerator>
+#include <QScrollBar>
 #include "../common/Shuffler.h"
 #include "TextEditor.h"
 #include <mutex>
@@ -26,8 +27,8 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     highlighter(*this, document()),
     isUserColorsToggled(false),
     hasLostFocus(false),
-    copiedFromOutside(false),
-    draggedFromOutside(false),
+    copiedFromOutside(true),
+    draggedFromOutside(true),
     mousePressed(false),
     documentId(0),
     documentName(QString()) {
@@ -76,6 +77,26 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     connect(ui.actionToggle_user_colors, &QAction::triggered, this, &TextEditor::toggleUserColors);
 
     connect(QApplication::clipboard(), &QClipboard::dataChanged, this, &TextEditor::clipboardDataChange);
+
+    connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &TextEditor::paintCursors);
+
+    /**
+     * action connections
+     */
+
+    connect(this, &QTextEdit::undoAvailable, ui.actionUndo, &QAction::setEnabled);
+    connect(this, &QTextEdit::redoAvailable, ui.actionRedo, &QAction::setEnabled);
+    ui.actionCopy->setEnabled(false);
+    connect(this, &QTextEdit::copyAvailable, ui.actionCopy, &QAction::setEnabled);
+    ui.actionCut->setEnabled(false);
+    connect(this, &QTextEdit::copyAvailable, ui.actionCut, &QAction::setEnabled);
+
+    ui.actionUndo->setEnabled(document()->isUndoAvailable());
+    ui.actionRedo->setEnabled(document()->isUndoAvailable());
+
+    if (const QMimeData *md = QApplication::clipboard()->mimeData()) {
+        ui.actionPaste->setEnabled(md->hasText());
+    }
 
     /**
      * testing code
@@ -833,11 +854,11 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
 
 }
 
-SharedEditor TextEditor::getEditor() const{
+SharedEditor TextEditor::getEditor() const {
     return editor;
 }
 
-std::vector<int> TextEditor::getIndex() const{
+std::vector<int> TextEditor::getIndex() const {
     return index;
 }
 
@@ -904,6 +925,7 @@ void TextEditor::updateCursorMap(QVector<User> onlineUserList, QVector<User> com
     for (auto it : newOnlineUserIds) {
         cursorMap[it].first = document()->characterCount()-1;
         cursorMap[it].second = new QLabel(this);
+        cursorMap[it].second->setTextInteractionFlags(Qt::NoTextInteraction);
     }
 
     /**
@@ -959,7 +981,11 @@ int TextEditor::getNumChars() const {
 }
 
 void TextEditor::clipboardDataChange() {
-    if (QApplication::clipboard()->mimeData()) {
+
+    if (const QMimeData *md = QApplication::clipboard()->mimeData()) {
+
+        ui.actionPaste->setEnabled(md->hasText());
+
         if (hasLostFocus) {
             qDebug() << "clipboard changed outside";
             copiedFromOutside = true;

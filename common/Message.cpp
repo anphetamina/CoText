@@ -56,14 +56,14 @@ void BigMessage::readPayload(QDataStream &stream) {
 // Packet to transmit multiple Qsymbol
 AlignMessage::AlignMessage() : Packet(PACK_TYPE_ALIGN) {}
 
-AlignMessage::AlignMessage(int positionStart, int delta, Qt::Alignment alignment, int siteId) : Packet(PACK_TYPE_ALIGN),
+AlignMessage::AlignMessage(QSymbol positionStart, int delta, Qt::Alignment alignment, int siteId) : Packet(PACK_TYPE_ALIGN),
                                                                                                 positionStart(
                                                                                                         positionStart),
                                                                                                 delta(delta),
                                                                                                 alignment(alignment),
                                                                                                 siteId(siteId) {};
 
-int AlignMessage::getPositionStart() const {
+QSymbol AlignMessage::getPositionStart() const {
     return positionStart;
 }
 

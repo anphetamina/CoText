@@ -311,7 +311,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
         }
         case (PACK_TYPE_ALIGN): {
             AlignMessage *am = dynamic_cast<AlignMessage *>(rcvd_packet.get());
-            emit updateAlignmentReceived(am->getAlignment(), am->getPositionStart());
+            //emit updateAlignmentReceived(am->getAlignment(), am->getPositionStart());
             break;
         }
         case (PACK_TYPE_CURSOR_POS): {
@@ -402,8 +402,8 @@ void SslEchoClient::sendAskUri(qint32 userId, int docId, QString invCode) {
 }
 
 void SslEchoClient::sendAlignment(Qt::Alignment alignment, int position, int siteId) {
-    AlignMessage am = AlignMessage(position, 0, alignment, siteId);
-    am.send(*pServer);
+    //AlignMessage am = AlignMessage(position, 0, alignment, siteId);
+    //am.send(*pServer);
 }
 
 void SslEchoClient::connectToEditor(TextEditor* te) {
