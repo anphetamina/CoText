@@ -89,8 +89,6 @@ bool Login::checkInput(const QString& username, const QString& psw) {
 
 void Login::loginFailed(){
     ui->errorLabel->setText("Wrong Username or Password !");
-    ui->lineEdit_User->setText("");
-    ui->lineEdit_Pass->setText("");
 }
 
 void Login::loginSuccessful(){

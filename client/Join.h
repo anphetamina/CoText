@@ -19,6 +19,10 @@ public:
 private slots:
     void on_pushButton_join_clicked();
 
+public slots:
+    void closeJoin();
+    void showError();
+
 signals:
     void sendJoin(qint32 userId, int docId, QString invCode);
 

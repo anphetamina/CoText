@@ -532,6 +532,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
 
                     // Send current online userlist for the given document
                     sendUpdatedOnlineUserByDocId(docId);
+
                 } else {
                     QVector<QVector<QSymbol>> doc = { {} };
                     docId = PACK_TYPE_DOC_INV_ERROR;

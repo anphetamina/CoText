@@ -113,7 +113,8 @@ public slots:
     void openDocumentMainWindow(int docId, QString docName, std::vector<std::vector<QSymbol>> qsymbols);
     void sendDocumentDeletedMainWindow(QString docName);
     void closeMainWindow();
-    
+    void joinFailedMW();
+    void joinSucceededMW();
 
 signals:
     void sendAskUriMainWindow(qint32 userId, int docId, QString invCode);
@@ -122,7 +123,8 @@ signals:
     void sendDocCreateMainWindow(QString docName, qint32 userId);
     void closeMainMenu();
     void sendDocumentDeletedSignal(QString docName, quint32 userId);
-    
+    void closeJoinMW();
+    void showJoinErrorMW();
 
 private:
     Ui::MainWindow *ui;

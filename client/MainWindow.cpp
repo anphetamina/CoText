@@ -467,14 +467,15 @@ void MainWindow::joinFromMainMenu() {
     Join join;
     join.setWindowTitle("Join a shared document");
     connect(&join, &Join::sendJoin, this, &MainWindow::sendJoinFromMainMenu);
+    connect(this, &MainWindow::closeJoinMW, &join, &Join::closeJoin );
+    connect(this, &MainWindow::showJoinErrorMW, &join, &Join::showError );
+
     join.setModal(true);
     join.exec();
 }
 
 void MainWindow::sendJoinFromMainMenu(qint32 userId, int docId, QString invCode){
-    emit closeMainMenu();
     emit(sendAskUriMainWindow(userId,docId,invCode));
-    this->show();
 }
 
 void MainWindow::on_actionPrintPDF_triggered() {
@@ -696,6 +697,7 @@ void MainWindow::on_actionJoin_triggered() {
     Join join;
     join.setWindowTitle("Join a shared document");
     connect(&join, &Join::sendJoin, this, &MainWindow::sendJoinMainWindow);
+    connect(this, &MainWindow::closeJoinMW, &join, &Join::closeJoin);
     join.setModal(true);
     join.exec();
 }
@@ -759,3 +761,12 @@ void MainWindow::closeMainWindow(){
     exit(0);
 }
 
+void MainWindow::joinFailedMW(){
+    emit showJoinErrorMW();
+}
+
+void MainWindow::joinSucceededMW(){
+    emit closeJoinMW();
+    emit closeMainMenu();
+    this->show();
+}
