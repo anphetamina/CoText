@@ -323,13 +323,16 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             DocumentOkPacket *doc = dynamic_cast<DocumentOkPacket *>(rcvd_packet.get());
             if(doc->getdocId() > 0) {
                 qDebug() << "[OPEN_DOC] (" << doc->getdocName() << ") with id " << doc->getdocId();
-            } else{
+                QVector<QVector<QSymbol>> qsymbols = doc->getqsymbols();
+                std::vector<std::vector<QSymbol>> symbols  = toVector(qsymbols);
+                emit documentNameReceived(doc->getdocName());
+                emit documentReceived(doc->getdocId(), doc->getdocName(), symbols);
+                emit joinSucceeded();
+            } else if (doc->getdocId() == PACK_TYPE_DOC_INV_ERROR){
+                emit(joinFailed());
+            }else {
                 qDebug() << "[OPEN_DOC] FAILED (No permission for " << doc->getdocName() << ") with docId " << doc->getdocId();
             }
-            QVector<QVector<QSymbol>> qsymbols = doc->getqsymbols();
-            std::vector<std::vector<QSymbol>> symbols  = toVector(qsymbols);
-            emit documentNameReceived(doc->getdocName());
-            emit documentReceived(doc->getdocId(), doc->getdocName(), symbols);
             break;
         }
         case (PACK_TYPE_DOC_LIST): {
@@ -436,7 +439,8 @@ void SslEchoClient::connectToMainWindow(MainWindow* mw) {
     connect(this, &SslEchoClient::documentReceived, mw, &MainWindow::openDocumentMainWindow);
     connect(mw, &MainWindow::sendDocumentDeletedSignal, this, &SslEchoClient::sendDocumentDeletedSlot);
     connect(this, &SslEchoClient::documentNameReceived, mw, &MainWindow::setMainWindowTitle);
-    
+    connect(this, &SslEchoClient::joinFailed, mw, &MainWindow::joinFailedMW);
+    connect(this, &SslEchoClient::joinSucceeded, mw, &MainWindow::joinSucceededMW);
 }
 
 void SslEchoClient::connectToRegister(Register* r) {
