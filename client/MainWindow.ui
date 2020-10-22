@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>981</width>
+    <width>1200</width>
     <height>600</height>
    </rect>
   </property>
@@ -325,7 +325,7 @@
   <action name="actionUserInfo">
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/imgs/icons/noun_Settings_2324598.svg</normaloff>:/imgs/icons/noun_Settings_2324598.svg</iconset>
+     <normaloff>:/imgs/icons/noun_user login_178831.svg</normaloff>:/imgs/icons/noun_user login_178831.svg</iconset>
    </property>
    <property name="text">
     <string>User Information</string>

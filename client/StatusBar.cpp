@@ -74,7 +74,7 @@ void StatusBar::setupSB() {
 		docTitle->setText("Untitled");
 	 */
 	docTitle->setText("Untitled");
-	docTitle->setFixedWidth(66);
+	docTitle->setFixedWidth(120);
 	docTitle->setToolTip("This is the current document title");
 	
 	/*

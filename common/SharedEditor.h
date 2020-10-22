@@ -30,8 +30,6 @@ private:
     std::map<int, bool> strategies;
     int base;
     int boundary;
-
-    int connectedUsers = 1;
 public:
     SharedEditor(int siteId = 0);
 
@@ -39,6 +37,7 @@ public:
     void setSiteId(int siteId);
 
     const std::vector<std::vector<QSymbol>>& getSymbols() const;
+    const QSymbol& getSymbol(int row, int col) const;
 
     void setSymbols(std::vector<std::vector<QSymbol>> symbols);
 
@@ -58,18 +57,8 @@ public:
     std::pair<int, int> remoteInsert(const QSymbol &symbol);
     std::pair<int, int> remoteErase(const QSymbol &symbol);
 
-    bool isNewLine(QChar &c);
-
     std::vector<QSymbol> getBlock(int startLine, int startIndex, int endLine, int endIndex);
     std::pair<int, int> getPos(const QSymbol &symbol);
-
-    void connectedUsersDecrease();
-
-    void connectedUsersIncrease();
-
-    int getConnectedUsers();
-
-    void setConnectedUsers(int connectedUsers);
 
 
 };

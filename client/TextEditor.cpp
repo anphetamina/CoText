@@ -7,6 +7,7 @@
 #include <QtWidgets/QFontDialog>
 #include <QThread>
 #include <QRandomGenerator>
+#include <QScrollBar>
 #include "../common/Shuffler.h"
 #include "TextEditor.h"
 #include <mutex>
@@ -26,8 +27,8 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     highlighter(*this, document()),
     isUserColorsToggled(false),
     hasLostFocus(false),
-    copiedFromOutside(false),
-    draggedFromOutside(false),
+    copiedFromOutside(true),
+    draggedFromOutside(true),
     mousePressed(false),
     documentId(0),
     documentName(QString()) {
@@ -76,6 +77,26 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     connect(ui.actionToggle_user_colors, &QAction::triggered, this, &TextEditor::toggleUserColors);
 
     connect(QApplication::clipboard(), &QClipboard::dataChanged, this, &TextEditor::clipboardDataChange);
+
+    connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &TextEditor::paintCursors);
+
+    /**
+     * action connections
+     */
+
+    connect(this, &QTextEdit::undoAvailable, ui.actionUndo, &QAction::setEnabled);
+    connect(this, &QTextEdit::redoAvailable, ui.actionRedo, &QAction::setEnabled);
+    ui.actionCopy->setEnabled(false);
+    connect(this, &QTextEdit::copyAvailable, ui.actionCopy, &QAction::setEnabled);
+    ui.actionCut->setEnabled(false);
+    connect(this, &QTextEdit::copyAvailable, ui.actionCut, &QAction::setEnabled);
+
+    ui.actionUndo->setEnabled(document()->isUndoAvailable());
+    ui.actionRedo->setEnabled(document()->isUndoAvailable());
+
+    if (const QMimeData *md = QApplication::clipboard()->mimeData()) {
+        ui.actionPaste->setEnabled(md->hasText());
+    }
 
     /**
      * testing code
@@ -157,8 +178,20 @@ void TextEditor::setTextAlignment(QAction *action) {
         QTextBlock block = document()->findBlock(textCursor().selectionStart());
         int pos = 0;
         while (block.isValid() && block.position() <= textCursor().selectionEnd()) {
-            block.position() != -1 ? pos = block.position() : pos = textCursor().selectionEnd();
-            emit textAlignmentChanged(flag, pos, editor.getSiteId());
+            block.position() != -1 ? pos = block.position()-1 : pos = document()->findBlock(textCursor().selectionEnd()).position()-1;
+            if (pos < 0) {
+                qDebug() << "first block encountered ( pos = " << pos << ")";
+            } else {
+                try {
+                    int row = getRow(pos);
+                    int col = getCol(row, pos);
+                    QSymbol symbol = editor.getSymbol(row, col);
+                    emit textAlignmentChanged(flag, symbol, editor.getSiteId());
+                } catch (const std::exception &e) {
+                    qDebug() << __PRETTY_FUNCTION__ << e.what();
+                }
+            }
+
             block = block.next();
         }
     }
@@ -833,11 +866,11 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
 
 }
 
-SharedEditor TextEditor::getEditor() const{
+SharedEditor TextEditor::getEditor() const {
     return editor;
 }
 
-std::vector<int> TextEditor::getIndex() const{
+std::vector<int> TextEditor::getIndex() const {
     return index;
 }
 
@@ -857,7 +890,8 @@ void TextEditor::printSymbols(const std::string &functionName) {
     qDebug();
 }
 
-void TextEditor::updateAlignment(Qt::Alignment alignment, int position) {
+void TextEditor::updateAlignment(Qt::Alignment alignment, QSymbol symbol) {
+    // todo check cursors
     document()->blockSignals(true);
 
     QTextBlockFormat f;
@@ -865,6 +899,15 @@ void TextEditor::updateAlignment(Qt::Alignment alignment, int position) {
 
     try {
         QTextCursor c(document());
+        std::pair<int, int> pos = editor.getPos(symbol);
+        int position = getPosition(pos.first, pos.second)+1;
+
+        if (pos.first == -1 || pos.second == -1) {
+            throw std::runtime_error("symbol not found");
+        } else if (position > document()->characterCount()) {
+            throw std::out_of_range(std::to_string(position) + " greater than character count " + std::to_string(document()->characterCount()));
+        }
+
         c.setPosition(position);
         c.setBlockFormat(f);
     } catch (const std::exception &e) {
@@ -880,6 +923,7 @@ bool TextEditor::isNewLine(QChar c) {
 
 void TextEditor::updateCursorMap(QVector<User> onlineUserList, QVector<User> completeUserList /*ignored*/) {
 
+    // todo check when users disconnect
     std::vector<int> onlineUserIds{};
     std::for_each(onlineUserList.begin(), onlineUserList.end(), [&](const User &u) { onlineUserIds.push_back(u.getId()); });
     std::sort(onlineUserIds.begin(), onlineUserIds.end());
@@ -904,6 +948,7 @@ void TextEditor::updateCursorMap(QVector<User> onlineUserList, QVector<User> com
     for (auto it : newOnlineUserIds) {
         cursorMap[it].first = document()->characterCount()-1;
         cursorMap[it].second = new QLabel(this);
+        cursorMap[it].second->setTextInteractionFlags(Qt::NoTextInteraction);
     }
 
     /**
@@ -959,7 +1004,11 @@ int TextEditor::getNumChars() const {
 }
 
 void TextEditor::clipboardDataChange() {
-    if (QApplication::clipboard()->mimeData()) {
+
+    if (const QMimeData *md = QApplication::clipboard()->mimeData()) {
+
+        ui.actionPaste->setEnabled(md->hasText());
+
         if (hasLostFocus) {
             qDebug() << "clipboard changed outside";
             copiedFromOutside = true;

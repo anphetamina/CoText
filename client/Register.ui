@@ -552,6 +552,16 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>lineEdit_Name</tabstop>
+  <tabstop>lineEdit_Surname</tabstop>
+  <tabstop>lineEdit_email</tabstop>
+  <tabstop>lineEdit_Pass2</tabstop>
+  <tabstop>lineEdit_Pass1</tabstop>
+  <tabstop>pushButton_BrowseReg</tabstop>
+  <tabstop>pushButton_Register</tabstop>
+  <tabstop>pushButton_Canc_Reg</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

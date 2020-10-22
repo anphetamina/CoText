@@ -154,12 +154,12 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
     //User Information
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionUserInfo)) && event->type() == QEvent::Enter) {
         setCursor(Qt::PointingHandCursor);
-        ui->actionUserInfo->setIcon(QIcon(":/imgs/icons/noun_Settings_2324598_white.svg"));
+        ui->actionUserInfo->setIcon(QIcon(":/imgs/icons/noun_user login_178831_white.svg"));
         return true;
     }
     if(watched == dynamic_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->actionUserInfo)) && event->type() == QEvent::Leave) {
         setCursor(Qt::ArrowCursor);
-        ui->actionUserInfo->setIcon(QIcon(":/imgs/icons/noun_Settings_2324598.svg"));
+        ui->actionUserInfo->setIcon(QIcon(":/imgs/icons/noun_user login_178831.svg"));
         return true;
     }
 
@@ -294,7 +294,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
 		ui->actionUnderline->setIcon(QIcon(":/imgs/icons/noun_underline_1384032.svg"));
 		return true;
 	}
-    
+	
     //AlignLeft
 	if(watched == dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionAlign_left)) && event->type() == QEvent::Enter) {
 		setCursor(Qt::PointingHandCursor);
@@ -586,7 +586,7 @@ void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> n
                 if(!user.getProfilePic().isNull()){
                     orig = QPixmap::fromImage(user.getProfilePic());
                 }else{
-                    orig.load(":/imgs/icons/user-group.svg");
+                    orig.load(":/imgs/icons/noun_user login_178831_white.svg");
                 }
                 QPixmap background = addImageInRightToolBar(orig, colorMap[newCompleteUserList[i].getId()].name());
                 iconLabel->setPixmap(background);
@@ -636,20 +636,22 @@ QPixmap MainWindow::addImageInRightToolBar(const QPixmap &orig, QColor color) {
     QPixmap rounded = QPixmap(size, size);
     rounded.fill(Qt::transparent);
     QPainterPath path;
-    //path.setFillRule(QPainterPath::QVectorPath);
     path.addEllipse(rounded.rect());
-    QPainter painter(&rounded);
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.setClipPath(path);
+    QPainter *painter = new QPainter(&rounded);
+    //painter->setPen(color);
+
+    painter->setRenderHint(QPainter::Antialiasing);
+    painter->setClipPath(path);
 
 
     // Filling rounded area if needed
-    painter.fillRect(rounded.rect(), Qt::black);
+    //Before was Qt::black
+    painter->fillRect(rounded.rect(), Qt::transparent);
 
     // Getting offsets if the original picture is not square
     int x = qAbs(orig.width() - size) / 2;
     int y = qAbs(orig.height() - size) / 2;
-    painter.drawPixmap(-x, -y, orig.width(), orig.height(), orig);
+    painter->drawPixmap(-x, -y, orig.width(), orig.height(), orig);
 
     QPixmap background = QPixmap(size + 50, size + 50);
     background.fill(Qt::transparent);
@@ -667,6 +669,7 @@ QPixmap MainWindow::addImageInRightToolBar(const QPixmap &orig, QColor color) {
     y = qAbs(rounded.height() - size - 50) / 2;
     painter1.drawPixmap(x, y, rounded.width(), rounded.height(), rounded);
 
+    delete painter;
     return background.scaled(30,30);
 }
 

@@ -85,7 +85,7 @@ public slots:
     void remoteErase(QSymbol symbol);
     void remoteEraseBlock(std::vector<QSymbol> symbols);
     void updateCursor(int userId, int position);
-    void updateAlignment(Qt::Alignment alignment, int position);
+    void updateAlignment(Qt::Alignment alignment, QSymbol symbol);
     void openDocument(int docId, QString docName, std::vector<std::vector<QSymbol>> symbols);
     void updateCursorMap(QVector<User> onlineUserList, QVector<User> completeUserList);
     void paintCursors();
@@ -119,7 +119,7 @@ signals:
     void symbolsInserted(std::vector<QSymbol> symbols, int siteId);
     void symbolsErased(std::vector<QSymbol> symbols, int siteId);
     void cursorPositionChanged(int userId, int position);
-    void textAlignmentChanged(Qt::Alignment alignment, int position, int siteId);
+    void textAlignmentChanged(Qt::Alignment alignment, QSymbol symbol, int siteId);
 
 };
 
