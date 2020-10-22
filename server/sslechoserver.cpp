@@ -717,11 +717,19 @@ std::pair <QVector<QVector<QSymbol>>, QVector<AlignMessage> > SslEchoServer::rem
         //QSharedPointer<QVector<AlignMessage>> qalign(new QVector<AlignMessage>);
         qalign = loadAlignmentFromDisk(docId);
 
+
         QSharedPointer<SharedEditor> se(new SharedEditor(9999));
         std::vector<std::vector<QSymbol>> symbols = toVector(qsymbols);
         se->setSymbols(symbols);
         editorMapping.insert(docId, se);
+        // prune unused alignement (or relative to deleted paragraph)
+        qalign.erase(std::remove_if(qalign.begin(), qalign.end(), [se](AlignMessage am) {
+            auto qsPos = se->getPos(am.getPositionStart());
+            return (qsPos.first < 0 || qsPos.second < 0);
+            }),
+            qalign.end());
         alignmentMapping.insert(docId, qalign);
+
     } else // Altrimenti prendo lo stato soltanto
     {
         std::vector<std::vector<QSymbol>> symbols = editorMapping[docId]->getSymbols();
