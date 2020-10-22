@@ -32,10 +32,11 @@ int main(int argc, char *argv[]) {
     }
     else {
         QTextStream in(&f);
-        //qDebug() << f.size() << in.readLine();
+        //qDebug() << f.size() << in.readLine() << serverAddr;
         serverAddr = in.readLine();
+        f.close();
     }
-	client = new SslEchoClient(QUrl());
+	client = new SslEchoClient(QUrl(serverAddr));
 	Q_UNUSED(*client);
 
     MainWindow *w = new MainWindow();
