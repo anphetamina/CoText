@@ -16,6 +16,22 @@ Additional features are:
 - :white_check_mark: Multi-platform compatibility
 - :white_check_mark: Low footprint on bandwith, memory and CPU.
 
+## :question: How to run CoText?
+If you want to start server on a given port  you can specify it as the first parameter. If no port is given the server will use the default 12345.
+
+Example:
+```bash
+$ server 12345
+```
+
+For the client you can configure the server address by creating a client.config file in the client's directory.
+Example content for a client.config file used for a server running on localhost and using  the default port is the following:
+
+```plaintext
+wss://localhost:12345
+```
+
+But using a similar defined config file is the same as not using anything at all. The client will fallback to this if no given file is found.
 ## :grey_exclamation: Setup
 CoText has some requirements and some setup steps needed to run it.
 
