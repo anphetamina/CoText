@@ -76,7 +76,7 @@ private:
     void decrementIndex(int pos, int n);
     int getPosition(int row, int col);
     void printSymbols(const std::string &functionName);
-    bool isNewLine(QChar c);
+    int isNewLine(QChar c);
     void insertBlock(const std::vector<QSymbol> &block, int position);
 
 public slots:

@@ -883,7 +883,7 @@ void TextEditor::printSymbols(const std::string &functionName) {
         QString sline = QString();
         for (int j = 0; j < symbols[i].size(); j++) {
             const QSymbol &s = symbols[i][j];
-            sline.append(isNewLine(s.getC()) ? QChar::LineFeed : s.getC());
+            sline.append(isNewLine(s.getC()) == -1 ? s.getC() : QChar::LineFeed);
         }
         qDebug() << "[" << index[i] << "] " << sline;
     }
@@ -917,8 +917,19 @@ void TextEditor::updateAlignment(Qt::Alignment alignment, QSymbol symbol) {
     document()->blockSignals(false);
 }
 
-bool TextEditor::isNewLine(QChar c) {
-    return c == QChar::LineFeed || c == QChar::ParagraphSeparator || c == QChar::LineSeparator;
+/**
+ *
+ * @param c
+ * @return 1 if c == QChar::LineFeed, 0 if c == QChar::ParagraphSeparator || c == QChar::LineSeparator, else -1
+ */
+int TextEditor::isNewLine(QChar c) {
+    int res = -1;
+    if (c == QChar::LineFeed) {
+        res = 1;
+    } else if (c == QChar::ParagraphSeparator || c == QChar::LineSeparator) {
+        res = 0;
+    }
+    return res;
 }
 
 void TextEditor::updateCursorMap(QVector<User> onlineUserList, QVector<User> completeUserList /*ignored*/) {
