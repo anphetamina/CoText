@@ -25,8 +25,18 @@ int main(int argc, char *argv[]) {
 	QString stylesheetString = QLatin1String(styleFile.readAll());
 	a.setStyleSheet(stylesheetString);
 
-    /** Login Phase */
-	client = new SslEchoClient(QUrl(QStringLiteral("wss://localhost:12345")));
+    QFile f("./client.config");
+    QString serverAddr = "wss://localhost:12345";
+    if (!f.open(QFile::ReadOnly | QFile::Text)) {
+        qInfo("No client.config was found.\nFallback to default value for a localhost server running on default (1235) port: wss://localhost:12345");
+    }
+    else {
+        QTextStream in(&f);
+        //qDebug() << f.size() << in.readLine() << serverAddr;
+        serverAddr = in.readLine();
+        f.close();
+    }
+	client = new SslEchoClient(QUrl(serverAddr));
 	Q_UNUSED(*client);
 
     MainWindow *w = new MainWindow();
@@ -63,6 +73,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    /** Login Phase */
     // Perform authentication now if user and pass where passed as CLI arg
     QString quser, qpass;
     if (argc > 1) {

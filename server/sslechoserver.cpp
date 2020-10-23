@@ -28,10 +28,14 @@ SslEchoServer::SslEchoServer(quint16 port, QObject *parent) :
                                               QWebSocketServer::SecureMode,
                                               this);
     QSslConfiguration sslConfiguration;
+    
     QFile certFile(QStringLiteral("./localhost.cert"));
     QFile keyFile(QStringLiteral("./localhost.key"));
-    certFile.open(QIODevice::ReadOnly);
-    keyFile.open(QIODevice::ReadOnly);
+    //certFile.open(QIODevice::ReadOnly);
+    if (!certFile.open(QIODevice::ReadOnly) || !keyFile.open(QIODevice::ReadOnly)) {
+        qFatal("Missing certificate. Please add a valid certificate and name it as localhost.cert. The file should be in the same folder of the server.");
+    }
+
     QSslCertificate certificate(&certFile, QSsl::Pem);
     QSslKey sslKey(&keyFile, QSsl::Rsa, QSsl::Pem);
     certFile.close();
@@ -42,13 +46,13 @@ SslEchoServer::SslEchoServer(quint16 port, QObject *parent) :
     m_pWebSocketServer->setSslConfiguration(sslConfiguration);
 
     if (m_pWebSocketServer->listen(QHostAddress::Any, port)) {
-        qInfo() << "Server listening on port" << port;
+        qInfo() << "[INFO] Server is now listening on port" << port;
         connect(m_pWebSocketServer, &QWebSocketServer::newConnection,
                 this, &SslEchoServer::onNewConnection);
         connect(m_pWebSocketServer, &QWebSocketServer::sslErrors,
                 this, &SslEchoServer::onSslErrors);
     } else {
-        qFatal("Cant listen");
+        qFatal("[ERROR] Cant listen. Check if the port is already used by an other server.");
     }
 
 }

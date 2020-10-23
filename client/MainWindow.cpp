@@ -5,13 +5,11 @@
 #include "ShareUri.h"
 #include "Join.h"
 #include "OpenDocument.h"
-#include "AlertNewDocument.h"
 #include "ChooseName.h"
 #include "sslechoclient.h"
 #include "info.h"
 #include <QPixmap> //allows to create a qpixmap onj which takes 1 arg
 #include <QPrinter>
-#include <QColorDialog>
 #include <QColor>
 #include <QCloseEvent>
 #include <QtSvg>
@@ -374,22 +372,56 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
 void MainWindow::on_actionNew_triggered() {
     ChooseName chooseName(docList);
     connect(&chooseName, &ChooseName::nameChosen, this, &MainWindow::nameChosenMainWindow);
+    connect(this, &MainWindow::closeChooseNameMW, &chooseName, &ChooseName::closeChooseName);
     chooseName.setWindowTitle("Choose document name");
     chooseName.setModal(true);
     chooseName.exec();
 }
 
-void MainWindow::nameChosenMainWindow(QString name){
+void MainWindow::nameChosenMainWindow(QString newDocName){
     if(editor->isEnabled()){    //c'è già un documento aperto
-        AlertNewDocument alert(this->windowTitle(), name);
-        connect(&alert, &AlertNewDocument::openNewDocument, this, &MainWindow::openNewDocumentMainWindow);
-        alert.setWindowTitle("Alert");
-        alert.setModal(true);
-        alert.exec();
+
+       QString messageText;
+       if(newDocName.isEmpty()){    //create new document
+            messageText = "Do you want to close "+ this->windowTitle()+" and open a new document ?";
+        }else{                      //open an existing document
+           messageText = "Do you want to close '"+ this->windowTitle()+"' and open '"+ newDocName +"' ?";
+       }
+
+       QMessageBox::StandardButton resBtn = QMessageBox::question(this, "Alert", messageText,  QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
+
+        if(resBtn == QMessageBox::Yes) {
+            if(newDocName.isEmpty()){   //create new document
+                openNewDocumentMainWindow("Untitled");
+            }else{                      //open an existing document
+                openNewDocumentMainWindow(newDocName);
+            }
+            emit closeChooseNameMW();
+        }
+
     }else { //non c'è nessun documento aperto
-        emit(sendDocCreateMainWindow(name, user.getId()));   //il server poi risponde con DocumentOkPacket e il client nella slot apre il nuovo documento
-        docList.append(name);
+        emit sendDocCreateMainWindow(newDocName, user.getId());   //il server poi risponde con DocumentOkPacket e il client nella slot apre il nuovo documento
+        emit closeChooseNameMW();
+        docList.append(newDocName);
     }
+}
+
+void MainWindow::newDocumentFromMainMenu() {
+    ChooseName chooseName(docList);
+    connect(&chooseName, &ChooseName::nameChosen, this, &MainWindow::nameChosenFromMainMenu);
+    connect(this, &MainWindow::closeChooseNameMW, &chooseName, &ChooseName::closeChooseName);
+    chooseName.setWindowTitle("Choose document name");
+    chooseName.setModal(true);
+    chooseName.exec();
+}
+
+void MainWindow::nameChosenFromMainMenu(QString name){
+    emit closeChooseNameMW();
+    emit closeMainMenu();
+    emit sendDocCreateMainWindow(name, user.getId());   //il server poi risponde con DocumentOkPacket e il client nella slot apre il nuovo documento
+    docList.append(name);
+    this->qSB->updateDocInfo(name);
+    this->show();
 }
 
 void MainWindow::connectToMainMenu(MainMenu* mainMenu) {
@@ -398,22 +430,6 @@ void MainWindow::connectToMainMenu(MainMenu* mainMenu) {
     connect(mainMenu, &MainMenu::joinClicked, this, &MainWindow::joinFromMainMenu);
     connect(this, &MainWindow::closeMainMenu, mainMenu, &MainMenu::closeMainMenuSlot);
     connect(mainMenu, &MainMenu::sendCloseMainWindow, this, &MainWindow::closeMainWindow);
-}
-
-void MainWindow::newDocumentFromMainMenu() {
-    ChooseName chooseName(docList);
-    connect(&chooseName, &ChooseName::nameChosen, this, &MainWindow::nameChosenFromMainMenu);
-    chooseName.setWindowTitle("Choose document name");
-    chooseName.setModal(true);
-    chooseName.exec();
-}
-
-void MainWindow::nameChosenFromMainMenu(QString name){
-    emit closeMainMenu();
-    emit(sendDocCreateMainWindow(name, user.getId()));   //il server poi risponde con DocumentOkPacket e il client nella slot apre il nuovo documento
-    docList.append(name);
-    this->qSB->updateDocInfo(name);
-    this->show();
 }
 
 void MainWindow::openNewDocumentMainWindow(QString docName){
@@ -453,6 +469,7 @@ void MainWindow::on_actionOpen_triggered() {
     //emit(sendAskDocListMainWindow(user.getId())); //todo understand if it's useful
     OpenDocument openDocument(docList, this);
     connect(&openDocument, &OpenDocument::sendOpenDocument, this, &MainWindow::sendOpenDocumentMainWindow);
+    connect(this, &MainWindow::closeOpenDocumentMW, &openDocument, &OpenDocument::closeOpenDocument);
     openDocument.setWindowTitle("Select a document");
     openDocument.setModal(true);
     openDocument.exec();

@@ -21,6 +21,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
     add_definitions(-DQT_NO_DEBUG_OUTPUT)
 endif (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
 
+find_package(Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt5 COMPONENTS WebSockets)
 find_package(Qt5 COMPONENTS Gui REQUIRED)
 find_package(Qt5 COMPONENTS Sql REQUIRED)
@@ -32,6 +33,7 @@ file(GLOB common_src "${common_dir}/*.h" "${common_dir}/*.cpp")
 add_executable(CoText-server ${common_src} ${server_src})
 
 target_link_libraries(CoText-server PUBLIC
+        Qt5::Core
         Qt5::Network
         Qt5::WebSockets
         Qt5::Gui
@@ -57,3 +59,4 @@ qt5_add_resources(CoText-server "securesocketclient"
 #        BUNDLE DESTINATION "${INSTALL_EXAMPLEDIR}"
 #        LIBRARY DESTINATION "${INSTALL_EXAMPLEDIR}"
 #        )
+#https://stackoverflow.com/questions/33743493/why-visual-studio-2015-cant-run-exe-file-ucrtbased-dll

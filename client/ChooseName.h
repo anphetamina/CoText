@@ -19,6 +19,9 @@ private slots:
     void on_pushButton_ok_clicked();
     void on_pushButton_cancel_clicked();
 
+public slots:
+    void closeChooseName();
+
 signals:
     void nameChosen(QString name);
 
