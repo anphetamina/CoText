@@ -148,7 +148,7 @@ void TextEditor::setFontUnderline(bool underline) {
 
 void TextEditor::setFontColor() {
     QColor color = QColorDialog::getColor(textColor(), parent);
-    if (!color.isValid()){
+    if (!color.isValid()) {
         return;
     }
     setTextColor(color);
@@ -646,6 +646,7 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
         int lastIndex = lastPos.second;
 
         if (firstLine == -1 || firstIndex == -1 || lastLine == -1 || lastIndex == -1) {
+            document()->blockSignals(false);
             return;
         }
 
@@ -707,6 +708,7 @@ void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
         int lastIndex = lastPos.second;
 
         if (firstLine == -1 || firstIndex == -1 || lastLine == -1 || lastIndex == -1) {
+            document()->blockSignals(false);
             return;
         }
 
@@ -854,41 +856,49 @@ int TextEditor::getUserId(int row, int col) const {
 
 void TextEditor::openDocument(int docId, QString docName, std::vector<std::vector<QSymbol>> symbols) {
 
-    if (std::any_of(symbols.begin(), symbols.end(), [](const std::vector<QSymbol> &row){
-        return std::any_of(row.begin(), row.end(), [](const QSymbol &s){ return !s.isValid(); });
-    })) {
-        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": document is invalid");
+    document()->blockSignals(true);
+
+    try {
+        if (std::any_of(symbols.begin(), symbols.end(), [](const std::vector<QSymbol> &row){
+            return std::any_of(row.begin(), row.end(), [](const QSymbol &s){ return !s.isValid(); });
+        })) {
+            throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": document is invalid");
+        }
+
+        this->setSiteId(user.getId());
+        qDebug() << "[DOC_OPENED] : updating siteId "<< this->getSiteId();
+        documentId = docId;
+        documentName = docName;
+
+        if (document()->characterCount() > 1 || !editor.getSymbols()[0].empty()) {
+            editor.clear();
+
+            this->clear();
+
+        }
+
+        this->setDisabled(false);
+
+        Benchmark b = Benchmark("TextEditor::openDocument");
+        b.startTimer();
+
+        index.clear();
+        index.push_back(0);
+
+        for (int i = 0; i < symbols.size(); i++) {
+            this->remoteInsertBlock(symbols[i]);
+        }
+
+        b.stopTimer();
+
+        alignmentChange(alignment());
+        currentCharFormatChange(currentCharFormat());
+        setFocus();
+    } catch (const std::exception &e) {
+        qDebug() << "[EXCEPTION]" << __PRETTY_FUNCTION__ << e.what();
     }
 
-    this->setSiteId(user.getId());
-    qDebug() << "[DOC_OPENED] : updating siteId "<< this->getSiteId();
-    documentId = docId;
-    documentName = docName;
-
-    if (document()->characterCount() > 1 || !editor.getSymbols()[0].empty()) {
-        editor.clear();
-        document()->blockSignals(true);
-        this->clear();
-        document()->blockSignals(false);
-    }
-
-    this->setDisabled(false);
-
-    Benchmark b = Benchmark("TextEditor::openDocument");
-    b.startTimer();
-
-    index.clear();
-    index.push_back(0);
-
-    for (int i = 0; i < symbols.size(); i++) {
-        this->remoteInsertBlock(symbols[i]);
-    }
-
-    b.stopTimer();
-
-    alignmentChange(alignment());
-    currentCharFormatChange(currentCharFormat());
-    setFocus();
+    document()->blockSignals(false);
 
 }
 
