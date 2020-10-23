@@ -277,12 +277,13 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             switch (msg->getType()) {
                 case(MSG_INSERT_SYM): {
                     emit insertReceived(msg->getQS());
-                    
+                    qDebug() << "received add symbol";
                     break;
                 }
 
                 case(MSG_ERASE_SYM): {
                     emit eraseReceived(msg->getQS());
+                    qDebug() << "received del symbol";
                     break;
                 }
             }
@@ -294,7 +295,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
                 case(MSG_INSERT_SYM): {
                     QVector<QSymbol> syms = msg->getQSS();
                     std::vector<QSymbol> symbols(syms.begin(), syms.end());
-
+                    qDebug() << "received add block";
                     emit insertBlockReceived(symbols);
                     break;
                 }
@@ -302,7 +303,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
                 case(MSG_ERASE_SYM): {
                     QVector<QSymbol> syms = msg->getQSS();
                     std::vector<QSymbol> symbols(syms.begin(), syms.end());
-
+                    qDebug() << "received del block";
                     emit eraseBlockReceived(symbols);
                     break;
                 }
@@ -364,12 +365,12 @@ void SslEchoClient::sendInsert(std::vector<QSymbol> symbols, int siteId) {
         QVector<QSymbol> syms(symbols.begin(), symbols.end());
         BigMessage msg = BigMessage(MSG_INSERT_SYM, syms, siteId);
         msg.send(*pServer);
-        // qDebug() << "sent add block";
+        qDebug() << "sent add block";
     } else {
         QSymbol symbol = symbols.front();
         Message msg = Message(MSG_INSERT_SYM, symbol, siteId);
         msg.send(*pServer);
-        // qDebug() << "sent add " << ((symbol.isNewLine()) ? "LF" : QString(symbol.getC()));
+        qDebug() << "sent add " << ((symbol.isNewLine()) ? "LF" : QString(symbol.getC()));
     }
 }
 
@@ -378,12 +379,12 @@ void SslEchoClient::sendErase(std::vector<QSymbol> symbols, int siteId) {
         QVector<QSymbol> syms(symbols.begin(), symbols.end());
         BigMessage msg = BigMessage(MSG_ERASE_SYM, syms, siteId);
         msg.send(*pServer);
-        // qDebug() << "sent del block";
+        qDebug() << "sent del block";
     } else {
         QSymbol symbol = symbols.front();
         Message msg = Message(MSG_ERASE_SYM, symbol, siteId);
         msg.send(*pServer);
-        // qDebug() << "sent del " << ((symbol.isNewLine()) ? "LF" : QString(symbol.getC()));
+        qDebug() << "sent del " << ((symbol.isNewLine()) ? "LF" : QString(symbol.getC()));
     }
 }
 

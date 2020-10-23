@@ -201,7 +201,7 @@ void TextEditor::setTextAlignment(QAction *action) {
 
 
             } catch (const std::exception &e) {
-                qDebug() << __PRETTY_FUNCTION__ << e.what();
+                qDebug() << "[EXCEPTION]"  << __PRETTY_FUNCTION__ << e.what();
             }
 
 
@@ -258,6 +258,8 @@ void TextEditor::currentCharFormatChange(const QTextCharFormat &f) {
 
 void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) {
 
+    qDebug() << "contentsChange";
+
     if (document()->signalsBlocked()) {
         document()->blockSignals(false);
         return;
@@ -297,7 +299,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
             emit symbolsErased(erasedSymbols, editor.getSiteId());
         } catch (const std::exception &e) {
-            qDebug() << "TextEditor::contentsChange charsRemoved" << e.what();
+            qDebug() << "[EXCEPTION]" << "TextEditor::contentsChange charsRemoved" << e.what();
             undo();
         }
 
@@ -365,7 +367,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
                 emit textAlignmentChanged(document()->findBlock(position-1).blockFormat().alignment(), sym, editor.getSiteId());
             }
         } catch (const std::exception &e) {
-            qDebug() << "TextEditor::contentsChange charsAdded" << e.what();
+            qDebug() << "[EXCEPTION]"  << "TextEditor::contentsChange charsAdded" << e.what();
         }
 
     }
@@ -540,7 +542,7 @@ void TextEditor::remoteInsert(QSymbol symbol) {
             cursorPositionChange();
         }
     } catch (const std::exception &e) {
-        qDebug() << __PRETTY_FUNCTION__ << e.what();
+        qDebug() << "[EXCEPTION]"  << __PRETTY_FUNCTION__ << e.what();
     }
 
     printSymbols(__PRETTY_FUNCTION__);
@@ -582,7 +584,7 @@ void TextEditor::remoteErase(QSymbol symbol) {
             cursorPositionChange();
         }
     } catch (const std::exception &e) {
-        qDebug() << __PRETTY_FUNCTION__ << e.what();
+        qDebug() << "[EXCEPTION]"  << __PRETTY_FUNCTION__ << e.what();
     }
 
     printSymbols(__PRETTY_FUNCTION__);
@@ -665,7 +667,7 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
         insertBlock(block, lastPosition);
 
     } catch (const std::exception &e) {
-        qDebug() << "TextEditor::remoteInsertBlock" << __PRETTY_FUNCTION__ << e.what();
+        qDebug() << "[EXCEPTION]"  << "TextEditor::remoteInsertBlock" << __PRETTY_FUNCTION__ << e.what();
     }
 
     document()->blockSignals(false);
@@ -740,7 +742,7 @@ void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
 
         insertBlock(diffBlock, position);
     } catch (const std::exception &e) {
-        qDebug() << "TextEditor::remoteEraseBlock" << __PRETTY_FUNCTION__ << e.what();
+        qDebug() << "[EXCEPTION]"  << "TextEditor::remoteEraseBlock" << __PRETTY_FUNCTION__ << e.what();
     }
 
     document()->blockSignals(false);
@@ -947,7 +949,7 @@ void TextEditor::updateAlignment(Qt::Alignment align, QSymbol symbol) {
         alignmentChange(alignment());
         paintCursors();
     } catch (const std::exception &e) {
-        qDebug() << "TextEditor::updateAlignment" << __PRETTY_FUNCTION__ << e.what();
+        qDebug() << "[EXCEPTION]"  << "TextEditor::updateAlignment" << __PRETTY_FUNCTION__ << e.what();
     }
 
     document()->blockSignals(false);
