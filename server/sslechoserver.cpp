@@ -153,18 +153,17 @@ bool SslEchoServer::closeDocumentById(int closedDocId, QSharedPointer<Client> cl
     if (closedDocId > 0) {
         // Remove from document open map
         this->findAndDeleteFromDoclist(client);
-
         // Decrease the counter of current online user per document
-        //editorMapping[closedDocId]->connectedUsersDecrease();
+        editorMapping[closedDocId]->decreaseConnectedUsers();
         //qDebug() << "[DOC_CLOSE] Remaining online user in the same document: " << editorMapping[closedDocId]->getConnectedUsers();
         // Every time a user disconnect itself the server save a copy (of document and its alignment info)
         saveToDisk(toQVector(editorMapping[closedDocId]->getSymbols()), closedDocId);
         saveAlignmentToDisk(alignmentMapping[closedDocId], closedDocId);
         // if last user online is disconnecting,  delete the editorMapping entry
-        /*if (editorMapping[closedDocId]->getConnectedUsers() == 0) {
+        if (editorMapping[closedDocId]->getConnectedUsers() == 0) {
             editorMapping.remove(closedDocId);
             alignmentMapping.remove(closedDocId);
-        }*/
+        }
         // Send to all the the user connected to the document that was just closed by the client the new userlist
         sendUpdatedOnlineUserByDocId(closedDocId);
         return true;
@@ -456,6 +455,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
                 //QVector<AlignMessage> align = docAndAlign.second;
                 docContent = docAndAlign.first;
                 alignContent = docAndAlign.second;
+                
             }
             else {
                 docContent = { {} };
@@ -469,6 +469,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
             //Send alignment for that doc
             sendDocAlignment(alignContent, pClient);
 
+            
             // Send current online userlist for the given document
             sendUpdatedOnlineUserByDocId(docId);
             break;
@@ -746,11 +747,32 @@ std::pair <QVector<QVector<QSymbol>>, QVector<AlignMessage> > SslEchoServer::rem
 
     } else // Altrimenti prendo lo stato soltanto
     {
-        std::vector<std::vector<QSymbol>> symbols = editorMapping[docId]->getSymbols();
+        // Get the symbol from the current crdt instance
+        QSharedPointer<SharedEditor> se(editorMapping[docId]);
+
+        std::vector<std::vector<QSymbol>> symbols = se->getSymbols();
         qsymbols = toQVector(symbols);
-        //editorMapping[docId]->connectedUsersIncrease();
+
         qalign = alignmentMapping[docId];
+        // prune unused alignment (or relative to deleted paragraph)
+        qalign.erase(std::remove_if(qalign.begin(), qalign.end(), [se](AlignMessage am) {
+            QSymbol qs = am.getPositionStart();
+
+            bool isFirstDummyAlignSym = qs.getId() == FIRST_ROW;
+            std::pair<int, int> qsPos;
+            if (!isFirstDummyAlignSym) {
+                qsPos = se->getPos(qs);
+            }
+            else {
+                return false;
+            }
+            return (qsPos.first < 0 || qsPos.second < 0);
+            }),
+            qalign.end());
     }
+    // Increase counter of online user for that doc
+    editorMapping[docId]->increaseConnectedUsers();
+
     return std::make_pair(qsymbols, qalign) ;
 }
 

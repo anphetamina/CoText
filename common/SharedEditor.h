@@ -30,6 +30,8 @@ private:
     std::map<int, bool> strategies;
     int base;
     int boundary;
+
+    int connectedUsers = 0;
 public:
     SharedEditor(int siteId = 0);
 
@@ -59,6 +61,11 @@ public:
 
     std::vector<QSymbol> getBlock(int startLine, int startIndex, int endLine, int endIndex);
     std::pair<int, int> getPos(const QSymbol &symbol);
+
+    int getConnectedUsers() ;
+    void increaseConnectedUsers();
+    void decreaseConnectedUsers();
+
 
 
 };

@@ -652,3 +652,15 @@ std::vector<QSymbol> SharedEditor::getBlock(int startLine, int startIndex, int e
 
     return block;
 }
+
+int SharedEditor::getConnectedUsers() {
+    return this->connectedUsers;
+}
+
+void SharedEditor::increaseConnectedUsers() {
+    this->connectedUsers++;
+}
+
+void SharedEditor::decreaseConnectedUsers() {
+    this->connectedUsers++;
+}
