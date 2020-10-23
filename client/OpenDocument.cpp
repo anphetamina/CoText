@@ -1,6 +1,5 @@
 #include "OpenDocument.h"
 #include "ui_OpenDocument.h"
-#include "AlertNewDocument.h"
 #include "DeletePushButton.h"
 #include <QDebug.h>
 #include <QtWidgets/QHBoxLayout>
@@ -62,19 +61,33 @@ OpenDocument::~OpenDocument()
 void OpenDocument::on_pushButton_clicked()
 {
     if(ui->listWidget->currentItem() != nullptr){
+
         if(mainWindow->getTextEditor()->isEnabled()){    //c'è già un documento aperto
-            AlertNewDocument alert(mainWindow->windowTitle(), ui->listWidget->currentItem()->text());
-            connect(&alert, &AlertNewDocument::openNewDocument, this, &OpenDocument::forwardOpenNewDocument);
-            alert.setWindowTitle("Alert");
-            alert.setModal(true);
-            alert.exec();
+
+            QString messageText;
+            if(ui->listWidget->currentItem()->text().isEmpty()){    //create new document
+                messageText = "Do you want to close "+ mainWindow->windowTitle()+" and open a new document ?";
+            }else{                      //open an existing document
+                messageText = "Do you want to close '"+ mainWindow->windowTitle()+"' and open '"+ ui->listWidget->currentItem()->text() +"' ?";
+            }
+
+            QMessageBox::StandardButton resBtn = QMessageBox::question(this, "Alert", messageText,  QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
+
+            if(resBtn == QMessageBox::Yes) {
+                if(ui->listWidget->currentItem()->text().isEmpty()){   //create new document
+                    emit sendOpenDocument("Untitled");
+                }else{                      //open an existing document
+                    emit sendOpenDocument(ui->listWidget->currentItem()->text());
+                }
+            }
+
         }else { //non c'è nessun documento aperto
-            emit(sendOpenDocument(ui->listWidget->currentItem()->text()));
+            emit sendOpenDocument(ui->listWidget->currentItem()->text());
         }
         this->close();
     }
 }
 
-void OpenDocument::forwardOpenNewDocument(QString docName){
-    emit(sendOpenDocument(docName));
+void OpenDocument::closeOpenDocument(){
+    this->close();
 }

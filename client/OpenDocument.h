@@ -25,8 +25,8 @@ signals:
     void documentDeleted(QString docName);
 
 public slots:
-    void forwardOpenNewDocument(QString docName);
     void buttonPressed(int i);
+void closeOpenDocument();
 
 private:
     Ui::OpenDocument *ui;

@@ -125,6 +125,8 @@ signals:
     void sendDocumentDeletedSignal(QString docName, quint32 userId);
     void closeJoinMW();
     void showJoinErrorMW();
+    void closeChooseNameMW();
+    void closeOpenDocumentMW();
 
 private:
     Ui::MainWindow *ui;
