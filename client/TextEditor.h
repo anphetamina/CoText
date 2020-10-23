@@ -16,6 +16,8 @@
 #include "UserHighlighter.h"
 #include "../common/User.h"
 
+#define FIRST_ROW "FIRST_ROW_ID"
+
 class UserHighlighter;
 
 namespace Ui { class MainWindow; }

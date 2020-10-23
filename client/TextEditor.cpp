@@ -155,6 +155,11 @@ void TextEditor::setFontColor() {
 
 void TextEditor::setTextAlignment(QAction *action) {
 
+    /**
+     * this prevent from erasing the entire block
+     */
+    document()->blockSignals(true);
+
     Qt::Alignment flag;
     bool hasChanged = true;
 
@@ -179,22 +184,31 @@ void TextEditor::setTextAlignment(QAction *action) {
         int pos = 0;
         while (block.isValid() && block.position() <= textCursor().selectionEnd()) {
             block.position() != -1 ? pos = block.position()-1 : pos = document()->findBlock(textCursor().selectionEnd()).position()-1;
-            if (pos < 0) {
-                qDebug() << "first block encountered ( pos = " << pos << ")";
-            } else {
-                try {
+
+            try {
+
+                if (pos < 0) {
+                    qDebug() << "first block encountered ( pos = " << pos << ")";
+                    QSymbol symbol(QChar(), FIRST_ROW, {}, QTextCharFormat());
+                    emit textAlignmentChanged(flag, symbol, editor.getSiteId());
+                } else {
                     int row = getRow(pos);
                     int col = getCol(row, pos);
                     QSymbol symbol = editor.getSymbol(row, col);
                     emit textAlignmentChanged(flag, symbol, editor.getSiteId());
-                } catch (const std::exception &e) {
-                    qDebug() << __PRETTY_FUNCTION__ << e.what();
                 }
+
+
+            } catch (const std::exception &e) {
+                qDebug() << __PRETTY_FUNCTION__ << e.what();
             }
+
 
             block = block.next();
         }
     }
+
+    document()->blockSignals(false);
 
 }
 
@@ -303,6 +317,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
             int newRows = 0;
 
             std::vector<QSymbol> insertedSymbols;
+            std::vector<QSymbol> insertedLineFeeds;
 
             while (charsAdded > 0) {
                 try {
@@ -313,8 +328,12 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
                     QSymbol symbol = editor.localInsert(row, col, addedChar, c.charFormat());
 
-                    if (isNewLine(addedChar)) {
+                    int aNewLine = isNewLine(addedChar);
+                    if (aNewLine != -1) {
                         newRows++;
+                        if (aNewLine == 0) {
+                            insertedLineFeeds.push_back(symbol);
+                        }
                     }
 
                     insertedSymbols.push_back(symbol);
@@ -340,6 +359,10 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
             insertRow(pos, newRows);
 
             emit symbolsInserted(insertedSymbols, editor.getSiteId());
+
+            for (const QSymbol& sym : insertedLineFeeds) {
+                emit textAlignmentChanged(document()->findBlock(position-1).blockFormat().alignment(), sym, editor.getSiteId());
+            }
         } catch (const std::exception &e) {
             qDebug() << "TextEditor::contentsChange charsAdded" << e.what();
         }
@@ -890,26 +913,38 @@ void TextEditor::printSymbols(const std::string &functionName) {
     qDebug();
 }
 
-void TextEditor::updateAlignment(Qt::Alignment alignment, QSymbol symbol) {
-    // todo check cursors
+void TextEditor::updateAlignment(Qt::Alignment align, QSymbol symbol) {
     document()->blockSignals(true);
 
     QTextBlockFormat f;
-    f.setAlignment(alignment);
+    f.setAlignment(align);
 
     try {
         QTextCursor c(document());
-        std::pair<int, int> pos = editor.getPos(symbol);
-        int position = getPosition(pos.first, pos.second)+1;
+        int position = 0;
 
-        if (pos.first == -1 || pos.second == -1) {
-            throw std::runtime_error("symbol not found");
-        } else if (position > document()->characterCount()) {
-            throw std::out_of_range(std::to_string(position) + " greater than character count " + std::to_string(document()->characterCount()));
+        /**
+         * the position for the alignment update should be computed only
+         * if the symbol id is not equal to the special symbol one
+         * used to manage the first line of the document
+         */
+        if (symbol.getId() != FIRST_ROW) {
+            std::pair<int, int> pos = editor.getPos(symbol);
+            position = getPosition(pos.first, pos.second)+1;
+
+            if (pos.first == -1 || pos.second == -1) {
+                throw std::runtime_error("symbol not found");
+            } else if (position > document()->characterCount()) {
+                throw std::out_of_range(std::to_string(position) + " greater than character count " + std::to_string(document()->characterCount()));
+            }
         }
+
 
         c.setPosition(position);
         c.setBlockFormat(f);
+
+        alignmentChange(alignment());
+        paintCursors();
     } catch (const std::exception &e) {
         qDebug() << "TextEditor::updateAlignment" << __PRETTY_FUNCTION__ << e.what();
     }
