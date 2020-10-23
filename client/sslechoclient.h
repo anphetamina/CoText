@@ -49,6 +49,7 @@ signals:
     void updateSuccessfulReceived();
     void joinFailed();
     void joinSucceeded();
+    void openDocFailed();
 
 public slots:
     void sendInsert(std::vector<QSymbol> symbols, int siteId);

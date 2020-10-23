@@ -26,7 +26,8 @@ signals:
 
 public slots:
     void buttonPressed(int i);
-void closeOpenDocument();
+    void closeOpenDocument();
+    void openDocFailedOD();
 
 private:
     Ui::OpenDocument *ui;
