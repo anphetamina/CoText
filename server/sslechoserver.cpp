@@ -730,8 +730,15 @@ std::pair <QVector<QVector<QSymbol>>, QVector<AlignMessage> > SslEchoServer::rem
         // prune unused alignement (or relative to deleted paragraph)
         qalign.erase(std::remove_if(qalign.begin(), qalign.end(), [se](AlignMessage am) {
             QSymbol qs = am.getPositionStart();
-            auto qsPos = se->getPos(qs);
+            
             bool isFirstDummyAlignSym = qs.getId() == FIRST_ROW;
+            std::pair<int, int> qsPos;
+            if (!isFirstDummyAlignSym) {
+                qsPos = se->getPos(qs);
+            }
+            else {
+                return false;
+            }
             return ( (qsPos.first < 0 || qsPos.second < 0) && !isFirstDummyAlignSym );
             }),
             qalign.end());
