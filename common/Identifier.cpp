@@ -51,5 +51,5 @@ QDataStream & operator>>(QDataStream& s, Identifier& i) {
 }
 
 bool Identifier::isValid() const {
-    return siteId < 0 || digit < 0;
+    return siteId >= 0 && digit >= 0;
 }
