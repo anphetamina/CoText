@@ -89,12 +89,10 @@ int QSymbol::getSiteId() const {
 }
 
 bool QSymbol::isValid() const {
-    return !c.isNull() &&
-           !id.trimmed().isEmpty() &&
+    return !id.trimmed().isEmpty() &&
            !position.empty() &&
            std::all_of(position.begin(), position.end(), [](const Identifier &i) { return i.isValid(); }) &&
-           !cf.isEmpty() &&
-           !cf.isValid();
+           cf.isValid();
 }
 
 bool QSymbol::isNewLine() const {
