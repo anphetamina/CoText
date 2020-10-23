@@ -926,7 +926,7 @@ void TextEditor::updateAlignment(Qt::Alignment align, QSymbol symbol) {
         /**
          * the position for the alignment update should be computed only
          * if the symbol id is not equal to the special symbol one
-         * used to manage the first line of the document
+         * used to manage the first block of the document
          */
         if (symbol.getId() != FIRST_ROW) {
             std::pair<int, int> pos = editor.getPos(symbol);

@@ -45,3 +45,5 @@
 
 #define MSG_INSERT_SYM 1
 #define MSG_ERASE_SYM -1
+
+#define FIRST_ROW "FIRST_ROW_ID"
