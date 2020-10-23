@@ -739,7 +739,7 @@ std::pair <QVector<QVector<QSymbol>>, QVector<AlignMessage> > SslEchoServer::rem
             else {
                 return false;
             }
-            return ( (qsPos.first < 0 || qsPos.second < 0) && !isFirstDummyAlignSym );
+            return (qsPos.first < 0 || qsPos.second < 0);
             }),
             qalign.end());
         alignmentMapping.insert(docId, qalign);
