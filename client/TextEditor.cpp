@@ -13,6 +13,7 @@
 #include <mutex>
 #include "Benchmark.h"
 #include "MainWindow.h"
+#include "../common/PacketDef.h"
 
 
 TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
