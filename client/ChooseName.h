@@ -11,6 +11,7 @@ class ChooseName : public QDialog
 {
     Q_OBJECT
 
+
 public:
     explicit ChooseName(QVector<QString> dList, QWidget *parent = nullptr);
     ~ChooseName();
@@ -21,6 +22,7 @@ private slots:
 
 public slots:
     void closeChooseName();
+    void openDocFailedCN();
 
 signals:
     void nameChosen(QString name);

@@ -328,9 +328,11 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
                 emit documentNameReceived(doc->getdocName());
                 emit documentReceived(doc->getdocId(), doc->getdocName(), symbols);
                 emit joinSucceeded();
+                emit joinSucceeded();
             } else if (doc->getdocId() == PACK_TYPE_DOC_INV_ERROR){
-                emit(joinFailed());
-            }else {
+                emit joinFailed();
+            }else if (doc->getdocId() == PACK_TYPE_DOC_OPEN_ERROR){
+                emit openDocFailed();
                 qDebug() << "[OPEN_DOC] FAILED (No permission for " << doc->getdocName() << ") with docId " << doc->getdocId();
             }
             break;
@@ -391,7 +393,6 @@ void SslEchoClient::sendCursor(qint32 userId, qint32 position) {
 }
 
 void SslEchoClient::sendDocOpen(QString docName, qint32 userId) {
-    //qDebug()<<"[CLIENT] sendDocOpen docName = "<<docName <<" userId = "<<userId;
     if(!pServer->isValid()) // if u call this and login wasnt performed
         return;
     DocumentOpenPacket dop = DocumentOpenPacket(docName, userId );
@@ -453,7 +454,6 @@ void SslEchoClient::connectToUserEdit(UserEditWidget* uew) {
 }
 
 void SslEchoClient::sendDocumentDeletedSlot(QString docName, quint32 userId) {
-    qDebug() << "[CLIENT] sendDocumentDeletedSlot docName = "<<docName << " userId = "<< userId;
     if(!pServer->isValid()) // if u call this and login wasnt performed
         return;
     DocumentDelPacket ddp = DocumentDelPacket(docName, userId);
@@ -468,14 +468,15 @@ void SslEchoClient::sendAskDocList(qint32 userId) {
 }
 
 void SslEchoClient::sendDocCreate(QString docName, qint32 userId) {
-    qDebug() << "[ECHO CLIENT] sendDocCreate docName = "<<docName<<" userId = "<<userId;
-    if(!pServer->isValid()) // if u call this and login wasnt performed
+
+    if(!pServer->isValid())
         return;
     DocumentCreatePacket dcp = DocumentCreatePacket(docName, userId );
     dcp.send(*pServer);
-    // For now auto send also a document open (for UX pourpose?)
+
     DocumentOpenPacket dop = DocumentOpenPacket(docName, userId );
     dop.send(*pServer);
+
 }
 
 bool SslEchoClient::isConnected(){

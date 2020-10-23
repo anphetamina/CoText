@@ -11,7 +11,6 @@ OpenDocument::OpenDocument(QVector<QString> docList, MainWindow* mw, QWidget *pa
 {
     ui->setupUi(this);
     mainWindow = mw;
-    qDebug() << "Doclist = "<<docList;
 
     repaint();
 }
@@ -84,10 +83,17 @@ void OpenDocument::on_pushButton_clicked()
         }else { //non c'è nessun documento aperto
             emit sendOpenDocument(ui->listWidget->currentItem()->text());
         }
-        this->close();
     }
 }
 
 void OpenDocument::closeOpenDocument(){
     this->close();
+}
+
+void OpenDocument::openDocFailedOD(){
+    QMessageBox::StandardButton resBtn = QMessageBox::question(this, "Document opening failed", "You haven't rights to open this document",  QMessageBox::Cancel | QMessageBox::Retry, QMessageBox::Retry);
+
+    if (resBtn == QMessageBox::Retry) {
+        ui->pushButton->click();
+    }
 }

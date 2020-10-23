@@ -17,6 +17,7 @@
 #include "StatusBar.h"
 #include "Login.h"
 #include "MainMenu.h"
+#include "ChooseName.h"
 
 #ifdef _MSC_VER
 #define __PRETTY_FUNCTION__ __FUNCSIG__
@@ -102,7 +103,6 @@ public slots:
     void sendOpenDocumentMainWindow(QString docName);
     void documentListReceivedMainWindow(QVector<QString> documentList);
     void setMainWindowTitle(QString title);
-    void openNewDocumentMainWindow(QString docName);
     void nameChosenMainWindow(QString name);
     void newDocumentFromMainMenu();
     void openDocumentFromMainMenu();
@@ -162,6 +162,8 @@ private:
     bool eventFilter(QObject *watched, QEvent *event) override;
     void removeOldOnlineNowOffline(QVector<User> newOnlineUserList);
     QPixmap addImageInRightToolBar(const QPixmap &orig, QColor color);
+    void createChooseName(bool isromMainMenu);
+    void openDocument(bool isFromMainMenu);
 
 };
 #endif // MAINWINDOW_H
