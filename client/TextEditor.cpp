@@ -56,7 +56,6 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     connect(ui.actionItalic, &QAction::triggered, this, &TextEditor::setFontItalic);
     connect(ui.actionUnderline, &QAction::triggered, this, &TextEditor::setFontUnderline);
     connect(ui.actionTextColor, &QAction::triggered, this, &TextEditor::setFontColor);
-
     connect(this, &QTextEdit::currentCharFormatChanged, this, &TextEditor::currentCharFormatChange);
 
     if (MainWindow *mw = dynamic_cast<MainWindow*>(parent)) {
@@ -72,14 +71,10 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
      */
 
     connect(document(), &QTextDocument::contentsChange, this, &TextEditor::contentsChange);
-
     connect(this, &QTextEdit::cursorPositionChanged, this, &TextEditor::cursorPositionChange);
     connect(this, &QTextEdit::selectionChanged, this, &TextEditor::selectionChange);
-
     connect(ui.actionToggle_user_colors, &QAction::triggered, this, &TextEditor::toggleUserColors);
-
     connect(QApplication::clipboard(), &QClipboard::dataChanged, this, &TextEditor::clipboardDataChange);
-
     connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &TextEditor::paintCursors);
     connect(this, &QTextEdit::textChanged, this, &TextEditor::paintCursors);
 
@@ -201,6 +196,7 @@ void TextEditor::setTextAlignment(QAction *action) {
 
             } catch (const std::exception &e) {
                 qDebug() << "[EXCEPTION]"  << __PRETTY_FUNCTION__ << e.what();
+                resyncWithSharedEditor();
             }
 
 
@@ -297,6 +293,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
         } catch (const std::exception &e) {
             qDebug() << "[EXCEPTION]" << "TextEditor::contentsChange charsRemoved" << e.what();
             undo();
+            resyncWithSharedEditor();
         }
 
     }
@@ -350,6 +347,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
                     charsAdded--;
                 } catch (const std::exception &e) {
                     textCursor().deleteChar();
+                    resyncWithSharedEditor();
                     throw;
                 }
             }
@@ -364,6 +362,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
             }
         } catch (const std::exception &e) {
             qDebug() << "[EXCEPTION]"  << "TextEditor::contentsChange charsAdded" << e.what();
+            resyncWithSharedEditor();
         }
 
     }
@@ -535,6 +534,7 @@ void TextEditor::remoteInsert(QSymbol symbol) {
         }
     } catch (const std::exception &e) {
         qDebug() << "[EXCEPTION]"  << __PRETTY_FUNCTION__ << e.what();
+        resyncWithSharedEditor();
     }
 
     printSymbols(__PRETTY_FUNCTION__);
@@ -575,6 +575,7 @@ void TextEditor::remoteErase(QSymbol symbol) {
         }
     } catch (const std::exception &e) {
         qDebug() << "[EXCEPTION]"  << __PRETTY_FUNCTION__ << e.what();
+        resyncWithSharedEditor();
     }
 
     printSymbols(__PRETTY_FUNCTION__);
@@ -655,6 +656,7 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
 
     } catch (const std::exception &e) {
         qDebug() << "[EXCEPTION]"  << "TextEditor::remoteInsertBlock" << __PRETTY_FUNCTION__ << e.what();
+        resyncWithSharedEditor();
     }
 
 }
@@ -727,6 +729,7 @@ void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
         insertBlock(diffBlock, position);
     } catch (const std::exception &e) {
         qDebug() << "[EXCEPTION]"  << "TextEditor::remoteEraseBlock" << __PRETTY_FUNCTION__ << e.what();
+        resyncWithSharedEditor();
     }
 
 }
@@ -854,7 +857,6 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
             editor.clear();
             isFromRemote = true;
             this->clear();
-
         }
 
         this->setDisabled(false);
@@ -876,6 +878,7 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
         setFocus();
     } catch (const std::exception &e) {
         qDebug() << "[EXCEPTION]" << __PRETTY_FUNCTION__ << e.what();
+        resyncWithSharedEditor();
     }
 }
 
@@ -936,6 +939,7 @@ void TextEditor::updateAlignment(Qt::Alignment align, QSymbol symbol) {
         alignmentChange(alignment());
     } catch (const std::exception &e) {
         qDebug() << "[EXCEPTION]"  << "TextEditor::updateAlignment" << __PRETTY_FUNCTION__ << e.what();
+        resyncWithSharedEditor();
     }
 }
 
@@ -1123,3 +1127,21 @@ void TextEditor::filePrintPdf(QString filename){
 #endif
 }
 
+void TextEditor::resyncWithSharedEditor(){
+    /*int resBtn = QMessageBox::question(this, "Resync with the server", "The content of this document will be reloaded", QMessageBox::Ok , QMessageBox::Ok);
+
+    if(resBtn == QMessageBox::Ok) {
+        emit sendDocOpenTE(documentName, user.getId());
+    }*/
+
+    Resync resync;
+    resync.setWindowTitle("Resync with the server");
+    connect(&resync, &Resync::resync, this, &TextEditor::resyncTE);
+    resync.setModal(true);
+    resync.setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+    resync.exec();
+}
+
+void TextEditor::resyncTE(){
+    emit sendDocOpenTE(documentName, user.getId());
+}

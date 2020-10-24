@@ -15,6 +15,7 @@
 #include "../common/QSymbol.h"
 #include "UserHighlighter.h"
 #include "../common/User.h"
+#include "Resync.h"
 
 class UserHighlighter;
 
@@ -74,6 +75,7 @@ private:
     void printSymbols(const std::string &functionName);
     int isNewLine(QChar c);
     void insertBlock(const std::vector<QSymbol> &block, int position);
+    void resyncWithSharedEditor();
 
 public slots:
     void remoteInsert(QSymbol symbol);
@@ -85,6 +87,7 @@ public slots:
     void openDocument(int docId, QString docName, std::vector<std::vector<QSymbol>> symbols);
     void updateCursorMap(QVector<User> onlineUserList, QVector<User> completeUserList);
     void paintCursors();
+    void resyncTE();
 
 private slots:
     void setFontFamily(const QFont &font);
@@ -103,7 +106,6 @@ private slots:
     void clipboardDataChange();
 
 protected:
-
     void focusInEvent(QFocusEvent *e) override;
     void focusOutEvent(QFocusEvent *e) override;
     void dragEnterEvent(QDragEnterEvent *e) override;
@@ -116,7 +118,7 @@ signals:
     void symbolsErased(std::vector<QSymbol> symbols, int siteId);
     void cursorPositionChanged(int userId, int position);
     void textAlignmentChanged(Qt::Alignment alignment, QSymbol symbol, int siteId);
-
+    void sendDocOpenTE(QString docName, qint32 userId);
 };
 
 

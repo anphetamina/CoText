@@ -427,6 +427,7 @@ void SslEchoClient::connectToEditor(TextEditor* te) {
     connect(te, &TextEditor::symbolsErased, this, &SslEchoClient::sendErase);
     connect(te, &TextEditor::cursorPositionChanged, this, &SslEchoClient::sendCursor);
     connect(te, &TextEditor::textAlignmentChanged, this, &SslEchoClient::sendAlignment);
+    connect(te, &TextEditor::sendDocOpenTE, this, &SslEchoClient::sendDocOpen);
 
 }
 
