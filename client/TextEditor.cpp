@@ -80,6 +80,7 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     connect(QApplication::clipboard(), &QClipboard::dataChanged, this, &TextEditor::clipboardDataChange);
 
     connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &TextEditor::paintCursors);
+    connect(this, &QTextEdit::textChanged, this, &TextEditor::paintCursors);
 
     /**
      * action connections
@@ -957,7 +958,6 @@ void TextEditor::updateAlignment(Qt::Alignment align, QSymbol symbol) {
         c.setBlockFormat(f);
 
         alignmentChange(alignment());
-        paintCursors();
     } catch (const std::exception &e) {
         qDebug() << "[EXCEPTION]"  << "TextEditor::updateAlignment" << __PRETTY_FUNCTION__ << e.what();
     }
@@ -982,7 +982,6 @@ int TextEditor::isNewLine(QChar c) {
 
 void TextEditor::updateCursorMap(QVector<User> onlineUserList, QVector<User> completeUserList /*ignored*/) {
 
-    // todo check when users disconnect
     std::vector<int> onlineUserIds{};
     std::for_each(onlineUserList.begin(), onlineUserList.end(), [&](const User &u) { onlineUserIds.push_back(u.getId()); });
     std::sort(onlineUserIds.begin(), onlineUserIds.end());
@@ -1001,6 +1000,10 @@ void TextEditor::updateCursorMap(QVector<User> onlineUserList, QVector<User> com
     });
 
     for (auto it : offlineUserIds) {
+        cursorMap[it].second->clear();
+        cursorMap[it].second->setEnabled(false);
+        cursorMap[it].second->close();
+
         cursorMap.erase(it);
     }
 
