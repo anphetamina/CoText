@@ -11,6 +11,7 @@
 #include "../common/Shuffler.h"
 #include "TextEditor.h"
 #include <mutex>
+#include <QtPrintSupport/QPrinter>
 #include "Benchmark.h"
 #include "MainWindow.h"
 #include "../common/PacketDef.h"
@@ -1108,4 +1109,17 @@ QString TextEditor::getText() const{
     return text;
 }
 
+void TextEditor::filePrintPdf(QString filename){
+#ifndef QT_NO_PRINTER
+    QString fileName = QFileDialog::getSaveFileName(this, "Export PDF",filename, "*.pdf");
+    if (!fileName.isEmpty()) {
+        if (QFileInfo(fileName).suffix().isEmpty())
+            fileName.append(".pdf");
+        QPrinter printer(QPrinter::HighResolution);
+        printer.setOutputFormat(QPrinter::PdfFormat);
+        printer.setOutputFileName(fileName);
+        this->document()->print(&printer);
+    }
+#endif
+}
 
