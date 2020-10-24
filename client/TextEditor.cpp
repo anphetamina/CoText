@@ -158,14 +158,10 @@ void TextEditor::setFontColor() {
 
 void TextEditor::setTextAlignment(QAction *action) {
 
-    /**
-     * this prevent from erasing the entire block
-     */
-    document()->blockSignals(true);
-
     Qt::Alignment flag;
     bool hasChanged = true;
 
+    isFromRemote = true;
     if (action == ui.actionAlign_left) {
         setAlignment(Qt::AlignLeft);
         flag = Qt::AlignLeft;
@@ -210,9 +206,6 @@ void TextEditor::setTextAlignment(QAction *action) {
             block = block.next();
         }
     }
-
-    document()->blockSignals(false);
-
 }
 
 void TextEditor::alignmentChange(Qt::Alignment alignment) {
@@ -262,8 +255,8 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
     qDebug() << "contentsChange";
 
-    if (document()->signalsBlocked()) {
-        document()->blockSignals(false);
+    if (isFromRemote) {
+        isFromRemote = false;
         return;
     }
 
@@ -512,11 +505,6 @@ int TextEditor::getRow(int position) const {
 void TextEditor::remoteInsert(QSymbol symbol) {
 
 
-    /**
-     * block updates
-     */
-    document()->blockSignals(true);
-
     textCursor().clearSelection();
 
     try {
@@ -539,6 +527,7 @@ void TextEditor::remoteInsert(QSymbol symbol) {
             QTextCursor cursor(document());
             cursor.setPosition(position);
 
+            isFromRemote = true;
             cursor.insertText(symbol.getC(), symbol.getCF());
 
             cursorPositionChange();
@@ -549,8 +538,6 @@ void TextEditor::remoteInsert(QSymbol symbol) {
 
     printSymbols(__PRETTY_FUNCTION__);
 
-    document()->blockSignals(false);
-
 }
 
 /**
@@ -559,7 +546,6 @@ void TextEditor::remoteInsert(QSymbol symbol) {
  */
 void TextEditor::remoteErase(QSymbol symbol) {
 
-    document()->blockSignals(true);
     textCursor().clearSelection();
 
     try {
@@ -581,6 +567,7 @@ void TextEditor::remoteErase(QSymbol symbol) {
 
             QTextCursor cursor(document());
             cursor.setPosition(position);
+            isFromRemote = true;
             cursor.deleteChar();
 
             cursorPositionChange();
@@ -590,8 +577,6 @@ void TextEditor::remoteErase(QSymbol symbol) {
     }
 
     printSymbols(__PRETTY_FUNCTION__);
-
-    document()->blockSignals(false);
 
 }
 
@@ -612,8 +597,6 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
     if (symbols.empty()) {
         return;
     }
-
-    document()->blockSignals(true);
 
     textCursor().clearSelection();
 
@@ -648,7 +631,6 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
         int lastIndex = lastPos.second;
 
         if (firstLine == -1 || firstIndex == -1 || lastLine == -1 || lastIndex == -1) {
-            document()->blockSignals(false);
             return;
         }
 
@@ -663,6 +645,7 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
         QTextCursor cursor(document());
         cursor.setPosition(lastPosition);
         cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, diffSize);
+        isFromRemote = true;
         cursor.removeSelectedText();
 
         //std::cout << __PRETTY_FUNCTION__ << document()->toPlainText().toStdString() << std::endl;
@@ -673,8 +656,6 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
         qDebug() << "[EXCEPTION]"  << "TextEditor::remoteInsertBlock" << __PRETTY_FUNCTION__ << e.what();
     }
 
-    document()->blockSignals(false);
-
 }
 
 
@@ -683,8 +664,6 @@ void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
     if (symbols.empty()) {
         return;
     }
-
-    document()->blockSignals(true);
 
     try {
         std::pair<int, int> firstPos = std::make_pair(-1, -1);
@@ -710,7 +689,6 @@ void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
         int lastIndex = lastPos.second;
 
         if (firstLine == -1 || firstIndex == -1 || lastLine == -1 || lastIndex == -1) {
-            document()->blockSignals(false);
             return;
         }
 
@@ -740,6 +718,7 @@ void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
         int position = getPosition(firstLine, firstIndex);
         cursor.setPosition(position);
         cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, oldBlock.size());
+        isFromRemote = true;
         cursor.removeSelectedText();
 
         //std::cout << __PRETTY_FUNCTION__ << document()->toPlainText().toStdString() << std::endl;
@@ -748,8 +727,6 @@ void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
     } catch (const std::exception &e) {
         qDebug() << "[EXCEPTION]"  << "TextEditor::remoteEraseBlock" << __PRETTY_FUNCTION__ << e.what();
     }
-
-    document()->blockSignals(false);
 
 }
 
@@ -763,6 +740,7 @@ void TextEditor::insertBlock(const std::vector<QSymbol> &block, int position) {
         if (i != 0 && block[i].getCF() != lastCF) {
 
             cursor.setPosition(position);
+            isFromRemote = true;
             cursor.insertText(bufferString, lastCF);
 
             position += bufferString.size();
@@ -775,6 +753,7 @@ void TextEditor::insertBlock(const std::vector<QSymbol> &block, int position) {
 
     if (!bufferString.isEmpty()) {
         cursor.setPosition(position);
+        isFromRemote = true;
         cursor.insertText(bufferString, lastCF);
     }
 
@@ -858,8 +837,6 @@ int TextEditor::getUserId(int row, int col) const {
 
 void TextEditor::openDocument(int docId, QString docName, std::vector<std::vector<QSymbol>> symbols) {
 
-    document()->blockSignals(true);
-
     try {
         if (std::any_of(symbols.begin(), symbols.end(), [](const std::vector<QSymbol> &row){
             return std::any_of(row.begin(), row.end(), [](const QSymbol &s){ return !s.isValid(); });
@@ -874,7 +851,7 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
 
         if (document()->characterCount() > 1 || !editor.getSymbols()[0].empty()) {
             editor.clear();
-
+            isFromRemote = true;
             this->clear();
 
         }
@@ -899,9 +876,6 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
     } catch (const std::exception &e) {
         qDebug() << "[EXCEPTION]" << __PRETTY_FUNCTION__ << e.what();
     }
-
-    document()->blockSignals(false);
-
 }
 
 SharedEditor TextEditor::getEditor() const {
@@ -929,7 +903,6 @@ void TextEditor::printSymbols(const std::string &functionName) {
 }
 
 void TextEditor::updateAlignment(Qt::Alignment align, QSymbol symbol) {
-    document()->blockSignals(true);
 
     QTextBlockFormat f;
     f.setAlignment(align);
@@ -956,14 +929,13 @@ void TextEditor::updateAlignment(Qt::Alignment align, QSymbol symbol) {
 
 
         c.setPosition(position);
+        isFromRemote = true;
         c.setBlockFormat(f);
 
         alignmentChange(alignment());
     } catch (const std::exception &e) {
         qDebug() << "[EXCEPTION]"  << "TextEditor::updateAlignment" << __PRETTY_FUNCTION__ << e.what();
     }
-
-    document()->blockSignals(false);
 }
 
 /**
