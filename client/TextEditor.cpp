@@ -1066,7 +1066,7 @@ void TextEditor::focusOutEvent(QFocusEvent *e) {
 }
 
 void TextEditor::dragEnterEvent(QDragEnterEvent *e) {
-    draggedFromOutside = !mousePressed;
+    draggedFromOutside = !mousePressed & !hasLostFocus;
     qDebug() << "dragged from" << (draggedFromOutside ? "outside" : "inside");
     QTextEdit::dragEnterEvent(e);
 }
