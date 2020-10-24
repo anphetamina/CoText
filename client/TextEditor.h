@@ -28,22 +28,18 @@ public:
     explicit TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent = nullptr);
 
 	void setSiteId(int siteId);
-
 	int getRow(int position) const;
 	int getCol(int row, int position) const;
-	
 	int getSiteId();
 	int getDocId() const;
 	QString getDocName() const;
 	int getNumChars() const;
-	
 	int getUserId(int row, int col) const;
 	QColor getUserColor(int userId) const;
-
     SharedEditor getEditor() const;
     std::vector<int> getIndex() const;
-
     QString getText() const;
+    void filePrintPdf(QString filename);
 
     std::atomic<bool> isFromRemote;
 

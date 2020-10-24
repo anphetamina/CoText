@@ -493,20 +493,7 @@ void MainWindow::sendJoinFromMainMenu(qint32 userId, int docId, QString invCode)
 }
 
 void MainWindow::on_actionPrintPDF_triggered() {
-    QString fileName = QFileDialog::getSaveFileName((QWidget* )0, "Export PDF", this->windowTitle(), "*.pdf");
-    if (QFileInfo(fileName).suffix().isEmpty()) { fileName.append(".pdf"); }
-
-    QPrinter printer(QPrinter::PrinterResolution);
-    printer.setOutputFormat(QPrinter::PdfFormat);
-    printer.setPaperSize(QPrinter::A4);
-    printer.setOutputFileName(fileName);
-
-    QString text = editor->getText();
-
-    QTextDocument doc;
-    doc.setPlainText(text);
-    doc.setPageSize(printer.pageRect().size()); // This is necessary if you want to hide the page number
-    doc.print(&printer);
+    editor->filePrintPdf(this->windowTitle());
 }
 
 /*
