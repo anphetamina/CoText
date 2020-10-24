@@ -127,8 +127,9 @@ void TextEditor::setFontFamily(const QFont &font) {
 }
 
 void TextEditor::setFontSize(const QString &text) {
-    qreal pointSize = text.toFloat();
-    if (text.toFloat() > 0) {
+    bool ok;
+    qreal pointSize = text.toFloat(&ok);
+    if (ok && pointSize > 0 && pointSize <= QFontDatabase::standardSizes().back()) {
         QTextCharFormat f;
         f.setFontPointSize(pointSize);
         mergeCurrentCharFormat(f);
