@@ -308,7 +308,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
 
         case (PACK_TYPE_MSG): {
             Message *msg = dynamic_cast<Message *>(rcvd_packet.get());
-            qDebug() << "[MSG] New symbol received." << endl << "\tChar: " << msg->getQS().getC() << " SiteId: "
+            qDebug() << "[MSG] New symbol received." << Qt::endl << "\tChar: " << msg->getQS().getC() << " SiteId: "
                      << msg->getSiteId();
             // Broadcast to all the connected client of a document
             QList<QSharedPointer<Client>> onlineClientPerDoc = documentMapping[getDocIdOpenedByUserId(
@@ -374,7 +374,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
         case (PACK_TYPE_CURSOR_POS): {
             CursorPacket *cp = dynamic_cast<CursorPacket *>(rcvd_packet.get());
             //qDebug() << msg->getData();
-            qDebug() << "[CP] New cursor position received." << endl << "Pos: " << cp->getnewPosition() << " User id: "
+            qDebug() << "[CP] New cursor position received." << Qt::endl << "Pos: " << cp->getnewPosition() << " User id: "
                      << cp->getuserId();
             // Broadcast to all the connected client of a document
             QList<QSharedPointer<Client>> onlineClientPerDoc = documentMapping[getDocIdOpenedByUserId(
@@ -389,7 +389,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
         }
         case (PACK_TYPE_ALIGN): {
             AlignMessage *am = dynamic_cast<AlignMessage *>(rcvd_packet.get());
-            qDebug() << "[ALIGN] New alignment  received." << endl;
+            qDebug() << "[ALIGN] New alignment  received." << Qt::endl;
 
             // Broadcast to all the connected client of a document
             int curDocId = getDocIdOpenedByUserId(client->getUserId());
@@ -732,7 +732,7 @@ std::pair <QVector<QVector<QSymbol>>, QVector<AlignMessage> > SslEchoServer::rem
         qalign.erase(std::remove_if(qalign.begin(), qalign.end(), [se](AlignMessage am) {
             QSymbol qs = am.getPositionStart();
             
-            bool isFirstDummyAlignSym = qs.getId() == FIRST_ROW;
+            bool isFirstDummyAlignSym = qs.getId() == FIRST_BLOCK_ID;
             std::pair<int, int> qsPos;
             if (!isFirstDummyAlignSym) {
                 qsPos = se->getPos(qs);
@@ -758,7 +758,7 @@ std::pair <QVector<QVector<QSymbol>>, QVector<AlignMessage> > SslEchoServer::rem
         qalign.erase(std::remove_if(qalign.begin(), qalign.end(), [se](AlignMessage am) {
             QSymbol qs = am.getPositionStart();
 
-            bool isFirstDummyAlignSym = qs.getId() == FIRST_ROW;
+            bool isFirstDummyAlignSym = qs.getId() == FIRST_BLOCK_ID;
             std::pair<int, int> qsPos;
             if (!isFirstDummyAlignSym) {
                 qsPos = se->getPos(qs);

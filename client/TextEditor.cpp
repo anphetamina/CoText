@@ -189,7 +189,7 @@ void TextEditor::setTextAlignment(QAction *action) {
 
                 if (pos < 0) {
                     qDebug() << "first block encountered ( pos = " << pos << ")";
-                    QSymbol symbol(QChar(), FIRST_ROW, {}, QTextCharFormat());
+                    QSymbol symbol(QChar(), FIRST_BLOCK_ID, {}, QTextCharFormat());
                     emit textAlignmentChanged(flag, symbol, editor.getSiteId());
                 } else {
                     int row = getRow(pos);
@@ -917,7 +917,7 @@ void TextEditor::updateAlignment(Qt::Alignment align, QSymbol symbol) {
          * if the symbol id is not equal to the special symbol one
          * used to manage the first block of the document
          */
-        if (symbol.getId() != FIRST_ROW) {
+        if (symbol.getId() != FIRST_BLOCK_ID) {
             std::pair<int, int> pos = editor.getPos(symbol);
             position = getPosition(pos.first, pos.second)+1;
 
