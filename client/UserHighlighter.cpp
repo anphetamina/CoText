@@ -15,27 +15,20 @@ void UserHighlighter::highlightBlock(const QString &text) {
 
     try {
 
-        document.blockSignals(true);
-        editor.blockSignals(true);
-
         for (int i = currentBlock().position(), j = 0; i < currentBlock().position() + text.length(); i++, j++) {
 
-            QTextCharFormat format;
-            format.setFontWeight(QFont::Bold);
+            QTextCharFormat f{format(i)};
+            f.setFontWeight(QFont::Bold);
             const int &row = editor.getRow(i);
             const int &col = editor.getCol(row, i);
             const int &userId = editor.getUserId(row, col);
             const QColor &color = editor.getUserColor(userId);
-            format.setForeground(color);
-            setFormat(j, 1, format);
+            f.setForeground(color);
+            setFormat(j, 1, f);
         }
     } catch (const std::exception &e) {
         qDebug() << e.what();
     }
-
-    document.blockSignals(false);
-    editor.blockSignals(false);
-
 }
 
 void UserHighlighter::enable() {
@@ -43,6 +36,6 @@ void UserHighlighter::enable() {
 }
 
 void UserHighlighter::disable() {
-    document.blockSignals(true);
+    editor.isFromRemote = true;
     setDocument(nullptr);
 }
