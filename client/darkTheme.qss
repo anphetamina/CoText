@@ -32,7 +32,7 @@ QMainWindow#MainWindow {
 QTextEdit {
     color: black;
     background-color: white;
-    font-size: 18pt;
+    font-size: 14pt;
     font-family: Arial;
     border: hidden;
     border-radius: 3px;
