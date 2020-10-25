@@ -347,7 +347,6 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
                     charsAdded--;
                 } catch (const std::exception &e) {
                     textCursor().deleteChar();
-                    resyncWithSharedEditor();
                     throw;
                 }
             }
@@ -878,7 +877,6 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
         setFocus();
     } catch (const std::exception &e) {
         qDebug() << "[EXCEPTION]" << __PRETTY_FUNCTION__ << e.what();
-        resyncWithSharedEditor();
     }
 }
 

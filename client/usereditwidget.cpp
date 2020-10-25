@@ -9,6 +9,7 @@ UserEditWidget::UserEditWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 	client->connectToUserEdit(this);
+	this->setWindowTitle("Edit User Dialog");
     User usr = MainWindow::getUser();
     clearInput();
     this->setOldUsername(usr.getEmail());
@@ -78,6 +79,9 @@ void UserEditWidget::on_pushButton_Done_clicked() {
 		
 		
 	}
+	
+	QMessageBox::information(this, "Completed", "User Edit completed");
+	this->close();
 	
 }
 
