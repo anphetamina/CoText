@@ -255,20 +255,24 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
         }
         
 	    case(PACK_TYPE_ACC_UPDATE): {
-		    AccountUpdatePacket* updateOk = dynamic_cast<AccountUpdatePacket*>(rcvd_packet.get());
+		    AccountUpdatePacket* accountUpdate = dynamic_cast<AccountUpdatePacket*>(rcvd_packet.get());
 		    User loggedUser;
-		    loggedUser.setEmail(updateOk->getUsername());
-		    loggedUser.setName(updateOk->getName());
-		    loggedUser.setSurname(updateOk->getSurname());
-		    loggedUser.setProfilePic(updateOk->getProfilePic());
+		    loggedUser.setId(accountUpdate->getId());
+            loggedUser.setPassword(accountUpdate->getHashedPassword());
+		    loggedUser.setEmail(accountUpdate->getUsername());
+		    loggedUser.setName(accountUpdate->getName());
+		    loggedUser.setSurname(accountUpdate->getSurname());
+		    loggedUser.setProfilePic(accountUpdate->getProfilePic());
 		    
 		    if(loggedUser.isLogged()) {
-			    qDebug() << "[REGISTER AUTH] Logged in as: " << loggedUser.getEmail();
+			    qDebug() << "Update user information: " << loggedUser.getEmail();
+                user = loggedUser;
 			    emit updateSuccessfulReceived();
+			    emit updateUserInToolbar();
+		    }else{
+                qDebug() << "Update user information failed";
 		    }
-		    
-		    pServer = qobject_cast<QWebSocket *>(sender());
-		    user = loggedUser;
+
 		    break;
 	    }
 
@@ -445,6 +449,7 @@ void SslEchoClient::connectToMainWindow(MainWindow* mw) {
     connect(this, &SslEchoClient::documentNameReceived, mw, &MainWindow::setMainWindowTitle);
     connect(this, &SslEchoClient::joinFailed, mw, &MainWindow::joinFailedMW);
     connect(this, &SslEchoClient::joinSucceeded, mw, &MainWindow::joinSucceededMW);
+    connect(this, &SslEchoClient::updateUserInToolbar, mw, &MainWindow::updateUserInToolbarMW);
 }
 
 void SslEchoClient::connectToRegister(Register* r) {
