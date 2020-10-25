@@ -35,6 +35,9 @@
  */
 class SslEchoClient;
 
+
+static int const EXIT_CODE_REBOOT = -123456789;
+
 inline User user;
 inline SslEchoClient *client = nullptr;
 

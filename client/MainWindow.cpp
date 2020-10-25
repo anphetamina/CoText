@@ -500,23 +500,12 @@ void MainWindow::on_actionLogout_triggered() {
     QMessageBox::StandardButton resBtn = QMessageBox::question(this, "Logout", tr("Are you sure to logout ?\n"),  QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
 
     if(resBtn == QMessageBox::Yes) {
-        user = User();
-        this->hide();
-        editor->setDisabled(true);
 
-        Login *login = new Login();
-        client->connectToLogin(login);
-        login->setWindowTitle("Welcome to CoText!");
-        login->setModal(true);
-        login->exec();
+        qApp->exit(EXIT_CODE_REBOOT );
 
-        MainMenu* mainMenu = new MainMenu();
-        this->connectToMainMenu(mainMenu);
-        mainMenu->setWindowTitle("Main Menu");
-        mainMenu->setModal(true);
-        mainMenu->exec();
     }
 }
+
 
 void MainWindow::on_actionCopy_triggered() {
 //    ui->textEdit->copy();

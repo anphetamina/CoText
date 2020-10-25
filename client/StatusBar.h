@@ -39,20 +39,13 @@ private:
 	ClickableLabel *userListToggle = new ClickableLabel();
 	QLabel *nActiveUsers;
 	std::atomic<bool> isUserListToggled;
-
 	
 	/** Document info */
 	QLabel *docTitle;
 	QLabel *docTitleLabel;
 	//QLabel *docSize;
 	//QLabel *nChars;
-	
-protected:
 
-
-
-	
-	
 
 public slots:
 	void showActiveUsersList();
