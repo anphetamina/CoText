@@ -38,14 +38,17 @@ void OpenDocument::repaint(){
             QString filename(":/imgs/icons/noun_Garbage_2025401.svg");
             QImage pixmap(filename);
             QImage scaledPixmap = pixmap.scaled(22, 22, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-            QImage garbageImage = scaledPixmap.convertToFormat(QImage::Format_ARGB32);
+            QImage garbageImage = pixmap.convertToFormat(QImage::Format_ARGB32);
+            
             QPixmap pix(QPixmap::fromImage(garbageImage));
             
             QIcon buttonIcon(pix);
             
+            
+           
             but->setIcon(buttonIcon);
-            but->setIconSize(pixmap.rect().size());
-            but->setFixedSize(pixmap.rect().size());
+            but->setIconSize(QSize(22, 22));
+            but->setFixedSize(QSize(22, 22));
             QLabel *lab = new QLabel ();
             w->layout()->addWidget ( lab );
             w->layout()->addWidget ( but );

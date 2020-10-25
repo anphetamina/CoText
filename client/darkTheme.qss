@@ -69,6 +69,11 @@ QToolBar {
 	
 }
 
+QPushButton#DeletePushButton {
+    background-color: #515151;
+
+}
+
 QToolBar#mainToolBar {
     spacing: 1px;
     border-radius: 0px;
