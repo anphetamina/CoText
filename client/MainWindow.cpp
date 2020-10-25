@@ -570,7 +570,7 @@ void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> n
                 label->setStyleSheet("font-weight: bold; color:"+colorMap[newCompleteUserList[i].getId()].name());
 
                 QPixmap orig;
-                if(!user.getProfilePic().isNull()){
+                if(!newCompleteUserList[i].getProfilePic().isNull()){
                     orig = QPixmap::fromImage(newCompleteUserList[i].getProfilePic());
                 }else{
                 	QString filename(":/imgs/icons/noun_user login_178831_white.svg");
