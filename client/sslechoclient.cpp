@@ -334,7 +334,6 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
                 emit documentNameReceived(doc->getdocName());
                 emit documentReceived(doc->getdocId(), doc->getdocName(), symbols);
                 emit joinSucceeded();
-                emit joinSucceeded();
             } else if (doc->getdocId() == PACK_TYPE_DOC_INV_ERROR){
                 emit joinFailed();
             }else if (doc->getdocId() == PACK_TYPE_DOC_OPEN_ERROR){
