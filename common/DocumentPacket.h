@@ -209,3 +209,18 @@ public:
 
 };
 
+
+
+/** Document close  packet: notify a server that a document is closed **/
+class DocumentClosePacket : public Packet {
+    //friend PacketBuilder;
+
+protected:
+    void writePayload(QDataStream& stream) const override;
+
+    void readPayload(QDataStream& stream) override;
+
+public:
+    DocumentClosePacket();
+    ~DocumentClosePacket() {};
+};
