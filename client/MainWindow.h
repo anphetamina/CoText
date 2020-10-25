@@ -115,6 +115,7 @@ public slots:
     void updateUserInToolbarMW();
 
 signals:
+    void sendCloseDocumentMainWindow();
     void sendAskUriMainWindow(qint32 userId, int docId, QString invCode);
     void sendAskDocListMainWindow(qint32 user);
     void sendOpenDocumentSignal(QString docName, qint32 user);

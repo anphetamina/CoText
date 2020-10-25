@@ -436,6 +436,7 @@ void SslEchoClient::connectToEditor(TextEditor* te) {
 }
 
 void SslEchoClient::connectToMainWindow(MainWindow* mw) {
+    connect(mw, &MainWindow::sendCloseDocumentMainWindow, this, &SslEchoClient::sendDocClose);
     connect(this, &SslEchoClient::updateUserListReceived, mw, &MainWindow::updateUserList);
     connect(mw, &MainWindow::sendAskUriMainWindow, this, &SslEchoClient::sendAskUri);
     connect(this, &SslEchoClient::askUriReceived, mw, &MainWindow::askUriReceivedMainWindow);
