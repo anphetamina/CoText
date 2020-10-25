@@ -9,6 +9,7 @@ UserEditWidget::UserEditWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 	client->connectToUserEdit(this);
+	this->setWindowTitle("Edit User Dialog");
     User usr = MainWindow::getUser();
     clearInput();
     this->setOldUsername(usr.getEmail());
