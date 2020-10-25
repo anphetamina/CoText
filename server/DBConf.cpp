@@ -113,7 +113,7 @@ User updateUser(int userId, QString username, QString password, QString name, QS
     bool updatedImage = false;
 
     if (!query.exec(
-            "UPDATE User SET username = '"+username+"',email = '"+email+"', name='"+name+"', surname'"+surname+"', password='"+password+"' WHERE id="+userId+";")) {
+            "UPDATE User SET username = '"+username+"',email = '"+email+"', name='"+name+"', surname='"+surname+"', password='"+password+"' WHERE id="+userId+";")) {
         qsuccess = false;
     }
 
