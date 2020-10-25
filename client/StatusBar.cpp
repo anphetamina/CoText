@@ -137,7 +137,7 @@ void StatusBar::displaySB() {
 
 
 void StatusBar::updateDocInfo(QString title) {
-	this->docTitle->setText(title);
+	this->docTitle->setText("'"+title+"'");
 }
 void StatusBar::updateUsersInfo(QString n) {
 	this->nActiveUsers->setText(n);
