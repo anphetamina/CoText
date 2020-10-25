@@ -549,7 +549,7 @@ void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> n
 
     for(int i=0; i<newCompleteUserList.size();i++){
         if(!colorMap.contains(newCompleteUserList[i].getId())){
-            colorMap.insert(newCompleteUserList[i].getId(),colorList.at(i%(colorList.size()-1)));
+            colorMap.insert(newCompleteUserList[i].getId(),colorList.at(colorMap.size()%(colorList.size())));
         }
 
         if(newOnlineUserList.contains(newCompleteUserList[i])){
@@ -570,9 +570,8 @@ void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> n
                 label->setStyleSheet("font-weight: bold; color:"+colorMap[newCompleteUserList[i].getId()].name());
 
                 QPixmap orig;
-                qDebug() << "User pic = " << user.getProfilePic();
                 if(!user.getProfilePic().isNull()){
-                    orig = QPixmap::fromImage(user.getProfilePic());
+                    orig = QPixmap::fromImage(newCompleteUserList[i].getProfilePic());
                 }else{
                 	QString filename(":/imgs/icons/noun_user login_178831_white.svg");
                 	QImage pixmap(filename);
@@ -608,16 +607,13 @@ void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> n
 }
 
 void MainWindow::removeOldOnlineNowOffline(QVector<User> newOnlineUserList){
-    QVector<User> toRemove;
     for(User u: onlineUserList){
         if(!newOnlineUserList.contains(u)){
             delete ui->rightToolBar->findChild<QWidget*>(QString::number(u.getId()));
         }
     }
 	QString n = QString::number(onlineUserList.size());
-	
 	this->qSB->updateUsersInfo(n);
-	
 }
 
 QPixmap MainWindow::addImageInRightToolBar(const QPixmap &orig, QColor color) {
