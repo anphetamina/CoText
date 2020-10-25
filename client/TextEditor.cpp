@@ -83,11 +83,17 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
      */
 
     connect(this, &QTextEdit::undoAvailable, ui.actionUndo, &QAction::setEnabled);
+    connect(ui.actionUndo, &QAction::triggered, this, &QTextEdit::undo);
     connect(this, &QTextEdit::redoAvailable, ui.actionRedo, &QAction::setEnabled);
+    connect(ui.actionRedo, &QAction::triggered, this, &QTextEdit::redo);
+
     ui.actionCopy->setEnabled(false);
     connect(this, &QTextEdit::copyAvailable, ui.actionCopy, &QAction::setEnabled);
+    connect(ui.actionCopy, &QAction::triggered, this, &QTextEdit::copy);
+
     ui.actionCut->setEnabled(false);
     connect(this, &QTextEdit::copyAvailable, ui.actionCut, &QAction::setEnabled);
+    connect(ui.actionCut, &QAction::triggered, this, &QTextEdit::cut);
 
     ui.actionUndo->setEnabled(document()->isUndoAvailable());
     ui.actionRedo->setEnabled(document()->isUndoAvailable());
@@ -95,6 +101,7 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     if (const QMimeData *md = QApplication::clipboard()->mimeData()) {
         ui.actionPaste->setEnabled(md->hasText());
     }
+    connect(ui.actionPaste, &QAction::triggered, this, &QTextEdit::paste);
 
     /**
      * testing code
@@ -854,8 +861,9 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
 
         if (document()->characterCount() > 1 || !editor.getSymbols()[0].empty()) {
             editor.clear();
-            isFromRemote = true;
+            document()->blockSignals(true);
             this->clear();
+            document()->blockSignals(false);
         }
 
         this->setDisabled(false);
