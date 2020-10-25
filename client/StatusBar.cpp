@@ -64,9 +64,14 @@ void StatusBar::setupSB() {
 	nActiveUsers->setToolTip("#activeUsers");
 	
 	//4.
+	docTitleLabel = new QLabel("DocTitleLabel");
+	docTitleLabel->setMinimumSize(docTitleLabel->sizeHint());
+	docTitleLabel->setAlignment(Qt::AlignLeft);
+	docTitleLabel->setText("Current document: ");
+	
 	docTitle = new QLabel("Document Title");
 	docTitle->setMinimumSize(docTitle->sizeHint());
-	docTitle->setAlignment(Qt::AlignCenter);
+	docTitle->setAlignment(Qt::AlignLeft);
 	/*
 	if(mw->getTextEditor()->getDocName().isNull() || mw->getTextEditor()->getDocName().isEmpty())
 		docTitle->setText(mw->getTextEditor()->getDocName());
@@ -122,6 +127,7 @@ void StatusBar::displaySB() {
 	addPermanentWidget(appName);
 	
 	//starting from left
+	addWidget(docTitleLabel);
 	addWidget(docTitle);
 	//addWidget(docSize);
 	//addWidget(nChars);

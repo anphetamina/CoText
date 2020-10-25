@@ -79,6 +79,7 @@ void UserEditWidget::on_pushButton_Done_clicked() {
 		
 		
 	}
+	
 	QMessageBox::information(this, "Completed", "User Edit completed");
 	this->close();
 	
