@@ -150,6 +150,7 @@ void SslEchoClient::sendUpdateProfile(int uID, QString name, QString surname, QS
 void SslEchoClient::updateUser(int uID, QString name, QString surname, QString email, QString password, QImage newPP) {
 
 	AccountUpdatePacket aup = AccountUpdatePacket(uID, email, password, name, surname, newPP);
+    aup.send(m_webSocket);
 	
 }
 

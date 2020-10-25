@@ -108,23 +108,30 @@ User updateUser(int userId, QString username, QString password, QString name, QS
     QSqlQuery query, query2, query3;
     QString email = username;
     QString hashedpassword = password;//perform hashing for sec. reason in production
-
-    bool success = true;
+    User loggedUser;
+    bool qsuccess = true;
+    bool updatedImage = false;
 
     if (!query.exec(
             "UPDATE User SET username = '"+username+"',email = '"+email+"', name='"+name+"', surname'"+surname+"', password='"+password+"' WHERE id="+userId+";")) {
-        success = false;
+        qsuccess = false;
     }
 
+    if (!profilePic.isNull()) {
+        updatedImage = saveProfilePic(userId, profilePic);
+    }
 
-
-    if ( success) {
-        User loggedUser = User(userId, email, name, surname);
+    if (qsuccess || updatedImage) { // If the image or any field was updated (and the query or saving doesnt failed)..
+        loggedUser = User(userId, email, name, surname);
         qDebug() << "[ACC] USer data updated with success." << endl << "\tRetrieved info = [Email: "
                  << loggedUser.getEmail() << "; Name:" << loggedUser.getName() << "]";
-        saveProfilePic(userId, profilePic);
+        loggedUser.setSurname(surname);
+        loggedUser.setPassword(hashedpassword);
+        loggedUser.setProfilePic(loadProfilePic(userId));
         return loggedUser;
     }
+
+    
     User failedUser = User();
     failedUser.setEmail(email);
     failedUser.setId(-1);
