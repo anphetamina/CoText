@@ -479,13 +479,18 @@ QVector<User> getUserListByDocId(int docId) {
     QSqlQuery query;
     QString qdocId = QString::number(docId);
     QVector<User> userList = QVector<User>();
-    query.exec("SELECT U.ID, U.email, U.name, U.surname FROM Permission P, User U WHERE P.UserID = U.ID AND documentid='" + qdocId + "'");
+    query.exec("SELECT U.ID, U.email, U.name, U.surname, U.password FROM Permission P, User U WHERE P.UserID = U.ID AND documentid='" + qdocId + "'");
     while (query.next()) {
         int id = query.value(0).toInt();
         QString email = query.value(1).toString();
         QString name = query.value(2).toString();
         QString surname = query.value(3).toString();
-        userList.append(User(id, email, name, surname));
+        QString hashedpassword = query.value(4).toString();
+        User curUser = User(id, email, name, surname);
+        curUser.setProfilePic(loadProfilePic(id));
+        curUser.setPassword(hashedpassword);
+
+        userList.append(curUser);
     }
     return userList;
 }
