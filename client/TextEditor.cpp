@@ -76,18 +76,24 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     connect(ui.actionToggle_user_colors, &QAction::triggered, this, &TextEditor::toggleUserColors);
     connect(QApplication::clipboard(), &QClipboard::dataChanged, this, &TextEditor::clipboardDataChange);
     connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &TextEditor::paintCursors);
-    connect(this, &QTextEdit::textChanged, this, &TextEditor::paintCursors);
+    connect(this, &QTextEdit::textChanged, this, &TextEditor::textChanged);
 
     /**
      * action connections
      */
 
     connect(this, &QTextEdit::undoAvailable, ui.actionUndo, &QAction::setEnabled);
+    connect(ui.actionUndo, &QAction::triggered, this, &QTextEdit::undo);
     connect(this, &QTextEdit::redoAvailable, ui.actionRedo, &QAction::setEnabled);
+    connect(ui.actionRedo, &QAction::triggered, this, &QTextEdit::redo);
+
     ui.actionCopy->setEnabled(false);
     connect(this, &QTextEdit::copyAvailable, ui.actionCopy, &QAction::setEnabled);
+    connect(ui.actionCopy, &QAction::triggered, this, &QTextEdit::copy);
+
     ui.actionCut->setEnabled(false);
     connect(this, &QTextEdit::copyAvailable, ui.actionCut, &QAction::setEnabled);
+    connect(ui.actionCut, &QAction::triggered, this, &QTextEdit::cut);
 
     ui.actionUndo->setEnabled(document()->isUndoAvailable());
     ui.actionRedo->setEnabled(document()->isUndoAvailable());
@@ -95,6 +101,7 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     if (const QMimeData *md = QApplication::clipboard()->mimeData()) {
         ui.actionPaste->setEnabled(md->hasText());
     }
+    connect(ui.actionPaste, &QAction::triggered, this, &QTextEdit::paste);
 
     /**
      * testing code
@@ -854,7 +861,6 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
 
         if (document()->characterCount() > 1 || !editor.getSymbols()[0].empty()) {
             editor.clear();
-            //isFromRemote = true;
             document()->blockSignals(true);
             this->clear();
             document()->blockSignals(false);
@@ -935,8 +941,6 @@ void TextEditor::updateAlignment(Qt::Alignment align, QSymbol symbol) {
         c.setPosition(position);
         isFromRemote = true;
         c.setBlockFormat(f);
-
-        alignmentChange(alignment());
     } catch (const std::exception &e) {
         qDebug() << "[EXCEPTION]"  << "TextEditor::updateAlignment" << __PRETTY_FUNCTION__ << e.what();
         resyncWithSharedEditor();
@@ -1057,6 +1061,11 @@ void TextEditor::clipboardDataChange() {
             copiedFromOutside = false;
         }
     }
+}
+
+void TextEditor::textChanged() {
+    paintCursors();
+    alignmentChange(alignment());
 }
 
 void TextEditor::focusInEvent(QFocusEvent *e) {

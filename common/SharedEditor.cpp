@@ -38,7 +38,7 @@ bool SharedEditor::retrieveStrategy(int level) {
 int SharedEditor::generateIdBetween(int min, int max, bool strategy) {
 
     if (min < 0 && max < 0) {
-        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": min and max is negative");
+        throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": min and max are negative");
     }
     if (min < 0) {
         throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": min is negative");
@@ -263,7 +263,7 @@ QSymbol SharedEditor::localInsert(int line, int index, QChar value, QTextCharFor
     QSymbol sym(value, sym_id, {}, format);
 
     if (!symbols[line].empty()) {
-        if (index >= symbols[line].size() && symbols[line].back().isNewLine()) {
+        if (index == symbols[line].size() && symbols[line].back().isNewLine()) {
             line++;
             index = 0;
         }
@@ -339,11 +339,11 @@ std::vector<QSymbol> SharedEditor::localErase(int startLine, int startIndex, int
 
     if (startLine < 0) {
         throw std::out_of_range(std::string{} + __PRETTY_FUNCTION__ + ": startLine "+std::to_string(startLine)+" is negative");
-    } else if (endLine > symbols.size()) {
+    } else if (endLine >= symbols.size()) {
         throw std::out_of_range(std::string{} + __PRETTY_FUNCTION__ + ": endLine "+std::to_string(endLine)+" > num of lines "+std::to_string(symbols.size()));
     } else if (startIndex < 0) {
         throw std::out_of_range(std::string{} + __PRETTY_FUNCTION__ + ": startIndex "+std::to_string(startIndex)+" is negative");
-    } else if (endIndex > symbols[endLine].size()) {
+    } else if (endIndex >= symbols[endLine].size()) {
         throw std::out_of_range(std::string{} + __PRETTY_FUNCTION__ + ": endIndex "+std::to_string(endIndex)+" > num of symbols "+std::to_string(symbols[endLine].size())+" line "+std::to_string(endLine));
     } else if (startLine > endLine) {
         throw std::invalid_argument(std::string{} + __PRETTY_FUNCTION__ + ": startLine "+std::to_string(startLine)+" > endLine "+std::to_string(endLine));
@@ -643,8 +643,6 @@ std::vector<QSymbol> SharedEditor::getBlock(int startLine, int startIndex, int e
             block.push_back(symbols[endLine][i]);
         }
     }
-
-
 
     return block;
 }
