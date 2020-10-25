@@ -854,8 +854,10 @@ void TextEditor::openDocument(int docId, QString docName, std::vector<std::vecto
 
         if (document()->characterCount() > 1 || !editor.getSymbols()[0].empty()) {
             editor.clear();
-            isFromRemote = true;
+            //isFromRemote = true;
+            document()->blockSignals(true);
             this->clear();
+            document()->blockSignals(false);
         }
 
         this->setDisabled(false);
