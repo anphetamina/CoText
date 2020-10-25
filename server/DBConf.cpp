@@ -108,12 +108,13 @@ User updateUser(int userId, QString username, QString password, QString name, QS
     QSqlQuery query, query2, query3;
     QString email = username;
     QString hashedpassword = password;//perform hashing for sec. reason in production
+    QString quserId = QString::number(userId);
+
     User loggedUser;
     bool qsuccess = true;
     bool updatedImage = false;
-
-    if (!query.exec(
-            "UPDATE User SET username = '"+username+"',email = '"+email+"', name='"+name+"', surname='"+surname+"', password='"+password+"' WHERE id="+userId+";")) {
+    QString updateQuery = "UPDATE User SET username = '" + username + "',email = '" + email + "', name='" + name + "', surname='" + surname + "', password='" + password + "' WHERE id=" + quserId + ";";
+    if (!query.exec(updateQuery)) {
         qsuccess = false;
     }
 
