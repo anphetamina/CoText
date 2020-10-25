@@ -574,7 +574,11 @@ void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> n
                 if(!user.getProfilePic().isNull()){
                     orig = QPixmap::fromImage(user.getProfilePic());
                 }else{
-                    orig.load(":/imgs/icons/noun_user login_178831_white.svg");
+                	QString filename(":/imgs/icons/noun_user login_178831_white.svg");
+                	QImage pixmap(filename);
+                	QImage scaledPix = pixmap.scaled(96, 96, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                	QImage labelPlaceholder = scaledPix = scaledPix.convertToFormat(QImage::Format_ARGB32);
+                    orig = QPixmap::fromImage(labelPlaceholder);
                 }
                 QPixmap background = addImageInRightToolBar(orig, colorMap[newCompleteUserList[i].getId()].name());
                 iconLabel->setPixmap(background);
@@ -626,7 +630,7 @@ QPixmap MainWindow::addImageInRightToolBar(const QPixmap &orig, QColor color) {
     QPainterPath path;
     path.addEllipse(rounded.rect());
     QPainter *painter = new QPainter(&rounded);
-    //painter->setPen(color);
+    painter->setPen(color);
 
     painter->setRenderHint(QPainter::Antialiasing);
     painter->setClipPath(path);
@@ -634,7 +638,7 @@ QPixmap MainWindow::addImageInRightToolBar(const QPixmap &orig, QColor color) {
 
     // Filling rounded area if needed
     //Before was Qt::black
-    painter->fillRect(rounded.rect(), Qt::transparent);
+    painter->fillRect(rounded.rect(), qRgb(58, 58, 58));
 
     // Getting offsets if the original picture is not square
     int x = qAbs(orig.width() - size) / 2;

@@ -35,8 +35,14 @@ void OpenDocument::repaint(){
             QWidget * w = new QWidget();
             w->setLayout ( new QHBoxLayout() );
             DeletePushButton *but = new DeletePushButton ( ui->listWidget->row(item));
-            QPixmap pixmap(":/imgs/icons/noun_Garbage_2025401.svg");
-            QIcon buttonIcon(pixmap);
+            QString filename(":/imgs/icons/noun_Garbage_2025401.svg");
+            QImage pixmap(filename);
+            QImage scaledPixmap = pixmap.scaled(22, 22, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            QImage garbageImage = scaledPixmap.convertToFormat(QImage::Format_ARGB32);
+            QPixmap pix(QPixmap::fromImage(garbageImage));
+            
+            QIcon buttonIcon(pix);
+            
             but->setIcon(buttonIcon);
             but->setIconSize(pixmap.rect().size());
             but->setFixedSize(pixmap.rect().size());
