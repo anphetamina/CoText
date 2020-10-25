@@ -1136,7 +1136,6 @@ void TextEditor::filePrintPdf(QString filename){
 #endif
 }
 
-void TextEditor::resyncWithSharedEditor(){
 
 void TextEditor::resyncWithSharedEditor() {
 
