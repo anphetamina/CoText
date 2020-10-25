@@ -476,23 +476,19 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
             sendUpdatedOnlineUserByDocId(docId);
             break;
         }
-            /*
-            case(PACK_TYPE_DOC_CLOSE): {
-                if (!client->isLogged()) {
-                    break;
-                }
-                DocumentClosePacket* dcp = dynamic_cast<DocumentClosePacket*>(rcvd_packet.get());
-                int docId = docIdByName(dcp->getdocName(), dcp->getuserId());
-                //checkDocPermission(docId, dcp->getuserId());
-                if(docId < 0 ){ // doesnt have permission (no document was found with that name associated to that user)
-                    DocumentOkPacket dokp = DocumentOkPacket(-1, dop->getdocName(), QVector<QVector<QSymbol>>());
-                    dokp.send(*pClient);
-                    break;
-                }
-
+        /*
+        case(PACK_TYPE_DOC_CLOSE): {
+            if (!client->isLogged()) {
                 break;
-            }*/
+            }
+            DocumentClosePacket* dcp = dynamic_cast<DocumentClosePacket*>(rcvd_packet.get());
 
+            // Get opened document id so that i can send to all the user connected to the same document a new online user lst
+            int closedDocId = getDocIdOpenedByUserId(client->getUserId());
+            closeDocumentById(closedDocId, client);
+            break;
+        }
+        */
         case (PACK_TYPE_DOC_DEL): {
             if (!client->isLogged()) {
                 break;
