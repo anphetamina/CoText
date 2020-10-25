@@ -8,7 +8,6 @@
 #include "sslechoclient.h"
 #include "info.h"
 #include <QPixmap> //allows to create a qpixmap onj which takes 1 arg
-#include <QPrinter>
 #include <QColor>
 #include <QCloseEvent>
 #include <QtSvg>
@@ -447,7 +446,6 @@ void MainWindow::openDocumentFromMainMenu() {
 }
 
 void MainWindow::openDocument(bool isFromMainMenu){
-    //emit(sendAskDocListMainWindow(user.getId())); //todo understand if it's useful
     OpenDocument openDocument(docList, this);
     connect(&openDocument, &OpenDocument::documentDeleted, this, &MainWindow::sendDocumentDeletedMainWindow);
     connect(this, &MainWindow::closeOpenDocumentMW, &openDocument, &OpenDocument::closeOpenDocument);
@@ -504,29 +502,6 @@ void MainWindow::on_actionLogout_triggered() {
         qApp->exit(EXIT_CODE_REBOOT );
 
     }
-}
-
-
-void MainWindow::on_actionCopy_triggered() {
-//    ui->textEdit->copy();
-
-}
-
-void MainWindow::on_actionPaste_triggered() {
-//    ui->textEdit->paste();
-}
-
-void MainWindow::on_actionCut_triggered() {
-
-//    ui->textEdit->cut();
-}
-
-void MainWindow::on_actionUndo_triggered() {
-//    ui->textEdit->undo();
-}
-
-void MainWindow::on_actionRedo_triggered() {
-//    ui->textEdit->redo();
 }
 
 void MainWindow::updateUserInToolbarMW(){
@@ -635,8 +610,7 @@ QPixmap MainWindow::addImageInRightToolBar(const QPixmap &orig, QColor color) {
     painter->setClipPath(path);
 
 
-    // Filling rounded area if needed
-    //Before was Qt::black
+    // Filling rounded area if needed. Before was Qt::black
     painter->fillRect(rounded.rect(), qRgb(58, 58, 58));
 
     // Getting offsets if the original picture is not square
@@ -666,7 +640,7 @@ QPixmap MainWindow::addImageInRightToolBar(const QPixmap &orig, QColor color) {
 
 
 void MainWindow::on_actionShare_Uri_triggered() {
-    emit(sendAskUriMainWindow(user.getId(), editor->getDocId(), ""));   //todo change userId and docId
+    emit(sendAskUriMainWindow(user.getId(), editor->getDocId(), ""));
 }
 
 void MainWindow::askUriReceivedMainWindow(QString URI) {
@@ -752,7 +726,6 @@ void MainWindow::openDocumentMainWindow(int docId, QString docName, std::vector<
 }
 
 void MainWindow::closeMainWindow(){
-    //qDebug()<<"[MAIN WINDOW] close ";
     exit(0);
 }
 

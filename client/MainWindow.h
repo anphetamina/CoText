@@ -25,7 +25,6 @@
 #include <unistd.h>
 #endif
 
-//#include <QSqlDatabase>
 
 /* COLOR PALETTE CODE:
     (30, 30, 30) dark
@@ -87,11 +86,6 @@ public:
 private slots:
     void on_actionOpen_triggered();
     void on_actionLogout_triggered();
-    void on_actionCopy_triggered();
-    void on_actionPaste_triggered();
-    void on_actionCut_triggered();
-    void on_actionUndo_triggered();
-    void on_actionRedo_triggered();
     void on_actionPrintPDF_triggered();
     void on_actionShare_Uri_triggered();
     void on_actionUserInfo_triggered();
