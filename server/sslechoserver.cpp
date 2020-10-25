@@ -262,6 +262,14 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
             AccountUpdatePacket aup = AccountUpdatePacket(loggedUser.getId(), loggedUser.getEmail(), loggedUser.getPassword(),
                     loggedUser.getName(), loggedUser.getSurname(), loggedUser.getProfilePic());
             aup.send(*pClient);
+            client->logout();
+            User* ploggedUser = checkUserLoginData(loggedUser.getEmail(), loggedUser.getPassword());
+            client->setAsLogged(ploggedUser);
+            clientMapping[pClient] = client;
+            // Send current online userlist for the given document
+            int openedDocId = getDocIdOpenedByUserId(client->getUserId());
+            sendUpdatedOnlineUserByDocId(openedDocId);
+
             break;
         }
         case (PACK_TYPE_LOGIN_REQ): {
@@ -296,8 +304,10 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
             if (client->isLogged()) {
                 qDebug() << "[LOGOUT] User " << client->getEmail() << " disconnected";
             }
-            // Remove from documentopen map
-            this->findAndDeleteFromDoclist(client);
+            // Get opened document id so that i can send to all the user connected to the same document a new online user lst
+            int closedDocId = getDocIdOpenedByUserId(client->getUserId());
+            closeDocumentById(closedDocId, client);
+            //
 
             client->logout();  // --> set peer as logged out and free the memory used for User structure
             clientMapping.remove(pClient);  // Remove entry from connected peer->user mapping
