@@ -500,23 +500,12 @@ void MainWindow::on_actionLogout_triggered() {
     QMessageBox::StandardButton resBtn = QMessageBox::question(this, "Logout", tr("Are you sure to logout ?\n"),  QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
 
     if(resBtn == QMessageBox::Yes) {
-        user = User();
-        this->hide();
-        editor->setDisabled(true);
 
-        Login *login = new Login();
-        client->connectToLogin(login);
-        login->setWindowTitle("Welcome to CoText!");
-        login->setModal(true);
-        login->exec();
+        qApp->exit(EXIT_CODE_REBOOT );
 
-        MainMenu* mainMenu = new MainMenu();
-        this->connectToMainMenu(mainMenu);
-        mainMenu->setWindowTitle("Main Menu");
-        mainMenu->setModal(true);
-        mainMenu->exec();
     }
 }
+
 
 void MainWindow::on_actionCopy_triggered() {
 //    ui->textEdit->copy();
@@ -540,6 +529,16 @@ void MainWindow::on_actionRedo_triggered() {
 //    ui->textEdit->redo();
 }
 
+void MainWindow::updateUserInToolbarMW(){
+
+    if(ui->rightToolBar->findChild<QWidget*>(QString::number(user.getId())) != nullptr) {
+        delete ui->rightToolBar->findChild<QWidget *>(QString::number(user.getId()));
+    }
+
+    addUserInRightToolbar(user);
+}
+
+
 void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> newCompleteUserList){
 
     qDebug() << "[MW] Update user list";
@@ -553,50 +552,7 @@ void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> n
         }
 
         if(newOnlineUserList.contains(newCompleteUserList[i])){
-            QLabel* label = new QLabel();
-            QLabel* iconLabel = new QLabel();
-            QString text;
-            QHBoxLayout *hBox = new QHBoxLayout;
-
-
-            if(newCompleteUserList[i].getId() == user.getId()) {
-                text = "  "+newCompleteUserList[i].getEmail() + " (YOU)  ";
-            }else {
-                text = "  "+newCompleteUserList[i].getEmail()+"  ";
-            }
-
-            if(ui->rightToolBar->findChild<QWidget*>(QString::number(newCompleteUserList[i].getId())) == nullptr){
-                label->setText(text);
-                label->setStyleSheet("font-weight: bold; color:"+colorMap[newCompleteUserList[i].getId()].name());
-
-                QPixmap orig;
-                if(!newCompleteUserList[i].getProfilePic().isNull()){
-                    orig = QPixmap::fromImage(newCompleteUserList[i].getProfilePic());
-                }else{
-                	QString filename(":/imgs/icons/noun_user login_178831_white.svg");
-                	QImage pixmap(filename);
-                	QImage scaledPix = pixmap.scaled(96, 96, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-                	QImage labelPlaceholder = scaledPix = scaledPix.convertToFormat(QImage::Format_ARGB32);
-                    orig = QPixmap::fromImage(labelPlaceholder);
-                }
-                QPixmap background = addImageInRightToolBar(orig, colorMap[newCompleteUserList[i].getId()].name());
-                iconLabel->setPixmap(background);
-
-                QSizePolicy spLeft(QSizePolicy::Preferred, QSizePolicy::Preferred);
-                spLeft.setHorizontalStretch(1);
-                iconLabel->setSizePolicy(spLeft);
-                QSizePolicy spRight(QSizePolicy::Preferred, QSizePolicy::Preferred);
-                spRight.setHorizontalStretch(5);
-                label->setSizePolicy(spRight);
-
-                hBox->addWidget( iconLabel);
-                hBox->addWidget( label);
-
-                QWidget *w = new QWidget();
-                w->setLayout(hBox);
-                w->setObjectName(QString::number(newCompleteUserList[i].getId()));
-                ui->rightToolBar->addWidget(w);
-            }
+            addUserInRightToolbar(newCompleteUserList[i]);
         }
     }
 
@@ -604,6 +560,53 @@ void MainWindow::updateUserList(QVector<User> newOnlineUserList, QVector<User> n
     QString n = QString::number(onlineUserList.size());
 	qDebug() << " online User size: "<<onlineUserList.size() << "n:" << n;
     this->qSB->updateUsersInfo(n);
+}
+
+void MainWindow::addUserInRightToolbar(User u){
+    QLabel* label = new QLabel();
+    QLabel* iconLabel = new QLabel();
+    QString text;
+    QHBoxLayout *hBox = new QHBoxLayout;
+
+
+    if(u.getId() == user.getId()) {
+        text = "  "+u.getEmail() + " (YOU)  ";
+    }else {
+        text = "  "+u.getEmail()+"  ";
+    }
+
+    if(ui->rightToolBar->findChild<QWidget*>(QString::number(u.getId())) == nullptr){
+        label->setText(text);
+        label->setStyleSheet("font-weight: bold; color:"+colorMap[u.getId()].name());
+
+        QPixmap orig;
+        if(!u.getProfilePic().isNull()){
+            orig = QPixmap::fromImage(u.getProfilePic());
+        }else{
+            QString filename(":/imgs/icons/noun_user login_178831_white.svg");
+            QImage pixmap(filename);
+            QImage scaledPix = pixmap.scaled(96, 96, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            QImage labelPlaceholder = scaledPix = scaledPix.convertToFormat(QImage::Format_ARGB32);
+            orig = QPixmap::fromImage(labelPlaceholder);
+        }
+        QPixmap background = addImageInRightToolBar(orig, colorMap[u.getId()].name());
+        iconLabel->setPixmap(background);
+
+        QSizePolicy spLeft(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        spLeft.setHorizontalStretch(1);
+        iconLabel->setSizePolicy(spLeft);
+        QSizePolicy spRight(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        spRight.setHorizontalStretch(5);
+        label->setSizePolicy(spRight);
+
+        hBox->addWidget( iconLabel);
+        hBox->addWidget( label);
+
+        QWidget *w = new QWidget();
+        w->setLayout(hBox);
+        w->setObjectName(QString::number(u.getId()));
+        ui->rightToolBar->addWidget(w);
+    }
 }
 
 void MainWindow::removeOldOnlineNowOffline(QVector<User> newOnlineUserList){

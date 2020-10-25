@@ -35,6 +35,9 @@
  */
 class SslEchoClient;
 
+
+static int const EXIT_CODE_REBOOT = -123456789;
+
 inline User user;
 inline SslEchoClient *client = nullptr;
 
@@ -115,6 +118,7 @@ public slots:
     void closeMainWindow();
     void joinFailedMW();
     void joinSucceededMW();
+    void updateUserInToolbarMW();
 
 signals:
     void sendAskUriMainWindow(qint32 userId, int docId, QString invCode);
@@ -164,6 +168,7 @@ private:
     QPixmap addImageInRightToolBar(const QPixmap &orig, QColor color);
     void createChooseName(bool isromMainMenu);
     void openDocument(bool isFromMainMenu);
+    void addUserInRightToolbar(User u);
 
 };
 #endif // MAINWINDOW_H

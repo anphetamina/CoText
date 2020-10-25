@@ -50,6 +50,7 @@ signals:
     void joinFailed();
     void joinSucceeded();
     void openDocFailed();
+    void updateUserInToolbar();
 
 public slots:
     void sendInsert(std::vector<QSymbol> symbols, int siteId);

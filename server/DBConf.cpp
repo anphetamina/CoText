@@ -123,7 +123,7 @@ User updateUser(int userId, QString username, QString password, QString name, QS
 
     if (qsuccess || updatedImage) { // If the image or any field was updated (and the query or saving doesnt failed)..
         loggedUser = User(userId, email, name, surname);
-        qDebug() << "[ACC] USer data updated with success." << endl << "\tRetrieved info = [Email: "
+        qDebug() << "[ACC] User data updated with success." << endl << "\tRetrieved info = [Email: "
                  << loggedUser.getEmail() << "; Name:" << loggedUser.getName() << "]";
         loggedUser.setSurname(surname);
         loggedUser.setPassword(hashedpassword);
