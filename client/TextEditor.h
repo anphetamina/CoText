@@ -105,6 +105,7 @@ private slots:
     void selectionChange();
     void toggleUserColors();
     void clipboardDataChange();
+    void textChanged();
 
 protected:
     void focusInEvent(QFocusEvent *e) override;
