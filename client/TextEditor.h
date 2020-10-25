@@ -60,6 +60,7 @@ private:
     std::atomic<bool> copiedFromOutside;
     std::atomic<bool> draggedFromOutside;
     std::atomic<bool> mousePressed;
+    std::atomic<bool> isResyncing = false;
 
     QFontComboBox *fontComboBox;
     QComboBox *sizeComboBox;
