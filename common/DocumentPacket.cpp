@@ -203,4 +203,13 @@ void DocumentBeaconOnlineUsers::readPayload(QDataStream &stream) {
     stream >> onlineUserList >> docId >> completeUserList;
 }
 
+
+/** DocumentClosePacket packet **/
+DocumentClosePacket::DocumentClosePacket() : Packet(PACK_TYPE_DOC_CLOSE) {}
+
+void DocumentClosePacket::writePayload(QDataStream& stream) const {
+}
+
+void DocumentClosePacket::readPayload(QDataStream& stream) {
+}
 //QVector::fromStdVector ( const std::vector<T> & vector )

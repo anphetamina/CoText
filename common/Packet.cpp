@@ -290,6 +290,8 @@ PacketHandler PacketBuilder::Container(quint8 type) {
             return new class DocumentListPacket();
         case PACK_TYPE_DOC_USERLIST:
             return new class DocumentBeaconOnlineUsers();
+        case PACK_TYPE_DOC_CLOSE:
+            return new class DocumentClosePacket();
 
         default:
             throw std::exception();//TODO: create custom exception

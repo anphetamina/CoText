@@ -476,7 +476,6 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
             sendUpdatedOnlineUserByDocId(docId);
             break;
         }
-        /*
         case(PACK_TYPE_DOC_CLOSE): {
             if (!client->isLogged()) {
                 break;
@@ -488,7 +487,6 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
             closeDocumentById(closedDocId, client);
             break;
         }
-        */
         case (PACK_TYPE_DOC_DEL): {
             if (!client->isLogged()) {
                 break;
