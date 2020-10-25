@@ -516,7 +516,7 @@ void TextEditor::remoteInsert(QSymbol symbol) {
     try {
 
         std::pair<int, int> pos = editor.remoteInsert(symbol);
-        if (pos.first != -1 || pos.second != -1) {
+        if (pos.first != -1 && pos.second != -1) {
 
             incrementIndex(pos.first, 1);
 
@@ -558,7 +558,7 @@ void TextEditor::remoteErase(QSymbol symbol) {
     try {
 
         std::pair<int, int> pos = editor.remoteErase(symbol);
-        if (pos.first != -1 || pos.second != -1) {
+        if (pos.first != -1 && pos.second != -1) {
 
             decrementIndex(pos.first, 1);
 
@@ -612,17 +612,18 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
 
         std::pair<int, int> firstPos = std::make_pair(-1, -1);
         std::pair<int, int> lastPos = std::make_pair(-1, -1);
-        int lineCount = 0;
 
         for (int j = 0; j < symbols.size(); j++) {
             QSymbol symbol = symbols[j];
 
             std::pair<int, int> pos = editor.remoteInsert(symbol);
 
-            if (pos.first != -1 || pos.second != -1) {
+            if (pos.first != -1 && pos.second != -1) {
+
+                incrementIndex(pos.first, 1);
 
                 if (symbol.isNewLine()) {
-                    lineCount++;
+                    insertRow(pos.first, 1);
                 }
 
                 if (firstPos.first == -1 || firstPos.second == -1) {
@@ -644,8 +645,6 @@ void TextEditor::remoteInsertBlock(std::vector<QSymbol> symbols) {
 
 
         std::vector<QSymbol> block = editor.getBlock(firstLine, firstIndex, lastLine, lastIndex);
-        incrementIndex(firstLine, block.size());
-        insertRow(firstLine, lineCount);
 
         int lastPosition = getPosition(firstLine, firstIndex);
 
@@ -681,7 +680,7 @@ void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
         for (int i = 0; i < symbols.size(); i++) {
             std::pair<int, int> pos = editor.getPos(symbols[i]);
 
-            if (pos.first != -1 || pos.second != -1) {
+            if (pos.first != -1 && pos.second != -1) {
 
                 if (firstPos.first == -1 || firstPos.second == -1) {
                     firstPos = pos;
@@ -705,13 +704,18 @@ void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
 
         std::vector<QSymbol> erasedBlock{};
 
-        int lineCount = 0;
         for (int i = 0; i < symbols.size(); i++) {
-            std::pair<int, int> pos = editor.remoteErase(symbols[i]);
 
-            if (pos.first != -1 || pos.second != -1) {
-                if (symbols[i].isNewLine()) {
-                    lineCount++;
+            QSymbol symbol = symbols[i];
+
+            std::pair<int, int> pos = editor.remoteErase(symbol);
+
+            if (pos.first != -1 && pos.second != -1) {
+
+                decrementIndex(pos.first, 1);
+
+                if (symbol.isNewLine()) {
+                    deleteRow(pos.first, 1);
                 }
                 erasedBlock.push_back(symbols[i]);
             }
@@ -719,9 +723,6 @@ void TextEditor::remoteEraseBlock(std::vector<QSymbol> symbols) {
 
         std::vector<QSymbol> diffBlock{};
         std::set_difference(oldBlock.begin(), oldBlock.end(), erasedBlock.begin(), erasedBlock.end(), std::inserter(diffBlock, diffBlock.begin()));
-
-        decrementIndex(firstLine, diffBlock.size());
-        deleteRow(firstLine, lineCount);
 
         QTextCursor cursor(document());
         int position = getPosition(firstLine, firstIndex);
@@ -1135,8 +1136,6 @@ void TextEditor::filePrintPdf(QString filename){
     }
 #endif
 }
-
-void TextEditor::resyncWithSharedEditor(){
 
 void TextEditor::resyncWithSharedEditor() {
 

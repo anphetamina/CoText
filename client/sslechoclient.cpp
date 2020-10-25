@@ -317,6 +317,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
         }
         case (PACK_TYPE_ALIGN): {
             AlignMessage *am = dynamic_cast<AlignMessage *>(rcvd_packet.get());
+            qDebug() << "received update align";
             emit updateAlignmentReceived(am->getAlignment(), am->getPositionStart());
             break;
         }
