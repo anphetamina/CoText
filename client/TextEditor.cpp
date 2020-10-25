@@ -1136,21 +1136,21 @@ void TextEditor::filePrintPdf(QString filename){
 #endif
 }
 
-void TextEditor::resyncWithSharedEditor() {
-    /*int resBtn = QMessageBox::question(this, "Resync with the server", "The content of this document will be reloaded", QMessageBox::Ok , QMessageBox::Ok);
+void TextEditor::resyncWithSharedEditor(){
 
-    if(resBtn == QMessageBox::Ok) {
-        emit sendDocOpenTE(documentName, user.getId());
-    }*/
+void TextEditor::resyncWithSharedEditor() {
+
     if (isResyncing)
         return;
     isResyncing = true;
+
     Resync resync;
     resync.setWindowTitle("Resync with the server");
     connect(&resync, &Resync::resync, this, &TextEditor::resyncTE);
     resync.setModal(true);
     resync.setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
     resync.exec();
+
     isResyncing = false;
 }
 

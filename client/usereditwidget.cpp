@@ -79,10 +79,7 @@ void UserEditWidget::on_pushButton_Done_clicked() {
 		
 		
 	}
-	
-	//QMessageBox::information(this, "Completed", "User Edit completed");
-	//this->close();
-	
+
 }
 
 bool UserEditWidget::checkInput(const QString &name, const QString &surname, const QString &email, const QString &pass, const QString &re_pass) {
