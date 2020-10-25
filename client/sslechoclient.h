@@ -60,6 +60,8 @@ public slots:
     void sendAlignment(Qt::Alignment alignment, QSymbol symbol, int siteId);
     void sendAskDocList(qint32 userId);
     void sendDocCreate(QString docName, qint32 userId);
+    void sendDocClose();
+
     void quitApp();
     void sendDocumentDeletedSlot(QString docName, quint32 userId);
 

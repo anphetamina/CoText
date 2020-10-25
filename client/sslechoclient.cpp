@@ -461,28 +461,32 @@ void SslEchoClient::connectToUserEdit(UserEditWidget* uew) {
 }
 
 void SslEchoClient::sendDocumentDeletedSlot(QString docName, quint32 userId) {
-    if(!pServer->isValid()) // if u call this and login wasnt performed
-        return;
+
     DocumentDelPacket ddp = DocumentDelPacket(docName, userId);
     ddp.send(*pServer);
 }
 
 void SslEchoClient::sendAskDocList(qint32 userId) {
-    if(!pServer->isValid()) // if u call this and login wasnt performed
-        return;
+
     DocumentAskListPacket dalp = DocumentAskListPacket(userId );
     dalp.send(*pServer);
 }
 
 void SslEchoClient::sendDocCreate(QString docName, qint32 userId) {
 
-    if(!pServer->isValid())
-        return;
+
     DocumentCreatePacket dcp = DocumentCreatePacket(docName, userId );
     dcp.send(*pServer);
 
     DocumentOpenPacket dop = DocumentOpenPacket(docName, userId );
     dop.send(*pServer);
+
+}
+
+void SslEchoClient::sendDocClose() {
+
+    DocumentClosePacket dcp = DocumentClosePacket();
+    dcp.send(*pServer);
 
 }
 
@@ -513,5 +517,4 @@ void SslEchoClient::connectToLoginWindow(Login* login, MainWindow* mw) {//Qdialo
 }
 
 */
-//    // Save the secret key that will be used
 
