@@ -259,7 +259,14 @@
   <action name="actionCopy">
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/imgs/icons/noun_copy_2080193.svg</normaloff>:/imgs/icons/noun_copy_2080193.svg</iconset>
+     <normaloff>:/imgs/icons/noun_copy_2080193.svg</normaloff>
+     <normalon>:/imgs/icons/noun_copy_2080193.svg</normalon>
+     <disabledoff>:/imgs/icons/noun_copy_2080193.svg</disabledoff>
+     <disabledon>:/imgs/icons/noun_copy_2080193.svg</disabledon>
+     <activeoff>:/imgs/icons/noun_copy_2080193.svg</activeoff>
+     <activeon>:/imgs/icons/noun_copy_2080193.svg</activeon>
+     <selectedoff>:/imgs/icons/noun_copy_2080193.svg</selectedoff>
+     <selectedon>:/imgs/icons/noun_copy_2080193.svg</selectedon>:/imgs/icons/noun_copy_2080193.svg</iconset>
    </property>
    <property name="text">
     <string>Copy</string>

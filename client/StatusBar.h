@@ -43,8 +43,7 @@ private:
 	/** Document info */
 	QLabel *docTitle;
 	QLabel *docTitleLabel;
-	//QLabel *docSize;
-	//QLabel *nChars;
+
 
 
 public slots:
