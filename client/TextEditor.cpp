@@ -76,7 +76,7 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     connect(ui.actionToggle_user_colors, &QAction::triggered, this, &TextEditor::toggleUserColors);
     connect(QApplication::clipboard(), &QClipboard::dataChanged, this, &TextEditor::clipboardDataChange);
     connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &TextEditor::paintCursors);
-    connect(this, &QTextEdit::textChanged, this, &TextEditor::paintCursors);
+    connect(this, &QTextEdit::textChanged, this, &TextEditor::textChanged);
 
     /**
      * action connections
@@ -933,8 +933,6 @@ void TextEditor::updateAlignment(Qt::Alignment align, QSymbol symbol) {
         c.setPosition(position);
         isFromRemote = true;
         c.setBlockFormat(f);
-
-        alignmentChange(alignment());
     } catch (const std::exception &e) {
         qDebug() << "[EXCEPTION]"  << "TextEditor::updateAlignment" << __PRETTY_FUNCTION__ << e.what();
         resyncWithSharedEditor();
@@ -1055,6 +1053,11 @@ void TextEditor::clipboardDataChange() {
             copiedFromOutside = false;
         }
     }
+}
+
+void TextEditor::textChanged() {
+    paintCursors();
+    alignmentChange(alignment());
 }
 
 void TextEditor::focusInEvent(QFocusEvent *e) {
