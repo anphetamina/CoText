@@ -176,7 +176,7 @@ void SslEchoClient::packetParse(QByteArray rcvd_packet) {
 
         try {
             // Create an empty packet and read the fields by deserializing the data stream into a structured Packet
-            PacketHandler packetH = PacketBuilder::Container(mType);
+            QSharedPointer<Packet>  packetH = PacketBuilder::Container(mType);
             packetH->read(dataStream);
             // Clear the buffer when a full packet is received (we are ready for the next one!)
             pBuffer->clearBuffer();
@@ -200,7 +200,7 @@ void SslEchoClient::packetParse(QByteArray rcvd_packet) {
     }
 }
 
-void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
+void SslEchoClient::dispatch(QSharedPointer<Packet>  rcvd_packet, QWebSocket* pClient) {
     //qDebug() << rcvd_packet.get();  // print packet as hex
     //qDebug() << "New packet type= " << rcvd_packet->getType();
     switch (rcvd_packet->getType()) {

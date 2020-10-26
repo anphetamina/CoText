@@ -119,81 +119,6 @@ void Packet::setSignature(quint8 signature) {
 }
 
 
-/** Packet handler**/
-PacketHandler::PacketHandler()
-        : ptr(nullptr), ref(nullptr) {
-}
-
-PacketHandler::PacketHandler(std::nullptr_t)
-        : ptr(nullptr), ref(nullptr) {
-}
-
-PacketHandler::PacketHandler(Packet *p)
-try
-        : ptr(p), ref(new int(1)) {
-}
-catch (...) {
-    delete p;
-    throw;
-}
-
-PacketHandler::PacketHandler(const PacketHandler &other)
-        : ptr(other.ptr), ref(other.ref) {
-    if (ptr != nullptr)
-        ++(*ref);
-}
-
-PacketHandler::PacketHandler(PacketHandler &&other) noexcept
-        : ptr(other.ptr), ref(other.ref) {
-    other.ptr = nullptr;
-}
-
-PacketHandler &PacketHandler::operator=(PacketHandler other) {
-    // Copy & Swap assignment operator implementation
-    std::swap(this->ptr, other.ptr);
-    std::swap(this->ref, other.ref);
-    return *this;
-}
-
-Packet &PacketHandler::operator*() const {
-    return *ptr;
-}
-
-Packet *PacketHandler::operator->() const {
-    return ptr;
-}
-
-PacketHandler::operator bool() const {
-    return ptr != nullptr;
-}
-
-Packet *PacketHandler::get() const {
-    return ptr;
-}
-
-void PacketHandler::reset() {
-    if (ptr != nullptr) {
-        --(*ref);
-        if (*ref == 0) {
-            delete ptr;
-            delete ref;
-        }
-    }
-
-    ptr = nullptr;
-    ref = nullptr;
-}
-
-PacketHandler::~PacketHandler() {
-    if (ptr != nullptr) {
-        --(*ref);
-        if (*ref == 0) {
-            delete ptr;
-            delete ref;
-        }
-    }
-}
-
 
 /*** Packet buffer ***/
 PacketBuffer::PacketBuffer()
@@ -248,50 +173,50 @@ QDataStream &operator>>(QDataStream &in, PacketBuffer &PacketBuffer) {
 
 /*** Packet forger **/
 
-PacketHandler PacketBuilder::Container(quint8 type) {
+QSharedPointer<Packet> PacketBuilder::Container(quint8 type) {
     switch (type) {
         case PACK_TYPE_PING:
-            return new PingPacket();
+            return QSharedPointer<Packet>(new PingPacket());
         case PACK_TYPE_LOGIN_REQ:
-            return new class LoginReqPacket();
+            return QSharedPointer<Packet>(new class LoginReqPacket());
         case PACK_TYPE_LOGIN_OK:
-            return new LoginOkPacket();
+            return QSharedPointer<Packet>(new LoginOkPacket());
         case PACK_TYPE_LOGOUT_REQ:
-            return new class LogoutReqPacket();
+            return QSharedPointer<Packet>(new class LogoutReqPacket());
 
         case PACK_TYPE_ACC_CREATE:
-            return new class AccountCreationPacket();
+            return QSharedPointer<Packet>(new class AccountCreationPacket());
         case PACK_TYPE_ACC_OK:
-            return new AccountOkPacket();
+            return QSharedPointer<Packet>(new AccountOkPacket());
         case PACK_TYPE_ACC_UPDATE:
-            return new class AccountUpdatePacket();
+            return QSharedPointer<Packet>(new class AccountUpdatePacket());
 
         case PACK_TYPE_MSG:
-            return new class Message();
+            return QSharedPointer<Packet>(new class Message());
         case PACK_TYPE_BIGMSG:
-            return new class BigMessage();
+            return QSharedPointer<Packet>(new class BigMessage());
         case PACK_TYPE_ALIGN:
-            return new class AlignMessage();
+            return QSharedPointer<Packet>(new class AlignMessage());
 
         case PACK_TYPE_CURSOR_POS:
-            return new class CursorPacket();
+            return QSharedPointer<Packet>(new class CursorPacket());
 
         case PACK_TYPE_DOC_CREATE:
-            return new class DocumentCreatePacket();
+            return QSharedPointer<Packet>(new class DocumentCreatePacket());
         case PACK_TYPE_DOC_OPEN:
-            return new class DocumentOpenPacket();
+            return QSharedPointer<Packet>(new class DocumentOpenPacket());
         case PACK_TYPE_DOC_DEL:
-            return new class DocumentDelPacket();
+            return QSharedPointer<Packet>(new class DocumentDelPacket());
         case PACK_TYPE_DOC_OK:
-            return new class DocumentOkPacket();
+            return QSharedPointer<Packet>(new class DocumentOkPacket());
         case PACK_TYPE_DOC_ASKSURI:
-            return new class DocumentAskSharableURIPacket();
+            return QSharedPointer<Packet>(new class DocumentAskSharableURIPacket());
         case PACK_TYPE_DOC_LIST:
-            return new class DocumentListPacket();
+            return QSharedPointer<Packet>(new class DocumentListPacket());
         case PACK_TYPE_DOC_USERLIST:
-            return new class DocumentBeaconOnlineUsers();
+            return QSharedPointer<Packet>(new class DocumentBeaconOnlineUsers());
         case PACK_TYPE_DOC_CLOSE:
-            return new class DocumentClosePacket();
+            return QSharedPointer<Packet>(new class DocumentClosePacket());
 
         default:
             throw UknownPacketException("[ERROR] Unknown packet.");
@@ -299,75 +224,75 @@ PacketHandler PacketBuilder::Container(quint8 type) {
     }
 }
 
-PacketHandler PacketBuilder::Ping(QString msg) {
-    return new PingPacket(msg);
+QSharedPointer<Packet>  PacketBuilder::Ping(QString msg) {
+    return QSharedPointer<Packet>(new PingPacket(msg));
 }
 
-PacketHandler PacketBuilder::LoginReqPacket(QString username, QString hashedPassword) {
-    return new class LoginReqPacket(username, hashedPassword);
+QSharedPointer<Packet>  PacketBuilder::LoginReqPacket(QString username, QString hashedPassword) {
+    return QSharedPointer<Packet>(new class LoginReqPacket(username, hashedPassword));
 }
 
-PacketHandler PacketBuilder::LoginOk(User user) {
-    return new class LoginOkPacket(user);
+QSharedPointer<Packet>  PacketBuilder::LoginOk(User user) {
+    return QSharedPointer<Packet>(new class LoginOkPacket(user));
 }
 
-PacketHandler PacketBuilder::AccountCreationPacket(QString username, QString password, QString name, QString surname,
+QSharedPointer<Packet>  PacketBuilder::AccountCreationPacket(QString username, QString password, QString name, QString surname,
                                                    QImage profilePic) {
-    return new class AccountCreationPacket(username, password, name, surname, profilePic);
+    return QSharedPointer<Packet>(new class AccountCreationPacket(username, password, name, surname, profilePic));
 }
 
-PacketHandler PacketBuilder::AccountOk(User user) {
-    return new class AccountOkPacket(user);
+QSharedPointer<Packet>  PacketBuilder::AccountOk(User user) {
+    return QSharedPointer<Packet>(new class AccountOkPacket(user));
 }
 
-PacketHandler PacketBuilder::AccountUpdatePacket(int id, QString username, QString password, QString name, QString surname,
+QSharedPointer<Packet>  PacketBuilder::AccountUpdatePacket(int id, QString username, QString password, QString name, QString surname,
                                                  QImage profilePic) {
-    return new class AccountUpdatePacket(id, username, password, name, surname, profilePic);
+    return QSharedPointer<Packet>(new class AccountUpdatePacket(id, username, password, name, surname, profilePic));
 }
 
-PacketHandler PacketBuilder::Message(int type, QSymbol qs, int siteId) {
-    return new class Message(type, qs, siteId);
+QSharedPointer<Packet>  PacketBuilder::Message(int type, QSymbol qs, int siteId) {
+    return QSharedPointer<Packet>(new class Message(type, qs, siteId));
 }
 
-PacketHandler PacketBuilder::BigMessage(int type, QVector<QSymbol> qss, int siteId) {
-    return new class BigMessage(type, qss, siteId);
+QSharedPointer<Packet>  PacketBuilder::BigMessage(int type, QVector<QSymbol> qss, int siteId) {
+    return QSharedPointer<Packet>(new class BigMessage(type, qss, siteId));
 }
 
-PacketHandler PacketBuilder::AlignMessage(QSymbol positionStart, int delta, Qt::Alignment alignment, int siteId) {
-    return new class AlignMessage(positionStart, delta, alignment, siteId);
+QSharedPointer<Packet>  PacketBuilder::AlignMessage(QSymbol positionStart, int delta, Qt::Alignment alignment, int siteId) {
+    return QSharedPointer<Packet>(new class AlignMessage(positionStart, delta, alignment, siteId));
 }
 
-PacketHandler PacketBuilder::CursorPacket(qint32 userId, qint32 newPosition) {
-    return new class CursorPacket(userId, newPosition);
+QSharedPointer<Packet>  PacketBuilder::CursorPacket(qint32 userId, qint32 newPosition) {
+    return QSharedPointer<Packet>(new class CursorPacket(userId, newPosition));
 }
 
 
-PacketHandler PacketBuilder::DocumentCreatePacket(QString docName, qint32 userId) {
-    return new class DocumentCreatePacket(docName, userId);
+QSharedPointer<Packet>  PacketBuilder::DocumentCreatePacket(QString docName, qint32 userId) {
+    return QSharedPointer<Packet>(new class DocumentCreatePacket(docName, userId));
 }
 
-PacketHandler PacketBuilder::DocumentOpenPacket(QString docName, qint32 userId) {
-    return new class DocumentOpenPacket(docName, userId);
+QSharedPointer<Packet>  PacketBuilder::DocumentOpenPacket(QString docName, qint32 userId) {
+    return QSharedPointer<Packet>(new class DocumentOpenPacket(docName, userId));
 }
 
-PacketHandler PacketBuilder::DocumentDelPacket(QString docName, qint32 userId) {
-    return new class DocumentDelPacket(docName, userId);
+QSharedPointer<Packet>  PacketBuilder::DocumentDelPacket(QString docName, qint32 userId) {
+    return QSharedPointer<Packet>(new class DocumentDelPacket(docName, userId));
 }
 
-PacketHandler PacketBuilder::DocumentOkPacket(QString docName, qint32 userId, QVector<QVector<QSymbol>> qsymbols) {
-    return new class DocumentOkPacket(userId, docName, qsymbols);
+QSharedPointer<Packet>  PacketBuilder::DocumentOkPacket(QString docName, qint32 userId, QVector<QVector<QSymbol>> qsymbols) {
+    return QSharedPointer<Packet>(new class DocumentOkPacket(userId, docName, qsymbols));
 }
 
-PacketHandler PacketBuilder::DocumentAskSharableURIPacket(int docId, qint32 userId, QString sharableURI) {
-    return new class DocumentAskSharableURIPacket(docId, userId, sharableURI);
+QSharedPointer<Packet>  PacketBuilder::DocumentAskSharableURIPacket(int docId, qint32 userId, QString sharableURI) {
+    return QSharedPointer<Packet>(new class DocumentAskSharableURIPacket(docId, userId, sharableURI));
 }
 
-PacketHandler PacketBuilder::DocumentListPacket(qint32 userId, QVector<QString> docList) {
-    return new class DocumentListPacket(userId, docList);
+QSharedPointer<Packet>  PacketBuilder::DocumentListPacket(qint32 userId, QVector<QString> docList) {
+    return QSharedPointer<Packet>(new class DocumentListPacket(userId, docList));
 }
 
-PacketHandler PacketBuilder::DocumentBeaconOnlineUsers(QVector<User> onlineUserList, qint32 docId, QVector<User> completeUserList) {
-    return new class DocumentBeaconOnlineUsers(onlineUserList, docId, completeUserList);
+QSharedPointer<Packet>  PacketBuilder::DocumentBeaconOnlineUsers(QVector<User> onlineUserList, qint32 docId, QVector<User> completeUserList) {
+    return QSharedPointer<Packet>(new class DocumentBeaconOnlineUsers(onlineUserList, docId, completeUserList));
 }
 
 
