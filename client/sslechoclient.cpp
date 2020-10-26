@@ -85,10 +85,6 @@ void SslEchoClient::socketDisconnected()
     serverDisconnected->exec();
 }
 
-void SslEchoClient::quitApp(){
-    qApp->exit(-2);
-}
-
 void SslEchoClient::sendPing() {
     // Create buffer
     PingPacket pp = PingPacket("test");
@@ -163,7 +159,7 @@ void SslEchoClient::packetParse(QByteArray rcvd_packet) {
 
     // Create a new packet buffer (used to w8 and receive for the full packet)
     PacketBuffer* pBuffer = new PacketBuffer();
-    //qDebug() << rcvd_packet;
+
     //Create a data stream (used to deserialize the rcvd bytearray  to a structured packet)
     QDataStream streamRcv(&rcvd_packet, QIODevice::ReadOnly);
 
@@ -229,7 +225,6 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
                 emit loginFailedReceived();
             }
             pServer = qobject_cast<QWebSocket *>(sender());
-	        //emit auth(loggedUser);
 	        user = loggedUser;
 
 	       // qDebug() << "USER LOGGED " << user.getId() << " " << user.getUsername() << " profilePic = "<<user.getProfilePic();
