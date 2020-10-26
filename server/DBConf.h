@@ -19,7 +19,7 @@ void getUserlist();
 
 User addUser(QString username, QString password, QString name, QString surname, QImage profilePic);
 
-User *checkUserLoginData(QString username, QString password);
+std::unique_ptr<User> checkUserLoginData(QString username, QString password);
 
 QImage loadProfilePic(int id);
 

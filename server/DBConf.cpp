@@ -142,7 +142,7 @@ User updateUser(int userId, QString username, QString password, QString name, QS
  * Check login data and return a user instance.
  * You can check with the isLogged method the result of the performed auth
  * */
-User *checkUserLoginData(QString username, QString password) {
+std::unique_ptr<User> checkUserLoginData(QString username, QString password) {
     QSqlQuery query;
     QString hashedpassword = password;
     //qDebug() << "[AUTH] Trying authentication for Mario Rossi (test@test.test)";
@@ -157,7 +157,7 @@ User *checkUserLoginData(QString username, QString password) {
         int id = query.value(1).toInt();
         QString name = query.value(2).toString();
         QString surname = query.value(3).toString();
-        User *loggedUser = new User(id, username, name, surname);
+        std::unique_ptr<User> loggedUser = std::make_unique<User>(id, username, name, surname);
         loggedUser->setSurname(surname);
         loggedUser->setPassword(hashedpassword);
         loggedUser->setProfilePic(loadProfilePic(id));
@@ -165,7 +165,7 @@ User *checkUserLoginData(QString username, QString password) {
                  << loggedUser->getUsername() << "; Name:" << loggedUser->getName() << "]";
         return loggedUser;
     } else {
-        User *failedUser = new User();
+        std::unique_ptr<User> failedUser = std::make_unique<User>();
         failedUser->setUsername(username);
         failedUser->setId(-1);
         qDebug() << "[AUTH] A user failed the auth. Email tried: " << username;

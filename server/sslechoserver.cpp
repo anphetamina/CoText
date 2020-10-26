@@ -263,7 +263,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
                     loggedUser.getName(), loggedUser.getSurname(), loggedUser.getProfilePic());
             aup.send(*pClient);
             client->logout();
-            User* ploggedUser = checkUserLoginData(loggedUser.getUsername(), loggedUser.getPassword());
+            std::unique_ptr<User> ploggedUser = checkUserLoginData(loggedUser.getUsername(), loggedUser.getPassword());
             client->setAsLogged(ploggedUser);
             clientMapping[pClient] = client;
             // Send current online userlist for the given document
@@ -277,20 +277,20 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
             QString username = loginReq->getUsername();
             QString password = loginReq->gethashedPassword();
 
-            User *loggedUser = checkUserLoginData(username, password);
+            std::unique_ptr<User> loggedUser = checkUserLoginData(username, password);
             client->setAsLogged(loggedUser);
 
             // Check if user changed connections (Do after login, userID is used)
             this->pruneOldConnectionsIfAny(client, pClient);
 
             // Send loginOk
-            LoginOkPacket lop = LoginOkPacket(*loggedUser);
+            LoginOkPacket lop = LoginOkPacket(client->getUser());
             lop.send(*pClient);
 
-            if (loggedUser->isLogged()) {
+            if (client->getUser().isLogged()) {
                 // Send user document list
-                QVector<QString> docList = getDocuments(loggedUser->getId());
-                DocumentListPacket dlp = DocumentListPacket(loggedUser->getId(), docList);
+                QVector<QString> docList = getDocuments(client->getUser().getId());
+                DocumentListPacket dlp = DocumentListPacket(client->getUser().getId(), docList);
                 dlp.send(*pClient);
             }
             //qDebug() << loginReq->getUsername();
@@ -495,6 +495,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
             // Get opened document id so that i can send to all the user connected to the same document a new online user lst
             int closedDocId = getDocIdOpenedByUserId(client->getUserId());
             closeDocumentById(closedDocId, client);
+            // Send back same packet, an ACK packet or just receive and doesnt send anything?
             break;
         }
         case (PACK_TYPE_DOC_DEL): {

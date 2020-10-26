@@ -13,7 +13,8 @@ Client::Client(QWebSocket* s) :
 Client::~Client()
 {
     if (user != nullptr)
-        delete user;
+        user = nullptr;
+        //delete user;
 }
 
 QWebSocket* Client::getSocket() const
@@ -41,18 +42,18 @@ QString Client::getUsername() const
 }
 
 
-void Client::setAsLogged(User* user)
+void Client::setAsLogged(std::unique_ptr<User> &user)
 {
     loggedFlag = true;
-    this->user = user;
+    this->user = std::move(user);
 }
 
 void Client::logout()
 {
     loggedFlag = false;
 
-    if (user != nullptr)
-        delete user;
+    //if (user != nullptr)
+    //    delete user;
 
     user = nullptr;
 }

@@ -14,7 +14,7 @@ class Client
 private:
 
     QWebSocket* websocket;
-    User* user;
+    std::unique_ptr<User> user;
     bool loggedFlag;
 
     PacketBuffer packetBuffer;
@@ -25,7 +25,7 @@ public:
 
     ~Client();
 
-    void setAsLogged(User* user);
+    void setAsLogged(std::unique_ptr<User> &user);
     void logout();
     bool isLogged();
 

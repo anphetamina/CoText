@@ -6,7 +6,7 @@
 int main(int argc, char *argv[])
 {
     int port = 12345;  // this is the default cotext port
-    // If the command line argument was set, use the user define port
+    // If the command line argument was set, use the user defined port
     if (argc > 1) {
         std::string arg = argv[1];
         try {
