@@ -62,6 +62,7 @@ void StatusBar::setupSB() {
 	docTitleLabel->setAlignment(Qt::AlignLeft);
 	docTitleLabel->setText("Current document: ");
 	
+	//5.
 	docTitle = new QLabel("Document Title");
 	docTitle->setMinimumSize(docTitle->sizeHint());
 	docTitle->setAlignment(Qt::AlignLeft);

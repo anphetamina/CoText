@@ -18,7 +18,7 @@ UserEditWidget::UserEditWidget(QWidget *parent) :
     ui->lineEditName->setText(usr.getName());
     ui->lineEditSurname->setText(usr.getSurname());
     ui->lineEditEmail->setText(usr.getUsername());
-    //the password is hashed
+    //the gotten password would be hashed because it comes from Server
     ui->lineEditPass->setText(usr.getPassword());
     ui->lineEditRePass->setText(usr.getPassword());
     

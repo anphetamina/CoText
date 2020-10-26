@@ -191,10 +191,10 @@ void SslEchoServer::packetParse(QByteArray rcvd_packet) {
     //Create a data stream (used to deserialize the rcvd bytearray  to a structured packet)
     QDataStream streamRcv(&rcvd_packet, QIODevice::ReadOnly);
 
-    // If the packet buffer is empty parse (deserialize) the headers field (MAGIC_VAL|Flags|type|payloadLen)
-    if (pBuffer->getDataSize() == 0) {
-        streamRcv >> *pBuffer;
-    }
+
+    // As first parse the headers field (MAGIC_VAL|Flags|type|payloadLen)
+    streamRcv >> *pBuffer;
+    // Get the payload content
     QByteArray payload = rcvd_packet.mid(4 + sizeof(quint32));//header+Payloadlen skip
     pBuffer->append(payload);
 
@@ -205,7 +205,7 @@ void SslEchoServer::packetParse(QByteArray rcvd_packet) {
 
         try {
             // Create an empty packet and read the fields by deserializing the data stream into a structured Packet
-            PacketHandler packetH = PacketBuilder::Container(mType);
+            QSharedPointer<Packet> packetH = PacketBuilder::Container(mType);
             packetH->read(dataStream);
             // Clear the buffer when a full packet is received (we are ready for the next one!)
             pBuffer->clearBuffer();
@@ -234,7 +234,7 @@ void SslEchoServer::packetParse(QByteArray rcvd_packet) {
  * @param rcvd_packet
  * @param pClient
  */
-void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
+void SslEchoServer::dispatch(QSharedPointer<Packet>  rcvd_packet, QWebSocket *pClient) {
     QSharedPointer<Client> client = clientMapping[pClient];
     //qDebug() << rcvd_packet.get();  // print packet as hex
 

@@ -31,7 +31,7 @@ void Login::on_pushButton_Login_clicked()
     QString username = ui->lineEdit_User->text();
     QString password = ui->lineEdit_Pass->text();
     
-	//// Do we need a while?
+	
     while(checkInput(username, password) && !checkDone) {
 	    //Do login
 	    checkDone = true;

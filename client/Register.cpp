@@ -60,7 +60,7 @@ void Register::on_pushButton_Register_clicked() {
             } else {
             
 				qDebug() << name, surname;
-				//here password is not hashed, it will be hashed in sendRegistration
+				//here password is not hashed, it would be hashed in sendRegistration
                 client->set_username(email);
                 client->set_password(pass1);
                 client->sendRegistration(name, surname, email, nickname, pass1, profilePicture);
@@ -72,7 +72,6 @@ void Register::on_pushButton_Register_clicked() {
 
 
 void Register::on_pushButton_BrowseReg_clicked() {
-	//QMessageBox::warning(this, "Resize Warn", "The image will be resized in order to be 128x128px");
 	
 	QString filename = QFileDialog::getOpenFileName(this, tr("Open Image"), "/home", tr("Image Files (*.png *.jpg *.jpeg)"));
 	if(QString::compare(filename, QString()) != 0) {

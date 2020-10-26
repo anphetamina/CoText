@@ -21,16 +21,6 @@ QPushButton {
     color: black;
 }
 
-
-
-/***** .QMAINWINDOW. *****/
-
-QMainWindow#MainWindow {
-
-	background-color: rgb(37, 37, 38);
-	
-}
-
 QTextEdit {
     color: black;
     background-color: white;
@@ -62,16 +52,30 @@ QComboBox QAbstractItemView {
     width: 170px;
 }
 
-QWidget#centralWidget{
-	background-color: rgb(37, 37, 38);
-}
 
 QToolBar {
 	spacing: 2px;
 	border-radius: 0px;
 	background-color: rgba(51, 51, 51, 255);
+
+}
+
+
+
+
+/***** .QMAINWINDOW. *****/
+
+QMainWindow#MainWindow {
+
+	background-color: rgb(37, 37, 38);
 	
 }
+
+
+QWidget#centralWidget{
+	background-color: rgb(37, 37, 38);
+}
+
 
 QPushButton#DeletePushButton {
     background-color: transparent;
@@ -84,18 +88,24 @@ QToolBar#mainToolBar {
     background-color: rgb(51, 51, 51);
 }
 
+
+QToolBar::separator:horizontal {
+
+    image: url(":/imgs/icons/verticalSeparator_toolbar.svg");
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
 QAction#actionLogin {
 
 	border-radius: 20px;
 
 }
 
+/***** .QStatusBar. *****/
+
 QStatusBar {
 	background-color: rgb(60, 202, 33);
-}
-
-QLabel#label_profilpic {
-	border-radius: 10px;
 }
 
 
@@ -112,13 +122,6 @@ StatusBar QLabel {
     color: white;
 }
 
-
-QToolBar::separator:horizontal {
-
-    image: url(":/imgs/icons/verticalSeparator_toolbar.svg");
-    margin-right: 5px;
-    margin-left: 5px;
-}
 
 
 
@@ -150,7 +153,6 @@ QDialog#Login{
 
 
 
-
 /**** USERWIDGET ****/
 
 
@@ -158,6 +160,10 @@ QDialog#UserWidget{
 
 	background-color: rgb(37, 37, 38);
 	
+}
+
+QLabel#label_profilpic {
+	border-radius: 10px;
 }
 
 QLabel#Nickname {
@@ -192,6 +198,10 @@ QDialog#UserEditWidget {
     background-color: rgb(37, 37, 38);
 
 }
+
+
+
+/**** AboutDialog ****/
 
 QDialog QLabel#AgosLabel {
     color: #efecec;

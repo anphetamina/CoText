@@ -34,13 +34,6 @@ public slots:
 signals:
 	void closeLogin();
 	
-	
-		
-		//void dragEnterEvent(QDragEnterEvent *event) override;
-    //void dropEvent(QDropEvent *event) override;
-    //void dragLeaveEvent(QDragLeaveEvent *event) override;
-
-
 
 private:
     QString name;
