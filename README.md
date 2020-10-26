@@ -20,12 +20,13 @@ Additional features are:
 If you want to start server on a given port  you can specify it as the first parameter. If no port is given the server will use the default 12345.
 
 Example:
-```bash
+```shell
 $ server 12345
 ```
 
-For the client you can configure the server address by creating a client.config file in the client's directory.
-Example content for a client.config file used for a server running on localhost and using  the default port is the following:
+For the client you can configure the server address by creating a *client.config* file in the client's directory.
+
+Example content for a *client.config* file used for a server running on localhost and using  the default port is the following:
 
 ```plaintext
 wss://localhost:12345
