@@ -161,6 +161,8 @@ bool SslEchoServer::closeDocumentById(int closedDocId, QSharedPointer<Client> cl
         saveAlignmentToDisk(alignmentMapping[closedDocId], closedDocId);
         // if last user online is disconnecting,  delete the editorMapping entry
         if (editorMapping[closedDocId]->getConnectedUsers() == 0) {
+            editorMapping[closedDocId].clear();
+            alignmentMapping[closedDocId].clear();
             editorMapping.remove(closedDocId);
             alignmentMapping.remove(closedDocId);
         }
@@ -269,7 +271,6 @@ void SslEchoServer::dispatch(QSharedPointer<Packet>  rcvd_packet, QWebSocket *pC
             // Send current online userlist for the given document
             int openedDocId = getDocIdOpenedByUserId(client->getUserId());
             sendUpdatedOnlineUserByDocId(openedDocId);
-
             break;
         }
         case (PACK_TYPE_LOGIN_REQ): {
@@ -345,12 +346,11 @@ void SslEchoServer::dispatch(QSharedPointer<Packet>  rcvd_packet, QWebSocket *pC
                     break;
                 }
             }
-
             break;
         }
         case (PACK_TYPE_BIGMSG): {
             BigMessage *bmsg = dynamic_cast<BigMessage *>(rcvd_packet.get());
-
+            std::cout << "BigMSG elboration start";
             // Broadcast to all the connected client of a document
             QList<QSharedPointer<Client>> onlineClientPerDoc = documentMapping[getDocIdOpenedByUserId(
                     client->getUserId())];
@@ -380,7 +380,7 @@ void SslEchoServer::dispatch(QSharedPointer<Packet>  rcvd_packet, QWebSocket *pC
                     break;
                 }
             }
-
+            std::cout << "BigMSG elboration end\n";
             break;
         }
         case (PACK_TYPE_CURSOR_POS): {
@@ -414,7 +414,6 @@ void SslEchoServer::dispatch(QSharedPointer<Packet>  rcvd_packet, QWebSocket *pC
             }
             // Update local instance of alignment per document.
             alignmentMapping[curDocId].push_back(*am);
-
             break;
         }
 
@@ -431,7 +430,6 @@ void SslEchoServer::dispatch(QSharedPointer<Packet>  rcvd_packet, QWebSocket *pC
 
             // Send current online userlist for the given document
             sendUpdatedOnlineUserByDocId(docId);*/
-
             break;
         }
 
@@ -444,6 +442,7 @@ void SslEchoServer::dispatch(QSharedPointer<Packet>  rcvd_packet, QWebSocket *pC
 
             DocumentListPacket dlp = DocumentListPacket(dalp->getuserId(), getDocuments(dalp->getuserId()));
             dlp.send(*pClient);
+
             break;
         }
 
@@ -484,6 +483,7 @@ void SslEchoServer::dispatch(QSharedPointer<Packet>  rcvd_packet, QWebSocket *pC
             
             // Send current online userlist for the given document
             sendUpdatedOnlineUserByDocId(docId);
+
             break;
         }
         case(PACK_TYPE_DOC_CLOSE): {
@@ -508,7 +508,6 @@ void SslEchoServer::dispatch(QSharedPointer<Packet>  rcvd_packet, QWebSocket *pC
             deleteDocument(ddp->getdocName(), ddp->getuserId());
 
             qDebug() << "[SERVER] DocumentDelPacket received docName = "<<ddp->getdocName() << " userId = "<<ddp->getuserId();
-
             break;
         }
 
@@ -568,6 +567,7 @@ void SslEchoServer::dispatch(QSharedPointer<Packet>  rcvd_packet, QWebSocket *pC
                 dasup.send(*pClient);
 
             }
+
             break;
         }
 

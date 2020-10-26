@@ -688,5 +688,5 @@ void SharedEditor::increaseConnectedUsers() {
 }
 
 void SharedEditor::decreaseConnectedUsers() {
-    this->connectedUsers++;
+    this->connectedUsers--;
 }
