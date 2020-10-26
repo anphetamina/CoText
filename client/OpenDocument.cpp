@@ -31,28 +31,35 @@ void OpenDocument::repaint(){
     for(QString document : documentList){
         if(mainWindow->windowTitle() != document){
             QListWidgetItem * item = new QListWidgetItem (document);
+            item->setSizeHint(QSize(319, 24));
+            
+            
             ui->listWidget->addItem ( item );
+            ui->listWidget->setIconSize(QSize(20, 20));
             QWidget * w = new QWidget();
             w->setLayout ( new QHBoxLayout() );
             DeletePushButton *but = new DeletePushButton ( ui->listWidget->row(item));
             QString filename(":/imgs/icons/noun_Garbage_2025401.svg");
             QImage pixmap(filename);
-            QImage scaledPixmap = pixmap.scaled(22, 22, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            QImage scaledPixmap = pixmap.scaled(20, 20, Qt::KeepAspectRatio, Qt::SmoothTransformation);
             QImage garbageImage = pixmap.convertToFormat(QImage::Format_ARGB32);
             
             QPixmap pix(QPixmap::fromImage(garbageImage));
             
-            QIcon buttonIcon(pix);
-            
-            
-           
-            but->setIcon(buttonIcon);
-            but->setIconSize(QSize(22, 22));
-            but->setFixedSize(QSize(22, 22));
+            QIcon buttonIcon;
+            buttonIcon.addPixmap(pix, QIcon::Normal);
+	        buttonIcon.addPixmap(pix, QIcon::Disabled);
+	
+	
+			but->isFlat();
+	        but->setIcon(buttonIcon);
+            but->setIconSize(QSize(20, 20));
+            but->setFixedSize(QSize(24, 24));
             QLabel *lab = new QLabel ();
             w->layout()->addWidget ( lab );
             w->layout()->addWidget ( but );
-            w->layout()->setContentsMargins ( 1, 1, 1, 1 );
+            //left, top, right, bottom
+            w->layout()->setContentsMargins ( 1, 0, 1, 1 );
 
             connect(but, &DeletePushButton::releasedWithIndex,this, &OpenDocument::buttonPressed);
 

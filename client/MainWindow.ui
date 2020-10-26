@@ -278,7 +278,14 @@
   <action name="actionPaste">
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/imgs/icons/noun_paste_2302624.svg</normaloff>:/imgs/icons/noun_paste_2302624.svg</iconset>
+     <normaloff>:/imgs/icons/noun_paste_2302624.svg</normaloff>
+     <normalon>:/imgs/icons/noun_paste_2302624.svg</normalon>
+     <disabledoff>:/imgs/icons/noun_paste_2302624.svg</disabledoff>
+     <disabledon>:/imgs/icons/noun_paste_2302624.svg</disabledon>
+     <activeoff>:/imgs/icons/noun_paste_2302624.svg</activeoff>
+     <activeon>:/imgs/icons/noun_paste_2302624.svg</activeon>
+     <selectedoff>:/imgs/icons/noun_paste_2302624.svg</selectedoff>
+     <selectedon>:/imgs/icons/noun_paste_2302624.svg</selectedon>:/imgs/icons/noun_paste_2302624.svg</iconset>
    </property>
    <property name="text">
     <string>Paste</string>
@@ -290,7 +297,14 @@
   <action name="actionCut">
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/imgs/icons/noun_Cut File_3118760.svg</normaloff>:/imgs/icons/noun_Cut File_3118760.svg</iconset>
+     <normaloff>:/imgs/icons/noun_Cut File_3118760.svg</normaloff>
+     <normalon>:/imgs/icons/noun_Cut File_3118760.svg</normalon>
+     <disabledoff>:/imgs/icons/noun_Cut File_3118760.svg</disabledoff>
+     <disabledon>:/imgs/icons/noun_Cut File_3118760.svg</disabledon>
+     <activeoff>:/imgs/icons/noun_Cut File_3118760.svg</activeoff>
+     <activeon>:/imgs/icons/noun_Cut File_3118760.svg</activeon>
+     <selectedoff>:/imgs/icons/noun_Cut File_3118760.svg</selectedoff>
+     <selectedon>:/imgs/icons/noun_Cut File_3118760.svg</selectedon>:/imgs/icons/noun_Cut File_3118760.svg</iconset>
    </property>
    <property name="text">
     <string>Cut</string>

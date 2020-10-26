@@ -14,6 +14,7 @@ QDialog {
 QListWidget {
     background-color: rgb(51, 51, 51);
     color: white;
+
 }
 
 QPushButton {
@@ -70,7 +71,8 @@ QToolBar {
 }
 
 QPushButton#DeletePushButton {
-    background-color: #515151;
+    background-color: transparent;
+
 
 }
 
