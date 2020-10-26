@@ -11,6 +11,7 @@ OpenDocument::OpenDocument(QVector<QString> docList, MainWindow* mw, QWidget *pa
 {
     ui->setupUi(this);
     mainWindow = mw;
+    
 
     repaint();
 }
@@ -97,6 +98,9 @@ void OpenDocument::on_pushButton_clicked()
             }
 
         }else { //non c'è nessun documento aperto
+        	ui->label->clear();
+        	ui->label->setText("Loading...");
+        	ui->pushButton->setDisabled(true);
             emit sendOpenDocument(ui->listWidget->currentItem()->text());
         }
     }
