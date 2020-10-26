@@ -9,7 +9,7 @@
 #endif
 
 SharedEditor::SharedEditor(int siteId)
-        : siteId(siteId), counter(0), base(INT16_MAX-1), boundary(INT8_MAX), idCounter(0) {
+        : siteId(siteId), counter(0), base(INT8_MAX), boundary(60), idCounter(0) {
     symbols.emplace_back();
 }
 
