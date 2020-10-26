@@ -11,6 +11,7 @@
 
 /**
  * Perform connection to the DB
+ * Return true on success. Trigger a qFatal otherwise.
  */
 bool dbConfigure() {
 
@@ -36,7 +37,7 @@ bool dbConfigure() {
 }
 
 /**
- * Print the current user in the DB
+ * Print all the registered users by querying the DB
  */
 void getUserlist() {
     QSqlQuery query;
@@ -52,6 +53,13 @@ void getUserlist() {
 
 /**
  * Add a user to the DB and save the profile picture
+ * Return a valid user instance on success, an invalid (id=-1) otherwise.
+ * 
+ * @param username
+ * @param password
+ * @param name
+ * @param surname
+ * @param profilePic
  */
 User addUser(QString username, QString password, QString name, QString surname, QImage profilePic) {
     QSqlQuery query, query2, query3;
@@ -102,6 +110,13 @@ User addUser(QString username, QString password, QString name, QString surname, 
 
 /**
  * Update a user in the DB and save the profile picture
+ * 
+ * @param userId
+ * @param username
+ * @param password
+ * @param name
+ * @param surname
+ * @param profilePic
  */
 User updateUser(int userId, QString username, QString password, QString name, QString surname, QImage profilePic) {
     QSqlQuery query, query2, query3;
@@ -140,8 +155,11 @@ User updateUser(int userId, QString username, QString password, QString name, QS
 }
 
 /**
- * Check login data and return a user instance.
- * You can check with the isLogged method the result of the performed auth
+ * Check login data and return a valid user instance on success, an invalid (id=-1) otherwise.
+ * You can check with the isLogged() method the result of the performed auth.
+ * 
+ * @param username
+ * @param password
  * */
 std::unique_ptr<User> checkUserLoginData(QString username, QString password) {
     QSqlQuery query;
@@ -175,11 +193,13 @@ std::unique_ptr<User> checkUserLoginData(QString username, QString password) {
 }
 
 /**
- * Load a profile picture from disk as QImage given the userId
+ * Load a profile picture from disk as QImage given the userId.
+ * 
+ * @param userId
  */
-QImage loadProfilePic(int id) {
+QImage loadProfilePic(int userId) {
     QImage myicon = QImage();
-    QString pictureFileName = QString::number(id) + ".png";
+    QString pictureFileName = QString::number(userId) + ".png";
     QString filePath = "./profilePictures/" + pictureFileName;
     QFile file(filePath);
     if (file.open(QIODevice::ReadOnly)) {
@@ -190,16 +210,26 @@ QImage loadProfilePic(int id) {
 
 /**
  * Save a profile picture to disk as QImage given the userId and the icon
+ * 
+ * @param userId
+ * @param newIcon
  */
-bool saveProfilePic(int id, QImage newIcon) {
+bool saveProfilePic(int userId, QImage newIcon) {
     if(!QDir("./profilePictures").exists()) {
         QDir().mkdir("./profilePictures");
     }
-    QString pictureFileName = QString::number(id) + ".png";
+    QString pictureFileName = QString::number(userId) + ".png";
 
     return newIcon.save("./profilePictures/" + pictureFileName);
 }
 
+/**
+ * Get documents for a given user. 
+ * Returns a vector containing the document name for each document for which the user has valid permission.
+ *
+ * @param userId
+ * @return docList
+ */
 QVector<QString> getDocuments(int userId) {
     QVector<QString> docList = QVector<QString>();
     QSqlQuery query;
@@ -215,7 +245,11 @@ QVector<QString> getDocuments(int userId) {
 }
 
 /**
- * Check if a given user has the right to open/edit a given document
+ * Check if a given user has the right to open/edit a given document.
+ * Return true if the user has privilege for that document, false otherwise.
+ * 
+ * @param docId
+ * @param userId
  */
 bool checkDocPermission(int docId, int userId) {
     QSqlQuery query;
@@ -236,7 +270,11 @@ bool checkDocPermission(int docId, int userId) {
 }
 
 /**
- * Create a document given a name and the userId of the creator
+ * Create a document given the docName and the userId of the creator.
+ * Return true on success, false otherwise.
+ * 
+ * @param docName
+ * @param userId
  */
 bool createDoc(QString docName, int userId) {
     QSqlQuery query0, query, query2, query3;
@@ -277,8 +315,10 @@ bool createDoc(QString docName, int userId) {
 }
 
 /**
- * Generate and return a random inv code of 20 alphanumerical chars.
+ * Generate and return a random invitation code composed by 20 alphanumerical chars.
  * The code is related to one document and can be redeemed by whatever user will use it as first.
+ * 
+ * @param docId
  */
 QString createInvite(int docId) {
     QSqlQuery query, query2;
@@ -297,7 +337,7 @@ QString createInvite(int docId) {
     }
 
     bool unique = false;
-    while (!unique) {//TONOTE: A better logic could be implemented for sure here, but collision rate is *really* low (and every time the invite is accepted the entry is deleted)
+    while (!unique) {  // TONOTE: A better logic could be implemented for sure here, but collision rate is *really* low (and every time the invite is accepted the entry is deleted)
         QSqlQuery uquery;
         invURI = GetRandomString(20);
         uquery.exec("SELECT documentid FROM Permission WHERE URI=" + invURI);
@@ -315,6 +355,10 @@ QString createInvite(int docId) {
 /**
  * Take the invitation uri and the userId that wants to validate the invite.
  * Add the permission to the user so he can access the document linked to that code.
+ * Return true if the inv code is valid and it was redeemed.
+ * 
+ * @param invUri
+ * @param userId
  * */
 bool acceptInvite(QString invURI, int userId) {
     QSqlQuery query, query2;
@@ -340,7 +384,13 @@ bool acceptInvite(QString invURI, int userId) {
     return true;
 }
 
-QVector<QString> docByInvURI(QString invURI) {
+/**
+ * Get the document attributes (name, id,..) for a given invitation code binded to it.
+ *
+ * @param invUri
+ * @param userId
+ * */
+QVector<QString> docByInvURI(QString invURI) {  // std:pair
     QVector<QString> doc({"", ""});
     QSqlQuery query;
     query.exec("SELECT documentid, documentname, documentpath FROM Permission WHERE URI='" + invURI + "'");
@@ -355,6 +405,9 @@ QVector<QString> docByInvURI(QString invURI) {
  * Add the document permission for a given documentId and userId.
  * Return false in case of failure.
  * Note: returns true also if the document already exist.
+ * 
+ * @param docId
+ * @param userId
  */
 
 bool addDocPermission(int docId, int userId) {
@@ -384,6 +437,9 @@ bool addDocPermission(int docId, int userId) {
 
 /**
  * Save to disk the internal representation of the document for a given documentId and bidimensional QVec
+ * 
+ * @param qdoc
+ * @param docId
  */
 void saveToDisk(QVector<QVector<QSymbol>> qdoc, int docId) {
     QString qdocId = QString::number(docId);
@@ -396,6 +452,9 @@ void saveToDisk(QVector<QVector<QSymbol>> qdoc, int docId) {
 
 /**
  * Save to disk the internal representation of the document alignment for a given document
+ * 
+ * @param qadoc
+ * @param docId
  */
 void saveAlignmentToDisk(QVector<AlignMessage> qadoc, int docId) {
     QString qdocId = QString::number(docId);
@@ -408,6 +467,8 @@ void saveAlignmentToDisk(QVector<AlignMessage> qadoc, int docId) {
 
 /**
  * Load the internal structure that represents the alignment of a given the documentId
+ * 
+ * @param docId
  */
 QVector<AlignMessage> loadAlignmentFromDisk(int docId) {
     QString qdocId = QString::number(docId);
@@ -423,6 +484,8 @@ QVector<AlignMessage> loadAlignmentFromDisk(int docId) {
 }
 /**
  * Load the internal structure that represents a document given the documentId
+ * 
+ * @param docId
  */
 QVector<QVector<QSymbol>> loadFromDisk(int docId) {
     QString qdocId = QString::number(docId);
@@ -441,6 +504,8 @@ QVector<QVector<QSymbol>> loadFromDisk(int docId) {
 
 /**
  * Generate an alphanumerical string for the given length.
+ * 
+ * @param randomStringLength
  */
 QString GetRandomString(int randomStringLength = 100) {
     const QString possibleCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
@@ -457,6 +522,9 @@ QString GetRandomString(int randomStringLength = 100) {
 /*
  * Returns the document Id given a documentName if the given userId has the right to access.
  * Return PACK_TYPE_DOC_OPEN_ERROR if the document doesnt exist or the current user has not the privilege.
+ * 
+ * @param docName
+ * @param userId
  */
 int docIdByName(QString docName, int userId) {
     QSqlQuery query;
@@ -469,16 +537,30 @@ int docIdByName(QString docName, int userId) {
         return PACK_TYPE_DOC_OPEN_ERROR;
 }
 
+/*
+ * Delete a document access permission for a given user.
+ * Return true if the entry was removed from permission table.
+ *
+ * @param docName
+ * @param userId
+ */
 bool deleteDocument(QString docName, int userId) {
     QSqlQuery query;
     QString quserId = QString::number(userId);
-    query.exec("DELETE FROM Permission WHERE userid=" + quserId + " AND documentname='" + docName + "'");
-    qDebug() << "[DB CONF] deleteDocument docName = "<<docName << " userId = "<< userId;
-    return true;
+    if (query.exec("DELETE FROM Permission WHERE userid=" + quserId + " AND documentname='" + docName + "'")) {
+        qDebug() << "[DOC DEL] deleteDocument where docName = " << docName << " userId = " << userId;
+        return true;
+    }
+    else {
+        qDebug() << "[DOC DEL] (FAILURE) deleteDocument where docName = " << docName << " userId = " << userId;
+        return false;
+    }
 }
 
 /*
  * Returns the list of all users that have permission on that document.
+ * 
+ * @param docId
  */
 QVector<User> getUserListByDocId(int docId) {
     QSqlQuery query;
