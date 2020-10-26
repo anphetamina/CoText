@@ -54,8 +54,14 @@ int SharedEditor::generateIdBetween(int min, int max, bool strategy) {
     }
 
     if ((max - min) == 2) {
+        /**
+         * min+1 is the only number available
+         */
         return min + 1;
     } else if ((max - min) < boundary) {
+        /**
+         * increase the lower bound and decreased the upper bound
+         */
         min = min + 1;
         max = max - 1;
     } else {
@@ -81,8 +87,14 @@ int SharedEditor::generateIdBetween(int min, int max, bool strategy) {
 std::vector<Identifier> SharedEditor::findPosBefore(int line, int index) {
 
     if (index == 0 && line == 0) {
+        /**
+         * get the lowest fractional position
+         */
         return std::vector<Identifier>{Identifier(0, siteId)};
     } else if (index == 0 && line != 0) {
+        /**
+         * get the lowest fractional position in the previous line
+         */
         line = line - 1;
         index = symbols[line].size();
     }
@@ -101,13 +113,17 @@ std::vector<Identifier> SharedEditor::findPosAfter(int line, int index) {
     int nLines = symbols.size();
 
     if (line == nLines - 1 && index == symbols[nLines - 1].size()) {
+        /**
+         * get the highest fractional position
+         */
         return {Identifier(base, siteId)};
     } else if (line < nLines - 1 && index == symbols[line].size()) {
+        /**
+         * get the lowest fractional position in the next line
+         */
         line++;
         index = 0;
-    }/* else if (line > nLines - 1 && index == 0) {
-        return {Identifier(base, siteId)};
-    }*/
+    }
 
     return symbols[line].at(index).getPosition();
 }
@@ -132,6 +148,9 @@ std::vector<Identifier> SharedEditor::generatePosBetween(std::vector<Identifier>
     int id2 = static_cast<int>(std::pow(2, level)*base);
     int siteId1 = siteId;
     int siteId2 = siteId;
+    /**
+     * get the current lowest and highest fractional position at the current level
+     */
     if (pos1.size() > level) {
         id1 = pos1.at(level).getDigit();
         siteId1 = pos1.at(level).getSiteId();
@@ -150,9 +169,15 @@ std::vector<Identifier> SharedEditor::generatePosBetween(std::vector<Identifier>
             newPos.emplace_back(newId, siteId);
             return newPos;
         } else if ((id2 - id1) == 1) {
+            /**
+             * there is no space between two ids and it needs to create a new level
+             */
             newPos.emplace_back(id1, siteId1);
             return this->generatePosBetween(pos1, {}, newPos, level+1);
         } else if (id1 == id2) {
+            /**
+             * always pick the lowest siteid to guarantee the order
+             */
             if (siteId1 < siteId2) {
                 newPos.emplace_back(id1, siteId1);
                 return this->generatePosBetween(pos1, {}, newPos, level + 1);
@@ -160,23 +185,6 @@ std::vector<Identifier> SharedEditor::generatePosBetween(std::vector<Identifier>
                 newPos.emplace_back(id1, siteId1);
                 return this->generatePosBetween(pos1, pos2, newPos, level + 1);
             } else {
-                /*std::stringstream err;
-                err << "pos1 {";
-                for (auto identifier: pos1) {
-                    err << " (" << identifier.getDigit() << ", " << identifier.getSiteId() << ")";
-                }
-                err << " }" << std::endl;
-                err << "pos2 {";
-                for (auto identifier: pos2) {
-                    err << " (" << identifier.getDigit() << ", " << identifier.getSiteId() << ")";
-                }
-                err << " }" << std::endl;
-                err << "newPos {";
-                for (auto identifier: newPos) {
-                    err << " (" << identifier.getDigit() << ", " << identifier.getSiteId() << ")";
-                }
-                err << " }" << std::endl;
-                err << "level " << level << std::endl;*/
                 newPos.emplace_back(id1, siteId2);
                 return this->generatePosBetween(pos1, pos2, newPos, level+1);
             }
@@ -203,8 +211,14 @@ void SharedEditor::insertSymbol(int line, int index, QSymbol symbol) {
         std::vector<QSymbol> lineAfter;
 
         if (index == symbols[line].size()) {
+            /**
+             * new line symbol at the end of line
+             */
             lineAfter = {};
         } else {
+            /**
+             * otherwise copy in the line after the content that comes after the new line
+             */
             lineAfter.assign(symbols[line].begin() + index, symbols[line].end());
         }
 
@@ -212,6 +226,10 @@ void SharedEditor::insertSymbol(int line, int index, QSymbol symbol) {
             symbols[line].push_back(symbol);
             symbols.emplace_back();
         } else {
+            /**
+             * copies the content of the line before in line
+             * and insert the line after content in the next one
+             */
             std::vector<QSymbol> lineBefore(symbols[line].begin(), symbols[line].begin() + index);
             lineBefore.push_back(symbol);
             symbols[line] = lineBefore;
@@ -263,6 +281,9 @@ QSymbol SharedEditor::localInsert(int line, int index, QChar value, QTextCharFor
     QSymbol sym(value, sym_id, {}, format);
 
     if (!symbols[line].empty()) {
+        /**
+         * adjust the coordinates if the new symbol is inserted after a line feed at the end of line
+         */
         if (index == symbols[line].size() && symbols[line].back().isNewLine()) {
             line++;
             index = 0;
@@ -319,6 +340,9 @@ std::vector<QSymbol> SharedEditor::eraseMultipleLines(int startLine, int startIn
     symbols[startLine].erase(symbols[startLine].begin() + startIndex, symbols[startLine].end());
     symbols[endLine].erase(symbols[endLine].begin(), symbols[endLine].begin() + endIndex + 1);
 
+    /**
+     * erase all the lines between startLine and endLine
+     */
     if (endLine-startLine != 1) {
         symbols.erase(symbols.begin() + startLine + 1, symbols.begin() + endLine);
     }
@@ -357,6 +381,11 @@ std::vector<QSymbol> SharedEditor::localErase(int startLine, int startIndex, int
         return {};
     } else if (startLine != endLine) {
         erasedSymbols = eraseMultipleLines(startLine, startIndex, endLine, endIndex);
+        /**
+         * check if the latest erased symbol is a new line
+         * if true the next one will be erased as well
+         * in order to avoid a pending empty line
+         */
         if (erasedSymbols.back().isNewLine()) {
             symbols.erase(symbols.begin() + startLine + 1);
         }
@@ -368,6 +397,9 @@ std::vector<QSymbol> SharedEditor::localErase(int startLine, int startIndex, int
         }
     }
 
+    /**
+     * merge only if it needs to and there is at least one symbol
+     */
     if (mergeLines && !(symbols[0].empty() && symbols.size() == 1)) {
         symbols[startLine].insert(symbols[startLine].end(), symbols[startLine+1].begin(), symbols[startLine+1].end());
         symbols.erase(symbols.begin() + startLine + 1);
@@ -479,7 +511,7 @@ std::pair<int, int> SharedEditor::remoteErase(const QSymbol &symbol) {
         });
 
         /*
-         * A = line_it = symbols.begin()
+         * A = line_it = symbols.begin() (first symbol)
          * B = line_it->front().getPosition() == symbol.getPosition()
          * C = line_it == last
          *
