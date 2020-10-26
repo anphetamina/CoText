@@ -8,8 +8,6 @@
 #include "sslechoclient.h"
 #include <Benchmark.h>
 
-//#include <QtCore/QCoreApplication>
-
 bool closed = false;
 
 int main(int argc, char *argv[]) {
@@ -22,7 +20,6 @@ int main(int argc, char *argv[]) {
         //exe icon for mac/linux
         QIcon icon(":/appIcon/CoText.ico");
         a.setWindowIcon(icon);
-        //a.setQuitOnLastWindowClosed(false);// Avoid exit the whole app when just one windows (ie. login) was opened and closed
         // Apply custom stylesheet (Theme)
         QFile styleFile(":/style/darkTheme.qss");
         styleFile.open(QFile::ReadOnly);
@@ -36,7 +33,6 @@ int main(int argc, char *argv[]) {
         }
         else {
             QTextStream in(&f);
-            //qDebug() << f.size() << in.readLine() << serverAddr;
             serverAddr = in.readLine();
             f.close();
         }

@@ -8,7 +8,6 @@
 Register::Register(QWidget *parent) : QDialog(parent), ui(new Ui::Register) {
     ui->setupUi(this);
     ui->labelPhoto->setVisible(false);
-    //ui->dropBox->setAcceptDrops(true);
 }
 
 Register::~Register() {
@@ -43,8 +42,7 @@ void Register::on_pushButton_Register_clicked() {
     if(null || empty)
         QMessageBox::warning(this, "Register failure", "You have missed some fields, please compile all fields in the form");
     else {
-        //if nickname exists -> warning
-        //if mail exists -> warning
+        //if nickname exists -> warning, if mail exists -> warning
         if(pass1 != pass2) {
             QMessageBox::warning(this, "Register failure", "Passwords don't match each other");
             pass1.clear();
@@ -104,31 +102,19 @@ void Register::on_pushButton_BrowseReg_clicked() {
 		painter.setClipPath(path);
 		//fill rounded area if needed
 		painter.fillRect(rounded.rect(), Qt::transparent);
-		/*
-		int x = qAbs(pixmap.width() + imgSize)
-		painter.drawPixmap()
-		*/
-		
-		
 		
 		this->profilePicture = squaredImage;
 		ui->labelPhoto->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 		ui->labelPhoto->setFixedWidth(squaredImage.width());
 		ui->labelPhoto->setFixedHeight(squaredImage.height());
-		//ui->labelPhoto->setMask(mask);
 		ui->labelPhoto->setPixmap(QPixmap::fromImage(squaredImage));
-		
 		ui->labelPhoto->setVisible(true);
-		
-		
 		
 	} else {
 		QMessageBox::warning(this, "File not valid", "The choosen file is not valid, please retry");
 	}
 	
 	qDebug() << filename;
-	
-	
 }
 
 void Register::on_pushButton_Canc_Reg_clicked() {
@@ -136,10 +122,8 @@ void Register::on_pushButton_Canc_Reg_clicked() {
 }
 
 void Register::showError() {
-	QMessageBox::warning(this, "Error", "Error from server");
+	QMessageBox::warning(this, "Registration error", "Registration error. Try with other credentials !");
 }
 void Register::registerOk() {
-    qDebug() << "[REGISTER] registerOk";
-    //emit closeLogin();
     this->close();
 }
