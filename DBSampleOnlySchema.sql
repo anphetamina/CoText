@@ -36,21 +36,6 @@ CREATE TABLE `permission` (
   `URI` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dump dei dati per la tabella `permission`
---
-
-INSERT INTO `permission` (`ID`, `UserID`, `DocumentID`, `DocumentName`, `DocumentPath`, `URI`) VALUES
-(1, 1, 12, 'AppuntiSofteng', NULL, NULL),
-(2, 2, 12, 'AppuntiSofteng', NULL, NULL),
-(3, 4, 12, 'AppuntiSofteng', NULL, NULL),
-(4, 7, 12, 'AppuntiSofteng', NULL, NULL),
-(5, 13, 12, 'AppuntiSofteng', NULL, NULL),
-(6, 14, 12, 'AppuntiSofteng', NULL, NULL),
-(7, 1, 33, 'Document1', NULL, NULL),
-(8, 7, 33, 'Document1', NULL, NULL);
-
--- --------------------------------------------------------
 
 --
 -- Struttura della tabella `user`
@@ -63,19 +48,6 @@ CREATE TABLE `user` (
   `Name` varchar(255) NOT NULL,
   `Surname` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dump dei dati per la tabella `user`
---
-
-INSERT INTO `user` (`ID`, `Username`, `Password`, `Name`, `Surname`) VALUES
-(2, 'test@test.test', 'test', 'Mario', 'Rossi'),
-(3, 'test2@test2.test2', 'test2', 'Mario2', 'Rossi2'),
-(4, 'test3@test3.test3', 'test3', 'Mario3', 'Rossi3'),
-(5, 'ema.muna95@gmail.com', 'password', 'Emanuele', 'Munafo'),
-(6, 'marco@marco.com', '12345', 'Marco', 'Testa'),
-(7, 'tony.santoro@polito.it', '1234', 'Tony', 'Santoro'),
-(8, 'ago@ago.it', 'ago', 'ago', 'ago');
 
 --
 -- Indici per le tabelle scaricate
@@ -102,13 +74,13 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT per la tabella `permission`
 --
 ALTER TABLE `permission`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT per la tabella `user`
 --
 ALTER TABLE `user`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
