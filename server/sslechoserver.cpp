@@ -191,10 +191,10 @@ void SslEchoServer::packetParse(QByteArray rcvd_packet) {
     //Create a data stream (used to deserialize the rcvd bytearray  to a structured packet)
     QDataStream streamRcv(&rcvd_packet, QIODevice::ReadOnly);
 
-    // If the packet buffer is empty parse (deserialize) the headers field (MAGIC_VAL|Flags|type|payloadLen)
-    if (pBuffer->getDataSize() == 0) {
-        streamRcv >> *pBuffer;
-    }
+
+    // As first parse the headers field (MAGIC_VAL|Flags|type|payloadLen)
+    streamRcv >> *pBuffer;
+    // Get the payload content
     QByteArray payload = rcvd_packet.mid(4 + sizeof(quint32));//header+Payloadlen skip
     pBuffer->append(payload);
 
