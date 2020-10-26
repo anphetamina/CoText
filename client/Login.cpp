@@ -1,7 +1,6 @@
 #include "Login.h"
 #include "ui_login.h"
 #include "Register.h"
-#include "UserWidget.h"
 #include "sslechoclient.h"
 
 Login::Login(QWidget *parent) : QDialog(parent), ui(new Ui::Login) {
@@ -28,7 +27,6 @@ void Login::clearInput() {
 
 void Login::on_pushButton_Login_clicked()
 {
-	//clearInput();
 	bool checkDone = false;
     QString username = ui->lineEdit_User->text();
     QString password = ui->lineEdit_Pass->text();
@@ -92,7 +90,11 @@ void Login::loginFailed(){
 }
 
 void Login::loginSuccessful(){
-    qDebug() << "[LOGIN] loginSuccessfull";
     this->close();
+}
+
+void Login::closeEvent(QCloseEvent *e)
+{
+    qApp->quit();
 }
 

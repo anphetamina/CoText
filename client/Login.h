@@ -26,10 +26,10 @@ public slots:
     void loginFailed();
     void loginSuccessful();
 
-
 private:
     Ui::Login *ui;
-	//void closeEvent(QCloseEvent *event) override;
+
+    virtual void closeEvent(QCloseEvent *e);
 };
 
 #endif // LOGIN_H
