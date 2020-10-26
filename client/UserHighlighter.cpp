@@ -36,6 +36,9 @@ void UserHighlighter::enable() {
 }
 
 void UserHighlighter::disable() {
+    /**
+     * it triggers the contentsChange signal
+     */
     editor.isFromRemote = true;
     setDocument(nullptr);
 }
