@@ -644,10 +644,14 @@ void MainWindow::on_actionShare_Uri_triggered() {
 }
 
 void MainWindow::askUriReceivedMainWindow(QString URI) {
+    if (isInvitationWindowOpened)
+        return;
+    isInvitationWindowOpened = true;
     ShareUri shareUri(URI);
     shareUri.setWindowTitle("Share with other people");
     shareUri.setModal(true);
     shareUri.exec();
+    isInvitationWindowOpened = false;
 }
 
 void MainWindow::on_actionUserInfo_triggered() {

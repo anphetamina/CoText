@@ -128,6 +128,7 @@ signals:
     void closeOpenDocumentMW();
 
 private:
+    bool isInvitationWindowOpened = false;
     Ui::MainWindow *ui;
     StatusBar *qSB;
     TextEditor * editor;

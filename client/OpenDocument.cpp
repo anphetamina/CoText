@@ -99,8 +99,10 @@ void OpenDocument::on_pushButton_clicked()
 
         }else { //non c'è nessun documento aperto
         	ui->label->clear();
-        	ui->label->setText("Loading...");
+        	ui->label->setText("Waiting for Document loading...");
+        	ui->pushButton->setText("Wait for opening...");
         	ui->pushButton->setDisabled(true);
+        	
             emit sendOpenDocument(ui->listWidget->currentItem()->text());
         }
     }
