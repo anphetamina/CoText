@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionUserInfo))->installEventFilter(this);
     dynamic_cast<QToolButton *>(ui->toolBar->widgetForAction(ui->actionJoin))->installEventFilter(this);
     
-    //installing EventiFilter for QToolButtons on the upperQToolBar
+    //installing EventFilter for QToolButtons on the upperQToolBar
     dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionPrintPDF))->installEventFilter(this);
 	dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionUndo))->installEventFilter(this);
 	dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionRedo))->installEventFilter(this);
@@ -47,32 +47,30 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionToggle_user_colors))->installEventFilter(this);
 	dynamic_cast<QToolButton *>(ui->mainToolBar->widgetForAction(ui->actionCoTextInfo))->installEventFilter(this);
 	
-	//this->setCentralWidget(ui->textEdit);
+	
     QPixmap icon(":/appIcon/CoText.ico");
-    //ui->iconLabel->setPixmap(icon);
-    // ui->statusbar->addPermanentWidget();
+
 	
 	ui->actionCut->setShortcut(QKeySequence::Cut);
     ui->actionCopy->setShortcut(QKeySequence::Copy);
     ui->actionPaste->setShortcut(QKeySequence::Paste);
-    //ui->actionRemove->setShortcut(QKeySequence::Delete);
     
+    // Create StatusBar
     setStatusBar(new StatusBar(*ui, this));
     this->qSB = dynamic_cast<StatusBar *>(statusBar());
     qSB->setupSB();
     qSB->displaySB();
 
 
-
+	// Create mainToolBar QComboBoxes
     fontComboBox = new QFontComboBox(this);
     ui->mainToolBar->insertWidget(ui->actionTextColor, fontComboBox);
 
     sizeComboBox = new QComboBox(this);
-    
-
-	sizeComboBox->setFixedWidth(60);
+    sizeComboBox->setFixedWidth(60);
     ui->mainToolBar->insertWidget(ui->actionTextColor, sizeComboBox);
     sizeComboBox->setEditable(true);
+    sizeComboBox->setValidator(new QIntValidator(1, 128, this));
     
 	const QList<int> standardSizes = QFontDatabase::standardSizes();
 	for (int size : standardSizes) {
