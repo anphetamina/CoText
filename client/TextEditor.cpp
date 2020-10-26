@@ -279,8 +279,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
             emit symbolsErased(erasedSymbols, editor.getSiteId());
         } catch (const std::exception &e) {
-            qDebug() << "[EXCEPTION]" << "TextEditor::contentsChange charsRemoved" << e.what();
-            undo();
+            qDebug() << "[EXCEPTION]" << "TextEditor::contentsChange" << e.what();
             resyncWithSharedEditor();
         }
 
@@ -349,7 +348,6 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
                     col++;
                     charsAdded--;
                 } catch (const std::exception &e) {
-                    textCursor().deleteChar();
                     throw;
                 }
             }
@@ -383,7 +381,7 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
                 }
             }
         } catch (const std::exception &e) {
-            qDebug() << "[EXCEPTION]"  << "TextEditor::contentsChange charsAdded" << e.what();
+            qDebug() << "[EXCEPTION]"  << "TextEditor::contentsChange" << e.what();
             resyncWithSharedEditor();
         }
 
