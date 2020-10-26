@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
         w->setTextEditor(editor);
         client->connectToMainWindow(w);
         client->connectToEditor(editor);
-        //client->connectToLoginWindow(login, w); //TODO: use signal/slot for creating/closing diffent windows.tonote: login is a QDialog not QWindow
+        //client->connectToLoginWindow(login, w); //TONOTE (Improvement): use signal/slot for creating/closing diffent windows.tonote: login is a QDialog not QWindow
 
         Benchmark* b = new Benchmark("main");
         b->startTimer();

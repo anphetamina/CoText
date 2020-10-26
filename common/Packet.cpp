@@ -294,7 +294,7 @@ PacketHandler PacketBuilder::Container(quint8 type) {
             return new class DocumentClosePacket();
 
         default:
-            throw std::exception();//TODO: create custom exception
+            throw UknownPacketException("[ERROR] Unknown packet.");
             break;
     }
 }
@@ -368,4 +368,11 @@ PacketHandler PacketBuilder::DocumentListPacket(qint32 userId, QVector<QString> 
 
 PacketHandler PacketBuilder::DocumentBeaconOnlineUsers(QVector<User> onlineUserList, qint32 docId, QVector<User> completeUserList) {
     return new class DocumentBeaconOnlineUsers(onlineUserList, docId, completeUserList);
+}
+
+
+UknownPacketException::UknownPacketException(char const* const message) throw()
+    : std::runtime_error(message)
+{
+
 }
