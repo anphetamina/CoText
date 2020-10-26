@@ -30,6 +30,7 @@ bool dbConfigure() {
         qDebug() << "[DB] Connected to DB.";
         return true;
     } else {
+        qFatal("[DB] Can not connect to db with the provided data.");
         return false;
     }
 }
@@ -296,7 +297,7 @@ QString createInvite(int docId) {
     }
 
     bool unique = false;
-    while (!unique) {//TODO: A better logic could be implemented for sure here, but collision rate is *really* low (and every time the invite is accepted the entry is deleted)
+    while (!unique) {//TONOTE: A better logic could be implemented for sure here, but collision rate is *really* low (and every time the invite is accepted the entry is deleted)
         QSqlQuery uquery;
         invURI = GetRandomString(20);
         uquery.exec("SELECT documentid FROM Permission WHERE URI=" + invURI);
