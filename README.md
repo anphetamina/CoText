@@ -54,8 +54,8 @@ When using the provided sql file the following account are available:
 In addition there are 2 empty document already loaded:
 | DocName       | User with privilege      |
 | ------------- |:------------------------:|
-|TestDocument1  |test                      |
-|AAA            |test, test2               |
+|Document1      |test                      |
+|AppuntiSofteng |test, test2               |
 
 ### :file_folder: Filesystem
 You need some space to store the document that are saved in the current working directory in which the server is run.
