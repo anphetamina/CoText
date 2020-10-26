@@ -57,7 +57,7 @@ private:
 
     void packetParse(QByteArray rcvd_packet);
 
-    void dispatch(PacketHandler rcvd_packet, QWebSocket *pClient);
+    void dispatch(QSharedPointer<Packet> rcvd_packet, QWebSocket *pClient);
 
     bool findAndDeleteFromDoclist(QSharedPointer<Client> client);
 

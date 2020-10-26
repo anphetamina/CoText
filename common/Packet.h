@@ -79,37 +79,6 @@ protected:
     void writeSize(QDataStream &stream);
 };
 
-/** Packet handler **/
-class PacketHandler
-{
-private:
-
-    Packet* ptr;
-    int* ref;
-
-public:
-
-    PacketHandler();
-    PacketHandler(std::nullptr_t);
-    PacketHandler(Packet* p);
-
-    PacketHandler(const PacketHandler& other);
-    PacketHandler(PacketHandler&& other) noexcept;
-
-    PacketHandler& operator=(PacketHandler other);
-
-    Packet& operator*() const;
-    Packet* operator->() const;
-
-    operator bool() const;
-
-    Packet* get() const;
-    void reset();
-
-    ~PacketHandler();
-};
-
-
 
 class PacketBuffer
 {
@@ -146,31 +115,31 @@ class PacketBuilder
 {
 public:
 
-    static PacketHandler Container(quint8 type);
-    static PacketHandler Ping(QString msg);
-    static PacketHandler LoginReqPacket(QString username, QString hashedPassword);
-    static PacketHandler LoginOk(User user);
-    static PacketHandler LogoutReq();
+    static QSharedPointer<Packet>  Container(quint8 type);
+    static QSharedPointer<Packet>  Ping(QString msg);
+    static QSharedPointer<Packet>  LoginReqPacket(QString username, QString hashedPassword);
+    static QSharedPointer<Packet>  LoginOk(User user);
+    static QSharedPointer<Packet>  LogoutReq();
 
-    static PacketHandler AccountCreationPacket(QString username,QString password, QString name, QString surname, QImage profilePic);
-    static PacketHandler AccountOk(User user);
-    static PacketHandler AccountUpdatePacket(int id, QString username,QString password, QString name, QString surname, QImage profilePic);
+    static QSharedPointer<Packet>  AccountCreationPacket(QString username,QString password, QString name, QString surname, QImage profilePic);
+    static QSharedPointer<Packet>  AccountOk(User user);
+    static QSharedPointer<Packet>  AccountUpdatePacket(int id, QString username,QString password, QString name, QString surname, QImage profilePic);
 
-    static PacketHandler Message(int type, QSymbol qs, int siteId);
-    static PacketHandler BigMessage(int type, QVector<QSymbol> qss, int siteId);
-    static PacketHandler AlignMessage(QSymbol positionStart, int delta, Qt::Alignment alignment, int siteId);
+    static QSharedPointer<Packet>  Message(int type, QSymbol qs, int siteId);
+    static QSharedPointer<Packet>  BigMessage(int type, QVector<QSymbol> qss, int siteId);
+    static QSharedPointer<Packet>  AlignMessage(QSymbol positionStart, int delta, Qt::Alignment alignment, int siteId);
 
-    static PacketHandler CursorPacket(qint32 userId, qint32 newPosition);
+    static QSharedPointer<Packet>  CursorPacket(qint32 userId, qint32 newPosition);
 
-    static PacketHandler DocumentCreatePacket(QString docName, qint32 userId);
-    static PacketHandler DocumentOpenPacket(QString docName, qint32 userId);
-    static PacketHandler DocumentDelPacket(QString docName, qint32 userId);
-    static PacketHandler DocumentOkPacket(QString docName, qint32 userId, QVector<QVector<QSymbol>> qsymbols);
-    static PacketHandler DocumentAskSharableURIPacket(int docId, qint32 userId, QString sharableURI);
-    static PacketHandler DocumentListPacket(qint32 userId, QVector<QString> docList);
-    static PacketHandler DocumentClosePacket();
+    static QSharedPointer<Packet>  DocumentCreatePacket(QString docName, qint32 userId);
+    static QSharedPointer<Packet>  DocumentOpenPacket(QString docName, qint32 userId);
+    static QSharedPointer<Packet>  DocumentDelPacket(QString docName, qint32 userId);
+    static QSharedPointer<Packet>  DocumentOkPacket(QString docName, qint32 userId, QVector<QVector<QSymbol>> qsymbols);
+    static QSharedPointer<Packet>  DocumentAskSharableURIPacket(int docId, qint32 userId, QString sharableURI);
+    static QSharedPointer<Packet>  DocumentListPacket(qint32 userId, QVector<QString> docList);
+    static QSharedPointer<Packet>  DocumentClosePacket();
 
-    PacketHandler DocumentBeaconOnlineUsers(QVector<User> onlineUserList, qint32 docId, QVector<User> completeUserList);
+    QSharedPointer<Packet>  DocumentBeaconOnlineUsers(QVector<User> onlineUserList, qint32 docId, QVector<User> completeUserList);
 
 };
 

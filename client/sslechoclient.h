@@ -81,7 +81,7 @@ private:
     int loginAttemptCount=0;
     void packetParse(QByteArray rcvd_packet);
     void sendTest();
-    void dispatch(PacketHandler rcvd_packet, QWebSocket *pClient);
+    void dispatch(QSharedPointer<Packet>  rcvd_packet, QWebSocket *pClient);
 
 public:
     void connectToEditor(TextEditor* te);
