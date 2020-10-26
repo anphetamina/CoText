@@ -22,6 +22,7 @@ QPushButton {
 }
 
 
+
 /***** .QMAINWINDOW. *****/
 
 QMainWindow#MainWindow {
@@ -48,6 +49,7 @@ QComboBox {
     border-radius: 5px;
 }
 
+
 QComboBox::down-arrow {
     color: #909090;
 
@@ -55,7 +57,7 @@ QComboBox::down-arrow {
 
 QComboBox QAbstractItemView {
     selection-background-color: #333333;
-    background-color: #858585;
+    background-color: rgb(37, 37, 38);
     width: 170px;
 }
 
