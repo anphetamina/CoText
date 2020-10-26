@@ -8,7 +8,7 @@ User::User() {
 
 }
 
-User::User(int id, QString email, QString name, QString surname) : id(id), email(email), name(name),
+User::User(int id, QString username, QString name, QString surname) : id(id), username(username), name(name),
                                                                    surname(surname) {};
 
 User::~User() {}
@@ -18,7 +18,7 @@ QString User::getName() { return this->name; }
 
 QString User::getSurname() { return this->surname; }
 
-QString User::getEmail() { return this->email; }
+QString User::getUsername() { return this->username; }
 
 int User::getId() const { return this->id; }
 
@@ -46,7 +46,7 @@ void User::setProfilePic(QImage _profilePic) { this->profilePic = _profilePic; }
 
 void User::setPassword(QString _hashedPassword) { this->hashedPsw = _hashedPassword; }
 
-void User::setEmail(QString _email) { this->email = _email; }
+void User::setUsername(QString _email) { this->username = _email; }
 
 void User::setId(int _id) { this->id = _id; }
 
@@ -59,7 +59,7 @@ void User::setUserState(int _state) { this->userState = _state; }
 void User::setSignature(uint8_t signature) { this->signature = signature; }
 
 QDataStream &operator>>(QDataStream &in, User &user) {
-    in >> user.id >> user.name >> user.surname >> user.email
+    in >> user.id >> user.name >> user.surname >> user.username
        >> user.profilePic
        >> user.hashedPsw
        >> user.userState
@@ -71,7 +71,7 @@ QDataStream &operator>>(QDataStream &in, User &user) {
 }
 
 QDataStream &operator<<(QDataStream &out, const User &user) {
-    out << user.id << user.name << user.surname << user.email
+    out << user.id << user.name << user.surname << user.username
         << user.profilePic
         << user.hashedPsw
         << user.userState
@@ -82,7 +82,7 @@ QDataStream &operator<<(QDataStream &out, const User &user) {
 }
 
 bool User::operator== (User u) const{
-    return id==u.id && name == u.name && surname == u.surname && email == u.email;
+    return id==u.id && name == u.name && surname == u.surname && username == u.username;
 }
 
 

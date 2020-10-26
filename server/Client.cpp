@@ -33,11 +33,11 @@ User Client::getUser() const
 }
 
 // Usr get email wrapper
-QString Client::getEmail() const
+QString Client::getUsername() const
 {
     if (user == nullptr)
         return QString::null;
-    else return user->getEmail();
+    else return user->getUsername();
 }
 
 

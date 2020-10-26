@@ -59,7 +59,7 @@ public:
 		user.setName(usr->getName());
 		user.setSurname(usr->getSurname());
 		user.setPassword(usr->getPassword());
-		user.setEmail(usr->getEmail());
+		user.setUsername(usr->getUsername());
 		user.setProfilePic(usr->getProfilePic());
 		user.setUserState(20); //ACTIVE USER
 	}

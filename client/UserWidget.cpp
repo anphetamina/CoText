@@ -24,7 +24,7 @@ UserWidget::UserWidget(QWidget *parent) : QDialog(parent), ui(new Ui::UserWidget
 	ui->label_profilpic->setMaximumHeight(128);
 	ui->Name->setText(user.getName());
 	ui->Surname->setText(user.getSurname());
-	ui->email->setText(user.getEmail());
+	ui->email->setText(user.getUsername());
 }
 
 UserWidget::~UserWidget() {

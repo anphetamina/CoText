@@ -545,9 +545,9 @@ void MainWindow::addUserInRightToolbar(User u){
 
 
     if(u.getId() == user.getId()) {
-        text = "  "+u.getEmail() + " (YOU)  ";
+        text = "  "+u.getUsername() + " (YOU)  ";
     }else {
-        text = "  "+u.getEmail()+"  ";
+        text = "  "+u.getUsername()+"  ";
     }
 
     if(ui->rightToolBar->findChild<QWidget*>(QString::number(u.getId())) == nullptr){

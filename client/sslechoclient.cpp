@@ -141,15 +141,15 @@ void SslEchoClient::sendRegistration(QString _name, QString _surname, QString _u
 	this->registerUser(_name, _surname, _username, _nickname, _password, _profilePic);
 }
 
-void SslEchoClient::sendUpdateProfile(int uID, QString name, QString surname, QString email, QString password,
+void SslEchoClient::sendUpdateProfile(int uID, QString name, QString surname, QString username, QString password,
                                       QImage newPP) {
 	
-	this->updateUser(uID, name, surname, email, password, newPP);
+	this->updateUser(uID, name, surname, username, password, newPP);
 }
 
-void SslEchoClient::updateUser(int uID, QString name, QString surname, QString email, QString password, QImage newPP) {
+void SslEchoClient::updateUser(int uID, QString name, QString surname, QString username, QString password, QImage newPP) {
 
-	AccountUpdatePacket aup = AccountUpdatePacket(uID, email, password, name, surname, newPP);
+	AccountUpdatePacket aup = AccountUpdatePacket(uID, username, password, name, surname, newPP);
     aup.send(m_webSocket);
 	
 }
@@ -221,7 +221,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             LoginOkPacket* loginOk = dynamic_cast<LoginOkPacket*>(rcvd_packet.get());
             User loggedUser = loginOk->getUser();
             if ( loggedUser.isLogged() ){
-                qDebug() << "[AUTH] Logged in as: " << loggedUser.getEmail();
+                qDebug() << "[AUTH] Logged in as: " << loggedUser.getUsername();
                 emit loginSuccessfulReceived();
             }
             else {
@@ -232,7 +232,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
 	        //emit auth(loggedUser);
 	        user = loggedUser;
 
-	       // qDebug() << "USER LOGGED " << user.getId() << " " << user.getEmail() << " profilePic = "<<user.getProfilePic();
+	       // qDebug() << "USER LOGGED " << user.getId() << " " << user.getUsername() << " profilePic = "<<user.getProfilePic();
 
 	        break;
         }
@@ -242,7 +242,7 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
         	AccountOkPacket* registerOk = dynamic_cast<AccountOkPacket*>(rcvd_packet.get());
         	User registeredUser = registerOk->getUser();
         	if(registeredUser.isLogged()) {
-        		qDebug() << "[REGISTER AUTH] Registered as: " << registeredUser.getEmail();
+        		qDebug() << "[REGISTER AUTH] Registered as: " << registeredUser.getUsername();
         		sendLogin();
 		        emit registerSuccessfulReceived();
         	} else {
@@ -259,13 +259,13 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
 		    User loggedUser;
 		    loggedUser.setId(accountUpdate->getId());
             loggedUser.setPassword(accountUpdate->getHashedPassword());
-		    loggedUser.setEmail(accountUpdate->getUsername());
+		    loggedUser.setUsername(accountUpdate->getUsername());
 		    loggedUser.setName(accountUpdate->getName());
 		    loggedUser.setSurname(accountUpdate->getSurname());
 		    loggedUser.setProfilePic(accountUpdate->getProfilePic());
 		    
 		    if(loggedUser.isLogged()) {
-			    qDebug() << "Update user information: " << loggedUser.getEmail();
+			    qDebug() << "Update user information: " << loggedUser.getUsername();
                 user = loggedUser;
 			    emit updateSuccessfulReceived();
 			    emit updateUserInToolbar();

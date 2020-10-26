@@ -12,12 +12,12 @@ UserEditWidget::UserEditWidget(QWidget *parent) :
 	this->setWindowTitle("Edit User Dialog");
     User usr = MainWindow::getUser();
     clearInput();
-    this->setOldUsername(usr.getEmail());
+    this->setOldUsername(usr.getUsername());
     this->setOldPP(usr.getProfilePic());
 	ui->LnewPP->setVisible(false);
     ui->lineEditName->setText(usr.getName());
     ui->lineEditSurname->setText(usr.getSurname());
-    ui->lineEditEmail->setText(usr.getEmail());
+    ui->lineEditEmail->setText(usr.getUsername());
     //the password is hashed
     ui->lineEditPass->setText(usr.getPassword());
     ui->lineEditRePass->setText(usr.getPassword());

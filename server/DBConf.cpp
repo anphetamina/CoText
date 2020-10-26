@@ -54,38 +54,36 @@ void getUserlist() {
  */
 User addUser(QString username, QString password, QString name, QString surname, QImage profilePic) {
     QSqlQuery query, query2, query3;
-    QString email = username;
     QString hashedpassword = password;//perform hashing for sec. reason in production
 
     bool success = true;
 
     if (!query.exec(
-            "INSERT INTO User(username,email, name, surname, password) VALUES ('" + username + "','" + email + "','" +
+            "INSERT INTO User(username, name, surname, password) VALUES ('" + username + "','" +
             name + "','" + surname + "','" + hashedpassword + "')")) {
         success = false;
     }
 
     // Check if it was  added (it should if here) and get ID
-    query2.exec("SELECT username, id, email, name, surname FROM User WHERE email='" + email + "' AND password='" +
+    query2.exec("SELECT username, id, name, surname FROM User WHERE username='" + username + "' AND password='" +
                 hashedpassword + "'");
 
     if (query2.next() && success) {
         QString username = query2.value(0).toString();
         int id = query2.value(1).toInt();
-        QString email = query2.value(2).toString();
-        QString name = query2.value(3).toString();
-        QString surname = query2.value(4).toString();
+        QString name = query2.value(2).toString();
+        QString surname = query2.value(3).toString();
 
        /* if (!saveProfilePic(id, profilePic)) {
             success = false;
         }*/
 
-        User loggedUser = User(id, email, name, surname);
+        User loggedUser = User(id, username, name, surname);
         loggedUser.setSurname(surname);
         loggedUser.setPassword(hashedpassword);
         //User loggedUser = checkUserLoginData(email, password);
         qDebug() << "[AUTH] New user registered with success." << endl << "\tRetrieved info = [Email: "
-                 << loggedUser.getEmail() << "; Name:" << loggedUser.getName() << "]";
+                 << loggedUser.getUsername() << "; Name:" << loggedUser.getName() << "]";
         qDebug() << "[DB CONF] Profile pic = "<<profilePic;
         if(saveProfilePic(id, profilePic)){
             qDebug() << "[DB CONF] save profile succeeded";
@@ -94,9 +92,9 @@ User addUser(QString username, QString password, QString name, QString surname, 
         return loggedUser;
     }
     User failedUser = User();
-    failedUser.setEmail(email);
+    failedUser.setUsername(username);
     failedUser.setId(-1);
-    qDebug() << "[AUTH] A user failed the auth. Email tried: " << email;
+    qDebug() << "[AUTH] A user failed the auth. Email tried: " << username;
     return failedUser;
 
 }
@@ -106,14 +104,13 @@ User addUser(QString username, QString password, QString name, QString surname, 
  */
 User updateUser(int userId, QString username, QString password, QString name, QString surname, QImage profilePic) {
     QSqlQuery query, query2, query3;
-    QString email = username;
     QString hashedpassword = password;//perform hashing for sec. reason in production
     QString quserId = QString::number(userId);
 
     User loggedUser;
     bool qsuccess = true;
     bool updatedImage = false;
-    QString updateQuery = "UPDATE User SET username = '" + username + "',email = '" + email + "', name='" + name + "', surname='" + surname + "', password='" + password + "' WHERE id=" + quserId + ";";
+    QString updateQuery = "UPDATE User SET username = '" + username + "', name='" + name + "', surname='" + surname + "', password='" + password + "' WHERE id=" + quserId + ";";
     if (!query.exec(updateQuery)) {
         qsuccess = false;
     }
@@ -123,9 +120,9 @@ User updateUser(int userId, QString username, QString password, QString name, QS
     }
 
     if (qsuccess || updatedImage) { // If the image or any field was updated (and the query or saving doesnt failed)..
-        loggedUser = User(userId, email, name, surname);
+        loggedUser = User(userId, username, name, surname);
         qDebug() << "[ACC] User data updated with success." << endl << "\tRetrieved info = [Email: "
-                 << loggedUser.getEmail() << "; Name:" << loggedUser.getName() << "]";
+                 << loggedUser.getUsername() << "; Name:" << loggedUser.getName() << "]";
         loggedUser.setSurname(surname);
         loggedUser.setPassword(hashedpassword);
         loggedUser.setProfilePic(loadProfilePic(userId));
@@ -134,9 +131,9 @@ User updateUser(int userId, QString username, QString password, QString name, QS
 
     
     User failedUser = User();
-    failedUser.setEmail(email);
+    failedUser.setUsername(username);
     failedUser.setId(-1);
-    qDebug() << "[AUTH] A user failed the auth. Email tried: " << email;
+    qDebug() << "[AUTH] A user failed the auth. Email tried: " << username;
     return failedUser;
 
 }
@@ -145,34 +142,33 @@ User updateUser(int userId, QString username, QString password, QString name, QS
  * Check login data and return a user instance.
  * You can check with the isLogged method the result of the performed auth
  * */
-User *checkUserLoginData(QString email, QString password) {
+User *checkUserLoginData(QString username, QString password) {
     QSqlQuery query;
     QString hashedpassword = password;
     //qDebug() << "[AUTH] Trying authentication for Mario Rossi (test@test.test)";
 
     // Avoiding security concerns about sql for now. Security :(
-    QString squery = "SELECT username, id, email, name, surname FROM User WHERE email='" + email + "' AND password='" +
+    QString squery = "SELECT username, id, name, surname FROM User WHERE username='" + username + "' AND password='" +
                      hashedpassword + "'";
     query.exec(squery);
 
     if (query.next()) {
         QString username = query.value(0).toString();
         int id = query.value(1).toInt();
-        QString email = query.value(2).toString();
-        QString name = query.value(3).toString();
-        QString surname = query.value(4).toString();
-        User *loggedUser = new User(id, email, name, surname);
+        QString name = query.value(2).toString();
+        QString surname = query.value(3).toString();
+        User *loggedUser = new User(id, username, name, surname);
         loggedUser->setSurname(surname);
         loggedUser->setPassword(hashedpassword);
         loggedUser->setProfilePic(loadProfilePic(id));
         qDebug() << "[AUTH] New user authenticated with success." << endl << "\tRetrieved info = [Email: "
-                 << loggedUser->getEmail() << "; Name:" << loggedUser->getName() << "]";
+                 << loggedUser->getUsername() << "; Name:" << loggedUser->getName() << "]";
         return loggedUser;
     } else {
         User *failedUser = new User();
-        failedUser->setEmail(email);
+        failedUser->setUsername(username);
         failedUser->setId(-1);
-        qDebug() << "[AUTH] A user failed the auth. Email tried: " << email;
+        qDebug() << "[AUTH] A user failed the auth. Email tried: " << username;
         return failedUser;
     }
 }
@@ -487,14 +483,14 @@ QVector<User> getUserListByDocId(int docId) {
     QSqlQuery query;
     QString qdocId = QString::number(docId);
     QVector<User> userList = QVector<User>();
-    query.exec("SELECT U.ID, U.email, U.name, U.surname, U.password FROM Permission P, User U WHERE P.UserID = U.ID AND documentid='" + qdocId + "'");
+    query.exec("SELECT U.ID, U.username, U.name, U.surname, U.password FROM Permission P, User U WHERE P.UserID = U.ID AND documentid='" + qdocId + "'");
     while (query.next()) {
         int id = query.value(0).toInt();
-        QString email = query.value(1).toString();
+        QString username = query.value(1).toString();
         QString name = query.value(2).toString();
         QString surname = query.value(3).toString();
         QString hashedpassword = query.value(4).toString();
-        User curUser = User(id, email, name, surname);
+        User curUser = User(id, username, name, surname);
         curUser.setProfilePic(loadProfilePic(id));
         curUser.setPassword(hashedpassword);
 

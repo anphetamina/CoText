@@ -126,7 +126,7 @@ void SslEchoServer::socketDisconnected() {
         QSharedPointer<Client> client = clientMapping[pClient];
 
         if (client->isLogged()) {
-            qDebug() << "User " << client->getEmail() << " disconnected";
+            qDebug() << "User " << client->getUsername() << " disconnected";
         }
 
         client->logout();
@@ -259,11 +259,11 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
             User loggedUser = updateUser(client->getUserId(),accReq->getUsername(), accReq->getHashedPassword(), accReq->getName(),
                                       accReq->getSurname(), accReq->getProfilePic());
 
-            AccountUpdatePacket aup = AccountUpdatePacket(loggedUser.getId(), loggedUser.getEmail(), loggedUser.getPassword(),
+            AccountUpdatePacket aup = AccountUpdatePacket(loggedUser.getId(), loggedUser.getUsername(), loggedUser.getPassword(),
                     loggedUser.getName(), loggedUser.getSurname(), loggedUser.getProfilePic());
             aup.send(*pClient);
             client->logout();
-            User* ploggedUser = checkUserLoginData(loggedUser.getEmail(), loggedUser.getPassword());
+            User* ploggedUser = checkUserLoginData(loggedUser.getUsername(), loggedUser.getPassword());
             client->setAsLogged(ploggedUser);
             clientMapping[pClient] = client;
             // Send current online userlist for the given document
@@ -302,7 +302,7 @@ void SslEchoServer::dispatch(PacketHandler rcvd_packet, QWebSocket *pClient) {
             LogoutReqPacket *logoutReq = dynamic_cast<LogoutReqPacket *>(rcvd_packet.get());
 
             if (client->isLogged()) {
-                qDebug() << "[LOGOUT] User " << client->getEmail() << " disconnected";
+                qDebug() << "[LOGOUT] User " << client->getUsername() << " disconnected";
             }
             // Get opened document id so that i can send to all the user connected to the same document a new online user lst
             int closedDocId = getDocIdOpenedByUserId(client->getUserId());

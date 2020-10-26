@@ -769,7 +769,7 @@ void TextEditor::insertBlock(const std::vector<QSymbol> &block, int position) {
     }
 
     cursorPositionChange();
-
+     
     printSymbols(__PRETTY_FUNCTION__);
 }
 

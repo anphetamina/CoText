@@ -34,7 +34,7 @@ public:
     /* getters */
     User getUser() const;
     int getUserId() const;
-    QString getEmail() const;
+    QString getUsername() const;
     QWebSocket* getSocket() const;
     PacketBuffer& getPacketBuffer();
 };

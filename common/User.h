@@ -22,7 +22,7 @@ class User {
 public:
     User();
 
-    User(int id, QString email, QString name, QString surname);
+    User(int id, QString username, QString name, QString surname);
 
     ~User();
 
@@ -30,7 +30,7 @@ public:
 
     QString getSurname();
 
-    QString getEmail();
+    QString getUsername();
     
     QString getPassword();
 
@@ -48,7 +48,7 @@ public:
     
 	void setPassword(QString hashedPassword);
 	
-    void setEmail(QString _email);
+    void setUsername(QString _email);
 
     void setId(int _id);
 
@@ -72,7 +72,7 @@ private:
     QList<User *> friendList;
     QString name;
     QString surname;
-    QString email;
+    QString username;
     QImage profilePic;
     QString hashedPsw;
     int userState;
