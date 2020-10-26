@@ -18,9 +18,6 @@ public:
 private slots:
     void on_pushButton_clicked();
 
-signals:
-    void quitClicked();
-
 private:
     Ui::ServerDisconnected *ui;
 };

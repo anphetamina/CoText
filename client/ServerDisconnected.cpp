@@ -15,5 +15,5 @@ ServerDisconnected::~ServerDisconnected()
 
 void ServerDisconnected::on_pushButton_clicked()
 {
-    emit quitClicked();
+    qApp->quit();
 }

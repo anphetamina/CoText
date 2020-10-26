@@ -79,14 +79,9 @@ void SslEchoClient::socketDisconnected()
 {
     qDebug() << "Server closed the connection.\n[HINT]Duplicated instance with the same user?";
     ServerDisconnected* serverDisconnected = new ServerDisconnected();
-    connect(serverDisconnected, &ServerDisconnected::quitClicked, this, &SslEchoClient::quitApp);
     serverDisconnected->setWindowTitle("Server disconnected");
     serverDisconnected->setModal(true);
     serverDisconnected->exec();
-}
-
-void SslEchoClient::quitApp(){
-    qApp->exit(-2);
 }
 
 void SslEchoClient::sendPing() {
@@ -163,7 +158,7 @@ void SslEchoClient::packetParse(QByteArray rcvd_packet) {
 
     // Create a new packet buffer (used to w8 and receive for the full packet)
     PacketBuffer* pBuffer = new PacketBuffer();
-    //qDebug() << rcvd_packet;
+
     //Create a data stream (used to deserialize the rcvd bytearray  to a structured packet)
     QDataStream streamRcv(&rcvd_packet, QIODevice::ReadOnly);
 
@@ -229,7 +224,6 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
                 emit loginFailedReceived();
             }
             pServer = qobject_cast<QWebSocket *>(sender());
-	        //emit auth(loggedUser);
 	        user = loggedUser;
 
 	       // qDebug() << "USER LOGGED " << user.getId() << " " << user.getUsername() << " profilePic = "<<user.getProfilePic();
