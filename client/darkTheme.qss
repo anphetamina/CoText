@@ -7,7 +7,7 @@ QLineEdit {
 }
 
 QDialog {
-    background-color: rgb(30, 30, 30);
+    background-color: rgb(37, 37, 38);
     color: #858585;
 }
 
@@ -132,7 +132,7 @@ QDialog#Register {
 }
 
 QGroupBox#groupBoxRegister {
-	background-color: rgb(30, 30, 30);
+	background-color: rgb(37, 37, 38);
 }
 
 
@@ -143,7 +143,7 @@ QGroupBox#groupBoxRegister {
 
 QDialog#Login{
 
-	background-color: rgb(30, 30, 30);
+	background-color: rgb(37, 37, 38);
 	
 }
 
@@ -155,7 +155,7 @@ QDialog#Login{
 
 QDialog#UserWidget{
 
-	background-color: rgb(30, 30, 30);
+	background-color: rgb(37, 37, 38);
 	
 }
 
@@ -188,7 +188,7 @@ QLabel#email {
 
 QDialog#UserEditWidget {
 
-    background-color: rgb(30, 30, 30);
+    background-color: rgb(37, 37, 38);
 
 }
 
