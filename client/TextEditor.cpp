@@ -848,6 +848,11 @@ void TextEditor::toggleUserColors() {
     isUserColorsToggled = !isUserColorsToggled;
 }
 
+/**
+ *
+ * @param userId
+ * @return QColor of userId if exists otherwise white
+ */
 QColor TextEditor::getUserColor(int userId) const {
 
     QColor color = QColorConstants::White;
@@ -865,6 +870,12 @@ QColor TextEditor::getUserColor(int userId) const {
     return color;
 }
 
+/**
+ *
+ * @param row
+ * @param col
+ * @return id of the symbol at [row][col]
+ */
 int TextEditor::getUserId(int row, int col) const {
     return editor.getSymbols()[row][col].getSiteId();
 }
@@ -936,6 +947,12 @@ void TextEditor::printSymbols(const std::string &functionName) {
     qDebug();
 }
 
+/**
+ * @param align
+ * @param symbol
+ * update align of the block right after symbol
+ * symbol is always a line feed so when it is deleted the block after is deleted as well
+ */
 void TextEditor::updateAlignment(Qt::Alignment align, QSymbol symbol) {
 
     QTextBlockFormat f;
@@ -985,6 +1002,12 @@ int TextEditor::isNewLine(QChar c) {
     return res;
 }
 
+/**
+ *
+ * @param onlineUserList
+ * @param completeUserList
+ * update the current online user list with onlineUserList and removes the offline users previously online
+ */
 void TextEditor::updateCursorMap(QVector<User> onlineUserList, QVector<User> completeUserList /*ignored*/) {
 
     std::vector<int> onlineUserIds{};
