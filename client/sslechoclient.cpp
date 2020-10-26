@@ -79,7 +79,6 @@ void SslEchoClient::socketDisconnected()
 {
     qDebug() << "Server closed the connection.\n[HINT]Duplicated instance with the same user?";
     ServerDisconnected* serverDisconnected = new ServerDisconnected();
-    connect(serverDisconnected, &ServerDisconnected::quitClicked, this, &SslEchoClient::quitApp);
     serverDisconnected->setWindowTitle("Server disconnected");
     serverDisconnected->setModal(true);
     serverDisconnected->exec();
