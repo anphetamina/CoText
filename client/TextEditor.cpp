@@ -967,7 +967,6 @@ void TextEditor::updateAlignment(Qt::Alignment align, QSymbol symbol) {
         c.setBlockFormat(f);
     } catch (const std::exception &e) {
         qDebug() << "[EXCEPTION]"  << "TextEditor::updateAlignment" << __PRETTY_FUNCTION__ << e.what();
-        resyncWithSharedEditor();
     }
 }
 

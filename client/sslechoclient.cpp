@@ -275,14 +275,14 @@ void SslEchoClient::dispatch(PacketHandler rcvd_packet, QWebSocket* pClient) {
             qDebug() << "PACK_TYPE_MSG messaggio ricevuto: siteID:" << msg->getSiteId() << " char: " << msg->getQS().getC();
             switch (msg->getType()) {
                 case(MSG_INSERT_SYM): {
-                    emit insertReceived(msg->getQS());
                     qDebug() << "received add symbol";
+                    emit insertReceived(msg->getQS());
                     break;
                 }
 
                 case(MSG_ERASE_SYM): {
-                    emit eraseReceived(msg->getQS());
                     qDebug() << "received del symbol";
+                    emit eraseReceived(msg->getQS());
                     break;
                 }
             }
