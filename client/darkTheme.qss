@@ -73,7 +73,6 @@ QToolBar {
 QPushButton#DeletePushButton {
     background-color: transparent;
 
-
 }
 
 QToolBar#mainToolBar {

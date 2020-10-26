@@ -31,7 +31,7 @@ void OpenDocument::repaint(){
     for(QString document : documentList){
         if(mainWindow->windowTitle() != document){
             QListWidgetItem * item = new QListWidgetItem (document);
-            item->setSizeHint(QSize(319, 24));
+            item->setSizeHint(QSize(319, 25));
             
             
             ui->listWidget->addItem ( item );
@@ -50,7 +50,7 @@ void OpenDocument::repaint(){
             buttonIcon.addPixmap(pix, QIcon::Normal);
 	        buttonIcon.addPixmap(pix, QIcon::Disabled);
 	
-	
+			
 			but->isFlat();
 	        but->setIcon(buttonIcon);
             but->setIconSize(QSize(20, 20));
@@ -59,7 +59,7 @@ void OpenDocument::repaint(){
             w->layout()->addWidget ( lab );
             w->layout()->addWidget ( but );
             //left, top, right, bottom
-            w->layout()->setContentsMargins ( 1, 0, 1, 1 );
+            w->layout()->setContentsMargins ( 1, 1, 1, 1 );
 
             connect(but, &DeletePushButton::releasedWithIndex,this, &OpenDocument::buttonPressed);
 
