@@ -41,13 +41,11 @@ CREATE TABLE `permission` (
 --
 
 INSERT INTO `permission` (`ID`, `UserID`, `DocumentID`, `DocumentName`, `DocumentPath`, `URI`) VALUES
-(1, 1, 12, 'AppuntiSofteng', NULL, NULL),
 (2, 2, 12, 'AppuntiSofteng', NULL, NULL),
 (3, 4, 12, 'AppuntiSofteng', NULL, NULL),
 (4, 7, 12, 'AppuntiSofteng', NULL, NULL),
 (5, 13, 12, 'AppuntiSofteng', NULL, NULL),
 (6, 14, 12, 'AppuntiSofteng', NULL, NULL),
-(7, 1, 33, 'Document1', NULL, NULL),
 (8, 7, 33, 'Document1', NULL, NULL);
 
 -- --------------------------------------------------------
