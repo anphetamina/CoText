@@ -39,7 +39,6 @@ public:
 	QColor getUserColor(int userId) const;
     SharedEditor getEditor() const;
     std::vector<int> getIndex() const;
-    QString getText() const;
     void filePrintPdf(QString filename);
 
     std::atomic<bool> isFromRemote;
@@ -50,7 +49,6 @@ private:
     SharedEditor editor;
     
     std::vector<int> index;
-    std::vector<std::vector<QSymbol>> testSymbols;
     int currentSelectedChars;
     
     UserHighlighter highlighter;
@@ -60,6 +58,7 @@ private:
     std::atomic<bool> copiedFromOutside;
     std::atomic<bool> draggedFromOutside;
     std::atomic<bool> mousePressed;
+    std::atomic<bool> undoRedoFlag;
     std::atomic<bool> isResyncing = false;
 
     QFontComboBox *fontComboBox;
@@ -106,6 +105,8 @@ private slots:
     void toggleUserColors();
     void clipboardDataChange();
     void textChanged();
+    void undo();
+    void redo();
 
 protected:
     void focusInEvent(QFocusEvent *e) override;

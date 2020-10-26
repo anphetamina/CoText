@@ -23,7 +23,6 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     index({0}),
     editor(SharedEditor(siteId)),
     isFromRemote(false),
-    testSymbols({{}}),
     cursorMap({}),
     currentSelectedChars(0),
     highlighter(*this, document()),
@@ -32,6 +31,7 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     copiedFromOutside(true),
     draggedFromOutside(true),
     mousePressed(false),
+    undoRedoFlag(false),
     documentId(0),
     documentName(QString()) {
 
@@ -83,9 +83,9 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
      */
 
     connect(this, &QTextEdit::undoAvailable, ui.actionUndo, &QAction::setEnabled);
-    connect(ui.actionUndo, &QAction::triggered, this, &QTextEdit::undo);
+    connect(ui.actionUndo, &QAction::triggered, this, &TextEditor::undo);
     connect(this, &QTextEdit::redoAvailable, ui.actionRedo, &QAction::setEnabled);
-    connect(ui.actionRedo, &QAction::triggered, this, &QTextEdit::redo);
+    connect(ui.actionRedo, &QAction::triggered, this, &TextEditor::redo);
 
     ui.actionCopy->setEnabled(false);
     connect(this, &QTextEdit::copyAvailable, ui.actionCopy, &QAction::setEnabled);
@@ -102,25 +102,6 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
         ui.actionPaste->setEnabled(md->hasText());
     }
     connect(ui.actionPaste, &QAction::triggered, this, &QTextEdit::paste);
-
-    /**
-     * testing code
-     */
-
-    /*QTextCharFormat f;
-    f.setFontWeight(QFont::Bold);
-    for (int i = 0; i < 200; i++) {
-        for (int j = 0; j < 40; j++) {
-            QSymbol s = editor.localInsert(i, j,'a', f);
-            testSymbols[i].push_back(s);
-        }
-        QSymbol s = editor.localInsert(i, editor.getSymbols()[i].size(), QChar::LineFeed, f);
-        testSymbols[i].push_back(s);
-        testSymbols.emplace_back();
-    }
-    editor.clear();
-
-    openDocument(testSymbols);*/
 }
 
 void TextEditor::setFontFamily(const QFont &font) {
@@ -132,7 +113,7 @@ void TextEditor::setFontFamily(const QFont &font) {
 void TextEditor::setFontSize(const QString &text) {
     bool ok;
     qreal pointSize = text.toFloat(&ok);
-    if (ok && pointSize > 0 && pointSize <= QFontDatabase::standardSizes().back()) {
+    if (ok && pointSize > 0 && pointSize <= QFontDatabase::standardSizes().back() && pointSize >= QFontDatabase::standardSizes().front()) {
         QTextCharFormat f;
         f.setFontPointSize(pointSize);
         mergeCurrentCharFormat(f);
@@ -322,6 +303,21 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
             std::vector<QSymbol> insertedSymbols;
             std::vector<QSymbol> insertedLineFeeds;
 
+            /**
+             * always send an update alignment for the linefeed of the previous block
+             * where the insert has been done
+             */
+
+            int firstBlockPosition = document()->findBlock(position).position();
+            if (firstBlockPosition == 0) {
+                insertedLineFeeds.push_back(QSymbol(QChar(), FIRST_BLOCK_ID, {}, QTextCharFormat()));
+            } else {
+                int row = getRow(firstBlockPosition-1);
+                int col = getCol(row, firstBlockPosition-1);
+                QSymbol symbol = editor.getSymbol(row, col);
+                insertedLineFeeds.push_back(symbol);
+            }
+
             while (charsAdded > 0) {
                 try {
                     QChar addedChar = document()->characterAt(position);
@@ -363,8 +359,28 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
 
             emit symbolsInserted(insertedSymbols, editor.getSiteId());
 
-            for (const QSymbol& sym : insertedLineFeeds) {
-                emit textAlignmentChanged(document()->findBlock(position-1).blockFormat().alignment(), sym, editor.getSiteId());
+
+            emit textAlignmentChanged(document()->findBlock(firstBlockPosition).blockFormat().alignment(), insertedLineFeeds.front(), editor.getSiteId());
+
+
+            for (int i = 1; i < insertedLineFeeds.size(); i++) {
+                /**
+                 * undo/redo workaround to avoid alignment mismatches in the last block
+                 * checks if the latest linefeed does not match with the latest insert symbol
+                 * so it does not emit the update alignment packet for the latest block
+                 */
+
+                /**
+                 * lastLineFeed undoRedo
+                 * T F -> T
+                 * T T -> F
+                 * F T -> T
+                 * F F -> T
+                 */
+
+                if (!(insertedLineFeeds[i] == insertedSymbols.back() && undoRedoFlag)) {
+                    emit textAlignmentChanged(document()->findBlock(position - 1).blockFormat().alignment(), insertedLineFeeds[i], editor.getSiteId());
+                }
             }
         } catch (const std::exception &e) {
             qDebug() << "[EXCEPTION]"  << "TextEditor::contentsChange charsAdded" << e.what();
@@ -372,6 +388,8 @@ void TextEditor::contentsChange(int position, int charsRemoved, int charsAdded) 
         }
 
     }
+
+    undoRedoFlag = false;
 
     printSymbols(__PRETTY_FUNCTION__);
 }
@@ -832,14 +850,19 @@ void TextEditor::toggleUserColors() {
 
 QColor TextEditor::getUserColor(int userId) const {
 
+    QColor color = QColorConstants::White;
+
     if (MainWindow *mw = dynamic_cast<MainWindow*>(parent)) {
 
-        return mw->getUserColor(userId);
+        try {
+            color = mw->getUserColor(userId);
+        } catch (const std::exception &e) {
+            qDebug() << "[EXCEPTION]" << __PRETTY_FUNCTION__ << e.what();
+        }
 
     }
 
-    qDebug() << "color for" << userId << "not found";
-    return QColorConstants::White;
+    return color;
 }
 
 int TextEditor::getUserId(int row, int col) const {
@@ -1107,20 +1130,14 @@ void TextEditor::insertFromMimeData(const QMimeData *source) {
     QTextEdit::insertFromMimeData(source);
 }
 
-QString TextEditor::getText() const{
-    QString text;
-    const auto& symbols = editor.getSymbols();
-    for (int i = 0; i < symbols.size(); i++) {
-        for (int j = 0; j < symbols[i].size(); j++) {
-            const QSymbol &s = symbols[i][j];
-            if(s.isNewLine()){
-                text = text + "\r\n";
-            }else{
-                text = text + s.getC().toLatin1();
-            }
-        }
-    }
-    return text;
+void TextEditor::undo() {
+    undoRedoFlag = true;
+    QTextEdit::undo();
+}
+
+void TextEditor::redo() {
+    undoRedoFlag = true;
+    QTextEdit::redo();
 }
 
 void TextEditor::filePrintPdf(QString filename){
