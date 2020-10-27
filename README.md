@@ -14,7 +14,8 @@ In particular, any user will be able to:
 Additional features are:
 - :white_check_mark: Persistency (auto-saving performed by server)
 - :white_check_mark: Multi-platform compatibility
-- :white_check_mark: Low footprint on bandwith, memory and CPU.
+
+[comment]: <> (- :white_check_mark: Low footprint on bandwith, memory and CPU.)
 
 ## :question: How to run CoText?
 If you want to start server on a given port  you can specify it as the first parameter. If no port is given the server will use the default 12345.
