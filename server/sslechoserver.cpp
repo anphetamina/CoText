@@ -94,9 +94,9 @@ void SslEchoServer::processTextMessage(QString message) {
 //! [processTextMessage]
 
 //! [processBinaryMessage]
-void SslEchoServer::processBinaryMessage(QByteArray message) {
+void SslEchoServer::processBinaryMessage(const QByteArray& message) {
     // Parse packet
-    this->packetParse(message);
+    this->packetParse(const_cast<QByteArray&>(message));
 
     /* //Send back (echoing) the packets for debug
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
@@ -185,7 +185,7 @@ void SslEchoServer::onSslErrors(const QList<QSslError> &) {
  *
  * @param rcvd_packet
  */
-void SslEchoServer::packetParse(QByteArray rcvd_packet) {
+void SslEchoServer::packetParse(QByteArray &rcvd_packet) {
 
     // Create a new packet buffer (used to w8 and receive for the full packet)
     PacketBuffer *pBuffer = new PacketBuffer();
@@ -194,10 +194,14 @@ void SslEchoServer::packetParse(QByteArray rcvd_packet) {
     QDataStream streamRcv(&rcvd_packet, QIODevice::ReadOnly);
 
 
-    // As first parse the headers field (MAGIC_VAL|Flags|type|payloadLen)
-    streamRcv >> *pBuffer;
+    // If the packet buffer is empty parse (deserialize) the headers field (MAGIC_VAL|Flags|type|payloadLen)
+    if (pBuffer->getDataSize() == 0) {
+        streamRcv >> *pBuffer;
+    }
     // Get the payload content
     QByteArray payload = rcvd_packet.mid(4 + sizeof(quint32));//header+Payloadlen skip
+    rcvd_packet.clear();
+
     pBuffer->append(payload);
 
     if (pBuffer->isComplete()) {
@@ -227,6 +231,8 @@ void SslEchoServer::packetParse(QByteArray rcvd_packet) {
             //socketAbort(m_webSocket);				// Terminate connection with the client
         }
     }
+    delete pBuffer;
+    
 }
 
 /**
