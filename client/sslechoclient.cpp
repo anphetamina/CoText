@@ -361,10 +361,50 @@ void SslEchoClient::dispatch(QSharedPointer<Packet>  rcvd_packet, QWebSocket* pC
 
 void SslEchoClient::sendInsert(std::vector<QSymbol> symbols, int siteId) {
     if (symbols.size() > 1) {
-        QVector<QSymbol> syms(symbols.begin(), symbols.end());
-        BigMessage msg = BigMessage(MSG_INSERT_SYM, syms, siteId);
-        msg.send(*pServer);
+
+            int tail = 0;
+            int chunk = 2700;
+            int length = 0;
+            int i = 0;
+
+            if(symbols.size() < chunk){ //non devo spezzare
+                QVector<QSymbol> syms(symbols.begin(), symbols.end());
+                BigMessage msg = BigMessage(MSG_INSERT_SYM, syms, siteId);
+                msg.send(*pServer);
+            } else {
+                tail = symbols.size()%chunk;
+
+                if(tail == 0) {
+                    //servono size/chunk cicli esatti per mandarlo
+                    for(i = 0; i < symbols.size()/chunk; i++) {
+                        //i = 0 -> length = 0
+                        //i = 1 -> length = 2700, length + chunk = 2chunk
+                        //i = 2 -> length = 2chunk, length + chunk = 3chunk
+                        //...
+                        QVector<QSymbol> syms(symbols.begin()+length, symbols.begin()+length+chunk);
+                        BigMessage msg = BigMessage(MSG_INSERT_SYM, syms, siteId);
+                        msg.send(*pServer);
+                        length += chunk;
+                    }
+                } else {
+                    // servono quegli stessi cicli + mando l'ultimo pezzo
+                    for(i = 0; i < symbols.size()/chunk; i++) {
+                        QVector<QSymbol> syms(symbols.begin()+length, symbols.begin()+length+chunk);
+                        BigMessage msg = BigMessage(MSG_INSERT_SYM, syms, siteId);
+                        msg.send(*pServer);
+                        length += chunk;
+                    }
+
+                    //mando l'ultimo pezzo BigMessage end-tail -> end
+                    QVector<QSymbol> syms(symbols.end()-tail, symbols.end());
+                    BigMessage msg = BigMessage(MSG_INSERT_SYM, syms, siteId);
+                    msg.send(*pServer);
+
+                }
+            }
+
         qDebug() << "sent add block";
+
     } else {
         QSymbol symbol = symbols.front();
         Message msg = Message(MSG_INSERT_SYM, symbol, siteId);
@@ -375,10 +415,50 @@ void SslEchoClient::sendInsert(std::vector<QSymbol> symbols, int siteId) {
 
 void SslEchoClient::sendErase(std::vector<QSymbol> symbols, int siteId) {
     if (symbols.size() > 1) {
-        QVector<QSymbol> syms(symbols.begin(), symbols.end());
-        BigMessage msg = BigMessage(MSG_ERASE_SYM, syms, siteId);
-        msg.send(*pServer);
+
+        int tail = 0;
+        int chunk = 2700;
+        int length = 0;
+        int i = 0;
+
+        if(symbols.size() < chunk){ //non devo spezzare
+            QVector<QSymbol> syms(symbols.begin(), symbols.end());
+            BigMessage msg = BigMessage(MSG_ERASE_SYM, syms, siteId);
+            msg.send(*pServer);
+        } else {
+            tail = symbols.size()%chunk;
+
+            if(tail == 0) {
+                //servono size/chunk cicli esatti per mandarlo
+                for(i = 0; i < symbols.size()/chunk; i++) {
+                    //i = 0 -> length = 0
+                    //i = 1 -> length = 2700, length + chunk = 2chunk
+                    //i = 2 -> length = 2chunk, length + chunk = 3chunk
+                    //...
+                    QVector<QSymbol> syms(symbols.begin()+length, symbols.begin()+length+chunk);
+                    BigMessage msg = BigMessage(MSG_ERASE_SYM, syms, siteId);
+                    msg.send(*pServer);
+                    length += chunk;
+                }
+            } else {
+                // servono quegli stessi cicli + mando l'ultimo pezzo
+                for(i = 0; i < symbols.size()/chunk; i++) {
+                    QVector<QSymbol> syms(symbols.begin()+length, symbols.begin()+length+chunk);
+                    BigMessage msg = BigMessage(MSG_ERASE_SYM, syms, siteId);
+                    msg.send(*pServer);
+                    length += chunk;
+                }
+
+                //mando l'ultimo pezzo BigMessage end-tail -> end
+                QVector<QSymbol> syms(symbols.end()-tail, symbols.end());
+                BigMessage msg = BigMessage(MSG_ERASE_SYM, syms, siteId);
+                msg.send(*pServer);
+
+            }
+        }
+
         qDebug() << "sent del block";
+
     } else {
         QSymbol symbol = symbols.front();
         Message msg = Message(MSG_ERASE_SYM, symbol, siteId);
