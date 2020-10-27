@@ -29,7 +29,7 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     isUserColorsToggled(false),
     hasLostFocus(false),
     copiedFromOutside(true),
-    draggedFromOutside(true),
+    draggedFromOutside(false),
     mousePressed(false),
     undoRedoFlag(false),
     documentId(0),
