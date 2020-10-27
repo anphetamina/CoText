@@ -31,6 +31,7 @@ TextEditor::TextEditor(int siteId, Ui::MainWindow &ui, QWidget *parent) :
     copiedFromOutside(true),
     draggedFromOutside(false),
     mousePressed(false),
+    beenDropped(false),
     undoRedoFlag(false),
     documentId(0),
     documentName(QString()) {
@@ -1124,9 +1125,14 @@ void TextEditor::focusOutEvent(QFocusEvent *e) {
 }
 
 void TextEditor::dragEnterEvent(QDragEnterEvent *e) {
-    draggedFromOutside = !mousePressed & !hasLostFocus;
+    draggedFromOutside = !mousePressed;
     qDebug() << "dragged from" << (draggedFromOutside ? "outside" : "inside");
     QTextEdit::dragEnterEvent(e);
+}
+
+void TextEditor::dropEvent(QDropEvent *e) {
+    beenDropped = true;
+    QTextEdit::dropEvent(e);
 }
 
 void TextEditor::mousePressEvent(QMouseEvent *e) {
@@ -1140,13 +1146,16 @@ void TextEditor::mouseReleaseEvent(QMouseEvent *e) {
 }
 
 void TextEditor::insertFromMimeData(const QMimeData *source) {
-    if (copiedFromOutside || draggedFromOutside) {
-        qDebug() << "paste format disabled";
-        setAcceptRichText(false);
-    } else {
-        qDebug() << "paste format enabled";
-        setAcceptRichText(true);
+    bool accept = !copiedFromOutside;
+
+    if (beenDropped) {
+        accept = !draggedFromOutside;
+        beenDropped = false;
     }
+
+    qDebug() << "paste format" << (accept ? "enabled" : "disabled");
+
+    setAcceptRichText(accept);
     QTextEdit::insertFromMimeData(source);
 }
 

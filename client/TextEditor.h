@@ -57,6 +57,7 @@ private:
     std::atomic<bool> hasLostFocus;
     std::atomic<bool> copiedFromOutside;
     std::atomic<bool> draggedFromOutside;
+    std::atomic<bool> beenDropped;
     std::atomic<bool> mousePressed;
     std::atomic<bool> undoRedoFlag;
     std::atomic<bool> isResyncing = false;
@@ -115,6 +116,7 @@ protected:
     void mousePressEvent(QMouseEvent *e) override;
     void mouseReleaseEvent(QMouseEvent *e) override;
     void insertFromMimeData(const QMimeData *source) override;
+    void dropEvent(QDropEvent *e) override;
 
 signals:
     void symbolsInserted(std::vector<QSymbol> symbols, int siteId);
