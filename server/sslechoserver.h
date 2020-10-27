@@ -33,7 +33,7 @@ private Q_SLOTS:
 
     void processTextMessage(QString message);
 
-    void processBinaryMessage(QByteArray message);
+    void processBinaryMessage(const QByteArray &message);
 
     void socketDisconnected();
 
@@ -55,7 +55,7 @@ private:
     // Association of opened document and alignement
     QMap<int, QVector<AlignMessage>> alignmentMapping;
 
-    void packetParse(QByteArray rcvd_packet);
+    void packetParse(QByteArray &rcvd_packet);
 
     void dispatch(QSharedPointer<Packet> rcvd_packet, QWebSocket *pClient);
 
